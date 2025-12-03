@@ -260,6 +260,31 @@
             border: 2px solid var(--white);
         }
 
+        .notification-badge { position: absolute; top: -4px; right: -4px; background: var(--red); color: var(--white); font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; border-radius: 9px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--white); }
+        .notification-wrapper { position: relative; }
+        .notification-dropdown { position: absolute; top: calc(100% + 8px); right: 0; width: 360px; max-height: 480px; background: var(--white); border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.2s; z-index: 1000; overflow: hidden; }
+        .notification-dropdown.show { opacity: 1; visibility: visible; transform: translateY(0); }
+        .notif-dropdown-header { padding: 16px 20px; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center; }
+        .notif-dropdown-header h3 { font-size: 16px; font-weight: 700; color: var(--gray-800); }
+        .notif-dropdown-header button { background: none; border: none; color: var(--navy); font-size: 13px; font-weight: 600; cursor: pointer; }
+        .notif-dropdown-list { max-height: 360px; overflow-y: auto; }
+        .notif-dropdown-item { padding: 14px 20px; display: flex; gap: 12px; border-bottom: 1px solid var(--gray-100); cursor: pointer; transition: background 0.2s; }
+        .notif-dropdown-item:hover { background: var(--gray-50); }
+        .notif-dropdown-item.unread { background: #dbeafe; }
+        .notif-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .notif-icon.friend { background: #dcfce7; color: var(--green); }
+        .notif-icon.message { background: #dbeafe; color: #3b82f6; }
+        .notif-icon svg { width: 20px; height: 20px; }
+        .notif-content { flex: 1; min-width: 0; }
+        .notif-content h4 { font-size: 14px; font-weight: 600; color: var(--gray-800); margin-bottom: 2px; }
+        .notif-content p { font-size: 13px; color: var(--gray-500); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .notif-content .time { font-size: 11px; color: var(--gray-400); margin-top: 4px; }
+        .notif-dropdown-footer { padding: 12px 20px; border-top: 1px solid var(--gray-200); text-align: center; }
+        .notif-dropdown-footer a { color: var(--navy); font-size: 14px; font-weight: 600; text-decoration: none; }
+        .notif-empty { padding: 40px 20px; text-align: center; color: var(--gray-400); }
+        .notif-empty svg { width: 48px; height: 48px; margin-bottom: 12px; opacity: 0.5; }
+        }
+
         /* ========== PROFILE CONTENT ========== */
         .profile-page {
             padding: 24px;
@@ -1001,10 +1026,17 @@
                 <h1 class="page-title">My Profile</h1>
             </div>
             <div class="topbar-right">
-                <button class="icon-btn">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-                    <span class="notification-dot" id="notificationDot" style="display: none;"></span>
-                </button>
+                <div class="notification-wrapper">
+                    <button class="icon-btn" id="notificationBell" onclick="toggleNotifications(event)">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                        <span class="notification-badge" id="notifBadge" style="display: none;">0</span>
+                    </button>
+                    <div class="notification-dropdown" id="notificationDropdown">
+                        <div class="notif-dropdown-header"><h3>Notifications</h3><button onclick="markAllNotificationsRead()">Mark all read</button></div>
+                        <div class="notif-dropdown-list" id="notifList"></div>
+                        <div class="notif-dropdown-footer"><a href="notifications.html">View All Notifications</a></div>
+                    </div>
+                </div>
             </div>
         </header>
 
@@ -1328,6 +1360,59 @@
         // =============================================
         // INIT
         // =============================================
+        // =============================================
+        // NOTIFICATIONS
+        // =============================================
+        let notificationsList = [];
+
+        async function loadNotifications() {
+            const { data } = await supabase.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(10);
+            notificationsList = data || [];
+            renderNotifications();
+        }
+
+        function renderNotifications() {
+            const list = document.getElementById('notifList');
+            const badge = document.getElementById('notifBadge');
+            const unread = notificationsList.filter(n => !n.is_read).length;
+            if (unread > 0) { badge.textContent = unread > 9 ? '9+' : unread; badge.style.display = 'flex'; }
+            else { badge.style.display = 'none'; }
+            if (notificationsList.length === 0) {
+                list.innerHTML = '<div class="notif-empty"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg><p>No notifications</p></div>';
+                return;
+            }
+            list.innerHTML = notificationsList.map(n => {
+                const iconClass = n.type.includes('friend') ? 'friend' : 'message';
+                return `<div class="notif-dropdown-item ${n.is_read ? '' : 'unread'}" onclick="handleNotifClick('${n.id}','${n.type}')"><div class="notif-icon ${iconClass}"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg></div><div class="notif-content"><h4>${escapeHtml(n.title)}</h4><p>${escapeHtml(n.body||'')}</p><div class="time">${formatNotifTime(n.created_at)}</div></div></div>`;
+            }).join('');
+        }
+
+        async function handleNotifClick(id, type) {
+            await supabase.from('notifications').update({ is_read: true }).eq('id', id);
+            const n = notificationsList.find(x => x.id === id); if (n) n.is_read = true;
+            renderNotifications();
+            if (type === 'friend_request') window.location.href = 'friends.html';
+            else if (type.includes('message')) window.location.href = 'messages.html';
+            document.getElementById('notificationDropdown').classList.remove('show');
+        }
+
+        async function markAllNotificationsRead() {
+            await supabase.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id);
+            notificationsList.forEach(n => n.is_read = true);
+            renderNotifications();
+        }
+
+        function toggleNotifications(event) {
+            event.stopPropagation();
+            document.getElementById('notificationDropdown').classList.toggle('show');
+        }
+
+        function formatNotifTime(d) { const s = Math.floor((new Date() - new Date(d)) / 1000); if (s < 60) return 'Just now'; if (s < 3600) return `${Math.floor(s/60)}m ago`; if (s < 86400) return `${Math.floor(s/3600)}h ago`; return `${Math.floor(s/86400)}d ago`; }
+
+        function subscribeToNotifications() {
+            supabase.channel('profile-notifications').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${currentUser.id}` }, (p) => { notificationsList.unshift(p.new); renderNotifications(); }).subscribe();
+        }
+
         async function init() {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) { window.location.href = 'index.html'; return; }
@@ -1354,6 +1439,16 @@
             if (localStorage.getItem('myub_darkMode') === 'true') {
                 document.body.classList.add('dark-mode');
             }
+
+            await loadNotifications();
+            subscribeToNotifications();
+
+            // Close dropdowns on outside click
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.notification-wrapper')) {
+                    document.getElementById('notificationDropdown').classList.remove('show');
+                }
+            });
 
             document.getElementById('loadingState').style.display = 'none';
             document.getElementById('mainContent').style.display = 'block';

@@ -180,6 +180,52 @@
         .modal-body { padding: 24px; }
         .modal-footer { padding: 16px 24px; border-top: 1px solid var(--gray-200); display: flex; justify-content: flex-end; gap: 12px; }
 
+        /* Profile Modal Content */
+        .profile-modal-content { text-align: center; }
+        .profile-modal-avatar { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); display: flex; align-items: center; justify-content: center; color: var(--white); font-family: 'Sora', sans-serif; font-weight: 700; font-size: 28px; margin: 0 auto 16px; overflow: hidden; position: relative; }
+        .profile-modal-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-modal-avatar .online-dot { position: absolute; bottom: 4px; right: 4px; width: 16px; height: 16px; background: var(--green); border-radius: 50%; border: 3px solid var(--white); }
+        .profile-modal-avatar .online-dot.offline { background: var(--gray-400); }
+        .profile-modal-name { font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 700; color: var(--gray-800); margin-bottom: 4px; }
+        .profile-modal-program { font-size: 14px; color: var(--gray-500); margin-bottom: 4px; }
+        .profile-modal-status { font-size: 13px; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .profile-modal-status.online { color: var(--green); }
+        .profile-modal-status.offline { color: var(--gray-400); }
+        .profile-modal-bio { font-size: 14px; color: var(--gray-600); background: var(--gray-50); padding: 12px 16px; border-radius: 10px; margin-bottom: 16px; text-align: left; }
+        .profile-modal-bio:empty { display: none; }
+        .profile-modal-meta { display: flex; justify-content: center; gap: 24px; padding: 12px 0; border-top: 1px solid var(--gray-200); margin-top: 8px; }
+        .profile-modal-meta-item { text-align: center; }
+        .profile-modal-meta-item .value { font-family: 'Sora', sans-serif; font-weight: 700; color: var(--gray-800); font-size: 18px; }
+        .profile-modal-meta-item .label { font-size: 12px; color: var(--gray-500); }
+        .profile-modal-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+        .profile-modal-actions .btn-row { display: flex; gap: 8px; }
+        .profile-modal-actions .btn-row .btn { flex: 1; justify-content: center; }
+        .profile-modal-link { display: inline-block; margin-top: 12px; color: var(--navy); font-size: 13px; font-weight: 600; text-decoration: none; }
+        .profile-modal-link:hover { text-decoration: underline; }
+
+        /* Form Elements */
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; font-size: 14px; font-weight: 600; color: var(--gray-700); margin-bottom: 6px; }
+        .form-select, .form-textarea { width: 100%; padding: 12px 14px; border: 2px solid var(--gray-200); border-radius: 10px; font-family: 'Outfit', sans-serif; font-size: 14px; transition: all 0.2s; background: var(--white); }
+        .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--navy); }
+        .form-textarea { resize: vertical; min-height: 80px; }
+
+        /* Blocked User Item */
+        .blocked-user-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 10px; background: var(--gray-50); margin-bottom: 8px; }
+        .blocked-user-item:last-child { margin-bottom: 0; }
+        .blocked-user-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); display: flex; align-items: center; justify-content: center; color: var(--white); font-weight: 600; font-size: 14px; flex-shrink: 0; overflow: hidden; }
+        .blocked-user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .blocked-user-info { flex: 1; min-width: 0; }
+        .blocked-user-name { font-size: 14px; font-weight: 600; color: var(--gray-800); }
+        .blocked-user-date { font-size: 12px; color: var(--gray-500); }
+        .blocked-empty { text-align: center; padding: 40px 20px; color: var(--gray-400); }
+
+        /* Danger button variant */
+        .btn-outline-danger { background: transparent; border: 2px solid #fee2e2; color: var(--red); }
+        .btn-outline-danger:hover { background: #fee2e2; }
+        .btn-warning { background: #fef3c7; color: #b45309; }
+        .btn-warning:hover { background: #fde68a; }
+
         /* Dark Mode */
         body.dark-mode { background: var(--gray-800); }
         body.dark-mode .sidebar { background: #0a1628; }
@@ -280,10 +326,6 @@
                         <div class="notif-dropdown-footer"><a href="notifications.html">View All Notifications</a></div>
                     </div>
                 </div>
-                <button class="icon-btn" onclick="toggleDarkMode()" title="Toggle dark mode">
-                    <svg id="sunIcon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-                    <svg id="moonIcon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display: none;"><path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
-                </button>
             </div>
         </header>
 
@@ -291,7 +333,7 @@
             <div class="stats-bar">
                 <div class="stat-card"><div class="stat-value" id="totalFriends">0</div><div class="stat-label">Total Friends</div></div>
                 <div class="stat-card online"><div class="stat-value" id="onlineFriends">0</div><div class="stat-label">Online Now</div></div>
-                <div class="stat-card"><div class="stat-value" id="pendingRequests">0</div><div class="stat-label">Pending</div></div>
+                <div class="stat-card" style="cursor: pointer;" onclick="openBlockedModal()" title="View blocked users"><div class="stat-value" id="blockedCount">0</div><div class="stat-label">Blocked</div></div>
             </div>
 
             <div class="tabs">
@@ -345,6 +387,78 @@
         </div>
     </div>
 
+    <!-- Profile Preview Modal -->
+    <div class="modal-overlay" id="profileModal">
+        <div class="modal" style="max-width: 420px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Profile</h3>
+                <button class="modal-close" onclick="closeProfileModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+            <div class="modal-body" id="profileModalBody">
+                <!-- Profile content loaded dynamically -->
+            </div>
+            <div class="modal-footer" id="profileModalFooter">
+                <!-- Actions loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Modal -->
+    <div class="modal-overlay" id="reportModal">
+        <div class="modal" style="max-width: 440px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Report User</h3>
+                <button class="modal-close" onclick="closeReportModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+            <div class="modal-body">
+                <p style="color: var(--gray-600); margin-bottom: 16px; font-size: 14px;">Help us keep MyUB safe. Reports are confidential and reviewed by our admin team.</p>
+                <div class="form-group">
+                    <label class="form-label">Reason for report</label>
+                    <select class="form-select" id="reportReason">
+                        <option value="">Select a reason...</option>
+                        <option value="spam">Spam or fake account</option>
+                        <option value="harassment">Harassment or bullying</option>
+                        <option value="hate_speech">Hate speech</option>
+                        <option value="inappropriate_content">Inappropriate content</option>
+                        <option value="impersonation">Impersonation</option>
+                        <option value="threatening_violence">Threatening violence</option>
+                        <option value="self_harm">Self-harm or suicide</option>
+                        <option value="illegal_activity">Illegal activity</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Additional details (optional)</label>
+                    <textarea class="form-textarea" id="reportDescription" placeholder="Provide any additional context..." rows="3"></textarea>
+                </div>
+                <input type="hidden" id="reportUserId">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeReportModal()">Cancel</button>
+                <button class="btn btn-danger" onclick="submitReport()">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    Submit Report
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Blocked Users Modal -->
+    <div class="modal-overlay" id="blockedModal">
+        <div class="modal" style="max-width: 480px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Blocked Users</h3>
+                <button class="modal-close" onclick="closeBlockedModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+            <div class="modal-body" id="blockedModalBody" style="max-height: 400px; overflow-y: auto;">
+                <!-- Blocked users loaded dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeBlockedModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
     <div class="toast" id="toast"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg><span id="toastMessage">Success!</span></div>
 
     <script>
@@ -357,7 +471,10 @@
         let incomingRequests = [];
         let outgoingRequests = [];
         let notifications = [];
+        let blockedUsers = [];
+        let blockedByUsers = []; // Users who blocked current user
         let confirmCallback = null;
+        let selectedProfileUser = null;
 
         async function init() {
             const { data: { session } } = await supabase.auth.getSession();
@@ -365,11 +482,9 @@
             currentUser = session.user;
             if (localStorage.getItem('myub_darkMode') === 'true') {
                 document.body.classList.add('dark-mode');
-                document.getElementById('sunIcon').style.display = 'none';
-                document.getElementById('moonIcon').style.display = 'block';
             }
             await updateOnlineStatus(true);
-            await Promise.all([loadFriends(), loadRequests(), loadNotifications()]);
+            await Promise.all([loadFriends(), loadRequests(), loadNotifications(), loadBlockedUsers()]);
             subscribeToRealtime();
             startHeartbeat();
             document.getElementById('loadingScreen').style.display = 'none';
@@ -413,7 +528,17 @@
                 const name = f.full_name || `${f.first_name} ${f.last_name}`;
                 const initials = getInitials(name);
                 const lastSeen = f.last_seen ? formatTimeAgo(f.last_seen) : 'Never';
-                return `<div class="friend-card"><div class="friend-avatar">${f.avatar_url ? `<img src="${f.avatar_url}" alt="">` : initials}<div class="online-indicator ${f.is_online ? '' : 'offline'}"></div></div><div class="friend-info"><div class="friend-name">${escapeHtml(name)}${f.is_online ? '<span class="online-text">● Online</span>' : `<span class="offline-text">● ${lastSeen}</span>`}</div><div class="friend-program">${escapeHtml(f.program_name || 'Student')}</div></div><div class="friend-actions"><button class="btn btn-primary btn-sm" onclick="startMessage('${f.id}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>Message</button><button class="btn btn-icon btn-danger" onclick="confirmRemoveFriend('${f.id}', '${escapeHtml(name)}')" title="Remove"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 7a4 4 0 11-8 0 4 4 0 018 0zM9 14a6 6 0 00-6 6v1h12v-1a6 6 0 00-6-6zM21 12h-6"/></svg></button></div></div>`;
+                return `<div class="friend-card">
+                    <div class="friend-avatar" onclick="openProfileModal('${f.id}')" style="cursor:pointer;">${f.avatar_url ? `<img src="${f.avatar_url}" alt="">` : initials}<div class="online-indicator ${f.is_online ? '' : 'offline'}"></div></div>
+                    <div class="friend-info" onclick="openProfileModal('${f.id}')" style="cursor:pointer;">
+                        <div class="friend-name">${escapeHtml(name)}${f.is_online ? '<span class="online-text">● Online</span>' : `<span class="offline-text">● ${lastSeen}</span>`}</div>
+                        <div class="friend-program">${escapeHtml(f.program_name || 'Student')}</div>
+                    </div>
+                    <div class="friend-actions">
+                        <button class="btn btn-primary btn-sm" onclick="startMessage('${f.id}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>Message</button>
+                        <button class="btn btn-icon btn-danger" onclick="confirmRemoveFriend('${f.id}', '${escapeHtml(name)}')" title="Remove"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 7a4 4 0 11-8 0 4 4 0 018 0zM9 14a6 6 0 00-6 6v1h12v-1a6 6 0 00-6-6zM21 12h-6"/></svg></button>
+                    </div>
+                </div>`;
             }).join('') + '</div>';
         }
 
@@ -506,18 +631,29 @@
             container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--gray-400);">Searching...</div>';
             const { data: results } = await supabase.from('profiles').select('id, first_name, last_name, full_name, program_name, avatar_url, is_online').or(`full_name.ilike.%${query}%,first_name.ilike.%${query}%,last_name.ilike.%${query}%,program_name.ilike.%${query}%`).neq('id', currentUser.id).limit(20);
             if (!results || results.length === 0) { container.innerHTML = '<div class="empty-state"><h3>No students found</h3><p>Try a different search</p></div>'; return; }
+            
+            // Filter out blocked users (both directions)
+            const blockedIds = blockedUsers.map(b => b.blocked_id);
+            const filteredResults = results.filter(u => !blockedIds.includes(u.id) && !blockedByUsers.includes(u.id));
+            
+            if (filteredResults.length === 0) { container.innerHTML = '<div class="empty-state"><h3>No students found</h3><p>Try a different search</p></div>'; return; }
+            
             const friendIds = friends.map(f => f.id);
             const pendingOut = outgoingRequests.map(r => r.receiver.id);
             const pendingIn = incomingRequests.map(r => r.sender.id);
-            container.innerHTML = '<div class="friends-grid">' + results.map(u => {
+            container.innerHTML = '<div class="friends-grid">' + filteredResults.map(u => {
                 const name = u.full_name || `${u.first_name} ${u.last_name}`, initials = getInitials(name);
                 const isFriend = friendIds.includes(u.id), isPendingOut = pendingOut.includes(u.id), isPendingIn = pendingIn.includes(u.id);
                 let btn = '';
                 if (isFriend) btn = '<button class="btn btn-secondary btn-sm" disabled>Already Friends</button>';
                 else if (isPendingOut) btn = '<button class="btn btn-secondary btn-sm" disabled>Request Sent</button>';
                 else if (isPendingIn) btn = '<button class="btn btn-success btn-sm" onclick="switchTab(\'requests\')">Accept Request</button>';
-                else btn = `<button class="btn btn-primary btn-sm" onclick="sendFriendRequest('${u.id}','${escapeHtml(name)}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>Add Friend</button>`;
-                return `<div class="friend-card"><div class="friend-avatar">${u.avatar_url ? `<img src="${u.avatar_url}">` : initials}<div class="online-indicator ${u.is_online ? '' : 'offline'}"></div></div><div class="friend-info"><div class="friend-name">${escapeHtml(name)}</div><div class="friend-program">${escapeHtml(u.program_name||'Student')}</div></div><div class="friend-actions">${btn}</div></div>`;
+                else btn = `<button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); sendFriendRequest('${u.id}','${escapeHtml(name)}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>Add Friend</button>`;
+                return `<div class="friend-card" onclick="openProfileModal('${u.id}')" style="cursor:pointer;">
+                    <div class="friend-avatar">${u.avatar_url ? `<img src="${u.avatar_url}">` : initials}<div class="online-indicator ${u.is_online ? '' : 'offline'}"></div></div>
+                    <div class="friend-info"><div class="friend-name">${escapeHtml(name)}</div><div class="friend-program">${escapeHtml(u.program_name||'Student')}</div></div>
+                    <div class="friend-actions" onclick="event.stopPropagation();">${btn}</div>
+                </div>`;
             }).join('') + '</div>';
         }
         document.getElementById('findSearch')?.addEventListener('keypress', e => { if (e.key === 'Enter') searchStudents(); });
@@ -575,7 +711,7 @@
         function updateStats() {
             document.getElementById('totalFriends').textContent = friends.length;
             document.getElementById('onlineFriends').textContent = friends.filter(f => f.is_online).length;
-            document.getElementById('pendingRequests').textContent = incomingRequests.length + outgoingRequests.length;
+            document.getElementById('blockedCount').textContent = blockedUsers.length;
         }
 
         function switchTab(tab) {
@@ -583,6 +719,225 @@
             document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.getElementById(`${tab}Tab`).classList.add('active');
+        }
+
+        // =============================================
+        // BLOCKED USERS
+        // =============================================
+        async function loadBlockedUsers() {
+            // Users I blocked
+            const { data: blocked } = await supabase
+                .from('blocked_users')
+                .select('blocked_id, created_at, blocked:profiles!blocked_users_blocked_id_fkey(id, first_name, last_name, full_name, avatar_url)')
+                .eq('blocker_id', currentUser.id);
+            blockedUsers = blocked || [];
+
+            // Users who blocked me
+            const { data: blockedBy } = await supabase
+                .from('blocked_users')
+                .select('blocker_id')
+                .eq('blocked_id', currentUser.id);
+            blockedByUsers = (blockedBy || []).map(b => b.blocker_id);
+
+            updateStats();
+        }
+
+        function isBlocked(userId) {
+            return blockedUsers.some(b => b.blocked_id === userId);
+        }
+
+        function isBlockedBy(userId) {
+            return blockedByUsers.includes(userId);
+        }
+
+        async function blockUser(userId, userName) {
+            if (isBlocked(userId)) { showToast('User already blocked', 'error'); return; }
+            try {
+                await supabase.from('blocked_users').insert({ blocker_id: currentUser.id, blocked_id: userId });
+                // Also remove friendship if exists
+                await supabase.from('friendships').delete().or(`and(user_id.eq.${currentUser.id},friend_id.eq.${userId}),and(user_id.eq.${userId},friend_id.eq.${currentUser.id})`);
+                // Cancel any pending requests
+                await supabase.from('friend_requests').delete().or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${userId}),and(sender_id.eq.${userId},receiver_id.eq.${currentUser.id})`);
+                showToast(`${userName} has been blocked`, 'success');
+                await Promise.all([loadBlockedUsers(), loadFriends(), loadRequests()]);
+                closeProfileModal();
+            } catch (e) { showToast('Failed to block user', 'error'); }
+        }
+
+        async function unblockUser(userId, userName) {
+            try {
+                await supabase.from('blocked_users').delete().eq('blocker_id', currentUser.id).eq('blocked_id', userId);
+                showToast(`${userName} has been unblocked`, 'success');
+                await loadBlockedUsers();
+                renderBlockedModal();
+            } catch (e) { showToast('Failed to unblock user', 'error'); }
+        }
+
+        function openBlockedModal() {
+            renderBlockedModal();
+            document.getElementById('blockedModal').classList.add('show');
+        }
+
+        function closeBlockedModal() {
+            document.getElementById('blockedModal').classList.remove('show');
+        }
+
+        function renderBlockedModal() {
+            const container = document.getElementById('blockedModalBody');
+            if (blockedUsers.length === 0) {
+                container.innerHTML = '<div class="blocked-empty"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg><p>No blocked users</p></div>';
+                return;
+            }
+            container.innerHTML = blockedUsers.map(b => {
+                const user = b.blocked;
+                const name = user.full_name || `${user.first_name} ${user.last_name}`;
+                const initials = getInitials(name);
+                const blockedDate = new Date(b.created_at).toLocaleDateString();
+                return `<div class="blocked-user-item">
+                    <div class="blocked-user-avatar">${user.avatar_url ? `<img src="${user.avatar_url}">` : initials}</div>
+                    <div class="blocked-user-info"><div class="blocked-user-name">${escapeHtml(name)}</div><div class="blocked-user-date">Blocked on ${blockedDate}</div></div>
+                    <button class="btn btn-sm btn-secondary" onclick="unblockUser('${user.id}', '${escapeHtml(name)}')">Unblock</button>
+                </div>`;
+            }).join('');
+        }
+
+        // =============================================
+        // REPORT USER
+        // =============================================
+        function openReportModal(userId) {
+            document.getElementById('reportUserId').value = userId;
+            document.getElementById('reportReason').value = '';
+            document.getElementById('reportDescription').value = '';
+            document.getElementById('reportModal').classList.add('show');
+        }
+
+        function closeReportModal() {
+            document.getElementById('reportModal').classList.remove('show');
+        }
+
+        async function submitReport() {
+            const userId = document.getElementById('reportUserId').value;
+            const reason = document.getElementById('reportReason').value;
+            const description = document.getElementById('reportDescription').value;
+
+            if (!reason) { showToast('Please select a reason', 'error'); return; }
+
+            try {
+                await supabase.from('user_reports').insert({
+                    reporter_id: currentUser.id,
+                    reported_id: userId,
+                    report_type: 'user',
+                    reason: reason,
+                    description: description
+                });
+                showToast('Report submitted. Our team will review it.', 'success');
+                closeReportModal();
+                closeProfileModal();
+            } catch (e) {
+                console.error('Report error:', e);
+                showToast('Failed to submit report', 'error');
+            }
+        }
+
+        // =============================================
+        // PROFILE MODAL
+        // =============================================
+        async function openProfileModal(userId) {
+            // Fetch full user profile
+            const { data: user } = await supabase
+                .from('profiles')
+                .select('id, first_name, last_name, full_name, program_name, year_of_study, bio, avatar_url, is_online, last_seen, created_at')
+                .eq('id', userId)
+                .single();
+
+            if (!user) { showToast('User not found', 'error'); return; }
+            selectedProfileUser = user;
+
+            const name = user.full_name || `${user.first_name} ${user.last_name}`;
+            const initials = getInitials(name);
+            const isFriend = friends.some(f => f.id === userId);
+            const isPendingOut = outgoingRequests.some(r => r.receiver.id === userId);
+            const isPendingIn = incomingRequests.some(r => r.sender.id === userId);
+            const blocked = isBlocked(userId);
+            const blockedBy = isBlockedBy(userId);
+            const lastSeen = user.last_seen ? formatTimeAgo(user.last_seen) : 'Unknown';
+            const memberSince = new Date(user.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+
+            // Modal body content
+            document.getElementById('profileModalBody').innerHTML = `
+                <div class="profile-modal-content">
+                    <div class="profile-modal-avatar">
+                        ${user.avatar_url ? `<img src="${user.avatar_url}" alt="">` : initials}
+                        <div class="online-dot ${user.is_online ? '' : 'offline'}"></div>
+                    </div>
+                    <div class="profile-modal-name">${escapeHtml(name)}</div>
+                    <div class="profile-modal-program">${escapeHtml(user.program_name || 'Student')}${user.year_of_study ? ` • Year ${user.year_of_study}` : ''}</div>
+                    <div class="profile-modal-status ${user.is_online ? 'online' : 'offline'}">
+                        <span>●</span> ${user.is_online ? 'Online now' : `Last seen ${lastSeen}`}
+                    </div>
+                    ${user.bio ? `<div class="profile-modal-bio">${escapeHtml(user.bio)}</div>` : ''}
+                    <div class="profile-modal-meta">
+                        <div class="profile-modal-meta-item"><div class="label">Member since</div><div class="value">${memberSince}</div></div>
+                    </div>
+                </div>
+            `;
+
+            // Modal footer actions
+            let actionsHtml = '';
+            if (blockedBy) {
+                actionsHtml = '<p style="text-align:center;color:var(--gray-500);font-size:14px;">You cannot interact with this user</p>';
+            } else if (blocked) {
+                actionsHtml = `<button class="btn btn-secondary" onclick="unblockUser('${userId}', '${escapeHtml(name)}')">Unblock User</button>`;
+            } else {
+                // Primary actions
+                let primaryBtn = '';
+                if (isFriend) {
+                    primaryBtn = `<button class="btn btn-primary" onclick="startMessage('${userId}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>Message</button>`;
+                } else if (isPendingOut) {
+                    primaryBtn = `<button class="btn btn-secondary" disabled>Request Sent</button>`;
+                } else if (isPendingIn) {
+                    primaryBtn = `<button class="btn btn-success" onclick="acceptRequestFromModal('${userId}')">Accept Request</button>`;
+                } else {
+                    primaryBtn = `<button class="btn btn-primary" onclick="sendFriendRequest('${userId}', '${escapeHtml(name)}'); closeProfileModal();"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>Add Friend</button>`;
+                }
+
+                actionsHtml = `
+                    <div class="profile-modal-actions">
+                        <div class="btn-row">
+                            ${primaryBtn}
+                            ${isFriend ? `<button class="btn btn-danger" onclick="confirmRemoveFriend('${userId}', '${escapeHtml(name)}'); closeProfileModal();"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 7a4 4 0 11-8 0 4 4 0 018 0zM9 14a6 6 0 00-6 6v1h12v-1a6 6 0 00-6-6zM21 12h-6"/></svg>Remove</button>` : ''}
+                        </div>
+                        <div class="btn-row">
+                            <button class="btn btn-outline-danger btn-sm" onclick="confirmBlockUser('${userId}', '${escapeHtml(name)}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>Block</button>
+                            <button class="btn btn-warning btn-sm" onclick="openReportModal('${userId}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>Report</button>
+                        </div>
+                        <a href="profile.html?user=${userId}" class="profile-modal-link">View Full Profile →</a>
+                    </div>
+                `;
+            }
+            document.getElementById('profileModalFooter').innerHTML = actionsHtml;
+            document.getElementById('profileModal').classList.add('show');
+        }
+
+        function closeProfileModal() {
+            document.getElementById('profileModal').classList.remove('show');
+            selectedProfileUser = null;
+        }
+
+        function confirmBlockUser(userId, userName) {
+            document.getElementById('confirmTitle').textContent = 'Block User';
+            document.getElementById('confirmMessage').innerHTML = `Block <strong>${userName}</strong>?<br><br><small style="color:var(--gray-500);">They won't be able to send you messages or friend requests. You can unblock them anytime.</small>`;
+            document.getElementById('confirmBtn').textContent = 'Block';
+            confirmCallback = () => { blockUser(userId, userName); closeConfirmModal(); };
+            document.getElementById('confirmModal').classList.add('show');
+        }
+
+        async function acceptRequestFromModal(senderId) {
+            const req = incomingRequests.find(r => r.sender.id === senderId);
+            if (req) {
+                await acceptRequest(req.id, senderId);
+                closeProfileModal();
+            }
         }
 
         function getInitials(name) { return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2); }
@@ -593,7 +948,6 @@
         function closeConfirmModal() { document.getElementById('confirmModal').classList.remove('show'); confirmCallback = null; }
         function confirmAction() { if (confirmCallback) confirmCallback(); }
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('show'); }
-        function toggleDarkMode() { document.body.classList.toggle('dark-mode'); const isDark = document.body.classList.contains('dark-mode'); localStorage.setItem('myub_darkMode', isDark); document.getElementById('sunIcon').style.display = isDark ? 'none' : 'block'; document.getElementById('moonIcon').style.display = isDark ? 'block' : 'none'; }
         async function handleLogout() { await updateOnlineStatus(false); await supabase.auth.signOut(); window.location.href = 'index.html'; }
         init();
     </script>

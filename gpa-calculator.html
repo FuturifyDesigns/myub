@@ -126,7 +126,27 @@
         .class-badge.upper { background: var(--blue-light); color: #1d4ed8; }
         .class-badge.lower { background: var(--yellow-light); color: #a16207; }
         .class-badge.pass { background: var(--orange-light); color: #c2410c; }
+        .class-badge.fail { background: #fee2e2; color: var(--red); }
         .class-badge.none { background: var(--gray-100); color: var(--gray-500); }
+
+        /* Progression Card */
+        .progression-card { background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); border-radius: 16px; padding: 24px; margin-bottom: 24px; color: var(--white); }
+        .progression-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
+        .progression-title { font-size: 14px; opacity: 0.8; margin-bottom: 4px; }
+        .progression-program { font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 700; }
+        .progression-degree { font-size: 13px; opacity: 0.7; margin-top: 4px; }
+        .progression-stats { text-align: right; }
+        .progression-credits { font-family: 'Sora', sans-serif; font-size: 28px; font-weight: 700; }
+        .progression-goal { font-size: 13px; opacity: 0.7; }
+        .progression-bar-container { background: rgba(255,255,255,0.2); border-radius: 10px; height: 12px; overflow: hidden; margin-bottom: 12px; }
+        .progression-bar { height: 100%; background: linear-gradient(90deg, #22c55e 0%, #4ade80 100%); border-radius: 10px; transition: width 0.5s ease; }
+        .progression-bar.complete { background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%); }
+        .progression-footer { display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+        .progression-percent { font-weight: 600; }
+        .progression-remaining { opacity: 0.7; }
+        .progression-complete { background: rgba(255,255,255,0.15); border-radius: 10px; padding: 12px; margin-top: 12px; text-align: center; }
+        .progression-complete-icon { font-size: 32px; margin-bottom: 8px; }
+        .progression-complete-text { font-weight: 600; }
 
         /* Cards */
         .card { background: var(--white); border-radius: 16px; padding: 24px; margin-bottom: 24px; }
@@ -365,6 +385,32 @@
 
             <!-- GPA Calculator Tab -->
             <div class="tab-content active" id="calculatorTab">
+                <!-- Progression Tracker -->
+                <div class="progression-card" id="progressionCard">
+                    <div class="progression-header">
+                        <div>
+                            <div class="progression-title">Program Progress</div>
+                            <div class="progression-program" id="programName">Loading...</div>
+                            <div class="progression-degree" id="degreeType">-</div>
+                        </div>
+                        <div class="progression-stats">
+                            <div class="progression-credits"><span id="earnedCredits">0</span> / <span id="requiredCredits">0</span></div>
+                            <div class="progression-goal">credits</div>
+                        </div>
+                    </div>
+                    <div class="progression-bar-container">
+                        <div class="progression-bar" id="progressionBar" style="width: 0%;"></div>
+                    </div>
+                    <div class="progression-footer">
+                        <div class="progression-percent"><span id="progressPercent">0</span>% complete</div>
+                        <div class="progression-remaining"><span id="remainingCredits">0</span> credits remaining</div>
+                    </div>
+                    <div class="progression-complete" id="progressionComplete" style="display: none;">
+                        <div class="progression-complete-icon">🎓</div>
+                        <div class="progression-complete-text">Congratulations! You've completed your credit requirements!</div>
+                    </div>
+                </div>
+
                 <div class="gpa-summary">
                     <div class="summary-card gpa"><div class="summary-label">Cumulative GPA</div><div class="summary-value" id="cumulativeGPA">0.00</div><div class="summary-sub">out of 5.00</div></div>
                     <div class="summary-card credits"><div class="summary-label">Total Credits</div><div class="summary-value" id="totalCredits">0</div><div class="summary-sub">credits earned</div></div>
@@ -423,9 +469,9 @@
                             ⚠️ CA + Exam weights must equal 100%
                         </div>
                         <div class="form-group">
-                            <label for="predCAMark">Your CA Mark (out of CA weight)</label>
-                            <input type="number" id="predCAMark" min="0" max="100" step="0.1" placeholder="e.g., 32 out of 40" oninput="calculateAllGrades()">
-                            <span class="form-hint" id="caMarkHint" style="font-size: 11px; color: var(--gray-400);">Enter your actual CA mark (0-40)</span>
+                            <label for="predCAMark">Your CA Mark (%)</label>
+                            <input type="number" id="predCAMark" min="0" max="100" step="0.1" placeholder="e.g., 75" oninput="calculateAllGrades()">
+                            <span class="form-hint" id="caMarkHint" style="font-size: 11px; color: var(--gray-400);">Enter your overall CA percentage (0-100%)</span>
                         </div>
                     </div>
 
@@ -512,9 +558,25 @@
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let currentUser = null;
+        let userProfile = null;
         let courses = [];
         let semesters = {};
         let deleteTarget = { type: null, id: null, key: null };
+
+        // Credit requirements by program type
+        const CREDIT_REQUIREMENTS = {
+            'certificate': 30,
+            'diploma': 60,
+            'graduate': 48,
+            'bachelor': 120
+        };
+
+        const PROGRAM_LABELS = {
+            'certificate': 'Certificate',
+            'diploma': 'Diploma',
+            'graduate': 'Graduate',
+            'bachelor': 'Bachelor\'s Degree'
+        };
 
         const GRADING_SCALE = { 
             'A':  { min: 80, max: 100, points: 5.0, description: 'Outstanding' }, 
@@ -541,11 +603,69 @@
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) { window.location.href = 'index.html'; return; }
             currentUser = session.user;
+            
+            // Load user profile for program info
+            await loadProfile();
             await loadCourses();
+            
             if (localStorage.getItem('myub_darkMode') === 'true') document.body.classList.add('dark-mode');
             document.getElementById('loadingState').style.display = 'none';
             document.getElementById('mainContent').style.display = 'block';
             validateWeights('ca'); // Initialize predictor
+        }
+
+        async function loadProfile() {
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('program_type, program_name')
+                .eq('id', currentUser.id)
+                .single();
+            
+            if (data) {
+                userProfile = data;
+                updateProgression();
+            }
+        }
+
+        function updateProgression() {
+            const programType = userProfile?.program_type || 'bachelor';
+            const programName = userProfile?.program_name || 'Not specified';
+            const requiredCredits = CREDIT_REQUIREMENTS[programType] || 120;
+            const programLabel = PROGRAM_LABELS[programType] || 'Bachelor\'s Degree';
+            
+            // Calculate earned credits (only passed courses - C- and above)
+            const failGrades = ['D+', 'D', 'D-', 'E'];
+            const earnedCredits = courses.reduce((sum, c) => {
+                if (c.grade && !failGrades.includes(c.grade)) {
+                    return sum + (c.credits || 0);
+                }
+                return sum;
+            }, 0);
+            
+            const progressPercent = Math.min(100, Math.round((earnedCredits / requiredCredits) * 100));
+            const remainingCredits = Math.max(0, requiredCredits - earnedCredits);
+            const isComplete = earnedCredits >= requiredCredits;
+            
+            // Update UI
+            document.getElementById('programName').textContent = programName;
+            document.getElementById('degreeType').textContent = programLabel;
+            document.getElementById('earnedCredits').textContent = earnedCredits;
+            document.getElementById('requiredCredits').textContent = requiredCredits;
+            document.getElementById('progressPercent').textContent = progressPercent;
+            document.getElementById('remainingCredits').textContent = remainingCredits;
+            
+            const progressBar = document.getElementById('progressionBar');
+            progressBar.style.width = progressPercent + '%';
+            
+            if (isComplete) {
+                progressBar.classList.add('complete');
+                document.getElementById('progressionComplete').style.display = 'block';
+                document.querySelector('.progression-footer').style.display = 'none';
+            } else {
+                progressBar.classList.remove('complete');
+                document.getElementById('progressionComplete').style.display = 'none';
+                document.querySelector('.progression-footer').style.display = 'flex';
+            }
         }
 
         function switchTab(tab) { 
@@ -656,7 +776,8 @@
             courses = data || []; 
             groupBySemester(); 
             renderSemesters(); 
-            updateSummary(); 
+            updateSummary();
+            updateProgression();
         }
 
         function groupBySemester() { 
@@ -709,7 +830,7 @@
                         </div>
                         <div class="semester-stats">
                             <div class="semester-stat">
-                                <div class="semester-stat-value">${semGPA.toFixed(2)}</div>
+                                <div class="semester-stat-value">${semGPA.toFixed(1)}</div>
                                 <div class="semester-stat-label">GPA</div>
                             </div>
                             <div class="semester-stat">
@@ -769,13 +890,13 @@
             const gpa = calculateGPA(courses); 
             const totalCredits = courses.reduce((sum, c) => sum + (c.credits || 0), 0); 
             const classification = getClassification(gpa); 
-            document.getElementById('cumulativeGPA').textContent = gpa.toFixed(2); 
+            document.getElementById('cumulativeGPA').textContent = gpa.toFixed(1); 
             document.getElementById('totalCredits').textContent = totalCredits; 
             document.getElementById('totalCourses').textContent = courses.length; 
             const classEl = document.getElementById('classification'); 
             classEl.textContent = classification.name; 
             classEl.className = `class-badge ${classification.badge}`; 
-            document.getElementById('classificationSub').textContent = courses.length === 0 ? 'Add courses to see' : gpa < 2.0 ? 'Below pass threshold' : `GPA ${gpa.toFixed(2)}`; 
+            document.getElementById('classificationSub').textContent = courses.length === 0 ? 'Add courses to see' : gpa < 2.0 ? 'Below pass threshold' : `GPA ${gpa.toFixed(1)}`; 
         }
 
         // =============================================
@@ -1028,10 +1149,6 @@
                 warningEl.style.display = 'none';
             }
             
-            // Update CA mark hint and max
-            document.getElementById('caMarkHint').textContent = `Enter your actual CA mark (0-${caWeight})`;
-            document.getElementById('predCAMark').max = caWeight;
-            
             calculateAllGrades();
         }
         
@@ -1043,7 +1160,6 @@
             const resultsEl = document.getElementById('predictorResults');
             const emptyEl = document.getElementById('predictorEmpty');
             const gradeResultsEl = document.getElementById('gradeResults');
-            const warningEl = document.getElementById('weightWarning');
             
             // Check weights add to 100
             if (caWeight + examWeight !== 100) {
@@ -1059,25 +1175,18 @@
                 emptyEl.style.display = 'block';
                 emptyEl.innerHTML = `
                     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width: 48px; height: 48px; margin-bottom: 12px; opacity: 0.5;"><path d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
-                    <p>Enter your CA mark to see what exam scores you need for each grade</p>
+                    <p>Enter your CA percentage to see what exam scores you need</p>
                 `;
                 return; 
             }
             
-            let caMark = parseFloat(caMarkInput);
+            let caMarkPercent = parseFloat(caMarkInput);
             
-            // Validate: CA mark must be between 0 and CA weight
-            if (isNaN(caMark) || caMark < 0) {
+            // Validate: CA mark must be between 0 and 100
+            if (isNaN(caMarkPercent) || caMarkPercent < 0 || caMarkPercent > 100) {
                 resultsEl.style.display = 'none';
                 emptyEl.style.display = 'block';
-                emptyEl.innerHTML = `<p style="color: var(--red);">CA mark must be 0 or greater</p>`;
-                return;
-            }
-            
-            if (caMark > caWeight) {
-                resultsEl.style.display = 'none';
-                emptyEl.style.display = 'block';
-                emptyEl.innerHTML = `<p style="color: var(--red);">CA mark cannot exceed ${caWeight} (your CA weight)</p>`;
+                emptyEl.innerHTML = `<p style="color: var(--red);">CA percentage must be between 0 and 100</p>`;
                 return;
             }
             
@@ -1085,14 +1194,19 @@
             resultsEl.style.display = 'block';
             emptyEl.style.display = 'none';
             
-            // Calculate max possible final score
-            const maxPossibleFinal = caMark + examWeight;
+            // Calculate CA contribution to final score
+            // e.g., if CA weight is 40% and you got 75%, contribution = 75 * 0.4 = 30
+            const caContribution = caMarkPercent * (caWeight / 100);
+            
+            // Max possible final (if 100% in exam)
+            const maxPossibleFinal = caContribution + examWeight;
             const bestPossibleGrade = getGradeFromScore(maxPossibleFinal);
+            const badgeClassBest = bestPossibleGrade.replace('+', '-plus').replace('-', '-minus');
             
             // Update summary
-            document.getElementById('caContribution').textContent = `${caMark}/${caWeight}`;
+            document.getElementById('caContribution').textContent = `${caMarkPercent}% → ${caContribution.toFixed(1)}`;
             document.getElementById('maxPossible').textContent = `${maxPossibleFinal.toFixed(1)}%`;
-            document.getElementById('bestGrade').innerHTML = `<span class="grade-badge ${bestPossibleGrade}">${bestPossibleGrade}</span>`;
+            document.getElementById('bestGrade').innerHTML = `<span class="grade-badge ${badgeClassBest}">${bestPossibleGrade}</span>`;
             
             // Calculate required exam scores for each grade
             const grades = ['A', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'E'];
@@ -1103,34 +1217,33 @@
                 const description = GRADING_SCALE[grade].description;
                 const points = GRADING_SCALE[grade].points;
                 
-                // Calculate required exam marks
-                const neededFromExam = minFinalScore - caMark;
-                const requiredExamPercent = examWeight > 0 ? (neededFromExam / examWeight) * 100 : 0;
+                // Final = caContribution + examPercent * (examWeight / 100)
+                // examPercent = (minFinalScore - caContribution) / (examWeight / 100)
+                const neededExamContribution = minFinalScore - caContribution;
+                const requiredExamPercent = examWeight > 0 ? (neededExamContribution / examWeight) * 100 : 0;
                 
                 let status, scoreDisplay, statusLabel;
                 
                 if (requiredExamPercent <= 0) {
-                    // Already guaranteed
                     status = 'guaranteed';
                     scoreDisplay = '✓ Guaranteed';
                     statusLabel = 'Your CA alone secures this!';
                 } else if (requiredExamPercent > 100) {
-                    // Impossible
                     status = 'impossible';
                     scoreDisplay = 'Not possible';
-                    statusLabel = `Would need ${neededFromExam.toFixed(1)}/${examWeight}`;
+                    statusLabel = `Would need ${requiredExamPercent.toFixed(0)}% in exam`;
                 } else if (requiredExamPercent <= 40) {
                     status = 'achievable';
                     scoreDisplay = `${Math.ceil(requiredExamPercent)}%`;
-                    statusLabel = `Need ${neededFromExam.toFixed(1)}/${examWeight} marks`;
+                    statusLabel = 'Very achievable 🎉';
                 } else if (requiredExamPercent <= 70) {
                     status = 'challenging';
                     scoreDisplay = `${Math.ceil(requiredExamPercent)}%`;
-                    statusLabel = `Need ${neededFromExam.toFixed(1)}/${examWeight} marks`;
+                    statusLabel = 'Achievable with effort 💪';
                 } else {
                     status = 'hard';
                     scoreDisplay = `${Math.ceil(requiredExamPercent)}%`;
-                    statusLabel = `Need ${neededFromExam.toFixed(1)}/${examWeight} marks`;
+                    statusLabel = 'Challenging - study hard! 📚';
                 }
                 
                 const badgeClass = grade.replace('+', '-plus').replace('-', '-minus');

@@ -411,6 +411,7 @@
             text-align: right;
         }
 
+        /* Online Status Indicator */
         .online-status {
             display: flex;
             align-items: center;
@@ -419,12 +420,24 @@
             margin-bottom: 8px;
         }
 
-        .online-status .dot {
+        .online-status .status-dot {
             width: 10px;
             height: 10px;
-            background: var(--green);
             border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .online-status .status-dot.online {
+            background: var(--green);
             box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.3);
+        }
+
+        .online-status .status-dot.offline {
+            background: var(--gray-400);
+        }
+
+        .online-status .status-text {
+            transition: all 0.3s;
         }
 
         .member-since {
@@ -986,6 +999,10 @@
                 margin-top: 16px;
             }
 
+            .online-status {
+                justify-content: center;
+            }
+
             .profile-form,
             .info-grid {
                 grid-template-columns: 1fr;
@@ -1267,8 +1284,8 @@
                     </div>
                     <div class="profile-status">
                         <div class="online-status">
-                            <span class="dot"></span>
-                            Online
+                            <span class="status-dot online" id="statusDot"></span>
+                            <span class="status-text" id="statusText">Online</span>
                         </div>
                         <p class="member-since" id="memberSince">Member since ...</p>
                     </div>
@@ -1494,7 +1511,9 @@
     </div>
 
     <script>
-        // Supabase Init
+        // =============================================
+        // SUPABASE INIT
+        // =============================================
         const SUPABASE_URL = 'https://weuxtwmaqmbhskjpjdyi.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndldXh0d21hcW1iaHNranBqZHlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NTYzMTcsImV4cCI6MjA4MDMzMjMxN30.J-0Nd0MY6-g_ltbBNHwOulqZuQfb8mKIRgx0dAaJ76o';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -1503,8 +1522,138 @@
         let userProfile = null;
         let isEditMode = false;
         let cropper = null;
+        let heartbeatInterval = null;
+        let realtimeChannel = null;
 
-        // Initialize
+        // =============================================
+        // REAL-TIME ONLINE STATUS SYSTEM
+        // =============================================
+        
+        const OnlineStatus = {
+            // Start heartbeat - call every 30 seconds to keep user "online"
+            startHeartbeat: function() {
+                // Initial heartbeat
+                this.sendHeartbeat();
+                
+                // Send heartbeat every 30 seconds
+                heartbeatInterval = setInterval(() => {
+                    this.sendHeartbeat();
+                }, 30000);
+            },
+            
+            // Send heartbeat to server
+            sendHeartbeat: async function() {
+                if (!currentUser) return;
+                try {
+                    await supabase.rpc('heartbeat');
+                } catch (err) {
+                    console.error('Heartbeat error:', err);
+                }
+            },
+            
+            // Set user online
+            setOnline: async function() {
+                if (!currentUser) return;
+                try {
+                    await supabase.rpc('update_online_status', { is_online_status: true });
+                } catch (err) {
+                    console.error('Set online error:', err);
+                }
+            },
+            
+            // Set user offline
+            setOffline: async function() {
+                if (!currentUser) return;
+                try {
+                    await supabase.rpc('update_online_status', { is_online_status: false });
+                } catch (err) {
+                    console.error('Set offline error:', err);
+                }
+            },
+            
+            // Stop heartbeat
+            stopHeartbeat: function() {
+                if (heartbeatInterval) {
+                    clearInterval(heartbeatInterval);
+                    heartbeatInterval = null;
+                }
+            },
+            
+            // Subscribe to real-time profile changes (for other users' status)
+            subscribeToProfiles: function(userIds, callback) {
+                if (realtimeChannel) {
+                    supabase.removeChannel(realtimeChannel);
+                }
+                
+                realtimeChannel = supabase
+                    .channel('online-users')
+                    .on(
+                        'postgres_changes',
+                        {
+                            event: 'UPDATE',
+                            schema: 'public',
+                            table: 'profiles',
+                            filter: userIds.length > 0 ? `id=in.(${userIds.join(',')})` : undefined
+                        },
+                        (payload) => {
+                            if (callback) callback(payload.new);
+                        }
+                    )
+                    .subscribe();
+                    
+                return realtimeChannel;
+            },
+            
+            // Format last seen time
+            formatLastSeen: function(lastSeenDate) {
+                if (!lastSeenDate) return 'Unknown';
+                
+                const now = new Date();
+                const lastSeen = new Date(lastSeenDate);
+                const diffMs = now - lastSeen;
+                const diffSeconds = Math.floor(diffMs / 1000);
+                const diffMinutes = Math.floor(diffSeconds / 60);
+                const diffHours = Math.floor(diffMinutes / 60);
+                const diffDays = Math.floor(diffHours / 24);
+                
+                if (diffSeconds < 60) {
+                    return 'Just now';
+                } else if (diffMinutes < 60) {
+                    return `${diffMinutes} minute${diffMinutes !== 1 ? 's' : ''} ago`;
+                } else if (diffHours < 24) {
+                    return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
+                } else if (diffDays < 7) {
+                    return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
+                } else {
+                    return lastSeen.toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric',
+                        year: lastSeen.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
+                    });
+                }
+            },
+            
+            // Get status display info
+            getStatusDisplay: function(isOnline, lastSeen) {
+                if (isOnline) {
+                    return {
+                        text: 'Online',
+                        dotClass: 'online',
+                        color: 'var(--green)'
+                    };
+                } else {
+                    return {
+                        text: 'Last seen ' + this.formatLastSeen(lastSeen),
+                        dotClass: 'offline',
+                        color: 'var(--gray-400)'
+                    };
+                }
+            }
+        };
+
+        // =============================================
+        // INITIALIZE APP
+        // =============================================
         async function init() {
             const { data: { session } } = await supabase.auth.getSession();
             
@@ -1529,11 +1678,19 @@
                 return;
             }
 
-            // Set user online
-            await supabase.rpc('update_online_status', { is_online_status: true });
+            // Start real-time online status
+            OnlineStatus.setOnline();
+            OnlineStatus.startHeartbeat();
 
             // Load profile
             await loadProfile();
+
+            // Subscribe to own profile changes for real-time status updates
+            OnlineStatus.subscribeToProfiles([currentUser.id], (updatedProfile) => {
+                if (updatedProfile.id === currentUser.id) {
+                    updateStatusUI(updatedProfile.is_online, updatedProfile.last_seen);
+                }
+            });
 
             // Load dark mode preference
             if (localStorage.getItem('myub_darkMode') === 'true') {
@@ -1545,7 +1702,10 @@
             document.getElementById('mainContent').style.display = 'block';
         }
 
-        // Load Profile Data
+        // =============================================
+        // PROFILE FUNCTIONS
+        // =============================================
+        
         async function loadProfile() {
             const { data, error } = await supabase
                 .from('profiles')
@@ -1556,10 +1716,10 @@
             if (data) {
                 userProfile = data;
                 updateProfileUI();
+                updateStatusUI(data.is_online, data.last_seen);
             }
         }
 
-        // Update Profile UI
         function updateProfileUI() {
             const p = userProfile;
 
@@ -1609,7 +1769,17 @@
             document.getElementById('editBio').value = p.bio || '';
         }
 
-        // Format program type
+        // Update status display in real-time
+        function updateStatusUI(isOnline, lastSeen) {
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            
+            const status = OnlineStatus.getStatusDisplay(isOnline, lastSeen);
+            
+            statusDot.className = `status-dot ${status.dotClass}`;
+            statusText.textContent = status.text;
+        }
+
         function formatProgramType(type) {
             const types = {
                 'bachelor': "Bachelor's Degree",
@@ -1620,12 +1790,14 @@
             return types[type] || type;
         }
 
-        // Get initials
         function getInitials(first, last) {
             return ((first?.[0] || '') + (last?.[0] || '')).toUpperCase() || '??';
         }
 
-        // Toggle Edit Mode
+        // =============================================
+        // EDIT PROFILE
+        // =============================================
+        
         function toggleEditMode() {
             isEditMode = !isEditMode;
             document.getElementById('infoView').style.display = isEditMode ? 'none' : 'grid';
@@ -1635,13 +1807,11 @@
                 : '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg> Edit';
         }
 
-        // Cancel Edit
         function cancelEdit() {
-            updateProfileUI(); // Reset form
+            updateProfileUI();
             toggleEditMode();
         }
 
-        // Save Profile
         async function saveProfile(e) {
             e.preventDefault();
             
@@ -1668,7 +1838,6 @@
 
                 if (error) throw error;
 
-                // Reload profile
                 await loadProfile();
                 toggleEditMode();
                 showToast('Profile updated successfully!', 'success');
@@ -1681,7 +1850,10 @@
             }
         }
 
-        // Avatar Modal
+        // =============================================
+        // AVATAR UPLOAD WITH CROPPER
+        // =============================================
+        
         function openAvatarModal() {
             document.getElementById('avatarModal').classList.add('show');
             resetAvatarUpload();
@@ -1712,19 +1884,16 @@
             const file = e.target.files[0];
             if (!file) return;
 
-            // Validate file size (2MB max)
             if (file.size > 2 * 1024 * 1024) {
                 showToast('Image must be less than 2MB', 'error');
                 return;
             }
 
-            // Validate file type
             if (!['image/jpeg', 'image/png', 'image/gif', 'image/webp'].includes(file.type)) {
                 showToast('Please select a valid image file', 'error');
                 return;
             }
 
-            // Show crop step
             const reader = new FileReader();
             reader.onload = function(e) {
                 document.getElementById('uploadStep').classList.remove('active');
@@ -1735,7 +1904,6 @@
                 const image = document.getElementById('cropperImage');
                 image.src = e.target.result;
 
-                // Initialize Cropper
                 if (cropper) {
                     cropper.destroy();
                 }
@@ -1765,7 +1933,6 @@
             uploadBtn.textContent = 'Uploading...';
 
             try {
-                // Get cropped canvas
                 const canvas = cropper.getCroppedCanvas({
                     width: 400,
                     height: 400,
@@ -1773,13 +1940,9 @@
                     imageSmoothingQuality: 'high'
                 });
 
-                // Convert to blob
                 const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.9));
-                
-                // Generate unique filename
                 const fileName = `${currentUser.id}/${Date.now()}.jpg`;
 
-                // Upload to Supabase Storage
                 const { data: uploadData, error: uploadError } = await supabase.storage
                     .from('avatars')
                     .upload(fileName, blob, {
@@ -1790,12 +1953,10 @@
 
                 if (uploadError) throw uploadError;
 
-                // Get public URL
                 const { data: urlData } = supabase.storage
                     .from('avatars')
                     .getPublicUrl(fileName);
 
-                // Update profile with avatar URL
                 const { error: updateError } = await supabase
                     .from('profiles')
                     .update({ avatar_url: urlData.publicUrl, updated_at: new Date().toISOString() })
@@ -1803,7 +1964,6 @@
 
                 if (updateError) throw updateError;
 
-                // Reload profile and close modal
                 await loadProfile();
                 closeAvatarModal();
                 showToast('Profile picture updated!', 'success');
@@ -1817,7 +1977,10 @@
             }
         }
 
-        // Delete Account Modal
+        // =============================================
+        // DELETE ACCOUNT
+        // =============================================
+        
         function openDeleteModal() {
             document.getElementById('deleteModal').classList.add('show');
             document.getElementById('deleteConfirmInput').value = '';
@@ -1839,7 +2002,9 @@
             confirmBtn.textContent = 'Deleting...';
 
             try {
-                // Delete profile directly (will cascade to other tables)
+                // Stop heartbeat first
+                OnlineStatus.stopHeartbeat();
+                
                 const { error } = await supabase
                     .from('profiles')
                     .delete()
@@ -1847,10 +2012,7 @@
                 
                 if (error) throw error;
 
-                // Sign out
                 await supabase.auth.signOut();
-                
-                // Redirect to home
                 window.location.href = 'index.html';
 
             } catch (err) {
@@ -1860,7 +2022,10 @@
             }
         }
 
-        // Toast Notifications
+        // =============================================
+        // UI HELPERS
+        // =============================================
+        
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
             const toastMessage = document.getElementById('toastMessage');
@@ -1868,7 +2033,6 @@
             toast.className = `toast ${type}`;
             toastMessage.textContent = message;
             
-            // Update icon
             const iconPath = type === 'success' 
                 ? 'M5 13l4 4L19 7' 
                 : 'M6 18L18 6M6 6l12 12';
@@ -1881,39 +2045,57 @@
             }, 3000);
         }
 
-        // Sidebar Toggle
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('open');
             document.getElementById('sidebarOverlay').classList.toggle('show');
         }
 
-        // Logout
         async function handleLogout() {
-            await supabase.rpc('update_online_status', { is_online_status: false });
+            OnlineStatus.stopHeartbeat();
+            await OnlineStatus.setOffline();
             await supabase.auth.signOut();
             window.location.href = 'index.html';
         }
 
-        // Handle online status on visibility change
+        // =============================================
+        // VISIBILITY & LIFECYCLE HANDLERS
+        // =============================================
+        
+        // Handle tab visibility changes
         document.addEventListener('visibilitychange', async () => {
-            if (currentUser) {
-                await supabase.rpc('update_online_status', { 
-                    is_online_status: document.visibilityState === 'visible' 
-                });
+            if (!currentUser) return;
+            
+            if (document.visibilityState === 'visible') {
+                // Tab became visible - go online
+                await OnlineStatus.setOnline();
+                OnlineStatus.startHeartbeat();
+            } else {
+                // Tab hidden - stop heartbeat but don't go offline immediately
+                // (user might just be switching tabs briefly)
+                OnlineStatus.stopHeartbeat();
             }
         });
 
-        // Set offline on page unload
-        window.addEventListener('beforeunload', async () => {
+        // Handle page unload - set offline
+        window.addEventListener('beforeunload', () => {
             if (currentUser) {
-                navigator.sendBeacon && navigator.sendBeacon(
+                // Use sendBeacon for reliable delivery
+                const data = JSON.stringify({ is_online_status: false });
+                navigator.sendBeacon(
                     `${SUPABASE_URL}/rest/v1/rpc/update_online_status`,
-                    JSON.stringify({ is_online_status: false })
+                    new Blob([data], { type: 'application/json' })
                 );
             }
         });
 
-        // Initialize
+        // Cleanup on page hide (mobile)
+        window.addEventListener('pagehide', () => {
+            OnlineStatus.stopHeartbeat();
+        });
+
+        // =============================================
+        // INITIALIZE
+        // =============================================
         init();
     </script>
 </body>

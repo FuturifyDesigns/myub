@@ -1665,10 +1665,11 @@
             let totalPoints = 0;
 
             if (courses && courses.length > 0) {
+                const failGrades = ['D', 'D-', 'E']; // Fail grades don't count as earned
                 courses.forEach(course => {
                     totalCredits += course.credits;
-                    // E is marginal pass (counts), only F is fail
-                    if (course.grade && course.grade !== 'F') {
+                    // Only count passed courses (C- and above)
+                    if (course.grade && !failGrades.includes(course.grade)) {
                         earnedCredits += course.credits;
                         totalPoints += course.credits * getGradePoints(course.grade);
                     }
@@ -1755,8 +1756,12 @@
         }
 
         function getGradePoints(grade) {
-            // UB Grading Scale (After August 2002)
-            const points = { 'A': 5.0, 'B': 4.0, 'C': 3.0, 'D': 2.0, 'E': 1.0, 'F': 0 };
+            // UB Grading Scale
+            const points = { 
+                'A': 5.0, 'B+': 4.5, 'B': 4.0, 'B-': 3.5, 
+                'C+': 3.0, 'C': 2.5, 'C-': 2.0, 
+                'D+': 1.5, 'D': 1.0, 'D-': 0.5, 'E': 0 
+            };
             return points[grade] || 0;
         }
 

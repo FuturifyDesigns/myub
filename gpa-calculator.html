@@ -174,11 +174,16 @@
 
         .grade-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; }
         .grade-badge.A { background: var(--green-light); color: #166534; }
+        .grade-badge.B-plus, .grade-badge[class*="B+"] { background: #d1fae5; color: #15803d; }
         .grade-badge.B { background: var(--blue-light); color: #1d4ed8; }
-        .grade-badge.C { background: var(--yellow-light); color: #a16207; }
-        .grade-badge.D { background: var(--orange-light); color: #c2410c; }
-        .grade-badge.E { background: var(--purple-light); color: #7c3aed; }
-        .grade-badge.F { background: #fee2e2; color: var(--red); }
+        .grade-badge.B-minus, .grade-badge[class*="B-"] { background: #dbeafe; color: #2563eb; }
+        .grade-badge.C-plus, .grade-badge[class*="C+"] { background: var(--yellow-light); color: #a16207; }
+        .grade-badge.C { background: #fef9c3; color: #ca8a04; }
+        .grade-badge.C-minus, .grade-badge[class*="C-"] { background: var(--orange-light); color: #c2410c; }
+        .grade-badge.D-plus, .grade-badge[class*="D+"] { background: #fee2e2; color: #dc2626; }
+        .grade-badge.D { background: #fecaca; color: #b91c1c; }
+        .grade-badge.D-minus, .grade-badge[class*="D-"] { background: #fca5a5; color: #991b1b; }
+        .grade-badge.E { background: #f87171; color: #7f1d1d; }
 
         .action-btns { display: flex; gap: 6px; }
         .action-btn { width: 28px; height: 28px; border-radius: 6px; border: none; background: var(--gray-100); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
@@ -372,23 +377,21 @@
                         <div><h2 class="card-title">My Semesters</h2><p class="card-subtitle">Organize your courses by semester</p></div>
                         <div class="card-actions"><button class="btn btn-primary" onclick="openSemesterModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>Add Semester</button></div>
                     </div>
-                    <div id="semestersContainer">
-                        <div class="empty-state" id="emptyState">
-                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                            <h3>No semesters yet</h3>
-                            <p>Add a semester to start tracking your courses and GPA</p>
-                            <button class="btn btn-primary" onclick="openSemesterModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>Add Your First Semester</button>
-                        </div>
-                    </div>
+                    <div id="semestersContainer"></div>
                     <div class="grading-info">
-                        <div class="grading-info-title"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>UB Grading Scale (After August 2002)</div>
-                        <div class="grading-grid">
+                        <div class="grading-info-title"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>UB Grading Scale</div>
+                        <div class="grading-grid" style="grid-template-columns: repeat(4, 1fr);">
                             <div class="grade-item"><div class="letter" style="color: #166534;">A</div><div class="range">80-100%</div><div class="points">5.0 pts</div></div>
-                            <div class="grade-item"><div class="letter" style="color: #1d4ed8;">B</div><div class="range">70-79%</div><div class="points">4.0 pts</div></div>
-                            <div class="grade-item"><div class="letter" style="color: #a16207;">C</div><div class="range">60-69%</div><div class="points">3.0 pts</div></div>
-                            <div class="grade-item"><div class="letter" style="color: #c2410c;">D</div><div class="range">50-59%</div><div class="points">2.0 pts</div></div>
-                            <div class="grade-item"><div class="letter" style="color: #7c3aed;">E</div><div class="range">40-49%</div><div class="points">1.0 pts</div></div>
-                            <div class="grade-item"><div class="letter" style="color: #dc2626;">F</div><div class="range">0-39%</div><div class="points">0.0 pts</div></div>
+                            <div class="grade-item"><div class="letter" style="color: #15803d;">B+</div><div class="range">75-79%</div><div class="points">4.5 pts</div></div>
+                            <div class="grade-item"><div class="letter" style="color: #1d4ed8;">B</div><div class="range">70-74%</div><div class="points">4.0 pts</div></div>
+                            <div class="grade-item"><div class="letter" style="color: #2563eb;">B-</div><div class="range">65-69%</div><div class="points">3.5 pts</div></div>
+                            <div class="grade-item"><div class="letter" style="color: #a16207;">C+</div><div class="range">60-64%</div><div class="points">3.0 pts</div></div>
+                            <div class="grade-item"><div class="letter" style="color: #ca8a04;">C</div><div class="range">55-59%</div><div class="points">2.5 pts</div></div>
+                            <div class="grade-item"><div class="letter" style="color: #c2410c;">C-</div><div class="range">50-54%</div><div class="points">2.0 pts</div></div>
+                            <div class="grade-item"><div class="letter" style="color: #dc2626;">D+</div><div class="range">45-49%</div><div class="points">1.5 pts</div></div>
+                            <div class="grade-item"><div class="letter" style="color: #b91c1c;">D</div><div class="range">40-44%</div><div class="points">1.0 pts</div></div>
+                            <div class="grade-item"><div class="letter" style="color: #991b1b;">D-</div><div class="range">35-39%</div><div class="points">0.5 pts</div></div>
+                            <div class="grade-item"><div class="letter" style="color: #7f1d1d;">E</div><div class="range">0-34%</div><div class="points">0.0 pts</div></div>
                         </div>
                     </div>
                 </div>
@@ -514,18 +517,24 @@
         let deleteTarget = { type: null, id: null, key: null };
 
         const GRADING_SCALE = { 
-            A: { min: 80, max: 100, points: 5.0, description: 'Excellent' }, 
-            B: { min: 70, max: 79, points: 4.0, description: 'Very Good' }, 
-            C: { min: 60, max: 69, points: 3.0, description: 'Good' }, 
-            D: { min: 50, max: 59, points: 2.0, description: 'Pass' }, 
-            E: { min: 40, max: 49, points: 1.0, description: 'Marginal Pass' }, 
-            F: { min: 0, max: 39, points: 0.0, description: 'Clear Fail' } 
+            'A':  { min: 80, max: 100, points: 5.0, description: 'Outstanding' }, 
+            'B+': { min: 75, max: 79.9, points: 4.5, description: 'Excellent' }, 
+            'B':  { min: 70, max: 74.9, points: 4.0, description: 'Very Good' }, 
+            'B-': { min: 65, max: 69.9, points: 3.5, description: 'Good' }, 
+            'C+': { min: 60, max: 64.9, points: 3.0, description: 'Satisfactory' }, 
+            'C':  { min: 55, max: 59.9, points: 2.5, description: 'Pass' }, 
+            'C-': { min: 50, max: 54.9, points: 2.0, description: 'Marginal Pass' }, 
+            'D+': { min: 45, max: 49.9, points: 1.5, description: 'Marginal' }, 
+            'D':  { min: 40, max: 44.9, points: 1.0, description: 'Marginal Fail' }, 
+            'D-': { min: 35, max: 39.9, points: 0.5, description: 'Fail' }, 
+            'E':  { min: 0, max: 34.9, points: 0.0, description: 'Fail' } 
         };
         const CLASSIFICATIONS = [
             { min: 4.4, max: 5.0, name: 'First Class / Distinction', badge: 'first' }, 
             { min: 3.6, max: 4.39, name: 'Second Class Upper / Merit', badge: 'upper' }, 
             { min: 2.8, max: 3.59, name: 'Second Class Lower / Credit', badge: 'lower' }, 
-            { min: 2.0, max: 2.79, name: 'Pass', badge: 'pass' }
+            { min: 2.0, max: 2.79, name: 'Pass', badge: 'pass' },
+            { min: 0, max: 1.99, name: 'Fail', badge: 'fail' }
         ];
 
         async function init() {
@@ -661,10 +670,20 @@
 
         function renderSemesters() {
             const container = document.getElementById('semestersContainer');
-            const emptyState = document.getElementById('emptyState');
             const keys = Object.keys(semesters);
-            if (keys.length === 0) { container.innerHTML = ''; container.appendChild(emptyState); emptyState.style.display = 'block'; return; }
-            emptyState.style.display = 'none';
+            
+            if (keys.length === 0) { 
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                        <h3>No semesters yet</h3>
+                        <p>Add a semester to start tracking your courses and GPA</p>
+                        <button class="btn btn-primary" onclick="openSemesterModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>Add Your First Semester</button>
+                    </div>
+                `;
+                return; 
+            }
+            
             keys.sort((a, b) => { 
                 const [yearA, semA] = [semesters[a].year, semesters[a].semester]; 
                 const [yearB, semB] = [semesters[b].year, semesters[b].semester]; 
@@ -717,7 +736,7 @@
                                             </td>
                                             <td>${course.credits}</td>
                                             <td><strong>${course.final_score !== null ? course.final_score.toFixed(1) + '%' : '-'}</strong></td>
-                                            <td>${course.grade ? `<span class="grade-badge ${course.grade}">${course.grade}</span>` : '-'}</td>
+                                            <td>${course.grade ? `<span class="grade-badge ${course.grade.replace('+', '-plus').replace('-', '-minus')}">${course.grade}</span>` : '-'}</td>
                                             <td>${course.grade_points !== null ? course.grade_points.toFixed(1) : '-'}</td>
                                             <td>
                                                 <div class="action-btns">
@@ -1076,7 +1095,7 @@
             document.getElementById('bestGrade').innerHTML = `<span class="grade-badge ${bestPossibleGrade}">${bestPossibleGrade}</span>`;
             
             // Calculate required exam scores for each grade
-            const grades = ['A', 'B', 'C', 'D', 'E'];
+            const grades = ['A', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'E'];
             let html = '';
             
             grades.forEach(grade => {
@@ -1114,10 +1133,12 @@
                     statusLabel = `Need ${neededFromExam.toFixed(1)}/${examWeight} marks`;
                 }
                 
+                const badgeClass = grade.replace('+', '-plus').replace('-', '-minus');
+                
                 html += `
                     <div class="grade-result-card ${status}">
                         <div class="grade-result-left">
-                            <span class="grade-badge ${grade}" style="font-size: 18px; padding: 8px 16px;">${grade}</span>
+                            <span class="grade-badge ${badgeClass}" style="font-size: 18px; padding: 8px 16px;">${grade}</span>
                             <div class="grade-result-info">
                                 <h4>${description} (${points.toFixed(1)} pts)</h4>
                                 <p>Final score: ${minFinalScore}% or higher</p>

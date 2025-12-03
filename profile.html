@@ -1,0 +1,1800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - MyUB</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy: #1a365d;
+            --navy-light: #2c5282;
+            --navy-dark: #0f2744;
+            --red: #c41e3a;
+            --white: #ffffff;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --green: #22c55e;
+            --yellow: #eab308;
+            --blue: #3b82f6;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --orange: #f97316;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--gray-100);
+            min-height: 100vh;
+        }
+
+        /* ========== SIDEBAR ========== */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 260px;
+            background: var(--navy-dark);
+            padding: 20px 0;
+            z-index: 100;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            text-decoration: none;
+        }
+
+        .sidebar-logo .logo-icon {
+            position: relative;
+            width: 32px;
+            height: 36px;
+        }
+
+        .sidebar-logo .logo-m {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Sora', sans-serif;
+            font-weight: 800;
+            font-size: 28px;
+            color: var(--white);
+            line-height: 1;
+        }
+
+        .sidebar-logo .cap {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .sidebar-logo .cap-board {
+            width: 26px;
+            height: 7px;
+            background: var(--white);
+            clip-path: polygon(10% 100%, 0% 0%, 100% 0%, 90% 100%);
+        }
+
+        .sidebar-logo .cap-crown {
+            width: 13px;
+            height: 5px;
+            background: var(--white);
+            margin: -1px auto 0;
+            border-radius: 0 0 2px 2px;
+        }
+
+        .sidebar-logo .cap-button {
+            width: 6px;
+            height: 6px;
+            background: var(--white);
+            border-radius: 50%;
+            position: absolute;
+            top: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .sidebar-logo .tassel {
+            position: absolute;
+            top: 2px;
+            right: -1px;
+            width: 2px;
+            height: 12px;
+            background: var(--red);
+            border-radius: 1px;
+        }
+
+        .sidebar-logo .tassel::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            background: var(--red);
+            border-radius: 50%;
+        }
+
+        .sidebar-logo .logo-text {
+            font-family: 'Sora', sans-serif;
+            font-weight: 700;
+            font-size: 20px;
+            color: var(--white);
+            margin-left: -2px;
+        }
+
+        .nav-section {
+            margin-bottom: 24px;
+        }
+
+        .nav-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--gray-400);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 20px;
+            margin-bottom: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: var(--gray-300);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.05);
+            color: var(--white);
+        }
+
+        .nav-item.active {
+            background: rgba(255,255,255,0.1);
+            color: var(--white);
+            border-right: 3px solid var(--red);
+        }
+
+        .nav-item svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .nav-item .badge {
+            margin-left: auto;
+            background: var(--red);
+            color: var(--white);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        /* ========== MAIN CONTENT ========== */
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+        }
+
+        /* Top Bar */
+        .topbar {
+            background: var(--white);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--gray-200);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray-600);
+        }
+
+        .page-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: none;
+            background: var(--gray-100);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .icon-btn:hover {
+            background: var(--gray-200);
+        }
+
+        .icon-btn svg {
+            width: 20px;
+            height: 20px;
+            color: var(--gray-600);
+        }
+
+        .icon-btn .notification-dot {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            background: var(--red);
+            border-radius: 50%;
+            border: 2px solid var(--white);
+        }
+
+        /* ========== PROFILE CONTENT ========== */
+        .profile-page {
+            padding: 24px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .profile-header-card {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+            border-radius: 20px;
+            padding: 32px;
+            color: var(--white);
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-header-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 400px;
+            height: 400px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
+
+        .profile-header-content {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .profile-avatar-wrapper {
+            position: relative;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 42px;
+            font-weight: 700;
+            color: var(--white);
+            border: 4px solid rgba(255,255,255,0.3);
+            overflow: hidden;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-edit-btn {
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--white);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            transition: all 0.2s;
+        }
+
+        .avatar-edit-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .avatar-edit-btn svg {
+            width: 18px;
+            height: 18px;
+            color: var(--navy);
+        }
+
+        .profile-header-info h1 {
+            font-family: 'Sora', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .profile-header-info .student-id {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 8px;
+        }
+
+        .profile-header-info .program-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .profile-status {
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .online-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .online-status .dot {
+            width: 10px;
+            height: 10px;
+            background: var(--green);
+            border-radius: 50%;
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.3);
+        }
+
+        .member-since {
+            font-size: 13px;
+            opacity: 0.7;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+
+        .card-subtitle {
+            font-size: 13px;
+            color: var(--gray-500);
+            margin-top: 4px;
+        }
+
+        .edit-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            background: var(--gray-100);
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--gray-700);
+            transition: all 0.2s;
+        }
+
+        .edit-btn:hover {
+            background: var(--gray-200);
+        }
+
+        .edit-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Profile Form */
+        .profile-form {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray-600);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px 14px;
+            border: 2px solid var(--gray-200);
+            border-radius: 10px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 15px;
+            color: var(--gray-800);
+            transition: all 0.2s;
+            background: var(--white);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--navy);
+        }
+
+        .form-group input:disabled,
+        .form-group select:disabled {
+            background: var(--gray-100);
+            color: var(--gray-500);
+            cursor: not-allowed;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-actions {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--navy);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--navy-light);
+        }
+
+        .btn-secondary {
+            background: var(--gray-100);
+            color: var(--gray-700);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-200);
+        }
+
+        .btn-danger {
+            background: #fee2e2;
+            color: var(--red);
+        }
+
+        .btn-danger:hover {
+            background: #fecaca;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Info Display (Read-only mode) */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .info-item.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .info-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--gray-500);
+        }
+
+        .info-value {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--gray-800);
+        }
+
+        .info-value.empty {
+            color: var(--gray-400);
+            font-style: italic;
+        }
+
+        /* Danger Zone */
+        .danger-zone {
+            border: 2px solid #fecaca;
+            background: #fef2f2;
+        }
+
+        .danger-zone .card-title {
+            color: var(--red);
+        }
+
+        .danger-description {
+            color: var(--gray-600);
+            font-size: 14px;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        /* ========== MODALS ========== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            padding: 20px;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--white);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 480px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.show .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            border: none;
+            background: var(--gray-100);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: var(--gray-200);
+        }
+
+        .modal-close svg {
+            width: 20px;
+            height: 20px;
+            color: var(--gray-600);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        /* Avatar Upload Modal */
+        .avatar-upload-area {
+            border: 2px dashed var(--gray-300);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 20px;
+        }
+
+        .avatar-upload-area:hover {
+            border-color: var(--navy);
+            background: var(--gray-50);
+        }
+
+        .avatar-upload-area svg {
+            width: 48px;
+            height: 48px;
+            color: var(--gray-400);
+            margin-bottom: 12px;
+        }
+
+        .avatar-upload-area p {
+            color: var(--gray-600);
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .avatar-upload-area span {
+            color: var(--gray-400);
+            font-size: 12px;
+        }
+
+        .avatar-preview-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .avatar-preview-container.show {
+            display: flex;
+        }
+
+        .avatar-preview {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 4px solid var(--gray-200);
+        }
+
+        .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-preview-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Delete Account Modal */
+        .delete-warning {
+            background: #fef2f2;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .delete-warning-icon {
+            width: 48px;
+            height: 48px;
+            background: #fee2e2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+        }
+
+        .delete-warning-icon svg {
+            width: 24px;
+            height: 24px;
+            color: var(--red);
+        }
+
+        .delete-warning h3 {
+            text-align: center;
+            color: var(--red);
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .delete-warning p {
+            text-align: center;
+            color: var(--gray-600);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .delete-confirmation {
+            margin-bottom: 16px;
+        }
+
+        .delete-confirmation label {
+            font-size: 14px;
+            color: var(--gray-700);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .delete-confirmation input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid var(--gray-200);
+            border-radius: 10px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 15px;
+        }
+
+        .delete-confirmation input:focus {
+            outline: none;
+            border-color: var(--red);
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 14px 20px;
+            border-radius: 12px;
+            color: var(--white);
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 2000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            background: var(--green);
+        }
+
+        .toast.error {
+            background: var(--red);
+        }
+
+        .toast svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* ========== MOBILE SIDEBAR ========== */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 99;
+        }
+
+        .sidebar-overlay.show {
+            display: block;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .profile-page {
+                padding: 16px;
+            }
+
+            .profile-header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .profile-status {
+                margin-left: 0;
+                text-align: center;
+                margin-top: 16px;
+            }
+
+            .profile-form,
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full-width,
+            .info-item.full-width {
+                grid-column: 1;
+            }
+
+            .profile-header-card {
+                padding: 24px;
+            }
+
+            .profile-avatar {
+                width: 100px;
+                height: 100px;
+                font-size: 36px;
+            }
+
+            .profile-header-info h1 {
+                font-size: 22px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .form-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .modal {
+                margin: 10px;
+            }
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: var(--gray-100);
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--gray-200);
+            border-top-color: var(--navy);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ========== DARK MODE ========== */
+        body.dark-mode {
+            --gray-50: #1e293b;
+            --gray-100: #0f172a;
+            --gray-200: #1e293b;
+            --gray-300: #334155;
+            --gray-400: #64748b;
+            --gray-500: #94a3b8;
+            --gray-600: #cbd5e1;
+            --gray-700: #e2e8f0;
+            --gray-800: #f1f5f9;
+        }
+
+        body.dark-mode .sidebar {
+            background: #0a0f1a;
+        }
+
+        body.dark-mode .main-content {
+            background: var(--gray-100);
+        }
+
+        body.dark-mode .topbar {
+            background: var(--gray-200);
+            border-bottom-color: var(--gray-300);
+        }
+
+        body.dark-mode .page-title {
+            color: var(--gray-800);
+        }
+
+        body.dark-mode .icon-btn {
+            background: var(--gray-300);
+        }
+
+        body.dark-mode .icon-btn svg {
+            color: var(--gray-500);
+        }
+
+        body.dark-mode .card {
+            background: var(--gray-200);
+        }
+
+        body.dark-mode .card-title {
+            color: var(--gray-800);
+        }
+
+        body.dark-mode .form-group input,
+        body.dark-mode .form-group select,
+        body.dark-mode .form-group textarea {
+            background: var(--gray-300);
+            border-color: var(--gray-300);
+            color: var(--gray-800);
+        }
+
+        body.dark-mode .form-group input:disabled,
+        body.dark-mode .form-group select:disabled {
+            background: var(--gray-200);
+            color: var(--gray-500);
+        }
+
+        body.dark-mode .info-value {
+            color: var(--gray-800);
+        }
+
+        body.dark-mode .edit-btn {
+            background: var(--gray-300);
+            color: var(--gray-700);
+        }
+
+        body.dark-mode .modal {
+            background: var(--gray-200);
+        }
+
+        body.dark-mode .modal-header {
+            border-bottom-color: var(--gray-300);
+        }
+
+        body.dark-mode .modal-title {
+            color: var(--gray-800);
+        }
+
+        body.dark-mode .modal-footer {
+            border-top-color: var(--gray-300);
+        }
+
+        body.dark-mode .avatar-upload-area {
+            border-color: var(--gray-400);
+        }
+
+        body.dark-mode .avatar-upload-area:hover {
+            background: var(--gray-300);
+        }
+
+        body.dark-mode .loading {
+            background: var(--gray-100);
+        }
+
+        body.dark-mode .danger-zone {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading State -->
+    <div class="loading" id="loadingState">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Sidebar Overlay (Mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="dashboard.html" class="sidebar-logo">
+                <div class="logo-icon">
+                    <div class="cap">
+                        <div class="cap-button"></div>
+                        <div class="cap-board"></div>
+                        <div class="cap-crown"></div>
+                        <div class="tassel"></div>
+                    </div>
+                    <span class="logo-m">M</span>
+                </div>
+                <span class="logo-text">yUB</span>
+            </a>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <div class="nav-section-title">Menu</div>
+                <a href="dashboard.html" class="nav-item">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    Dashboard
+                </a>
+                <a href="gpa-calculator.html" class="nav-item">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                    GPA Calculator
+                </a>
+                <a href="schedule.html" class="nav-item">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    Schedule
+                </a>
+                <a href="notes.html" class="nav-item">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                    Notes
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Social</div>
+                <a href="study-groups.html" class="nav-item">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                    Study Groups
+                </a>
+                <a href="messages.html" class="nav-item">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                    Messages
+                    <span class="badge" id="unreadBadge" style="display: none;">0</span>
+                </a>
+                <a href="friends.html" class="nav-item">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                    Friends
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Account</div>
+                <a href="profile.html" class="nav-item active">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    Profile
+                </a>
+                <button class="nav-item" onclick="handleLogout()">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                    Sign Out
+                </button>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent" style="display: none;">
+        <!-- Top Bar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+                <h1 class="page-title">My Profile</h1>
+            </div>
+            <div class="topbar-right">
+                <button class="icon-btn">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                    <span class="notification-dot" id="notificationDot" style="display: none;"></span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Profile Content -->
+        <div class="profile-page">
+            <!-- Profile Header Card -->
+            <div class="profile-header-card">
+                <div class="profile-header-content">
+                    <div class="profile-avatar-wrapper">
+                        <div class="profile-avatar" id="profileAvatar">--</div>
+                        <button class="avatar-edit-btn" onclick="openAvatarModal()">
+                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        </button>
+                    </div>
+                    <div class="profile-header-info">
+                        <h1 id="profileName">Loading...</h1>
+                        <p class="student-id" id="profileStudentId">Student ID: ...</p>
+                        <span class="program-badge" id="profileProgram">...</span>
+                    </div>
+                    <div class="profile-status">
+                        <div class="online-status">
+                            <span class="dot"></span>
+                            Online
+                        </div>
+                        <p class="member-since" id="memberSince">Member since ...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Information Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Profile Information</h2>
+                        <p class="card-subtitle">Manage your personal details</p>
+                    </div>
+                    <button class="edit-btn" id="editToggleBtn" onclick="toggleEditMode()">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                        Edit
+                    </button>
+                </div>
+
+                <!-- Read-only View -->
+                <div class="info-grid" id="infoView">
+                    <div class="info-item">
+                        <span class="info-label">First Name</span>
+                        <span class="info-value" id="infoFirstName">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Last Name</span>
+                        <span class="info-value" id="infoLastName">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Email</span>
+                        <span class="info-value" id="infoEmail">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Student ID</span>
+                        <span class="info-value" id="infoStudentId">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Year of Study</span>
+                        <span class="info-value" id="infoYear">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Program Type</span>
+                        <span class="info-value" id="infoProgramType">-</span>
+                    </div>
+                    <div class="info-item full-width">
+                        <span class="info-label">Program Name</span>
+                        <span class="info-value" id="infoProgramName">-</span>
+                    </div>
+                    <div class="info-item full-width">
+                        <span class="info-label">Bio</span>
+                        <span class="info-value" id="infoBio">-</span>
+                    </div>
+                </div>
+
+                <!-- Edit Form -->
+                <form class="profile-form" id="editForm" style="display: none;" onsubmit="saveProfile(event)">
+                    <div class="form-group">
+                        <label for="editFirstName">First Name</label>
+                        <input type="text" id="editFirstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editLastName">Last Name</label>
+                        <input type="text" id="editLastName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editEmail">Email</label>
+                        <input type="email" id="editEmail" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="editStudentId">Student ID</label>
+                        <input type="text" id="editStudentId" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="editYear">Year of Study</label>
+                        <select id="editYear" required>
+                            <option value="1">Year 1</option>
+                            <option value="2">Year 2</option>
+                            <option value="3">Year 3</option>
+                            <option value="4">Year 4</option>
+                            <option value="5">Year 5</option>
+                            <option value="6">Year 6</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editProgramType">Program Type</label>
+                        <select id="editProgramType" required>
+                            <option value="bachelor">Bachelor's Degree</option>
+                            <option value="graduate">Graduate/Master's</option>
+                            <option value="diploma">Diploma</option>
+                            <option value="certificate">Certificate</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="editProgramName">Program Name</label>
+                        <input type="text" id="editProgramName" placeholder="e.g., Computer Science" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="editBio">Bio</label>
+                        <textarea id="editBio" placeholder="Tell us about yourself..."></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="cancelEdit()">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="saveBtn">
+                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16" height="16"><path d="M5 13l4 4L19 7"/></svg>
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Danger Zone -->
+            <div class="card danger-zone">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">⚠️ Danger Zone</h2>
+                    </div>
+                </div>
+                <p class="danger-description">
+                    Once you delete your account, there is no going back. This will permanently delete your profile, courses, notes, messages, and all associated data.
+                </p>
+                <button class="btn btn-danger" onclick="openDeleteModal()">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="18" height="18"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    Delete Account
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Avatar Upload Modal -->
+    <div class="modal-overlay" id="avatarModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Update Profile Picture</h3>
+                <button class="modal-close" onclick="closeAvatarModal()">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="avatar-upload-area" id="uploadArea" onclick="document.getElementById('avatarInput').click()">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    <p>Click to upload an image</p>
+                    <span>JPG, PNG, GIF or WebP (max 2MB)</span>
+                </div>
+                <input type="file" id="avatarInput" accept="image/jpeg,image/png,image/gif,image/webp" style="display: none;" onchange="handleAvatarSelect(event)">
+                
+                <div class="avatar-preview-container" id="avatarPreviewContainer">
+                    <div class="avatar-preview">
+                        <img id="avatarPreviewImg" src="" alt="Preview">
+                    </div>
+                    <div class="avatar-preview-actions">
+                        <button class="btn btn-secondary" onclick="resetAvatarUpload()">Choose Different</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeAvatarModal()">Cancel</button>
+                <button class="btn btn-primary" id="uploadAvatarBtn" onclick="uploadAvatar()" disabled>
+                    Upload Photo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Account Modal -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Delete Account</h3>
+                <button class="modal-close" onclick="closeDeleteModal()">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="delete-warning">
+                    <div class="delete-warning-icon">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    </div>
+                    <h3>This action cannot be undone</h3>
+                    <p>This will permanently delete your account and remove all your data from our servers including your courses, notes, messages, and study groups.</p>
+                </div>
+                <div class="delete-confirmation">
+                    <label>Type <strong>DELETE</strong> to confirm:</label>
+                    <input type="text" id="deleteConfirmInput" placeholder="DELETE" oninput="checkDeleteConfirmation()">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+                <button class="btn btn-danger" id="confirmDeleteBtn" onclick="deleteAccount()" disabled>
+                    Delete My Account
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast" id="toast">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+        <span id="toastMessage">Success!</span>
+    </div>
+
+    <script>
+        // Supabase Init
+        const SUPABASE_URL = 'https://weuxtwmaqmbhskjpjdyi.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndldXh0d21hcW1iaHNranBqZHlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NTYzMTcsImV4cCI6MjA4MDMzMjMxN30.J-0Nd0MY6-g_ltbBNHwOulqZuQfb8mKIRgx0dAaJ76o';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let currentUser = null;
+        let userProfile = null;
+        let isEditMode = false;
+        let selectedAvatarFile = null;
+
+        // Initialize
+        async function init() {
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (!session) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            currentUser = session.user;
+            
+            // Check if user is banned
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('is_banned, ban_reason')
+                .eq('id', currentUser.id)
+                .single();
+
+            if (profile?.is_banned) {
+                alert('Your account has been suspended. Reason: ' + (profile.ban_reason || 'Violation of terms'));
+                await supabase.auth.signOut();
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Set user online
+            await supabase.rpc('update_online_status', { is_online_status: true });
+
+            // Load profile
+            await loadProfile();
+
+            // Load dark mode preference
+            if (localStorage.getItem('myub_darkMode') === 'true') {
+                document.body.classList.add('dark-mode');
+            }
+
+            // Show content
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+        }
+
+        // Load Profile Data
+        async function loadProfile() {
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', currentUser.id)
+                .single();
+
+            if (data) {
+                userProfile = data;
+                updateProfileUI();
+            }
+        }
+
+        // Update Profile UI
+        function updateProfileUI() {
+            const p = userProfile;
+
+            // Header
+            document.getElementById('profileName').textContent = p.full_name || `${p.first_name} ${p.last_name}`;
+            document.getElementById('profileStudentId').textContent = `Student ID: ${p.student_id}`;
+            document.getElementById('profileProgram').textContent = p.program_name || 'Student';
+            
+            // Avatar
+            const avatar = document.getElementById('profileAvatar');
+            if (p.avatar_url) {
+                avatar.innerHTML = `<img src="${p.avatar_url}" alt="Avatar">`;
+            } else {
+                avatar.textContent = getInitials(p.first_name, p.last_name);
+            }
+
+            // Member since
+            const joinDate = new Date(p.created_at);
+            document.getElementById('memberSince').textContent = `Member since ${joinDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`;
+
+            // Info view
+            document.getElementById('infoFirstName').textContent = p.first_name || '-';
+            document.getElementById('infoLastName').textContent = p.last_name || '-';
+            document.getElementById('infoEmail').textContent = p.email || '-';
+            document.getElementById('infoStudentId').textContent = p.student_id || '-';
+            document.getElementById('infoYear').textContent = p.year_of_study ? `Year ${p.year_of_study}` : '-';
+            document.getElementById('infoProgramType').textContent = formatProgramType(p.program_type) || '-';
+            document.getElementById('infoProgramName').textContent = p.program_name || '-';
+            
+            const bioEl = document.getElementById('infoBio');
+            if (p.bio) {
+                bioEl.textContent = p.bio;
+                bioEl.classList.remove('empty');
+            } else {
+                bioEl.textContent = 'No bio added yet';
+                bioEl.classList.add('empty');
+            }
+
+            // Edit form
+            document.getElementById('editFirstName').value = p.first_name || '';
+            document.getElementById('editLastName').value = p.last_name || '';
+            document.getElementById('editEmail').value = p.email || '';
+            document.getElementById('editStudentId').value = p.student_id || '';
+            document.getElementById('editYear').value = p.year_of_study || '1';
+            document.getElementById('editProgramType').value = p.program_type || 'bachelor';
+            document.getElementById('editProgramName').value = p.program_name || '';
+            document.getElementById('editBio').value = p.bio || '';
+        }
+
+        // Format program type
+        function formatProgramType(type) {
+            const types = {
+                'bachelor': "Bachelor's Degree",
+                'graduate': "Graduate/Master's",
+                'diploma': 'Diploma',
+                'certificate': 'Certificate'
+            };
+            return types[type] || type;
+        }
+
+        // Get initials
+        function getInitials(first, last) {
+            return ((first?.[0] || '') + (last?.[0] || '')).toUpperCase() || '??';
+        }
+
+        // Toggle Edit Mode
+        function toggleEditMode() {
+            isEditMode = !isEditMode;
+            document.getElementById('infoView').style.display = isEditMode ? 'none' : 'grid';
+            document.getElementById('editForm').style.display = isEditMode ? 'grid' : 'none';
+            document.getElementById('editToggleBtn').innerHTML = isEditMode 
+                ? '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg> Cancel'
+                : '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg> Edit';
+        }
+
+        // Cancel Edit
+        function cancelEdit() {
+            updateProfileUI(); // Reset form
+            toggleEditMode();
+        }
+
+        // Save Profile
+        async function saveProfile(e) {
+            e.preventDefault();
+            
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;border-width:2px;"></div> Saving...';
+
+            try {
+                const updates = {
+                    first_name: document.getElementById('editFirstName').value,
+                    last_name: document.getElementById('editLastName').value,
+                    full_name: `${document.getElementById('editFirstName').value} ${document.getElementById('editLastName').value}`,
+                    year_of_study: parseInt(document.getElementById('editYear').value),
+                    program_type: document.getElementById('editProgramType').value,
+                    program_name: document.getElementById('editProgramName').value,
+                    bio: document.getElementById('editBio').value,
+                    updated_at: new Date().toISOString()
+                };
+
+                const { error } = await supabase
+                    .from('profiles')
+                    .update(updates)
+                    .eq('id', currentUser.id);
+
+                if (error) throw error;
+
+                // Reload profile
+                await loadProfile();
+                toggleEditMode();
+                showToast('Profile updated successfully!', 'success');
+
+            } catch (err) {
+                showToast(err.message, 'error');
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16" height="16"><path d="M5 13l4 4L19 7"/></svg> Save Changes';
+            }
+        }
+
+        // Avatar Modal
+        function openAvatarModal() {
+            document.getElementById('avatarModal').classList.add('show');
+            resetAvatarUpload();
+        }
+
+        function closeAvatarModal() {
+            document.getElementById('avatarModal').classList.remove('show');
+            resetAvatarUpload();
+        }
+
+        function resetAvatarUpload() {
+            selectedAvatarFile = null;
+            document.getElementById('avatarInput').value = '';
+            document.getElementById('uploadArea').style.display = 'block';
+            document.getElementById('avatarPreviewContainer').classList.remove('show');
+            document.getElementById('uploadAvatarBtn').disabled = true;
+        }
+
+        function handleAvatarSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Validate file size (2MB max)
+            if (file.size > 2 * 1024 * 1024) {
+                showToast('Image must be less than 2MB', 'error');
+                return;
+            }
+
+            // Validate file type
+            if (!['image/jpeg', 'image/png', 'image/gif', 'image/webp'].includes(file.type)) {
+                showToast('Please select a valid image file', 'error');
+                return;
+            }
+
+            selectedAvatarFile = file;
+
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('avatarPreviewImg').src = e.target.result;
+                document.getElementById('uploadArea').style.display = 'none';
+                document.getElementById('avatarPreviewContainer').classList.add('show');
+                document.getElementById('uploadAvatarBtn').disabled = false;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function uploadAvatar() {
+            if (!selectedAvatarFile) return;
+
+            const uploadBtn = document.getElementById('uploadAvatarBtn');
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = 'Uploading...';
+
+            try {
+                // Generate unique filename
+                const fileExt = selectedAvatarFile.name.split('.').pop();
+                const fileName = `${currentUser.id}/${Date.now()}.${fileExt}`;
+
+                // Upload to Supabase Storage
+                const { data: uploadData, error: uploadError } = await supabase.storage
+                    .from('avatars')
+                    .upload(fileName, selectedAvatarFile, {
+                        cacheControl: '3600',
+                        upsert: true
+                    });
+
+                if (uploadError) throw uploadError;
+
+                // Get public URL
+                const { data: urlData } = supabase.storage
+                    .from('avatars')
+                    .getPublicUrl(fileName);
+
+                // Update profile with avatar URL
+                const { error: updateError } = await supabase
+                    .from('profiles')
+                    .update({ avatar_url: urlData.publicUrl, updated_at: new Date().toISOString() })
+                    .eq('id', currentUser.id);
+
+                if (updateError) throw updateError;
+
+                // Reload profile and close modal
+                await loadProfile();
+                closeAvatarModal();
+                showToast('Profile picture updated!', 'success');
+
+            } catch (err) {
+                showToast(err.message, 'error');
+            } finally {
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = 'Upload Photo';
+            }
+        }
+
+        // Delete Account Modal
+        function openDeleteModal() {
+            document.getElementById('deleteModal').classList.add('show');
+            document.getElementById('deleteConfirmInput').value = '';
+            document.getElementById('confirmDeleteBtn').disabled = true;
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('show');
+        }
+
+        function checkDeleteConfirmation() {
+            const input = document.getElementById('deleteConfirmInput').value;
+            document.getElementById('confirmDeleteBtn').disabled = input !== 'DELETE';
+        }
+
+        async function deleteAccount() {
+            const confirmBtn = document.getElementById('confirmDeleteBtn');
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = 'Deleting...';
+
+            try {
+                // Delete profile (will cascade to other tables)
+                const { error } = await supabase.rpc('delete_user_account');
+                
+                if (error) throw error;
+
+                // Sign out
+                await supabase.auth.signOut();
+                
+                // Redirect to home
+                window.location.href = 'index.html';
+
+            } catch (err) {
+                showToast(err.message, 'error');
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = 'Delete My Account';
+            }
+        }
+
+        // Toast Notifications
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            toast.className = `toast ${type}`;
+            toastMessage.textContent = message;
+            
+            // Update icon
+            const iconPath = type === 'success' 
+                ? 'M5 13l4 4L19 7' 
+                : 'M6 18L18 6M6 6l12 12';
+            toast.querySelector('svg path').setAttribute('d', iconPath);
+            
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Sidebar Toggle
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('show');
+        }
+
+        // Logout
+        async function handleLogout() {
+            await supabase.rpc('update_online_status', { is_online_status: false });
+            await supabase.auth.signOut();
+            window.location.href = 'index.html';
+        }
+
+        // Handle online status on visibility change
+        document.addEventListener('visibilitychange', async () => {
+            if (currentUser) {
+                await supabase.rpc('update_online_status', { 
+                    is_online_status: document.visibilityState === 'visible' 
+                });
+            }
+        });
+
+        // Set offline on page unload
+        window.addEventListener('beforeunload', async () => {
+            if (currentUser) {
+                navigator.sendBeacon && navigator.sendBeacon(
+                    `${SUPABASE_URL}/rest/v1/rpc/update_online_status`,
+                    JSON.stringify({ is_online_status: false })
+                );
+            }
+        });
+
+        // Initialize
+        init();
+    </script>
+</body>
+</html>

@@ -13,6 +13,8 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
         }
 
         :root {
@@ -1200,6 +1202,16 @@
 
             .user-dropdown:not(.show) {
                 transform: translateY(100%);
+            }
+
+            .notification-dropdown {
+                position: fixed;
+                top: 60px;
+                left: 8px;
+                right: 8px;
+                width: auto;
+                border-radius: 16px;
+                max-height: calc(100vh - 80px);
             }
         }
 

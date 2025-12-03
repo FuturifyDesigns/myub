@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; }
         :root {
             --navy: #1a365d; --navy-light: #2c5282; --navy-dark: #0f2744; --red: #c41e3a;
             --white: #ffffff; --gray-50: #f8fafc; --gray-100: #f1f5f9; --gray-200: #e2e8f0;
@@ -263,7 +263,7 @@
             .friend-actions { width: 100%; margin-top: 12px; justify-content: flex-end; }
             .search-input-wrapper { flex-direction: column; }
             .search-btn { width: 100%; justify-content: center; }
-            .notification-dropdown { width: 100vw; right: -12px; border-radius: 0 0 16px 16px; }
+            .notification-dropdown { position: fixed; top: 60px; left: 8px; right: 8px; width: auto; border-radius: 16px; max-height: calc(100vh - 80px); }
         }
         @media (max-width: 480px) {
             .tabs { gap: 2px; padding: 3px; }

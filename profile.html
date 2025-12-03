@@ -11,7 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; }
 
         :root {
             --navy: #1a365d;
@@ -880,6 +880,16 @@
 
             .crop-layout { flex-direction: column; }
             .crop-sidebar { width: 100%; flex-direction: row; justify-content: center; }
+
+            .notification-dropdown {
+                position: fixed;
+                top: 60px;
+                left: 8px;
+                right: 8px;
+                width: auto;
+                border-radius: 16px;
+                max-height: calc(100vh - 80px);
+            }
         }
 
         @media (max-width: 480px) {

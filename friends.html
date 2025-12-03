@@ -245,6 +245,34 @@
         body.dark-mode .modal { background: var(--gray-700); }
         body.dark-mode .modal-header, body.dark-mode .modal-footer { border-color: var(--gray-600); }
         body.dark-mode .modal-title { color: var(--white); }
+        body.dark-mode .discover-header h3 { color: var(--white); }
+        body.dark-mode .discover-card { background: var(--gray-700); }
+        body.dark-mode .discover-name { color: var(--white); }
+        body.dark-mode .filter-select { background: var(--gray-700); border-color: var(--gray-600); color: var(--white); }
+
+        /* Discovery Tab Styles */
+        .discover-header { text-align: center; padding: 24px 0 16px; }
+        .discover-header h3 { font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 700; color: var(--gray-800); margin-bottom: 4px; }
+        .discover-header p { font-size: 14px; color: var(--gray-500); }
+        .discover-filters { display: flex; justify-content: flex-end; margin-bottom: 16px; }
+        .filter-select { padding: 8px 14px; border: 2px solid var(--gray-200); border-radius: 8px; font-family: 'Outfit', sans-serif; font-size: 14px; background: var(--white); cursor: pointer; }
+        .filter-select:focus { outline: none; border-color: var(--navy); }
+        .discover-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+        .discover-card { background: var(--white); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; align-items: center; text-align: center; cursor: pointer; transition: all 0.2s; border: 2px solid transparent; }
+        .discover-card:hover { border-color: var(--navy); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
+        .discover-avatar { position: relative; width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); display: flex; align-items: center; justify-content: center; color: var(--white); font-family: 'Sora', sans-serif; font-weight: 700; font-size: 24px; margin-bottom: 12px; overflow: hidden; }
+        .discover-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .discover-avatar .online-dot { position: absolute; bottom: 2px; right: 2px; width: 14px; height: 14px; background: var(--green); border-radius: 50%; border: 3px solid var(--white); }
+        .discover-avatar .online-dot.offline { background: var(--gray-400); }
+        .discover-name { font-size: 16px; font-weight: 600; color: var(--gray-800); margin-bottom: 4px; }
+        .discover-program { font-size: 13px; color: var(--gray-500); margin-bottom: 8px; }
+        .discover-status { font-size: 12px; color: var(--green); display: flex; align-items: center; gap: 4px; }
+        .discover-status.offline { color: var(--gray-400); }
+        .discover-status .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+        .discover-actions { display: flex; gap: 8px; margin-top: 12px; width: 100%; }
+        .discover-actions .btn { flex: 1; justify-content: center; padding: 8px 12px; font-size: 13px; }
+        .loading-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; color: var(--gray-400); }
+        .loading-spinner-small { width: 32px; height: 32px; border: 3px solid var(--gray-200); border-top-color: var(--navy); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 12px; }
 
         /* Mobile Responsive */
         @media (max-width: 768px) {
@@ -255,7 +283,7 @@
             .menu-toggle { display: block; }
             .friends-page { padding: 16px; }
             .tabs { flex-wrap: wrap; }
-            .tab { flex: 1; min-width: 100px; justify-content: center; }
+            .tab { flex: 1; min-width: 80px; justify-content: center; font-size: 13px; padding: 10px 8px; }
             .stats-bar { grid-template-columns: repeat(3, 1fr); gap: 8px; }
             .stat-card { padding: 12px; }
             .stat-value { font-size: 22px; }
@@ -264,12 +292,18 @@
             .search-input-wrapper { flex-direction: column; }
             .search-btn { width: 100%; justify-content: center; }
             .notification-dropdown { position: fixed; top: 60px; left: 8px; right: 8px; width: auto; border-radius: 16px; max-height: calc(100vh - 80px); }
+            .discover-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+            .discover-card { padding: 16px; }
+            .discover-avatar { width: 60px; height: 60px; font-size: 20px; }
+            .discover-filters { justify-content: center; }
         }
         @media (max-width: 480px) {
             .tabs { gap: 2px; padding: 3px; }
-            .tab { padding: 8px 12px; font-size: 13px; }
+            .tab { padding: 8px 8px; font-size: 12px; min-width: 70px; }
             .friend-avatar { width: 48px; height: 48px; font-size: 16px; }
             .btn { padding: 8px 12px; font-size: 13px; }
+            .discover-grid { grid-template-columns: 1fr; }
+            .discover-actions { flex-direction: column; }
         }
     </style>
 </head>
@@ -340,6 +374,7 @@
                 <button class="tab active" data-tab="friends" onclick="switchTab('friends')">All Friends</button>
                 <button class="tab" data-tab="requests" onclick="switchTab('requests')">Requests<span class="count" id="requestsCount" style="display:none;">0</span></button>
                 <button class="tab" data-tab="find" onclick="switchTab('find')">Find Students</button>
+                <button class="tab" data-tab="discover" onclick="switchTab('discover')">Discover</button>
             </div>
 
             <div class="tab-content active" id="friendsTab">
@@ -373,6 +408,23 @@
                         <h3>Find Students</h3>
                         <p>Search for students by name or program to connect with them</p>
                     </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="discoverTab">
+                <div class="discover-header">
+                    <h3>Discover People on MyUB</h3>
+                    <p>Connect with other students at the University of Botswana</p>
+                </div>
+                <div class="discover-filters">
+                    <select class="filter-select" id="discoverFilter" onchange="loadDiscoverUsers()">
+                        <option value="all">All Users</option>
+                        <option value="online">Online Now</option>
+                        <option value="recent">Recently Active</option>
+                    </select>
+                </div>
+                <div id="discoverContainer">
+                    <div class="loading-state"><div class="loading-spinner-small"></div><p>Loading users...</p></div>
                 </div>
             </div>
         </div>
@@ -473,6 +525,7 @@
         let notifications = [];
         let blockedUsers = [];
         let blockedByUsers = []; // Users who blocked current user
+        let discoverUsers = [];
         let confirmCallback = null;
         let selectedProfileUser = null;
 
@@ -703,8 +756,23 @@
             supabase.channel('friendships').on('postgres_changes', { event: '*', schema: 'public', table: 'friendships' }, () => loadFriends()).subscribe();
             supabase.channel('notifications').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${currentUser.id}` }, (p) => { notifications.unshift(p.new); renderNotifications(); showToast(p.new.title); }).subscribe();
             supabase.channel('online-status').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, (p) => {
+                // Update friends list
                 const idx = friends.findIndex(f => f.id === p.new.id);
-                if (idx !== -1) { const wasOff = !friends[idx].is_online; friends[idx].is_online = p.new.is_online; friends[idx].last_seen = p.new.last_seen; renderFriends(); updateStats(); if (wasOff && p.new.is_online) showToast(`${friends[idx].full_name||friends[idx].first_name} is online`, 'success'); }
+                if (idx !== -1) { 
+                    const wasOff = !friends[idx].is_online; 
+                    friends[idx].is_online = p.new.is_online; 
+                    friends[idx].last_seen = p.new.last_seen; 
+                    renderFriends(); 
+                    updateStats(); 
+                    if (wasOff && p.new.is_online) showToast(`${friends[idx].full_name||friends[idx].first_name} is online`, 'success'); 
+                }
+                // Update discover list
+                const discoverIdx = discoverUsers.findIndex(u => u.id === p.new.id);
+                if (discoverIdx !== -1) {
+                    discoverUsers[discoverIdx].is_online = p.new.is_online;
+                    discoverUsers[discoverIdx].last_seen = p.new.last_seen;
+                    renderDiscoverUsers();
+                }
             }).subscribe();
         }
 
@@ -719,6 +787,121 @@
             document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.getElementById(`${tab}Tab`).classList.add('active');
+            
+            // Load discover users when switching to discover tab
+            if (tab === 'discover' && discoverUsers.length === 0) {
+                loadDiscoverUsers();
+            }
+        }
+
+        // =============================================
+        // DISCOVER USERS
+        // =============================================
+        async function loadDiscoverUsers() {
+            const container = document.getElementById('discoverContainer');
+            container.innerHTML = '<div class="loading-state"><div class="loading-spinner-small"></div><p>Loading users...</p></div>';
+
+            const filter = document.getElementById('discoverFilter').value;
+            
+            try {
+                let query = supabase
+                    .from('profiles')
+                    .select('id, first_name, last_name, full_name, avatar_url, program_name, is_online, last_seen, created_at')
+                    .neq('id', currentUser.id)
+                    .limit(50);
+
+                if (filter === 'online') {
+                    query = query.eq('is_online', true);
+                } else if (filter === 'recent') {
+                    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+                    query = query.gte('last_seen', oneHourAgo);
+                }
+
+                query = query.order('is_online', { ascending: false }).order('last_seen', { ascending: false });
+
+                const { data: users, error } = await query;
+
+                if (error) throw error;
+
+                // Filter out blocked users
+                const blockedIds = blockedUsers.map(b => b.blocked_id);
+                discoverUsers = (users || []).filter(u => !blockedIds.includes(u.id) && !blockedByUsers.includes(u.id));
+
+                renderDiscoverUsers();
+            } catch (e) {
+                console.error('Error loading discover users:', e);
+                container.innerHTML = '<div class="empty-state"><p>Error loading users</p></div>';
+            }
+        }
+
+        function renderDiscoverUsers() {
+            const container = document.getElementById('discoverContainer');
+
+            if (discoverUsers.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                        <h3>No users found</h3>
+                        <p>Try a different filter</p>
+                    </div>`;
+                return;
+            }
+
+            // Get friend IDs and request IDs for button states
+            const friendIds = friends.map(f => f.id);
+            const outgoingIds = outgoingRequests.map(r => r.receiver?.id || r.receiver_id);
+            const incomingIds = incomingRequests.map(r => r.sender?.id || r.sender_id);
+
+            container.innerHTML = '<div class="discover-grid">' + discoverUsers.map(user => {
+                const name = user.full_name || `${user.first_name} ${user.last_name}`;
+                const initials = getInitials(name);
+                const isFriend = friendIds.includes(user.id);
+                const hasSentRequest = outgoingIds.includes(user.id);
+                const hasIncomingRequest = incomingIds.includes(user.id);
+
+                let actionButtons = '';
+                if (isFriend) {
+                    actionButtons = `<button class="btn btn-secondary" disabled>Already Friends</button>`;
+                } else if (hasSentRequest) {
+                    actionButtons = `<button class="btn btn-secondary" disabled>Request Sent</button>`;
+                } else if (hasIncomingRequest) {
+                    actionButtons = `<button class="btn btn-success" onclick="event.stopPropagation(); acceptRequestFromDiscover('${user.id}')">Accept Request</button>`;
+                } else {
+                    actionButtons = `<button class="btn btn-primary" onclick="event.stopPropagation(); sendFriendRequest('${user.id}', '${escapeHtml(name)}')">Add Friend</button>`;
+                }
+
+                return `
+                    <div class="discover-card" onclick="openProfileModal('${user.id}')">
+                        <div class="discover-avatar">
+                            ${user.avatar_url ? `<img src="${user.avatar_url}" alt="">` : initials}
+                            <div class="online-dot ${user.is_online ? '' : 'offline'}"></div>
+                        </div>
+                        <div class="discover-name">${escapeHtml(name)}</div>
+                        <div class="discover-program">${escapeHtml(user.program_name || 'Student')}</div>
+                        <div class="discover-status ${user.is_online ? '' : 'offline'}">
+                            <span class="dot"></span>
+                            ${user.is_online ? 'Online' : (user.last_seen ? formatTimeAgo(user.last_seen) : 'Offline')}
+                        </div>
+                        <div class="discover-actions">
+                            ${actionButtons}
+                            <button class="btn btn-secondary" onclick="event.stopPropagation(); messageUser('${user.id}')">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:16px;height:16px;"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                            </button>
+                        </div>
+                    </div>`;
+            }).join('') + '</div>';
+        }
+
+        async function acceptRequestFromDiscover(userId) {
+            const request = incomingRequests.find(r => (r.sender?.id || r.sender_id) === userId);
+            if (request) {
+                await acceptRequest(request.id, request.sender?.first_name || 'User');
+                await loadDiscoverUsers();
+            }
+        }
+
+        function messageUser(userId) {
+            window.location.href = `messages.html?user=${userId}`;
         }
 
         // =============================================

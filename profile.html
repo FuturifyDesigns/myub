@@ -7,17 +7,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
-    <!-- Cropper.js CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Cropper.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
             --navy: #1a365d;
@@ -35,11 +29,6 @@
             --gray-700: #334155;
             --gray-800: #1e293b;
             --green: #22c55e;
-            --yellow: #eab308;
-            --blue: #3b82f6;
-            --purple: #8b5cf6;
-            --pink: #ec4899;
-            --orange: #f97316;
         }
 
         body {
@@ -156,9 +145,7 @@
             margin-left: -2px;
         }
 
-        .nav-section {
-            margin-bottom: 24px;
-        }
+        .nav-section { margin-bottom: 24px; }
 
         .nav-section-title {
             font-size: 11px;
@@ -198,11 +185,7 @@
             border-right: 3px solid var(--red);
         }
 
-        .nav-item svg {
-            width: 20px;
-            height: 20px;
-            flex-shrink: 0;
-        }
+        .nav-item svg { width: 20px; height: 20px; flex-shrink: 0; }
 
         .nav-item .badge {
             margin-left: auto;
@@ -215,12 +198,8 @@
         }
 
         /* ========== MAIN CONTENT ========== */
-        .main-content {
-            margin-left: 260px;
-            min-height: 100vh;
-        }
+        .main-content { margin-left: 260px; min-height: 100vh; }
 
-        /* Top Bar */
         .topbar {
             background: var(--white);
             padding: 16px 24px;
@@ -233,11 +212,7 @@
             z-index: 50;
         }
 
-        .topbar-left {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
+        .topbar-left { display: flex; align-items: center; gap: 16px; }
 
         .menu-toggle {
             display: none;
@@ -255,11 +230,7 @@
             color: var(--gray-800);
         }
 
-        .topbar-right {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
+        .topbar-right { display: flex; align-items: center; gap: 16px; }
 
         .icon-btn {
             width: 40px;
@@ -275,15 +246,8 @@
             transition: all 0.2s;
         }
 
-        .icon-btn:hover {
-            background: var(--gray-200);
-        }
-
-        .icon-btn svg {
-            width: 20px;
-            height: 20px;
-            color: var(--gray-600);
-        }
+        .icon-btn:hover { background: var(--gray-200); }
+        .icon-btn svg { width: 20px; height: 20px; color: var(--gray-600); }
 
         .icon-btn .notification-dot {
             position: absolute;
@@ -332,9 +296,7 @@
             z-index: 1;
         }
 
-        .profile-avatar-wrapper {
-            position: relative;
-        }
+        .profile-avatar-wrapper { position: relative; }
 
         .profile-avatar {
             width: 120px;
@@ -351,11 +313,7 @@
             overflow: hidden;
         }
 
-        .profile-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+        .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
         .avatar-edit-btn {
             position: absolute;
@@ -374,15 +332,8 @@
             transition: all 0.2s;
         }
 
-        .avatar-edit-btn:hover {
-            transform: scale(1.1);
-        }
-
-        .avatar-edit-btn svg {
-            width: 18px;
-            height: 18px;
-            color: var(--navy);
-        }
+        .avatar-edit-btn:hover { transform: scale(1.1); }
+        .avatar-edit-btn svg { width: 18px; height: 18px; color: var(--navy); }
 
         .profile-header-info h1 {
             font-family: 'Sora', sans-serif;
@@ -406,12 +357,8 @@
             font-weight: 500;
         }
 
-        .profile-status {
-            margin-left: auto;
-            text-align: right;
-        }
+        .profile-status { margin-left: auto; text-align: right; }
 
-        /* Online Status Indicator */
         .online-status {
             display: flex;
             align-items: center;
@@ -432,18 +379,8 @@
             box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.3);
         }
 
-        .online-status .status-dot.offline {
-            background: var(--gray-400);
-        }
-
-        .online-status .status-text {
-            transition: all 0.3s;
-        }
-
-        .member-since {
-            font-size: 13px;
-            opacity: 0.7;
-        }
+        .online-status .status-dot.offline { background: var(--gray-400); }
+        .member-since { font-size: 13px; opacity: 0.7; }
 
         /* Cards */
         .card {
@@ -488,14 +425,8 @@
             transition: all 0.2s;
         }
 
-        .edit-btn:hover {
-            background: var(--gray-200);
-        }
-
-        .edit-btn svg {
-            width: 16px;
-            height: 16px;
-        }
+        .edit-btn:hover { background: var(--gray-200); }
+        .edit-btn svg { width: 16px; height: 16px; }
 
         /* Profile Form */
         .profile-form {
@@ -510,9 +441,7 @@
             gap: 6px;
         }
 
-        .form-group.full-width {
-            grid-column: 1 / -1;
-        }
+        .form-group.full-width { grid-column: 1 / -1; }
 
         .form-group label {
             font-size: 13px;
@@ -547,10 +476,7 @@
             cursor: not-allowed;
         }
 
-        .form-group textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
+        .form-group textarea { resize: vertical; min-height: 100px; }
 
         .form-actions {
             grid-column: 1 / -1;
@@ -574,39 +500,15 @@
             gap: 8px;
         }
 
-        .btn-primary {
-            background: var(--navy);
-            color: var(--white);
-        }
+        .btn-primary { background: var(--navy); color: var(--white); }
+        .btn-primary:hover { background: var(--navy-light); }
+        .btn-secondary { background: var(--gray-100); color: var(--gray-700); }
+        .btn-secondary:hover { background: var(--gray-200); }
+        .btn-danger { background: #fee2e2; color: var(--red); }
+        .btn-danger:hover { background: #fecaca; }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        .btn-primary:hover {
-            background: var(--navy-light);
-        }
-
-        .btn-secondary {
-            background: var(--gray-100);
-            color: var(--gray-700);
-        }
-
-        .btn-secondary:hover {
-            background: var(--gray-200);
-        }
-
-        .btn-danger {
-            background: #fee2e2;
-            color: var(--red);
-        }
-
-        .btn-danger:hover {
-            background: #fecaca;
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        /* Info Display (Read-only mode) */
+        /* Info Display */
         .info-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -619,36 +521,14 @@
             gap: 4px;
         }
 
-        .info-item.full-width {
-            grid-column: 1 / -1;
-        }
-
-        .info-label {
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--gray-500);
-        }
-
-        .info-value {
-            font-size: 15px;
-            font-weight: 500;
-            color: var(--gray-800);
-        }
-
-        .info-value.empty {
-            color: var(--gray-400);
-            font-style: italic;
-        }
+        .info-item.full-width { grid-column: 1 / -1; }
+        .info-label { font-size: 13px; font-weight: 500; color: var(--gray-500); }
+        .info-value { font-size: 15px; font-weight: 500; color: var(--gray-800); }
+        .info-value.empty { color: var(--gray-400); font-style: italic; }
 
         /* Danger Zone */
-        .danger-zone {
-            border: 2px solid #fecaca;
-            background: #fef2f2;
-        }
-
-        .danger-zone .card-title {
-            color: var(--red);
-        }
+        .danger-zone { border: 2px solid #fecaca; background: #fef2f2; }
+        .danger-zone .card-title { color: var(--red); }
 
         .danger-description {
             color: var(--gray-600);
@@ -672,29 +552,20 @@
             padding: 20px;
         }
 
-        .modal-overlay.show {
-            opacity: 1;
-            visibility: visible;
-        }
+        .modal-overlay.show { opacity: 1; visibility: visible; }
 
         .modal {
             background: var(--white);
             border-radius: 20px;
             width: 100%;
-            max-width: 500px;
+            max-width: 480px;
             max-height: 90vh;
             overflow-y: auto;
             transform: scale(0.9);
             transition: transform 0.3s;
         }
 
-        .modal-overlay.show .modal {
-            transform: scale(1);
-        }
-
-        .modal.large {
-            max-width: 600px;
-        }
+        .modal-overlay.show .modal { transform: scale(1); }
 
         .modal-header {
             padding: 20px 24px;
@@ -724,19 +595,10 @@
             transition: all 0.2s;
         }
 
-        .modal-close:hover {
-            background: var(--gray-200);
-        }
+        .modal-close:hover { background: var(--gray-200); }
+        .modal-close svg { width: 20px; height: 20px; color: var(--gray-600); }
 
-        .modal-close svg {
-            width: 20px;
-            height: 20px;
-            color: var(--gray-600);
-        }
-
-        .modal-body {
-            padding: 24px;
-        }
+        .modal-body { padding: 24px; }
 
         .modal-footer {
             padding: 16px 24px;
@@ -746,19 +608,69 @@
             gap: 12px;
         }
 
-        /* Avatar Upload Modal */
-        .upload-step {
-            display: none;
+        /* Avatar Modal - Choice Step */
+        .avatar-choice {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
-        .upload-step.active {
-            display: block;
+        .avatar-choice-btn {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            background: var(--white);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
         }
 
+        .avatar-choice-btn:hover {
+            border-color: var(--navy);
+            background: var(--gray-50);
+        }
+
+        .avatar-choice-btn .choice-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: var(--gray-100);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .avatar-choice-btn .choice-icon svg {
+            width: 24px;
+            height: 24px;
+            color: var(--gray-600);
+        }
+
+        .avatar-choice-btn .choice-text h4 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 2px;
+        }
+
+        .avatar-choice-btn .choice-text p {
+            font-size: 13px;
+            color: var(--gray-500);
+        }
+
+        .avatar-choice-btn.danger { border-color: #fecaca; }
+        .avatar-choice-btn.danger:hover { background: #fef2f2; border-color: var(--red); }
+        .avatar-choice-btn.danger .choice-icon { background: #fee2e2; }
+        .avatar-choice-btn.danger .choice-icon svg { color: var(--red); }
+
+        /* Avatar Upload Area */
         .avatar-upload-area {
             border: 2px dashed var(--gray-300);
             border-radius: 16px;
-            padding: 40px;
+            padding: 32px;
             text-align: center;
             cursor: pointer;
             transition: all 0.2s;
@@ -770,87 +682,83 @@
         }
 
         .avatar-upload-area svg {
-            width: 48px;
-            height: 48px;
+            width: 40px;
+            height: 40px;
             color: var(--gray-400);
             margin-bottom: 12px;
         }
 
-        .avatar-upload-area p {
-            color: var(--gray-600);
-            font-size: 14px;
-            margin-bottom: 4px;
+        .avatar-upload-area p { color: var(--gray-600); font-size: 14px; margin-bottom: 4px; }
+        .avatar-upload-area span { color: var(--gray-400); font-size: 12px; }
+
+        /* Crop Step - Side by Side */
+        .crop-layout {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
         }
 
-        .avatar-upload-area span {
-            color: var(--gray-400);
-            font-size: 12px;
-        }
+        .crop-main { flex: 1; min-width: 0; }
 
-        /* Cropper Container */
-        .cropper-container-wrapper {
+        .cropper-wrapper {
             width: 100%;
-            max-height: 350px;
-            margin-bottom: 16px;
+            height: 220px;
+            background: var(--gray-100);
             border-radius: 12px;
             overflow: hidden;
-            background: var(--gray-100);
         }
 
-        .cropper-container-wrapper img {
-            max-width: 100%;
-            display: block;
-        }
+        .cropper-wrapper img { max-width: 100%; display: block; }
 
         .crop-controls {
             display: flex;
             justify-content: center;
-            gap: 8px;
-            margin-bottom: 16px;
+            gap: 6px;
+            margin-top: 12px;
         }
 
         .crop-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            border: none;
-            background: var(--gray-100);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-
-        .crop-btn:hover {
-            background: var(--gray-200);
-        }
-
-        .crop-btn svg {
-            width: 20px;
-            height: 20px;
-            color: var(--gray-600);
-        }
-
-        .crop-preview-wrapper {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
+            gap: 4px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: none;
+            background: var(--gray-100);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .crop-btn:hover { background: var(--gray-200); }
+        .crop-btn svg { width: 18px; height: 18px; color: var(--gray-600); }
+        .crop-btn span { font-size: 10px; color: var(--gray-500); font-weight: 500; }
+
+        .crop-sidebar {
+            width: 110px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
         }
 
         .crop-preview {
-            width: 150px;
-            height: 150px;
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
             overflow: hidden;
-            border: 4px solid var(--gray-200);
+            border: 3px solid var(--gray-200);
+            background: var(--gray-100);
         }
 
         .crop-preview-label {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--gray-500);
+            font-weight: 500;
         }
+
+        .upload-step { display: none; }
+        .upload-step.active { display: block; }
 
         /* Delete Account Modal */
         .delete-warning {
@@ -871,36 +779,12 @@
             margin: 0 auto 12px;
         }
 
-        .delete-warning-icon svg {
-            width: 24px;
-            height: 24px;
-            color: var(--red);
-        }
+        .delete-warning-icon svg { width: 24px; height: 24px; color: var(--red); }
+        .delete-warning h3 { text-align: center; color: var(--red); font-size: 16px; margin-bottom: 8px; }
+        .delete-warning p { text-align: center; color: var(--gray-600); font-size: 14px; line-height: 1.5; }
 
-        .delete-warning h3 {
-            text-align: center;
-            color: var(--red);
-            font-size: 16px;
-            margin-bottom: 8px;
-        }
-
-        .delete-warning p {
-            text-align: center;
-            color: var(--gray-600);
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        .delete-confirmation {
-            margin-bottom: 16px;
-        }
-
-        .delete-confirmation label {
-            font-size: 14px;
-            color: var(--gray-700);
-            margin-bottom: 8px;
-            display: block;
-        }
+        .delete-confirmation { margin-bottom: 16px; }
+        .delete-confirmation label { font-size: 14px; color: var(--gray-700); margin-bottom: 8px; display: block; }
 
         .delete-confirmation input {
             width: 100%;
@@ -911,12 +795,9 @@
             font-size: 15px;
         }
 
-        .delete-confirmation input:focus {
-            outline: none;
-            border-color: var(--red);
-        }
+        .delete-confirmation input:focus { outline: none; border-color: var(--red); }
 
-        /* Toast Notifications */
+        /* Toast */
         .toast {
             position: fixed;
             bottom: 24px;
@@ -935,25 +816,12 @@
             transition: all 0.3s;
         }
 
-        .toast.show {
-            transform: translateY(0);
-            opacity: 1;
-        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.success { background: var(--green); }
+        .toast.error { background: var(--red); }
+        .toast svg { width: 20px; height: 20px; }
 
-        .toast.success {
-            background: var(--green);
-        }
-
-        .toast.error {
-            background: var(--red);
-        }
-
-        .toast svg {
-            width: 20px;
-            height: 20px;
-        }
-
-        /* ========== MOBILE SIDEBAR ========== */
+        /* Sidebar Overlay */
         .sidebar-overlay {
             display: none;
             position: fixed;
@@ -962,92 +830,41 @@
             z-index: 99;
         }
 
-        .sidebar-overlay.show {
-            display: block;
-        }
+        .sidebar-overlay.show { display: block; }
 
         /* ========== RESPONSIVE ========== */
         @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-            }
-
-            .main-content {
-                margin-left: 0;
-            }
-
-            .menu-toggle {
-                display: block;
-            }
-
-            .profile-page {
-                padding: 16px;
-            }
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .menu-toggle { display: block; }
+            .profile-page { padding: 16px; }
 
             .profile-header-content {
                 flex-direction: column;
                 text-align: center;
             }
 
-            .profile-status {
-                margin-left: 0;
-                text-align: center;
-                margin-top: 16px;
-            }
+            .profile-status { margin-left: 0; text-align: center; margin-top: 16px; }
+            .online-status { justify-content: center; }
+            .profile-form, .info-grid { grid-template-columns: 1fr; }
+            .form-group.full-width, .info-item.full-width { grid-column: 1; }
+            .profile-header-card { padding: 24px; }
+            .profile-avatar { width: 100px; height: 100px; font-size: 36px; }
+            .profile-header-info h1 { font-size: 22px; }
 
-            .online-status {
-                justify-content: center;
-            }
-
-            .profile-form,
-            .info-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .form-group.full-width,
-            .info-item.full-width {
-                grid-column: 1;
-            }
-
-            .profile-header-card {
-                padding: 24px;
-            }
-
-            .profile-avatar {
-                width: 100px;
-                height: 100px;
-                font-size: 36px;
-            }
-
-            .profile-header-info h1 {
-                font-size: 22px;
-            }
+            .crop-layout { flex-direction: column; }
+            .crop-sidebar { width: 100%; flex-direction: row; justify-content: center; }
         }
 
         @media (max-width: 480px) {
-            .form-actions {
-                flex-direction: column;
-            }
-
-            .form-actions .btn {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .modal {
-                margin: 10px;
-            }
-
-            .crop-controls {
-                flex-wrap: wrap;
-            }
+            .form-actions { flex-direction: column; }
+            .form-actions .btn { width: 100%; justify-content: center; }
+            .modal { margin: 10px; }
+            .crop-controls { flex-wrap: wrap; }
         }
 
-        /* Loading State */
+        /* Loading */
         .loading {
             display: flex;
             align-items: center;
@@ -1065,9 +882,7 @@
             animation: spin 0.8s linear infinite;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         /* ========== DARK MODE ========== */
         body.dark-mode {
@@ -1082,38 +897,9 @@
             --gray-800: #f1f5f9;
         }
 
-        body.dark-mode .sidebar {
-            background: #0a0f1a;
-        }
-
-        body.dark-mode .main-content {
-            background: var(--gray-100);
-        }
-
-        body.dark-mode .topbar {
-            background: var(--gray-200);
-            border-bottom-color: var(--gray-300);
-        }
-
-        body.dark-mode .page-title {
-            color: var(--gray-800);
-        }
-
-        body.dark-mode .icon-btn {
-            background: var(--gray-300);
-        }
-
-        body.dark-mode .icon-btn svg {
-            color: var(--gray-500);
-        }
-
-        body.dark-mode .card {
-            background: var(--gray-200);
-        }
-
-        body.dark-mode .card-title {
-            color: var(--gray-800);
-        }
+        body.dark-mode .sidebar { background: #0a0f1a; }
+        body.dark-mode .topbar { background: var(--gray-200); border-bottom-color: var(--gray-300); }
+        body.dark-mode .card { background: var(--gray-200); }
 
         body.dark-mode .form-group input,
         body.dark-mode .form-group select,
@@ -1123,48 +909,9 @@
             color: var(--gray-800);
         }
 
-        body.dark-mode .form-group input:disabled,
-        body.dark-mode .form-group select:disabled {
-            background: var(--gray-200);
-            color: var(--gray-500);
-        }
-
-        body.dark-mode .info-value {
-            color: var(--gray-800);
-        }
-
-        body.dark-mode .edit-btn {
-            background: var(--gray-300);
-            color: var(--gray-700);
-        }
-
-        body.dark-mode .modal {
-            background: var(--gray-200);
-        }
-
-        body.dark-mode .modal-header {
-            border-bottom-color: var(--gray-300);
-        }
-
-        body.dark-mode .modal-title {
-            color: var(--gray-800);
-        }
-
-        body.dark-mode .modal-footer {
-            border-top-color: var(--gray-300);
-        }
-
-        body.dark-mode .avatar-upload-area {
-            border-color: var(--gray-400);
-        }
-
-        body.dark-mode .avatar-upload-area:hover {
-            background: var(--gray-300);
-        }
-
-        body.dark-mode .loading {
-            background: var(--gray-100);
-        }
+        body.dark-mode .modal { background: var(--gray-200); }
+        body.dark-mode .modal-header { border-bottom-color: var(--gray-300); }
+        body.dark-mode .modal-footer { border-top-color: var(--gray-300); }
 
         body.dark-mode .danger-zone {
             background: rgba(239, 68, 68, 0.1);
@@ -1173,15 +920,12 @@
     </style>
 </head>
 <body>
-    <!-- Loading State -->
     <div class="loading" id="loadingState">
         <div class="loading-spinner"></div>
     </div>
 
-    <!-- Sidebar Overlay (Mobile) -->
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-    <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <a href="dashboard.html" class="sidebar-logo">
@@ -1250,9 +994,7 @@
         </nav>
     </aside>
 
-    <!-- Main Content -->
     <main class="main-content" id="mainContent" style="display: none;">
-        <!-- Top Bar -->
         <header class="topbar">
             <div class="topbar-left">
                 <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
@@ -1266,9 +1008,7 @@
             </div>
         </header>
 
-        <!-- Profile Content -->
         <div class="profile-page">
-            <!-- Profile Header Card -->
             <div class="profile-header-card">
                 <div class="profile-header-content">
                     <div class="profile-avatar-wrapper">
@@ -1292,7 +1032,6 @@
                 </div>
             </div>
 
-            <!-- Profile Information Card -->
             <div class="card">
                 <div class="card-header">
                     <div>
@@ -1305,7 +1044,6 @@
                     </button>
                 </div>
 
-                <!-- Read-only View -->
                 <div class="info-grid" id="infoView">
                     <div class="info-item">
                         <span class="info-label">First Name</span>
@@ -1341,7 +1079,6 @@
                     </div>
                 </div>
 
-                <!-- Edit Form -->
                 <form class="profile-form" id="editForm" style="display: none;" onsubmit="saveProfile(event)">
                     <div class="form-group">
                         <label for="editFirstName">First Name</label>
@@ -1397,7 +1134,6 @@
                 </form>
             </div>
 
-            <!-- Danger Zone -->
             <div class="card danger-zone">
                 <div class="card-header">
                     <div>
@@ -1415,18 +1151,42 @@
         </div>
     </main>
 
-    <!-- Avatar Upload Modal -->
+    <!-- Avatar Modal -->
     <div class="modal-overlay" id="avatarModal">
-        <div class="modal large">
+        <div class="modal">
             <div class="modal-header">
-                <h3 class="modal-title">Update Profile Picture</h3>
+                <h3 class="modal-title">Profile Picture</h3>
                 <button class="modal-close" onclick="closeAvatarModal()">
                     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
             <div class="modal-body">
-                <!-- Step 1: Upload -->
-                <div class="upload-step active" id="uploadStep">
+                <!-- Step 1: Choice (only if has avatar) -->
+                <div class="upload-step" id="choiceStep">
+                    <div class="avatar-choice">
+                        <button type="button" class="avatar-choice-btn" onclick="showUploadStep()">
+                            <div class="choice-icon">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            </div>
+                            <div class="choice-text">
+                                <h4>Change Photo</h4>
+                                <p>Upload a new profile picture</p>
+                            </div>
+                        </button>
+                        <button type="button" class="avatar-choice-btn danger" onclick="removeAvatar()">
+                            <div class="choice-icon">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            </div>
+                            <div class="choice-text">
+                                <h4>Remove Photo</h4>
+                                <p>Go back to using your initials</p>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Upload -->
+                <div class="upload-step" id="uploadStep">
                     <div class="avatar-upload-area" onclick="document.getElementById('avatarInput').click()">
                         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                         <p>Click to upload an image</p>
@@ -1435,40 +1195,47 @@
                     <input type="file" id="avatarInput" accept="image/jpeg,image/png,image/gif,image/webp" style="display: none;" onchange="handleAvatarSelect(event)">
                 </div>
 
-                <!-- Step 2: Crop -->
+                <!-- Step 3: Crop -->
                 <div class="upload-step" id="cropStep">
-                    <div class="cropper-container-wrapper">
-                        <img id="cropperImage" src="" alt="Crop preview">
-                    </div>
-                    <div class="crop-controls">
-                        <button type="button" class="crop-btn" onclick="cropper.rotate(-90)" title="Rotate Left">
-                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                        </button>
-                        <button type="button" class="crop-btn" onclick="cropper.rotate(90)" title="Rotate Right">
-                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" transform="scale(-1,1) translate(-24,0)"/></svg>
-                        </button>
-                        <button type="button" class="crop-btn" onclick="cropper.zoom(0.1)" title="Zoom In">
-                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/></svg>
-                        </button>
-                        <button type="button" class="crop-btn" onclick="cropper.zoom(-0.1)" title="Zoom Out">
-                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"/></svg>
-                        </button>
-                        <button type="button" class="crop-btn" onclick="cropper.reset()" title="Reset">
-                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                        </button>
-                    </div>
-                    <div class="crop-preview-wrapper">
-                        <div class="crop-preview" id="cropPreview"></div>
-                        <span class="crop-preview-label">Preview</span>
+                    <div class="crop-layout">
+                        <div class="crop-main">
+                            <div class="cropper-wrapper">
+                                <img id="cropperImage" src="" alt="Crop preview">
+                            </div>
+                            <div class="crop-controls">
+                                <button type="button" class="crop-btn" onclick="cropper.rotate(-90)">
+                                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.5 2v6h6M2.66 15.57a10 10 0 1 0 .57-8.38"/></svg>
+                                    <span>Left</span>
+                                </button>
+                                <button type="button" class="crop-btn" onclick="cropper.rotate(90)">
+                                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38"/></svg>
+                                    <span>Right</span>
+                                </button>
+                                <button type="button" class="crop-btn" onclick="cropper.zoom(0.1)">
+                                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/></svg>
+                                    <span>Zoom+</span>
+                                </button>
+                                <button type="button" class="crop-btn" onclick="cropper.zoom(-0.1)">
+                                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"/></svg>
+                                    <span>Zoom-</span>
+                                </button>
+                                <button type="button" class="crop-btn" onclick="cropper.reset()">
+                                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8m0-4v4h4"/></svg>
+                                    <span>Reset</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="crop-sidebar">
+                            <div class="crop-preview" id="cropPreview"></div>
+                            <span class="crop-preview-label">Preview</span>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" id="avatarBackBtn" onclick="resetAvatarUpload()" style="display: none;">Back</button>
+                <button class="btn btn-secondary" id="avatarBackBtn" onclick="avatarGoBack()" style="display: none;">Back</button>
                 <button class="btn btn-secondary" onclick="closeAvatarModal()">Cancel</button>
-                <button class="btn btn-primary" id="uploadAvatarBtn" onclick="uploadAvatar()" style="display: none;">
-                    Upload Photo
-                </button>
+                <button class="btn btn-primary" id="uploadAvatarBtn" onclick="uploadAvatar()" style="display: none;">Upload Photo</button>
             </div>
         </div>
     </div>
@@ -1488,7 +1255,7 @@
                         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                     </div>
                     <h3>This action cannot be undone</h3>
-                    <p>This will permanently delete your account and remove all your data from our servers including your courses, notes, messages, and study groups.</p>
+                    <p>This will permanently delete your account and remove all your data from our servers.</p>
                 </div>
                 <div class="delete-confirmation">
                     <label>Type <strong>DELETE</strong> to confirm:</label>
@@ -1497,23 +1264,17 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
-                <button class="btn btn-danger" id="confirmDeleteBtn" onclick="deleteAccount()" disabled>
-                    Delete My Account
-                </button>
+                <button class="btn btn-danger" id="confirmDeleteBtn" onclick="deleteAccount()" disabled>Delete My Account</button>
             </div>
         </div>
     </div>
 
-    <!-- Toast Container -->
     <div class="toast" id="toast">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
         <span id="toastMessage">Success!</span>
     </div>
 
     <script>
-        // =============================================
-        // SUPABASE INIT
-        // =============================================
         const SUPABASE_URL = 'https://weuxtwmaqmbhskjpjdyi.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndldXh0d21hcW1iaHNranBqZHlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NTYzMTcsImV4cCI6MjA4MDMzMjMxN30.J-0Nd0MY6-g_ltbBNHwOulqZuQfb8mKIRgx0dAaJ76o';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -1523,148 +1284,55 @@
         let isEditMode = false;
         let cropper = null;
         let heartbeatInterval = null;
-        let realtimeChannel = null;
+        let currentAvatarStep = 'choice';
 
         // =============================================
-        // REAL-TIME ONLINE STATUS SYSTEM
+        // ONLINE STATUS
         // =============================================
-        
         const OnlineStatus = {
-            // Start heartbeat - call every 30 seconds to keep user "online"
-            startHeartbeat: function() {
-                // Initial heartbeat
+            startHeartbeat() {
                 this.sendHeartbeat();
-                
-                // Send heartbeat every 30 seconds
-                heartbeatInterval = setInterval(() => {
-                    this.sendHeartbeat();
-                }, 30000);
+                heartbeatInterval = setInterval(() => this.sendHeartbeat(), 30000);
             },
-            
-            // Send heartbeat to server
-            sendHeartbeat: async function() {
+            async sendHeartbeat() {
                 if (!currentUser) return;
-                try {
-                    await supabase.rpc('heartbeat');
-                } catch (err) {
-                    console.error('Heartbeat error:', err);
-                }
+                try { await supabase.rpc('heartbeat'); } catch (e) { console.error(e); }
             },
-            
-            // Set user online
-            setOnline: async function() {
+            async setOnline() {
                 if (!currentUser) return;
-                try {
-                    await supabase.rpc('update_online_status', { is_online_status: true });
-                } catch (err) {
-                    console.error('Set online error:', err);
-                }
+                try { await supabase.rpc('update_online_status', { is_online_status: true }); } catch (e) { console.error(e); }
             },
-            
-            // Set user offline
-            setOffline: async function() {
+            async setOffline() {
                 if (!currentUser) return;
-                try {
-                    await supabase.rpc('update_online_status', { is_online_status: false });
-                } catch (err) {
-                    console.error('Set offline error:', err);
-                }
+                try { await supabase.rpc('update_online_status', { is_online_status: false }); } catch (e) { console.error(e); }
             },
-            
-            // Stop heartbeat
-            stopHeartbeat: function() {
-                if (heartbeatInterval) {
-                    clearInterval(heartbeatInterval);
-                    heartbeatInterval = null;
-                }
+            stopHeartbeat() {
+                if (heartbeatInterval) { clearInterval(heartbeatInterval); heartbeatInterval = null; }
             },
-            
-            // Subscribe to real-time profile changes (for other users' status)
-            subscribeToProfiles: function(userIds, callback) {
-                if (realtimeChannel) {
-                    supabase.removeChannel(realtimeChannel);
-                }
-                
-                realtimeChannel = supabase
-                    .channel('online-users')
-                    .on(
-                        'postgres_changes',
-                        {
-                            event: 'UPDATE',
-                            schema: 'public',
-                            table: 'profiles',
-                            filter: userIds.length > 0 ? `id=in.(${userIds.join(',')})` : undefined
-                        },
-                        (payload) => {
-                            if (callback) callback(payload.new);
-                        }
-                    )
-                    .subscribe();
-                    
-                return realtimeChannel;
-            },
-            
-            // Format last seen time
-            formatLastSeen: function(lastSeenDate) {
-                if (!lastSeenDate) return 'Unknown';
-                
+            formatLastSeen(date) {
+                if (!date) return 'Unknown';
                 const now = new Date();
-                const lastSeen = new Date(lastSeenDate);
+                const lastSeen = new Date(date);
                 const diffMs = now - lastSeen;
-                const diffSeconds = Math.floor(diffMs / 1000);
-                const diffMinutes = Math.floor(diffSeconds / 60);
-                const diffHours = Math.floor(diffMinutes / 60);
+                const diffMins = Math.floor(diffMs / 60000);
+                const diffHours = Math.floor(diffMins / 60);
                 const diffDays = Math.floor(diffHours / 24);
-                
-                if (diffSeconds < 60) {
-                    return 'Just now';
-                } else if (diffMinutes < 60) {
-                    return `${diffMinutes} minute${diffMinutes !== 1 ? 's' : ''} ago`;
-                } else if (diffHours < 24) {
-                    return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
-                } else if (diffDays < 7) {
-                    return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
-                } else {
-                    return lastSeen.toLocaleDateString('en-US', { 
-                        month: 'short', 
-                        day: 'numeric',
-                        year: lastSeen.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
-                    });
-                }
-            },
-            
-            // Get status display info
-            getStatusDisplay: function(isOnline, lastSeen) {
-                if (isOnline) {
-                    return {
-                        text: 'Online',
-                        dotClass: 'online',
-                        color: 'var(--green)'
-                    };
-                } else {
-                    return {
-                        text: 'Last seen ' + this.formatLastSeen(lastSeen),
-                        dotClass: 'offline',
-                        color: 'var(--gray-400)'
-                    };
-                }
+                if (diffMins < 1) return 'Just now';
+                if (diffMins < 60) return `${diffMins}m ago`;
+                if (diffHours < 24) return `${diffHours}h ago`;
+                if (diffDays < 7) return `${diffDays}d ago`;
+                return lastSeen.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
             }
         };
 
         // =============================================
-        // INITIALIZE APP
+        // INIT
         // =============================================
         async function init() {
             const { data: { session } } = await supabase.auth.getSession();
-            
-            if (!session) {
-                window.location.href = 'index.html';
-                return;
-            }
-
+            if (!session) { window.location.href = 'index.html'; return; }
             currentUser = session.user;
-            
-            // Check if user is banned
+
             const { data: profile } = await supabase
                 .from('profiles')
                 .select('is_banned, ban_reason')
@@ -1678,32 +1346,24 @@
                 return;
             }
 
-            // Start real-time online status
             await OnlineStatus.setOnline();
             OnlineStatus.startHeartbeat();
-
-            // Load profile
             await loadProfile();
-
-            // For own profile, always show as Online (since we're viewing it)
             updateStatusUI(true, new Date().toISOString());
 
-            // Load dark mode preference
             if (localStorage.getItem('myub_darkMode') === 'true') {
                 document.body.classList.add('dark-mode');
             }
 
-            // Show content
             document.getElementById('loadingState').style.display = 'none';
             document.getElementById('mainContent').style.display = 'block';
         }
 
         // =============================================
-        // PROFILE FUNCTIONS
+        // PROFILE
         // =============================================
-        
         async function loadProfile() {
-            const { data, error } = await supabase
+            const { data } = await supabase
                 .from('profiles')
                 .select('*')
                 .eq('id', currentUser.id)
@@ -1712,19 +1372,15 @@
             if (data) {
                 userProfile = data;
                 updateProfileUI();
-                updateStatusUI(data.is_online, data.last_seen);
             }
         }
 
         function updateProfileUI() {
             const p = userProfile;
-
-            // Header
             document.getElementById('profileName').textContent = p.full_name || `${p.first_name} ${p.last_name}`;
             document.getElementById('profileStudentId').textContent = `Student ID: ${p.student_id}`;
             document.getElementById('profileProgram').textContent = p.program_name || 'Student';
-            
-            // Avatar
+
             const avatar = document.getElementById('profileAvatar');
             if (p.avatar_url) {
                 avatar.innerHTML = `<img src="${p.avatar_url}" alt="Avatar">`;
@@ -1732,11 +1388,9 @@
                 avatar.textContent = getInitials(p.first_name, p.last_name);
             }
 
-            // Member since
             const joinDate = new Date(p.created_at);
             document.getElementById('memberSince').textContent = `Member since ${joinDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`;
 
-            // Info view
             document.getElementById('infoFirstName').textContent = p.first_name || '-';
             document.getElementById('infoLastName').textContent = p.last_name || '-';
             document.getElementById('infoEmail').textContent = p.email || '-';
@@ -1744,17 +1398,11 @@
             document.getElementById('infoYear').textContent = p.year_of_study ? `Year ${p.year_of_study}` : '-';
             document.getElementById('infoProgramType').textContent = formatProgramType(p.program_type) || '-';
             document.getElementById('infoProgramName').textContent = p.program_name || '-';
-            
-            const bioEl = document.getElementById('infoBio');
-            if (p.bio) {
-                bioEl.textContent = p.bio;
-                bioEl.classList.remove('empty');
-            } else {
-                bioEl.textContent = 'No bio added yet';
-                bioEl.classList.add('empty');
-            }
 
-            // Edit form
+            const bioEl = document.getElementById('infoBio');
+            if (p.bio) { bioEl.textContent = p.bio; bioEl.classList.remove('empty'); }
+            else { bioEl.textContent = 'No bio added yet'; bioEl.classList.add('empty'); }
+
             document.getElementById('editFirstName').value = p.first_name || '';
             document.getElementById('editLastName').value = p.last_name || '';
             document.getElementById('editEmail').value = p.email || '';
@@ -1765,24 +1413,20 @@
             document.getElementById('editBio').value = p.bio || '';
         }
 
-        // Update status display in real-time
         function updateStatusUI(isOnline, lastSeen) {
-            const statusDot = document.getElementById('statusDot');
-            const statusText = document.getElementById('statusText');
-            
-            const status = OnlineStatus.getStatusDisplay(isOnline, lastSeen);
-            
-            statusDot.className = `status-dot ${status.dotClass}`;
-            statusText.textContent = status.text;
+            const dot = document.getElementById('statusDot');
+            const text = document.getElementById('statusText');
+            if (isOnline) {
+                dot.className = 'status-dot online';
+                text.textContent = 'Online';
+            } else {
+                dot.className = 'status-dot offline';
+                text.textContent = 'Last seen ' + OnlineStatus.formatLastSeen(lastSeen);
+            }
         }
 
         function formatProgramType(type) {
-            const types = {
-                'bachelor': "Bachelor's Degree",
-                'graduate': "Graduate/Master's",
-                'diploma': 'Diploma',
-                'certificate': 'Certificate'
-            };
+            const types = { 'bachelor': "Bachelor's Degree", 'graduate': "Graduate/Master's", 'diploma': 'Diploma', 'certificate': 'Certificate' };
             return types[type] || type;
         }
 
@@ -1793,24 +1437,19 @@
         // =============================================
         // EDIT PROFILE
         // =============================================
-        
         function toggleEditMode() {
             isEditMode = !isEditMode;
             document.getElementById('infoView').style.display = isEditMode ? 'none' : 'grid';
             document.getElementById('editForm').style.display = isEditMode ? 'grid' : 'none';
-            document.getElementById('editToggleBtn').innerHTML = isEditMode 
+            document.getElementById('editToggleBtn').innerHTML = isEditMode
                 ? '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg> Cancel'
                 : '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg> Edit';
         }
 
-        function cancelEdit() {
-            updateProfileUI();
-            toggleEditMode();
-        }
+        function cancelEdit() { updateProfileUI(); toggleEditMode(); }
 
         async function saveProfile(e) {
             e.preventDefault();
-            
             const saveBtn = document.getElementById('saveBtn');
             saveBtn.disabled = true;
             saveBtn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;border-width:2px;"></div> Saving...';
@@ -1827,17 +1466,12 @@
                     updated_at: new Date().toISOString()
                 };
 
-                const { error } = await supabase
-                    .from('profiles')
-                    .update(updates)
-                    .eq('id', currentUser.id);
-
+                const { error } = await supabase.from('profiles').update(updates).eq('id', currentUser.id);
                 if (error) throw error;
 
                 await loadProfile();
                 toggleEditMode();
                 showToast('Profile updated successfully!', 'success');
-
             } catch (err) {
                 showToast(err.message, 'error');
             } finally {
@@ -1847,32 +1481,72 @@
         }
 
         // =============================================
-        // AVATAR UPLOAD WITH CROPPER
+        // AVATAR MODAL
         // =============================================
-        
         function openAvatarModal() {
             document.getElementById('avatarModal').classList.add('show');
-            resetAvatarUpload();
+            // Show choice if has avatar, else show upload directly
+            if (userProfile?.avatar_url) {
+                showStep('choice');
+            } else {
+                showStep('upload');
+            }
         }
 
         function closeAvatarModal() {
             document.getElementById('avatarModal').classList.remove('show');
-            if (cropper) {
-                cropper.destroy();
-                cropper = null;
-            }
-            resetAvatarUpload();
+            if (cropper) { cropper.destroy(); cropper = null; }
+            document.getElementById('avatarInput').value = '';
         }
 
-        function resetAvatarUpload() {
-            document.getElementById('avatarInput').value = '';
-            document.getElementById('uploadStep').classList.add('active');
+        function showStep(step) {
+            currentAvatarStep = step;
+            document.getElementById('choiceStep').classList.remove('active');
+            document.getElementById('uploadStep').classList.remove('active');
             document.getElementById('cropStep').classList.remove('active');
-            document.getElementById('uploadAvatarBtn').style.display = 'none';
             document.getElementById('avatarBackBtn').style.display = 'none';
-            if (cropper) {
-                cropper.destroy();
-                cropper = null;
+            document.getElementById('uploadAvatarBtn').style.display = 'none';
+
+            if (step === 'choice') {
+                document.getElementById('choiceStep').classList.add('active');
+            } else if (step === 'upload') {
+                document.getElementById('uploadStep').classList.add('active');
+                if (userProfile?.avatar_url) {
+                    document.getElementById('avatarBackBtn').style.display = 'inline-flex';
+                }
+            } else if (step === 'crop') {
+                document.getElementById('cropStep').classList.add('active');
+                document.getElementById('avatarBackBtn').style.display = 'inline-flex';
+                document.getElementById('uploadAvatarBtn').style.display = 'inline-flex';
+            }
+        }
+
+        function showUploadStep() { showStep('upload'); }
+
+        function avatarGoBack() {
+            if (currentAvatarStep === 'crop') {
+                if (cropper) { cropper.destroy(); cropper = null; }
+                document.getElementById('avatarInput').value = '';
+                showStep('upload');
+            } else if (currentAvatarStep === 'upload') {
+                showStep('choice');
+            }
+        }
+
+        async function removeAvatar() {
+            try {
+                const { error } = await supabase
+                    .from('profiles')
+                    .update({ avatar_url: null, updated_at: new Date().toISOString() })
+                    .eq('id', currentUser.id);
+
+                if (error) throw error;
+
+                await loadProfile();
+                closeAvatarModal();
+                showToast('Profile picture removed!', 'success');
+            } catch (err) {
+                showToast(err.message, 'error');
             }
         }
 
@@ -1892,31 +1566,32 @@
 
             const reader = new FileReader();
             reader.onload = function(e) {
-                document.getElementById('uploadStep').classList.remove('active');
-                document.getElementById('cropStep').classList.add('active');
-                document.getElementById('uploadAvatarBtn').style.display = 'inline-flex';
-                document.getElementById('avatarBackBtn').style.display = 'inline-flex';
+                showStep('crop');
 
                 const image = document.getElementById('cropperImage');
                 image.src = e.target.result;
 
-                if (cropper) {
-                    cropper.destroy();
-                }
+                if (cropper) cropper.destroy();
 
-                cropper = new Cropper(image, {
-                    aspectRatio: 1,
-                    viewMode: 1,
-                    dragMode: 'move',
-                    autoCropArea: 1,
-                    cropBoxResizable: true,
-                    cropBoxMovable: true,
-                    guides: true,
-                    center: true,
-                    highlight: false,
-                    background: false,
-                    preview: '#cropPreview'
-                });
+                // Small delay to ensure image is loaded
+                setTimeout(() => {
+                    cropper = new Cropper(image, {
+                        aspectRatio: 1,
+                        viewMode: 1,
+                        dragMode: 'move',
+                        autoCropArea: 1,
+                        cropBoxResizable: true,
+                        cropBoxMovable: true,
+                        guides: true,
+                        center: true,
+                        highlight: false,
+                        background: false,
+                        preview: '#cropPreview',
+                        ready() {
+                            // Instant ready
+                        }
+                    });
+                }, 50);
             };
             reader.readAsDataURL(file);
         }
@@ -1939,19 +1614,13 @@
                 const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.9));
                 const fileName = `${currentUser.id}/${Date.now()}.jpg`;
 
-                const { data: uploadData, error: uploadError } = await supabase.storage
+                const { error: uploadError } = await supabase.storage
                     .from('avatars')
-                    .upload(fileName, blob, {
-                        contentType: 'image/jpeg',
-                        cacheControl: '3600',
-                        upsert: true
-                    });
+                    .upload(fileName, blob, { contentType: 'image/jpeg', cacheControl: '3600', upsert: true });
 
                 if (uploadError) throw uploadError;
 
-                const { data: urlData } = supabase.storage
-                    .from('avatars')
-                    .getPublicUrl(fileName);
+                const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(fileName);
 
                 const { error: updateError } = await supabase
                     .from('profiles')
@@ -1963,10 +1632,9 @@
                 await loadProfile();
                 closeAvatarModal();
                 showToast('Profile picture updated!', 'success');
-
             } catch (err) {
                 console.error('Upload error:', err);
-                showToast(err.message || 'Failed to upload image. Please check storage policies.', 'error');
+                showToast(err.message || 'Failed to upload image', 'error');
             } finally {
                 uploadBtn.disabled = false;
                 uploadBtn.textContent = 'Upload Photo';
@@ -1976,7 +1644,6 @@
         // =============================================
         // DELETE ACCOUNT
         // =============================================
-        
         function openDeleteModal() {
             document.getElementById('deleteModal').classList.add('show');
             document.getElementById('deleteConfirmInput').value = '';
@@ -1998,19 +1665,17 @@
             confirmBtn.textContent = 'Deleting...';
 
             try {
-                // Stop heartbeat first
                 OnlineStatus.stopHeartbeat();
-                
+
                 const { error } = await supabase
                     .from('profiles')
                     .delete()
                     .eq('id', currentUser.id);
-                
+
                 if (error) throw error;
 
                 await supabase.auth.signOut();
                 window.location.href = 'index.html';
-
             } catch (err) {
                 showToast(err.message, 'error');
                 confirmBtn.disabled = false;
@@ -2021,24 +1686,15 @@
         // =============================================
         // UI HELPERS
         // =============================================
-        
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
             const toastMessage = document.getElementById('toastMessage');
-            
             toast.className = `toast ${type}`;
             toastMessage.textContent = message;
-            
-            const iconPath = type === 'success' 
-                ? 'M5 13l4 4L19 7' 
-                : 'M6 18L18 6M6 6l12 12';
+            const iconPath = type === 'success' ? 'M5 13l4 4L19 7' : 'M6 18L18 6M6 6l12 12';
             toast.querySelector('svg path').setAttribute('d', iconPath);
-            
             toast.classList.add('show');
-            
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
+            setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
         function toggleSidebar() {
@@ -2054,44 +1710,29 @@
         }
 
         // =============================================
-        // VISIBILITY & LIFECYCLE HANDLERS
+        // LIFECYCLE
         // =============================================
-        
-        // Handle tab visibility changes
         document.addEventListener('visibilitychange', async () => {
             if (!currentUser) return;
-            
             if (document.visibilityState === 'visible') {
-                // Tab became visible - go online
                 await OnlineStatus.setOnline();
                 OnlineStatus.startHeartbeat();
             } else {
-                // Tab hidden - stop heartbeat but don't go offline immediately
-                // (user might just be switching tabs briefly)
                 OnlineStatus.stopHeartbeat();
             }
         });
 
-        // Handle page unload - set offline
         window.addEventListener('beforeunload', () => {
             if (currentUser) {
-                // Use sendBeacon for reliable delivery
-                const data = JSON.stringify({ is_online_status: false });
                 navigator.sendBeacon(
                     `${SUPABASE_URL}/rest/v1/rpc/update_online_status`,
-                    new Blob([data], { type: 'application/json' })
+                    new Blob([JSON.stringify({ is_online_status: false })], { type: 'application/json' })
                 );
             }
         });
 
-        // Cleanup on page hide (mobile)
-        window.addEventListener('pagehide', () => {
-            OnlineStatus.stopHeartbeat();
-        });
+        window.addEventListener('pagehide', () => OnlineStatus.stopHeartbeat());
 
-        // =============================================
-        // INITIALIZE
-        // =============================================
         init();
     </script>
 </body>

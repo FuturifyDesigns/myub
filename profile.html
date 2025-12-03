@@ -7,7 +7,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- Cropper.js CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Cropper.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -664,7 +668,7 @@
             background: var(--white);
             border-radius: 20px;
             width: 100%;
-            max-width: 480px;
+            max-width: 500px;
             max-height: 90vh;
             overflow-y: auto;
             transform: scale(0.9);
@@ -673,6 +677,10 @@
 
         .modal-overlay.show .modal {
             transform: scale(1);
+        }
+
+        .modal.large {
+            max-width: 600px;
         }
 
         .modal-header {
@@ -726,6 +734,14 @@
         }
 
         /* Avatar Upload Modal */
+        .upload-step {
+            display: none;
+        }
+
+        .upload-step.active {
+            display: block;
+        }
+
         .avatar-upload-area {
             border: 2px dashed var(--gray-300);
             border-radius: 16px;
@@ -733,7 +749,6 @@
             text-align: center;
             cursor: pointer;
             transition: all 0.2s;
-            margin-bottom: 20px;
         }
 
         .avatar-upload-area:hover {
@@ -759,34 +774,69 @@
             font-size: 12px;
         }
 
-        .avatar-preview-container {
-            display: none;
+        /* Cropper Container */
+        .cropper-container-wrapper {
+            width: 100%;
+            max-height: 350px;
+            margin-bottom: 16px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: var(--gray-100);
+        }
+
+        .cropper-container-wrapper img {
+            max-width: 100%;
+            display: block;
+        }
+
+        .crop-controls {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .crop-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: none;
+            background: var(--gray-100);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .crop-btn:hover {
+            background: var(--gray-200);
+        }
+
+        .crop-btn svg {
+            width: 20px;
+            height: 20px;
+            color: var(--gray-600);
+        }
+
+        .crop-preview-wrapper {
+            display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 16px;
+            gap: 12px;
         }
 
-        .avatar-preview-container.show {
-            display: flex;
-        }
-
-        .avatar-preview {
-            width: 200px;
-            height: 200px;
+        .crop-preview {
+            width: 150px;
+            height: 150px;
             border-radius: 50%;
             overflow: hidden;
             border: 4px solid var(--gray-200);
         }
 
-        .avatar-preview img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .avatar-preview-actions {
-            display: flex;
-            gap: 12px;
+        .crop-preview-label {
+            font-size: 13px;
+            color: var(--gray-500);
         }
 
         /* Delete Account Modal */
@@ -973,6 +1023,10 @@
 
             .modal {
                 margin: 10px;
+            }
+
+            .crop-controls {
+                flex-wrap: wrap;
             }
         }
 
@@ -1346,7 +1400,7 @@
 
     <!-- Avatar Upload Modal -->
     <div class="modal-overlay" id="avatarModal">
-        <div class="modal">
+        <div class="modal large">
             <div class="modal-header">
                 <h3 class="modal-title">Update Profile Picture</h3>
                 <button class="modal-close" onclick="closeAvatarModal()">
@@ -1354,25 +1408,48 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div class="avatar-upload-area" id="uploadArea" onclick="document.getElementById('avatarInput').click()">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                    <p>Click to upload an image</p>
-                    <span>JPG, PNG, GIF or WebP (max 2MB)</span>
-                </div>
-                <input type="file" id="avatarInput" accept="image/jpeg,image/png,image/gif,image/webp" style="display: none;" onchange="handleAvatarSelect(event)">
-                
-                <div class="avatar-preview-container" id="avatarPreviewContainer">
-                    <div class="avatar-preview">
-                        <img id="avatarPreviewImg" src="" alt="Preview">
+                <!-- Step 1: Upload -->
+                <div class="upload-step active" id="uploadStep">
+                    <div class="avatar-upload-area" onclick="document.getElementById('avatarInput').click()">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <p>Click to upload an image</p>
+                        <span>JPG, PNG, GIF or WebP (max 2MB)</span>
                     </div>
-                    <div class="avatar-preview-actions">
-                        <button class="btn btn-secondary" onclick="resetAvatarUpload()">Choose Different</button>
+                    <input type="file" id="avatarInput" accept="image/jpeg,image/png,image/gif,image/webp" style="display: none;" onchange="handleAvatarSelect(event)">
+                </div>
+
+                <!-- Step 2: Crop -->
+                <div class="upload-step" id="cropStep">
+                    <div class="cropper-container-wrapper">
+                        <img id="cropperImage" src="" alt="Crop preview">
+                    </div>
+                    <div class="crop-controls">
+                        <button type="button" class="crop-btn" onclick="cropper.rotate(-90)" title="Rotate Left">
+                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                        </button>
+                        <button type="button" class="crop-btn" onclick="cropper.rotate(90)" title="Rotate Right">
+                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" transform="scale(-1,1) translate(-24,0)"/></svg>
+                        </button>
+                        <button type="button" class="crop-btn" onclick="cropper.zoom(0.1)" title="Zoom In">
+                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/></svg>
+                        </button>
+                        <button type="button" class="crop-btn" onclick="cropper.zoom(-0.1)" title="Zoom Out">
+                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"/></svg>
+                        </button>
+                        <button type="button" class="crop-btn" onclick="cropper.reset()" title="Reset">
+                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                        </button>
+                    </div>
+                    <div class="crop-preview-wrapper">
+                        <div class="crop-preview" id="cropPreview"></div>
+                        <span class="crop-preview-label">Preview</span>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
+                <button class="btn btn-secondary" id="avatarBackBtn" onclick="resetAvatarUpload()" style="display: none;">Back</button>
                 <button class="btn btn-secondary" onclick="closeAvatarModal()">Cancel</button>
-                <button class="btn btn-primary" id="uploadAvatarBtn" onclick="uploadAvatar()" disabled>
+                <button class="btn btn-primary" id="uploadAvatarBtn" onclick="uploadAvatar()" style="display: none;">
                     Upload Photo
                 </button>
             </div>
@@ -1425,7 +1502,7 @@
         let currentUser = null;
         let userProfile = null;
         let isEditMode = false;
-        let selectedAvatarFile = null;
+        let cropper = null;
 
         // Initialize
         async function init() {
@@ -1612,15 +1689,23 @@
 
         function closeAvatarModal() {
             document.getElementById('avatarModal').classList.remove('show');
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
             resetAvatarUpload();
         }
 
         function resetAvatarUpload() {
-            selectedAvatarFile = null;
             document.getElementById('avatarInput').value = '';
-            document.getElementById('uploadArea').style.display = 'block';
-            document.getElementById('avatarPreviewContainer').classList.remove('show');
-            document.getElementById('uploadAvatarBtn').disabled = true;
+            document.getElementById('uploadStep').classList.add('active');
+            document.getElementById('cropStep').classList.remove('active');
+            document.getElementById('uploadAvatarBtn').style.display = 'none';
+            document.getElementById('avatarBackBtn').style.display = 'none';
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
         }
 
         function handleAvatarSelect(e) {
@@ -1639,35 +1724,66 @@
                 return;
             }
 
-            selectedAvatarFile = file;
-
-            // Show preview
+            // Show crop step
             const reader = new FileReader();
             reader.onload = function(e) {
-                document.getElementById('avatarPreviewImg').src = e.target.result;
-                document.getElementById('uploadArea').style.display = 'none';
-                document.getElementById('avatarPreviewContainer').classList.add('show');
-                document.getElementById('uploadAvatarBtn').disabled = false;
+                document.getElementById('uploadStep').classList.remove('active');
+                document.getElementById('cropStep').classList.add('active');
+                document.getElementById('uploadAvatarBtn').style.display = 'inline-flex';
+                document.getElementById('avatarBackBtn').style.display = 'inline-flex';
+
+                const image = document.getElementById('cropperImage');
+                image.src = e.target.result;
+
+                // Initialize Cropper
+                if (cropper) {
+                    cropper.destroy();
+                }
+
+                cropper = new Cropper(image, {
+                    aspectRatio: 1,
+                    viewMode: 1,
+                    dragMode: 'move',
+                    autoCropArea: 1,
+                    cropBoxResizable: true,
+                    cropBoxMovable: true,
+                    guides: true,
+                    center: true,
+                    highlight: false,
+                    background: false,
+                    preview: '#cropPreview'
+                });
             };
             reader.readAsDataURL(file);
         }
 
         async function uploadAvatar() {
-            if (!selectedAvatarFile) return;
+            if (!cropper) return;
 
             const uploadBtn = document.getElementById('uploadAvatarBtn');
             uploadBtn.disabled = true;
             uploadBtn.textContent = 'Uploading...';
 
             try {
+                // Get cropped canvas
+                const canvas = cropper.getCroppedCanvas({
+                    width: 400,
+                    height: 400,
+                    imageSmoothingEnabled: true,
+                    imageSmoothingQuality: 'high'
+                });
+
+                // Convert to blob
+                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.9));
+                
                 // Generate unique filename
-                const fileExt = selectedAvatarFile.name.split('.').pop();
-                const fileName = `${currentUser.id}/${Date.now()}.${fileExt}`;
+                const fileName = `${currentUser.id}/${Date.now()}.jpg`;
 
                 // Upload to Supabase Storage
                 const { data: uploadData, error: uploadError } = await supabase.storage
                     .from('avatars')
-                    .upload(fileName, selectedAvatarFile, {
+                    .upload(fileName, blob, {
+                        contentType: 'image/jpeg',
                         cacheControl: '3600',
                         upsert: true
                     });
@@ -1693,7 +1809,8 @@
                 showToast('Profile picture updated!', 'success');
 
             } catch (err) {
-                showToast(err.message, 'error');
+                console.error('Upload error:', err);
+                showToast(err.message || 'Failed to upload image. Please check storage policies.', 'error');
             } finally {
                 uploadBtn.disabled = false;
                 uploadBtn.textContent = 'Upload Photo';
@@ -1722,8 +1839,11 @@
             confirmBtn.textContent = 'Deleting...';
 
             try {
-                // Delete profile (will cascade to other tables)
-                const { error } = await supabase.rpc('delete_user_account');
+                // Delete profile directly (will cascade to other tables)
+                const { error } = await supabase
+                    .from('profiles')
+                    .delete()
+                    .eq('id', currentUser.id);
                 
                 if (error) throw error;
 

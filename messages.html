@@ -71,20 +71,26 @@
         .profile-modal-status .dot.offline { background: var(--gray-400); }
         .profile-modal-status span { color: var(--gray-600); }
         .profile-modal-bio { background: var(--gray-50); padding: 12px 16px; border-radius: 10px; font-size: 14px; color: var(--gray-600); text-align: left; margin-bottom: 16px; }
-        .profile-modal-meta { font-size: 12px; color: var(--gray-400); margin-bottom: 16px; }
-        .profile-modal-actions { display: flex; flex-direction: column; gap: 10px; }
-        .profile-modal-actions .btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; font-size: 14px; font-weight: 600; border-radius: 10px; cursor: pointer; transition: all 0.2s; border: none; }
+        .profile-modal-meta { font-size: 13px; color: var(--gray-500); margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+        .profile-modal-meta .label { font-size: 11px; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.5px; }
+        .profile-modal-meta .value { font-family: 'Sora', sans-serif; font-weight: 600; color: var(--gray-700); }
+        .profile-modal-actions { display: flex; flex-direction: column; gap: 12px; padding-top: 8px; }
+        .profile-modal-actions .btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 20px; font-size: 14px; font-weight: 600; border-radius: 12px; cursor: pointer; transition: all 0.2s; border: none; width: 100%; }
         .profile-modal-actions .btn svg { width: 18px; height: 18px; }
         .profile-modal-actions .btn-primary { background: var(--navy); color: var(--white); }
-        .profile-modal-actions .btn-primary:hover { background: var(--navy-light); }
-        .profile-modal-actions .btn-row { display: flex; gap: 10px; }
-        .profile-modal-actions .btn-row .btn { flex: 1; padding: 10px 16px; font-size: 13px; }
-        .profile-modal-actions .btn-outline-danger { background: transparent; border: 2px solid var(--red); color: var(--red); }
-        .profile-modal-actions .btn-outline-danger:hover { background: #fee2e2; }
-        .profile-modal-actions .btn-warning { background: #fef3c7; color: #b45309; border: none; }
-        .profile-modal-actions .btn-warning:hover { background: #fde68a; }
-        .profile-modal-link { display: block; margin-top: 12px; color: var(--navy); font-size: 14px; font-weight: 600; text-decoration: none; text-align: center; }
-        .profile-modal-link:hover { text-decoration: underline; }
+        .profile-modal-actions .btn-primary:hover { background: var(--navy-light); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(26, 54, 93, 0.3); }
+        .profile-modal-actions .btn-row { display: flex; gap: 12px; }
+        .profile-modal-actions .btn-row .btn { flex: 1; padding: 12px 16px; font-size: 13px; }
+        .profile-modal-actions .btn-outline-danger { background: #fef2f2; border: 2px solid #fecaca; color: var(--red); }
+        .profile-modal-actions .btn-outline-danger:hover { background: #fee2e2; border-color: #fca5a5; }
+        .profile-modal-actions .btn-warning { background: #fffbeb; border: 2px solid #fde68a; color: #b45309; }
+        .profile-modal-actions .btn-warning:hover { background: #fef3c7; border-color: #fcd34d; }
+        .profile-modal-actions .btn-secondary { background: var(--gray-100); border: 2px solid var(--gray-200); color: var(--gray-700); }
+        .profile-modal-actions .btn-secondary:hover { background: var(--gray-200); border-color: var(--gray-300); }
+        .profile-modal-link-container { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--gray-200); }
+        .profile-modal-link { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; background: var(--gray-50); border: 2px solid var(--gray-200); border-radius: 12px; color: var(--navy); font-size: 14px; font-weight: 600; text-decoration: none; transition: all 0.2s; }
+        .profile-modal-link:hover { background: var(--gray-100); border-color: var(--navy); text-decoration: none; }
+        .profile-modal-link svg { width: 16px; height: 16px; }
         .profile-blocked-notice { background: #fee2e2; color: var(--red); padding: 12px; border-radius: 8px; font-size: 14px; margin-bottom: 16px; text-align: center; }
         /* Ensure confirm modal appears above profile modal */
         #confirmModal { z-index: 1100; }
@@ -139,32 +145,32 @@
         .selection-btn.forward { background: var(--white); color: var(--navy); }
         .selection-btn.delete { background: var(--red); color: var(--white); }
         .selection-btn.report { background: var(--orange); color: var(--white); }
-        .chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 4px; }
+        .chat-messages { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 20px; display: flex; flex-direction: column; gap: 4px; }
         .chat-date-divider { text-align: center; margin: 16px 0; }
         .chat-date-divider span { background: var(--gray-200); color: var(--gray-600); font-size: 12px; font-weight: 500; padding: 4px 12px; border-radius: 12px; }
-        .message-wrapper { display: flex; align-items: flex-end; gap: 8px; max-width: 75%; position: relative; margin-bottom: 4px; }
-        .message-wrapper.sent { margin-left: auto; flex-direction: row-reverse; }
-        .message-wrapper.received { margin-right: auto; }
+        .message-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+        .message-row.sent { justify-content: flex-end; }
+        .message-row.received { justify-content: flex-start; }
+        .message-select { width: 22px; height: 22px; min-width: 22px; border: 2px solid var(--gray-300); border-radius: 50%; cursor: pointer; display: none; align-items: center; justify-content: center; background: var(--white); transition: all 0.15s; flex-shrink: 0; }
+        .message-select.show { display: flex; }
+        .message-select.checked { background: var(--navy); border-color: var(--navy); }
+        .message-select.checked::after { content: '✓'; color: var(--white); font-size: 11px; font-weight: 700; }
+        .message-wrapper { display: flex; align-items: flex-end; gap: 8px; max-width: 70%; }
+        .message-row.sent .message-wrapper { flex-direction: row-reverse; }
         .message-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); display: flex; align-items: center; justify-content: center; color: var(--white); font-size: 11px; font-weight: 700; flex-shrink: 0; overflow: hidden; margin-bottom: 2px; }
         .message-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .message-wrapper.sent .message-avatar { display: none; }
+        .message-row.sent .message-avatar { display: none; }
         .message-bubble { padding: 10px 14px; border-radius: 18px; position: relative; cursor: pointer; transition: all 0.15s; }
-        .message-wrapper.sent .message-bubble { background: var(--navy); color: var(--white); border-bottom-right-radius: 4px; }
-        .message-wrapper.received .message-bubble { background: var(--white); color: var(--gray-800); border-bottom-left-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .message-row.sent .message-bubble { background: var(--navy); color: var(--white); border-bottom-right-radius: 4px; }
+        .message-row.received .message-bubble { background: var(--white); color: var(--gray-800); border-bottom-left-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         .message-bubble:hover { transform: scale(1.01); }
         .message-bubble.selected { outline: 3px solid var(--blue); outline-offset: 2px; }
         .message-sender { font-size: 12px; font-weight: 600; color: var(--navy); margin-bottom: 4px; }
-        .message-wrapper.sent .message-sender { display: none; }
+        .message-row.sent .message-sender { display: none; }
         .message-text { font-size: 14px; line-height: 1.5; word-wrap: break-word; }
         .message-meta { display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin-top: 4px; }
         .message-time { font-size: 11px; opacity: 0.7; }
         .message-status { font-size: 12px; }
-        .message-select { position: absolute; top: 50%; transform: translateY(-50%); width: 24px; height: 24px; border: 2px solid var(--gray-300); border-radius: 50%; cursor: pointer; display: none; align-items: center; justify-content: center; background: var(--white); transition: all 0.15s; }
-        .message-wrapper.received .message-select { left: -36px; }
-        .message-wrapper.sent .message-select { right: -36px; }
-        .message-select.show { display: flex; }
-        .message-select.checked { background: var(--navy); border-color: var(--navy); }
-        .message-select.checked::after { content: '✓'; color: var(--white); font-size: 12px; font-weight: 700; }
         .chat-input-area { padding: 16px 20px; background: var(--white); border-top: 1px solid var(--gray-200); display: flex; align-items: flex-end; gap: 12px; }
         .chat-input-wrapper { flex: 1; background: var(--gray-100); border-radius: 24px; padding: 4px 16px; display: flex; align-items: flex-end; }
         .chat-input { flex: 1; border: none; background: transparent; font-family: 'Outfit', sans-serif; font-size: 15px; padding: 10px 0; resize: none; max-height: 120px; line-height: 1.4; }
@@ -412,7 +418,20 @@
                 const msgDate = new Date(msg.created_at).toDateString();
                 if (msgDate !== lastDate) { html += `<div class="chat-date-divider"><span>${formatDateDivider(msg.created_at)}</span></div>`; lastDate = msgDate; }
                 const isSent = msg.sender_id === currentUser.id, isSelected = selectedMessages.has(msg.id), time = formatMessageTime(msg.created_at);
-                html += `<div class="message-wrapper ${isSent ? 'sent' : 'received'}" data-id="${msg.id}"><div class="message-select ${isSelectionMode ? 'show' : ''} ${isSelected ? 'checked' : ''}" onclick="toggleMessageSelect('${msg.id}')"></div>${!isSent ? `<div class="message-avatar">${currentChatUser?.avatar_url ? `<img src="${currentChatUser.avatar_url}">` : getInitials(currentChatUser?.full_name || currentChatUser?.first_name || 'U')}</div>` : ''}<div class="message-bubble ${isSelected ? 'selected' : ''}" onclick="handleMessageClick(event, '${msg.id}')">${!isSent ? `<div class="message-sender">${escapeHtml(currentChatUser?.first_name || 'User')}</div>` : ''}<div class="message-text">${escapeHtml(msg.content)}</div><div class="message-meta"><span class="message-time">${time}</span>${isSent ? `<span class="message-status">${msg.is_read ? '✓✓' : '✓'}</span>` : ''}</div></div></div>`;
+                html += `<div class="message-row ${isSent ? 'sent' : 'received'}" data-id="${msg.id}">
+                    <div class="message-select ${isSelectionMode ? 'show' : ''} ${isSelected ? 'checked' : ''}" onclick="toggleMessageSelect('${msg.id}')"></div>
+                    <div class="message-wrapper">
+                        ${!isSent ? `<div class="message-avatar">${currentChatUser?.avatar_url ? `<img src="${currentChatUser.avatar_url}">` : getInitials(currentChatUser?.full_name || currentChatUser?.first_name || 'U')}</div>` : ''}
+                        <div class="message-bubble ${isSelected ? 'selected' : ''}" onclick="handleMessageClick(event, '${msg.id}')">
+                            ${!isSent ? `<div class="message-sender">${escapeHtml(currentChatUser?.first_name || 'User')}</div>` : ''}
+                            <div class="message-text">${escapeHtml(msg.content)}</div>
+                            <div class="message-meta">
+                                <span class="message-time">${time}</span>
+                                ${isSent ? `<span class="message-status">${msg.is_read ? '✓✓' : '✓'}</span>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
             });
             container.innerHTML = html; container.scrollTop = container.scrollHeight;
         }
@@ -485,15 +504,31 @@
         }
 
         function deleteConversation() {
+            const convToDelete = currentConversation;
             document.getElementById('confirmTitle').textContent = 'Delete Conversation';
             document.getElementById('confirmMessage').textContent = 'Permanently delete this entire conversation?';
             confirmCallback = async () => { 
-                await supabase.from('messages').delete().or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${currentConversation}),and(sender_id.eq.${currentConversation},receiver_id.eq.${currentUser.id})`); 
+                // Delete all messages between both users
+                await supabase.from('messages').delete().or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${convToDelete}),and(sender_id.eq.${convToDelete},receiver_id.eq.${currentUser.id})`); 
+                
+                // Clear local state
                 messages = [];
+                
+                // Remove from conversations array immediately (check both oderId and user.id)
+                conversations = conversations.filter(c => c.oderId !== convToDelete && c.user?.id !== convToDelete);
+                renderConversations();
+                
+                // Reset chat panel
                 currentConversation = null;
                 currentChatUser = null;
-                await loadConversations();
-                backToConversations();
+                
+                // Show empty state
+                document.getElementById('chatHeader').style.display = 'none';
+                document.getElementById('chatMessages').style.display = 'none';
+                document.getElementById('chatInputArea').style.display = 'none';
+                document.getElementById('chatBlocked').style.display = 'none';
+                document.getElementById('chatEmpty').style.display = 'flex';
+                
                 showToast('Conversation deleted'); 
                 closeConfirmModal(); 
                 closeChatMenu(); 
@@ -718,20 +753,37 @@
             if (isBlockedBy) {
                 footerHtml += '</div>';
             } else if (isBlocked) {
-                footerHtml += `<button class="btn btn-secondary" onclick="unblockUser('${userId}', '${escapeHtml(name)}')">Unblock User</button>`;
+                footerHtml += `<button class="btn btn-secondary" onclick="unblockUser('${userId}', '${escapeHtml(name)}')">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                    Unblock User
+                </button>`;
             } else {
                 footerHtml += `
                     <button class="btn btn-primary" onclick="startConversationFromProfile('${userId}')">
-                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:16px;height:16px;"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
                         Message
                     </button>
                     <div class="btn-row">
-                        <button class="btn btn-outline-danger" onclick="blockUser('${userId}', '${escapeHtml(name)}')">Block</button>
-                        <button class="btn btn-warning" onclick="reportUser('${userId}')">Report</button>
+                        <button class="btn btn-outline-danger" onclick="blockUser('${userId}', '${escapeHtml(name)}')">
+                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                            Block
+                        </button>
+                        <button class="btn btn-warning" onclick="reportUser('${userId}')">
+                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                            Report
+                        </button>
                     </div>`;
             }
             
-            footerHtml += `<a href="profile.html?user=${userId}" class="profile-modal-link">View Full Profile →</a></div>`;
+            footerHtml += `
+                <div class="profile-modal-link-container">
+                    <a href="profile.html?user=${userId}" class="profile-modal-link">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                        View Full Profile
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+                    </a>
+                </div>
+            </div>`;
             document.getElementById('profileModalFooter').innerHTML = footerHtml;
 
             document.getElementById('profileModal').classList.add('show');

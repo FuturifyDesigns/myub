@@ -47,9 +47,9 @@
         .search-placeholder p { font-size: 14px; }
         .user-search-item { display: flex; align-items: center; gap: 12px; padding: 14px 16px; cursor: pointer; transition: all 0.15s; border-bottom: 1px solid var(--gray-100); }
         .user-search-item:hover { background: var(--gray-50); }
-        .user-search-avatar { position: relative; width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); display: flex; align-items: center; justify-content: center; color: var(--white); font-family: 'Sora', sans-serif; font-weight: 700; font-size: 15px; flex-shrink: 0; overflow: hidden; }
-        .user-search-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .user-search-avatar .online-indicator { position: absolute; bottom: 2px; right: 2px; width: 12px; height: 12px; background: var(--green); border-radius: 50%; border: 2px solid var(--white); }
+        .user-search-avatar { position: relative; width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); display: flex; align-items: center; justify-content: center; color: var(--white); font-family: 'Sora', sans-serif; font-weight: 700; font-size: 15px; flex-shrink: 0; }
+        .user-search-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        .user-search-avatar .online-indicator { position: absolute; bottom: 0; right: 0; width: 14px; height: 14px; background: var(--green); border-radius: 50%; border: 2px solid var(--white); }
         .user-search-avatar .online-indicator.offline { background: var(--gray-400); }
         .user-search-info { flex: 1; min-width: 0; }
         .user-search-name { font-size: 15px; font-weight: 600; color: var(--gray-800); margin-bottom: 2px; }
@@ -60,27 +60,35 @@
         
         /* Profile Modal Styles */
         .profile-modal-content { text-align: center; padding: 8px 0; }
-        .profile-modal-avatar { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); display: flex; align-items: center; justify-content: center; color: var(--white); font-family: 'Sora', sans-serif; font-weight: 700; font-size: 28px; margin: 0 auto 16px; position: relative; overflow: hidden; }
-        .profile-modal-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .profile-modal-avatar .online-dot { position: absolute; bottom: 4px; right: 4px; width: 16px; height: 16px; background: var(--green); border-radius: 50%; border: 3px solid var(--white); }
+        .profile-modal-avatar { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); display: flex; align-items: center; justify-content: center; color: var(--white); font-family: 'Sora', sans-serif; font-weight: 700; font-size: 28px; margin: 0 auto 16px; position: relative; }
+        .profile-modal-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        .profile-modal-avatar .online-dot { position: absolute; bottom: 2px; right: 2px; width: 16px; height: 16px; background: var(--green); border-radius: 50%; border: 3px solid var(--white); z-index: 1; }
         .profile-modal-avatar .online-dot.offline { background: var(--gray-400); }
         .profile-modal-name { font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 700; color: var(--gray-800); margin-bottom: 4px; }
         .profile-modal-program { font-size: 14px; color: var(--gray-500); margin-bottom: 8px; }
         .profile-modal-status { font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 16px; }
-        .profile-modal-status .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+        .profile-modal-status .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
         .profile-modal-status .dot.offline { background: var(--gray-400); }
         .profile-modal-status span { color: var(--gray-600); }
         .profile-modal-bio { background: var(--gray-50); padding: 12px 16px; border-radius: 10px; font-size: 14px; color: var(--gray-600); text-align: left; margin-bottom: 16px; }
-        .profile-modal-meta { font-size: 12px; color: var(--gray-400); }
-        .profile-modal-actions { display: flex; flex-direction: column; gap: 8px; }
-        .profile-modal-actions .btn-row { display: flex; gap: 8px; }
-        .profile-modal-actions .btn-row .btn { flex: 1; justify-content: center; }
-        .profile-modal-link { display: block; margin-top: 12px; color: var(--navy); font-size: 14px; font-weight: 600; text-decoration: none; }
+        .profile-modal-meta { font-size: 12px; color: var(--gray-400); margin-bottom: 16px; }
+        .profile-modal-actions { display: flex; flex-direction: column; gap: 10px; }
+        .profile-modal-actions .btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; font-size: 14px; font-weight: 600; border-radius: 10px; cursor: pointer; transition: all 0.2s; border: none; }
+        .profile-modal-actions .btn svg { width: 18px; height: 18px; }
+        .profile-modal-actions .btn-primary { background: var(--navy); color: var(--white); }
+        .profile-modal-actions .btn-primary:hover { background: var(--navy-light); }
+        .profile-modal-actions .btn-row { display: flex; gap: 10px; }
+        .profile-modal-actions .btn-row .btn { flex: 1; padding: 10px 16px; font-size: 13px; }
+        .profile-modal-actions .btn-outline-danger { background: transparent; border: 2px solid var(--red); color: var(--red); }
+        .profile-modal-actions .btn-outline-danger:hover { background: #fee2e2; }
+        .profile-modal-actions .btn-warning { background: #fef3c7; color: #b45309; border: none; }
+        .profile-modal-actions .btn-warning:hover { background: #fde68a; }
+        .profile-modal-link { display: block; margin-top: 12px; color: var(--navy); font-size: 14px; font-weight: 600; text-decoration: none; text-align: center; }
         .profile-modal-link:hover { text-decoration: underline; }
-        .profile-blocked-notice { background: #fee2e2; color: var(--red); padding: 12px; border-radius: 8px; font-size: 14px; margin-bottom: 16px; }
-        .btn-outline-danger { background: transparent; border: 2px solid var(--red); color: var(--red); }
-        .btn-outline-danger:hover { background: #fee2e2; }
-        .btn-warning { background: #fef3c7; color: #b45309; }
+        .profile-blocked-notice { background: #fee2e2; color: var(--red); padding: 12px; border-radius: 8px; font-size: 14px; margin-bottom: 16px; text-align: center; }
+        /* Ensure confirm modal appears above profile modal */
+        #confirmModal { z-index: 1100; }
+        #userReportModal { z-index: 1100; }
         .conversations-search { padding: 12px 16px; border-bottom: 1px solid var(--gray-200); }
         .search-input { width: 100%; padding: 10px 14px 10px 40px; border: 2px solid var(--gray-200); border-radius: 10px; font-family: 'Outfit', sans-serif; font-size: 14px; background: var(--gray-50) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%2394a3b8' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'/%3E%3C/svg%3E") no-repeat 12px center; background-size: 18px; }
         .search-input:focus { outline: none; border-color: var(--navy); background-color: var(--white); }
@@ -90,9 +98,9 @@
         .conversation-item.active { background: var(--blue-light); }
         .conversation-item.unread { background: var(--gray-50); }
         .conversation-item.unread::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--navy); }
-        .conv-avatar { position: relative; width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); display: flex; align-items: center; justify-content: center; color: var(--white); font-family: 'Sora', sans-serif; font-weight: 700; font-size: 16px; flex-shrink: 0; overflow: hidden; }
-        .conv-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .conv-online { position: absolute; bottom: 2px; right: 2px; width: 12px; height: 12px; background: var(--green); border-radius: 50%; border: 2px solid var(--white); }
+        .conv-avatar { position: relative; width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); display: flex; align-items: center; justify-content: center; color: var(--white); font-family: 'Sora', sans-serif; font-weight: 700; font-size: 16px; flex-shrink: 0; }
+        .conv-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        .conv-online { position: absolute; bottom: 0; right: 0; width: 14px; height: 14px; background: var(--green); border-radius: 50%; border: 2px solid var(--white); }
         .conv-online.offline { background: var(--gray-400); }
         .conv-info { flex: 1; min-width: 0; }
         .conv-name { font-size: 15px; font-weight: 600; color: var(--gray-800); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -110,9 +118,9 @@
         .chat-header-back { display: none; width: 36px; height: 36px; border: none; background: var(--gray-100); border-radius: 8px; cursor: pointer; align-items: center; justify-content: center; }
         .chat-header-back svg { width: 20px; height: 20px; color: var(--gray-600); }
         .chat-user-info { flex: 1; display: flex; align-items: center; gap: 12px; cursor: pointer; }
-        .chat-avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); display: flex; align-items: center; justify-content: center; color: var(--white); font-family: 'Sora', sans-serif; font-weight: 700; font-size: 14px; position: relative; overflow: hidden; }
-        .chat-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .chat-avatar .online-dot { position: absolute; bottom: 1px; right: 1px; width: 10px; height: 10px; background: var(--green); border-radius: 50%; border: 2px solid var(--white); }
+        .chat-avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); display: flex; align-items: center; justify-content: center; color: var(--white); font-family: 'Sora', sans-serif; font-weight: 700; font-size: 14px; position: relative; }
+        .chat-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        .chat-avatar .online-dot { position: absolute; bottom: 0; right: 0; width: 12px; height: 12px; background: var(--green); border-radius: 50%; border: 2px solid var(--white); }
         .chat-avatar .online-dot.offline { background: var(--gray-400); }
         .chat-user-details h3 { font-size: 16px; font-weight: 600; color: var(--gray-800); }
         .chat-user-status { font-size: 12px; color: var(--green); }
@@ -151,11 +159,12 @@
         .message-meta { display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin-top: 4px; }
         .message-time { font-size: 11px; opacity: 0.7; }
         .message-status { font-size: 12px; }
-        .message-select { position: absolute; left: -30px; top: 50%; transform: translateY(-50%); width: 22px; height: 22px; border: 2px solid var(--gray-300); border-radius: 50%; cursor: pointer; display: none; align-items: center; justify-content: center; background: var(--white); }
+        .message-select { position: absolute; top: 50%; transform: translateY(-50%); width: 24px; height: 24px; border: 2px solid var(--gray-300); border-radius: 50%; cursor: pointer; display: none; align-items: center; justify-content: center; background: var(--white); transition: all 0.15s; }
+        .message-wrapper.received .message-select { left: -36px; }
+        .message-wrapper.sent .message-select { right: -36px; }
         .message-select.show { display: flex; }
         .message-select.checked { background: var(--navy); border-color: var(--navy); }
-        .message-select.checked::after { content: ''; width: 8px; height: 8px; background: var(--white); border-radius: 50%; }
-        .message-wrapper.sent .message-select { left: auto; right: -30px; }
+        .message-select.checked::after { content: '✓'; color: var(--white); font-size: 12px; font-weight: 700; }
         .chat-input-area { padding: 16px 20px; background: var(--white); border-top: 1px solid var(--gray-200); display: flex; align-items: flex-end; gap: 12px; }
         .chat-input-wrapper { flex: 1; background: var(--gray-100); border-radius: 24px; padding: 4px 16px; display: flex; align-items: flex-end; }
         .chat-input { flex: 1; border: none; background: transparent; font-family: 'Outfit', sans-serif; font-size: 15px; padding: 10px 0; resize: none; max-height: 120px; line-height: 1.4; }
@@ -462,15 +471,33 @@
 
         function clearConversation() {
             document.getElementById('confirmTitle').textContent = 'Clear Chat';
-            document.getElementById('confirmMessage').textContent = 'Clear all messages?';
-            confirmCallback = async () => { await supabase.from('messages').update({ is_deleted: true }).or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${currentConversation}),and(sender_id.eq.${currentConversation},receiver_id.eq.${currentUser.id})`); showToast('Chat cleared'); closeConfirmModal(); closeChatMenu(); await loadMessages(currentConversation); await loadConversations(); };
+            document.getElementById('confirmMessage').textContent = 'Clear all messages in this conversation?';
+            confirmCallback = async () => { 
+                await supabase.from('messages').update({ is_deleted: true }).or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${currentConversation}),and(sender_id.eq.${currentConversation},receiver_id.eq.${currentUser.id})`); 
+                messages = []; 
+                renderMessages(); 
+                await loadConversations();
+                showToast('Chat cleared'); 
+                closeConfirmModal(); 
+                closeChatMenu(); 
+            };
             document.getElementById('confirmModal').classList.add('show');
         }
 
         function deleteConversation() {
             document.getElementById('confirmTitle').textContent = 'Delete Conversation';
-            document.getElementById('confirmMessage').textContent = 'Delete entire conversation?';
-            confirmCallback = async () => { await supabase.from('messages').delete().or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${currentConversation}),and(sender_id.eq.${currentConversation},receiver_id.eq.${currentUser.id})`); showToast('Conversation deleted'); closeConfirmModal(); closeChatMenu(); backToConversations(); await loadConversations(); };
+            document.getElementById('confirmMessage').textContent = 'Permanently delete this entire conversation?';
+            confirmCallback = async () => { 
+                await supabase.from('messages').delete().or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${currentConversation}),and(sender_id.eq.${currentConversation},receiver_id.eq.${currentUser.id})`); 
+                messages = [];
+                currentConversation = null;
+                currentChatUser = null;
+                await loadConversations();
+                backToConversations();
+                showToast('Conversation deleted'); 
+                closeConfirmModal(); 
+                closeChatMenu(); 
+            };
             document.getElementById('confirmModal').classList.add('show');
         }
 
@@ -510,10 +537,21 @@
         async function handleNotifClick(id, type) { await supabase.from('notifications').update({ is_read: true }).eq('id', id); const n = notifications.find(x => x.id === id); if (n) n.is_read = true; renderNotifications(); if (type === 'friend_request') window.location.href = 'friends.html'; document.getElementById('notificationDropdown').classList.remove('show'); }
         async function markAllNotificationsRead() { await supabase.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id); notifications.forEach(n => n.is_read = true); renderNotifications(); }
 
+        // Notification sound
+        function playNotificationSound() {
+            try {
+                const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1bdHiAg4F9eXmCh4iGhIOEhYSDgn98fH+ChYaGhoWEhISDgYB+fn+BhIWGhoaFhIOCgX9+fn+Bg4WGhoaFhYOCgH5+f4GDhYaHhoWEg4KAfn5/gYOFhoeGhYSDgX9+fn+Bg4WGhoWFhIOCgH5+f4GDhYaGhoWEg4F/fn5/gYOFhoaGhYSDgn9+fn+Bg4WGhoaFhIOBf35+f4GDhYaGhoWEg4J/fn5/gYOFhoaGhYSDgX9+fn+Bg4WGhoaFhIOCf35+f4GDhYaGhoWEg4F/fn5/gYOFhoaGhYSDgn9+fn+Bg4WGhoaFhIOBf35+f4GDhYaGhoWEg4J/fn5/gYOFhoaGhYSDgX9+fn+Bg4WGhoWFhIOCgH5+f4GDhYaGhoWEg4F/fn5/gYOFhoaGhYSDgn9+fn+Bg4WGhoaFhIOBf35+f4GDhYaGhoWEg4J/fn5/gYOFhoaGhYSDgX9+fn+Bg4WGhoaFhIOCf35+f4GDhYaGhoWEg4F/fn5/gYOFhoaGhYSDgn9+fn+Bg4WGhoaFhIOBf35+f4GDhYaGhoWEg4J/fn5/gYOFhoaGhYSDgX9+fn+Bg4WGhoaFhIOCf35+f4GDhYaGhoWEg4F/fn5/gYOFhoaGhYSDgn9+fn+Bg4WGhoaFhIOBf35+f4GDhYaGhoWEg4J/fn5/gYOFhoaGhYSDgX9+fn+Bg4WGhoaFhIOCf35+');
+                audio.volume = 0.3;
+                audio.play().catch(() => {});
+            } catch (e) {}
+        }
+
         function subscribeToRealtime() {
             supabase.channel('messages-channel').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `receiver_id=eq.${currentUser.id}` }, async (payload) => {
                 const msg = payload.new;
+                playNotificationSound();
                 if (currentConversation === msg.sender_id) { messages.push(msg); renderMessages(); await supabase.from('messages').update({ is_read: true }).eq('id', msg.id); }
+                else { showToast('New message received', 'success'); }
                 await loadConversations();
             }).subscribe();
             supabase.channel('message-reads').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'messages', filter: `sender_id=eq.${currentUser.id}` }, (payload) => { const msgIdx = messages.findIndex(m => m.id === payload.new.id); if (msgIdx !== -1) { messages[msgIdx].is_read = payload.new.is_read; renderMessages(); } }).subscribe();
@@ -521,11 +559,16 @@
                 if (currentChatUser && currentChatUser.id === payload.new.id) { currentChatUser.is_online = payload.new.is_online; currentChatUser.last_seen = payload.new.last_seen; const statusEl = document.getElementById('chatUserStatus'); statusEl.textContent = payload.new.is_online ? 'Online' : `Last seen ${formatTimeAgo(payload.new.last_seen)}`; statusEl.className = 'chat-user-status' + (payload.new.is_online ? '' : ' offline'); }
                 const conv = conversations.find(c => c.oderId === payload.new.id); if (conv && conv.user) { conv.user.is_online = payload.new.is_online; conv.user.last_seen = payload.new.last_seen; renderConversations(); }
             }).subscribe();
-            supabase.channel('notifications-messages').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${currentUser.id}` }, (payload) => { notifications.unshift(payload.new); renderNotifications(); }).subscribe();
+            supabase.channel('notifications-messages').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${currentUser.id}` }, (payload) => { 
+                notifications.unshift(payload.new); 
+                renderNotifications(); 
+                playNotificationSound();
+                showToast(payload.new.title, 'success');
+            }).subscribe();
         }
 
         function updateUnreadBadge() { const totalUnread = conversations.reduce((sum, c) => sum + (c.unreadCount || 0), 0); const badge = document.getElementById('sidebarMsgBadge'); if (totalUnread > 0) { badge.textContent = totalUnread > 99 ? '99+' : totalUnread; badge.style.display = 'inline'; } else badge.style.display = 'none'; }
-        function viewUserProfile() { if (currentChatUser) window.location.href = `profile.html?user=${currentChatUser.id}`; closeChatMenu(); }
+        function viewUserProfile() { if (currentChatUser) { openProfileModal(currentChatUser.id); } closeChatMenu(); }
         function toggleChatMenu(event) { event.stopPropagation(); document.getElementById('chatMenu').classList.toggle('show'); }
         function closeChatMenu() { document.getElementById('chatMenu').classList.remove('show'); }
         function handleOutsideClick(e) { if (!e.target.closest('.notification-wrapper')) document.getElementById('notificationDropdown').classList.remove('show'); if (!e.target.closest('.chat-header-actions')) closeChatMenu(); }

@@ -1801,15 +1801,19 @@
             
             document.getElementById('groupsCount').textContent = groupsCount || 0;
 
-            // Load pending tasks
-            const { count: tasksCount } = await supabase
-                .from('schedules')
-                .select('*', { count: 'exact', head: true })
-                .eq('user_id', currentUser.id)
-                .eq('is_completed', false)
-                .gte('start_time', new Date().toISOString());
-            
-            document.getElementById('tasksCount').textContent = tasksCount || 0;
+            // Load pending tasks (with error handling for missing table)
+            try {
+                const { count: tasksCount } = await supabase
+                    .from('schedules')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('user_id', currentUser.id)
+                    .eq('is_completed', false)
+                    .gte('start_time', new Date().toISOString());
+                
+                document.getElementById('tasksCount').textContent = tasksCount || 0;
+            } catch (e) {
+                document.getElementById('tasksCount').textContent = '0';
+            }
 
             // Load upcoming schedule
             await loadUpcomingSchedule();
@@ -1822,45 +1826,58 @@
                 .eq('is_read', false);
 
             if (unreadCount > 0) {
-                document.getElementById('unreadBadge').textContent = unreadCount;
-                document.getElementById('unreadBadge').style.display = 'inline';
-                document.getElementById('notificationDot').style.display = 'block';
+                const unreadBadge = document.getElementById('unreadBadge');
+                const notificationDot = document.getElementById('notificationDot');
+                if (unreadBadge) {
+                    unreadBadge.textContent = unreadCount;
+                    unreadBadge.style.display = 'inline';
+                }
+                if (notificationDot) {
+                    notificationDot.style.display = 'block';
+                }
             }
         }
 
         async function loadUpcomingSchedule() {
-            const { data: schedules } = await supabase
-                .from('schedules')
-                .select('*')
-                .eq('user_id', currentUser.id)
-                .gte('start_time', new Date().toISOString())
-                .order('start_time', { ascending: true })
-                .limit(3);
+            try {
+                const { data: schedules, error } = await supabase
+                    .from('schedules')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .gte('start_time', new Date().toISOString())
+                    .order('start_time', { ascending: true })
+                    .limit(3);
 
-            const container = document.getElementById('scheduleList');
+                if (error) return; // Table might not exist yet
 
-            if (schedules && schedules.length > 0) {
-                container.innerHTML = schedules.map(schedule => {
-                    const date = new Date(schedule.start_time);
-                    const time = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-                    const [timeNum, period] = time.split(' ');
-                    
-                    const typeClass = schedule.event_type === 'exam' ? 'exam' : 
-                                     schedule.event_type === 'assignment' ? 'assignment' : '';
-                    
-                    return `
-                        <div class="schedule-item ${typeClass}">
-                            <div class="schedule-time">
-                                <div class="time">${timeNum}</div>
-                                <div class="period">${period}</div>
+                const container = document.getElementById('scheduleList');
+                if (!container) return;
+
+                if (schedules && schedules.length > 0) {
+                    container.innerHTML = schedules.map(schedule => {
+                        const date = new Date(schedule.start_time);
+                        const time = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+                        const [timeNum, period] = time.split(' ');
+                        
+                        const typeClass = schedule.event_type === 'exam' ? 'exam' : 
+                                         schedule.event_type === 'assignment' ? 'assignment' : '';
+                        
+                        return `
+                            <div class="schedule-item ${typeClass}">
+                                <div class="schedule-time">
+                                    <div class="time">${timeNum}</div>
+                                    <div class="period">${period}</div>
+                                </div>
+                                <div class="schedule-details">
+                                    <h4>${schedule.title}</h4>
+                                    <p>${schedule.course_code || ''} ${schedule.location ? '• ' + schedule.location : ''}</p>
+                                </div>
                             </div>
-                            <div class="schedule-details">
-                                <h4>${schedule.title}</h4>
-                                <p>${schedule.course_code || ''} ${schedule.location ? '• ' + schedule.location : ''}</p>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
+                        `;
+                    }).join('');
+                }
+            } catch (e) {
+                // Silently handle error - schedules table might not exist
             }
         }
 

@@ -1667,7 +1667,8 @@
             if (courses && courses.length > 0) {
                 courses.forEach(course => {
                     totalCredits += course.credits;
-                    if (course.grade && course.grade !== 'E' && course.grade !== 'F') {
+                    // E is marginal pass (counts), only F is fail
+                    if (course.grade && course.grade !== 'F') {
                         earnedCredits += course.credits;
                         totalPoints += course.credits * getGradePoints(course.grade);
                     }
@@ -1754,14 +1755,16 @@
         }
 
         function getGradePoints(grade) {
-            const points = { 'A': 5.0, 'B': 4.0, 'C': 3.0, 'D': 2.0, 'E': 0, 'F': 0 };
+            // UB Grading Scale (After August 2002)
+            const points = { 'A': 5.0, 'B': 4.0, 'C': 3.0, 'D': 2.0, 'E': 1.0, 'F': 0 };
             return points[grade] || 0;
         }
 
         function getGPAStatus(gpa) {
-            if (gpa >= 4.5) return 'First Class 🎉';
-            if (gpa >= 3.5) return 'Second Class Upper';
-            if (gpa >= 2.5) return 'Second Class Lower';
+            // UB Degree Classification
+            if (gpa >= 4.4) return 'First Class / Distinction 🎉';
+            if (gpa >= 3.6) return 'Second Class Upper / Merit';
+            if (gpa >= 2.8) return 'Second Class Lower / Credit';
             if (gpa >= 2.0) return 'Pass';
             if (gpa > 0) return 'Below Pass';
             return 'Add courses to calculate';

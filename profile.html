@@ -1679,18 +1679,14 @@
             }
 
             // Start real-time online status
-            OnlineStatus.setOnline();
+            await OnlineStatus.setOnline();
             OnlineStatus.startHeartbeat();
 
             // Load profile
             await loadProfile();
 
-            // Subscribe to own profile changes for real-time status updates
-            OnlineStatus.subscribeToProfiles([currentUser.id], (updatedProfile) => {
-                if (updatedProfile.id === currentUser.id) {
-                    updateStatusUI(updatedProfile.is_online, updatedProfile.last_seen);
-                }
-            });
+            // For own profile, always show as Online (since we're viewing it)
+            updateStatusUI(true, new Date().toISOString());
 
             // Load dark mode preference
             if (localStorage.getItem('myub_darkMode') === 'true') {

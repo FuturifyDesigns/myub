@@ -656,9 +656,9 @@
             }
             const count = incomingRequests.length;
             const badge = document.getElementById('requestsCount');
-            const sbBadge = document.getElementById('sidebarFriendBadge');
-            if (count > 0) { badge.textContent = count; badge.style.display = 'inline'; sbBadge.textContent = count; sbBadge.style.display = 'inline'; }
-            else { badge.style.display = 'none'; sbBadge.style.display = 'none'; }
+            const sbBadge = document.getElementById('sidebarFriendsBadge');
+            if (count > 0) { badge.textContent = count; badge.style.display = 'inline'; if (sbBadge) { sbBadge.textContent = count; sbBadge.style.display = 'inline'; } }
+            else { badge.style.display = 'none'; if (sbBadge) sbBadge.style.display = 'none'; }
         }
 
         async function acceptRequest(requestId, senderId) {

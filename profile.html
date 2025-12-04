@@ -1611,17 +1611,16 @@
             const memberSince = document.getElementById('memberSince');
             if (memberSince) memberSince.textContent = `Member since ${new Date(user.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`;
 
-            // COMPLETELY HIDE all other cards (Profile Information, Account Settings, etc.)
+            // HIDE ALL .card elements (Profile Information, Account Settings, etc.)
+            // The profile header is .profile-header-card, not .card, so it won't be hidden
             const allCards = document.querySelectorAll('.card');
-            allCards.forEach((card, index) => {
-                if (index > 0) { // Keep only the first card (profile header)
-                    card.style.display = 'none';
-                }
+            allCards.forEach((card) => {
+                card.style.display = 'none';
             });
 
-            // Insert new cards for viewing other user's profile AFTER the first card
-            const firstCard = document.querySelector('.card');
-            if (firstCard) {
+            // Insert new cards for viewing other user's profile AFTER the profile header
+            const profileHeader = document.querySelector('.profile-header-card');
+            if (profileHeader) {
                 const viewProfileHtml = `
                     <div class="card view-other-profile-card" style="margin-top:20px;">
                         <div class="card-header">
@@ -1639,6 +1638,14 @@
                                 <div style="padding:16px;background:var(--gray-50);border-radius:10px;">
                                     <div style="color:var(--gray-500);font-size:13px;margin-bottom:6px;">Last Name</div>
                                     <div style="font-weight:600;color:var(--gray-900);">${escapeHtml(user.last_name || 'Not specified')}</div>
+                                </div>
+                                <div style="padding:16px;background:var(--gray-50);border-radius:10px;">
+                                    <div style="color:var(--gray-500);font-size:13px;margin-bottom:6px;">Email</div>
+                                    <div style="font-weight:600;color:var(--gray-900);">${escapeHtml(user.email || 'Not specified')}</div>
+                                </div>
+                                <div style="padding:16px;background:var(--gray-50);border-radius:10px;">
+                                    <div style="color:var(--gray-500);font-size:13px;margin-bottom:6px;">Student ID</div>
+                                    <div style="font-weight:600;color:var(--gray-900);">${escapeHtml(user.student_id || 'Not specified')}</div>
                                 </div>
                                 <div style="padding:16px;background:var(--gray-50);border-radius:10px;">
                                     <div style="color:var(--gray-500);font-size:13px;margin-bottom:6px;">Program</div>
@@ -1675,7 +1682,7 @@
                         </div>
                     </div>
                 `;
-                firstCard.insertAdjacentHTML('afterend', viewProfileHtml);
+                profileHeader.insertAdjacentHTML('afterend', viewProfileHtml);
             }
         }
 

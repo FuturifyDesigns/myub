@@ -164,11 +164,50 @@
         .chat-input-area { padding: 16px 20px; background: var(--white); border-top: 1px solid var(--gray-200); display: flex; align-items: flex-end; gap: 12px; }
         .emoji-btn { width: 40px; height: 40px; border: none; background: var(--gray-100); border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; }
         .emoji-btn svg { width: 20px; height: 20px; color: var(--gray-500); }
-        .emoji-picker { position: absolute; bottom: 100%; left: 0; background: var(--white); border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); padding: 12px; display: none; z-index: 100; width: 280px; margin-bottom: 8px; }
+        .emoji-picker { position: absolute; bottom: calc(100% + 10px); left: 0; background: var(--white); border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); padding: 16px; display: none; z-index: 1000; width: 320px; }
         .emoji-picker.show { display: block; }
-        .emoji-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; }
-        .emoji-item { font-size: 22px; cursor: pointer; padding: 6px; border-radius: 8px; text-align: center; transition: background 0.2s; display: flex; align-items: center; justify-content: center; }
-        .emoji-item:hover { background: var(--gray-100); }
+        
+        /* Selection Mode */
+        .selection-header { padding: 12px 20px; background: var(--navy); display: none; align-items: center; gap: 12px; border-radius: 0; }
+        .selection-header.show { display: flex; }
+        .selection-count { color: var(--white); font-size: 15px; font-weight: 600; flex: 1; }
+        .selection-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .selection-btn { padding: 8px 14px; border: none; border-radius: 8px; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s; }
+        .selection-btn svg { width: 16px; height: 16px; }
+        .selection-btn.cancel { background: rgba(255,255,255,0.2); color: var(--white); }
+        .selection-btn.delete { background: var(--red); color: var(--white); }
+        .selection-btn.delete:hover { background: #a01830; }
+        .message-select { width: 22px; height: 22px; min-width: 22px; border: 2px solid var(--gray-300); border-radius: 50%; cursor: pointer; display: none; align-items: center; justify-content: center; background: var(--white); transition: all 0.15s; flex-shrink: 0; margin-right: 8px; }
+        .message-select.show { display: flex; }
+        .message-select.checked { background: var(--navy); border-color: var(--navy); }
+        .message-select.checked::after { content: '✓'; color: var(--white); font-size: 11px; font-weight: 700; }
+        .message-bubble.selected { outline: 3px solid var(--blue); outline-offset: 2px; }
+        .emoji-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; }
+        .emoji-item { font-size: 20px; cursor: pointer; padding: 8px; border-radius: 8px; text-align: center; transition: background 0.2s; display: flex; align-items: center; justify-content: center; line-height: 1; }
+        .emoji-item:hover { background: var(--gray-100); transform: scale(1.1); }
+        
+        /* Message Selection */
+        .message-select { width: 22px; height: 22px; min-width: 22px; border: 2px solid var(--gray-300); border-radius: 50%; cursor: pointer; display: none; align-items: center; justify-content: center; background: var(--white); transition: all 0.15s; flex-shrink: 0; margin-right: 8px; }
+        .message-select.show { display: flex; }
+        .message-select.checked { background: var(--navy); border-color: var(--navy); }
+        .message-select.checked::after { content: '✓'; color: var(--white); font-size: 11px; font-weight: 700; }
+        .selection-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--navy); color: white; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; z-index: 500; transform: translateY(100%); transition: transform 0.3s; }
+        .selection-bar.show { transform: translateY(0); }
+        .selection-bar-left { display: flex; align-items: center; gap: 12px; }
+        .selection-bar-count { font-weight: 600; }
+        .selection-bar-actions { display: flex; gap: 8px; }
+        .selection-bar-actions button { padding: 8px 16px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+        .selection-bar-actions .cancel-btn { background: rgba(255,255,255,0.2); color: white; }
+        .selection-bar-actions .delete-btn { background: var(--red); color: white; }
+        
+        /* Message Context Menu */
+        .message-context-menu { position: fixed; background: var(--white); border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); min-width: 180px; z-index: 1000; overflow: hidden; display: none; }
+        .message-context-menu.show { display: block; }
+        .context-menu-item { display: flex; align-items: center; gap: 10px; padding: 12px 16px; font-size: 14px; color: var(--gray-700); cursor: pointer; transition: background 0.2s; }
+        .context-menu-item:hover { background: var(--gray-50); }
+        .context-menu-item svg { width: 16px; height: 16px; }
+        .context-menu-item.danger { color: var(--red); }
+        
         .chat-input-wrapper { flex: 1; background: var(--gray-100); border-radius: 24px; padding: 4px 16px; display: flex; align-items: flex-end; }
         .chat-input { flex: 1; border: none; background: transparent; font-family: 'Outfit', sans-serif; font-size: 15px; padding: 10px 0; resize: none; max-height: 120px; line-height: 1.4; }
         .chat-input:focus { outline: none; }
@@ -468,16 +507,16 @@
                     <h2>Study Groups</h2>
                     <div style="display:flex;gap:8px;align-items:center;">
                         <div class="notification-wrapper">
-                            <button class="icon-btn" onclick="toggleNotifications(event)" style="width:40px;height:40px;border-radius:50%;background:var(--gray-100);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative;">
+                            <button class="icon-btn notif-btn" onclick="toggleNotifications(event)" style="width:40px;height:40px;border-radius:50%;background:var(--gray-100);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative;">
                                 <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
                                 <span class="notification-badge" id="notifBadge2" style="display:none;position:absolute;top:-2px;right:-2px;background:var(--red);color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;min-width:16px;text-align:center;">0</span>
                             </button>
-                            <div class="notification-dropdown" id="notificationDropdown">
+                            <div class="notification-dropdown" id="notificationDropdown2">
                                 <div class="notif-dropdown-header">
                                     <h3>Notifications</h3>
                                     <button onclick="markAllNotificationsRead()">Mark all read</button>
                                 </div>
-                                <div class="notif-dropdown-list" id="notifList"></div>
+                                <div class="notif-dropdown-list" id="notifList2"></div>
                             </div>
                         </div>
                         <button class="create-btn" id="createBtn" onclick="openCreateModal()" title="Create Group">
@@ -515,6 +554,9 @@
                         </div>
                     </div>
                     <div class="chat-header-actions">
+                        <button class="chat-action-btn" onclick="enterSelectionMode()" title="Select Messages">
+                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                        </button>
                         <button class="chat-action-btn" onclick="openAddMembersModal()" title="Add Members">
                             <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
                         </button>
@@ -523,6 +565,7 @@
                         </button>
                         <div class="dropdown-menu" id="chatMenu">
                             <div class="dropdown-item" onclick="openGroupInfoModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Group Info</div>
+                            <div class="dropdown-item" onclick="enterSelectionMode()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>Select Messages</div>
                             <div class="dropdown-item" onclick="openAddMembersModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>Add Members</div>
                             <div class="dropdown-item" id="manageBansItem" style="display:none;" onclick="openManageBansModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>Manage Bans</div>
                             <div class="dropdown-divider"></div>
@@ -546,6 +589,36 @@
             </div>
         </div>
     </main>
+    
+    <!-- Selection Bar -->
+    <div class="selection-bar" id="selectionBar">
+        <div class="selection-bar-left">
+            <span class="selection-bar-count"><span id="selectedCount">0</span> selected</span>
+        </div>
+        <div class="selection-bar-actions">
+            <button class="cancel-btn" onclick="cancelSelection()">Cancel</button>
+            <button class="delete-btn" onclick="deleteSelectedMessages()">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                Delete
+            </button>
+        </div>
+    </div>
+    
+    <!-- Message Context Menu -->
+    <div class="message-context-menu" id="messageContextMenu">
+        <div class="context-menu-item" onclick="copyMessageText()">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            Copy
+        </div>
+        <div class="context-menu-item" onclick="startSelection()">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Select
+        </div>
+        <div class="context-menu-item danger" id="deleteMenuItem" onclick="deleteContextMessage()">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            Delete
+        </div>
+    </div>
     
     <!-- Create Group Modal -->
     <div class="modal" id="createModal">
@@ -824,6 +897,10 @@
         var croppedImageBlob = null;
         var avatarMode = 'create';
         var pendingRequests = [];
+        var isSelectionMode = false;
+        var selectedMessages = [];
+        var contextMenuMessageId = null;
+        var contextMenuMessageContent = null;
         
         // ============================================
         // HELPERS
@@ -1129,20 +1206,25 @@
                 var initials = getInitials(name);
                 var time = formatMessageTime(msg.created_at);
                 var isBlocked = blockedUsers.indexOf(msg.sender_id) !== -1;
+                var isSelected = selectedMessages.indexOf(msg.id) !== -1;
                 
                 if (isBlocked && !isSent) {
                     html += '<div class="message-row"><div class="message-avatar" style="background:var(--gray-400);">?</div><div class="message-bubble" style="background:var(--gray-200);color:var(--gray-500);font-style:italic;"><div class="message-text">Message from blocked user</div></div></div>';
                     continue;
                 }
                 
-                html += '<div class="message-row' + (isSent ? ' sent' : '') + '">';
+                html += '<div class="message-row' + (isSent ? ' sent' : '') + '" data-msg-id="' + msg.id + '" oncontextmenu="showMessageContextMenu(event, \'' + msg.id + '\', ' + isSent + ')">';
+                
+                // Selection checkbox
+                html += '<div class="message-select ' + (isSelectionMode ? 'show' : '') + ' ' + (isSelected ? 'checked' : '') + '" onclick="toggleMessageSelect(\'' + msg.id + '\')"></div>';
+                
                 if (!isSent) {
                     var avatarContent = hasValidAvatar(sender.avatar_url) ? '<img src="' + escapeHtml(sender.avatar_url) + '">' : initials;
                     html += '<div class="message-avatar" onclick="openProfileModal(\'' + msg.sender_id + '\')" style="background:' + getColorFromId(msg.sender_id) + ';">' + avatarContent + '</div>';
                 }
-                html += '<div class="message-bubble">';
+                html += '<div class="message-bubble" onclick="if(isSelectionMode) toggleMessageSelect(\'' + msg.id + '\')">';
                 if (!isSent) html += '<div class="message-sender">' + escapeHtml(name) + '</div>';
-                html += '<div class="message-text">' + escapeHtml(filterBadWords(msg.content)) + '</div>';
+                html += '<div class="message-text" id="msg-text-' + msg.id + '">' + escapeHtml(filterBadWords(msg.content)) + '</div>';
                 html += '<div class="message-meta"><span class="message-time">' + time + '</span></div></div></div>';
             }
             container.innerHTML = html;
@@ -1165,33 +1247,37 @@
                 badge2.textContent = unread > 9 ? '9+' : unread;
             }
             
-            var container = document.getElementById('notifList');
+            // Build notification HTML
+            var html = '';
             if (notifications.length === 0) {
-                container.innerHTML = '<div class="notif-empty">No notifications</div>';
-                return;
+                html = '<div class="notif-empty" style="padding:40px;text-align:center;color:var(--gray-400);">No notifications yet</div>';
+            } else {
+                for (var i = 0; i < notifications.length; i++) {
+                    var n = notifications[i];
+                    var iconClass = '';
+                    if (n.type === 'group_join_request') iconClass = 'orange';
+                    else if (n.type === 'group_request_accepted') iconClass = 'green';
+                    else if (n.type === 'friend_request') iconClass = 'blue';
+                    else if (n.type === 'group_message') iconClass = 'blue';
+                    else if (n.type === 'new_member') iconClass = 'green';
+                    
+                    html += '<div class="notif-dropdown-item' + (n.is_read ? '' : ' unread') + '" onclick="handleNotifClick(\'' + n.id + '\',\'' + n.type + '\',\'' + (n.reference_id || '') + '\')">';
+                    html += '<div class="notif-icon ' + iconClass + '"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg></div>';
+                    html += '<div class="notif-content"><h4>' + escapeHtml(n.title || 'Notification') + '</h4><p>' + escapeHtml(n.message || '') + '</p><div class="time">' + formatTimeAgo(n.created_at) + '</div>';
+                    
+                    // Action buttons for join requests (for admins)
+                    if (n.type === 'group_join_request' && !n.is_read && n.reference_id) {
+                        html += '<div class="notif-actions"><button class="accept" onclick="event.stopPropagation();handleJoinRequest(\'' + n.reference_id + '\',\'' + n.id + '\',true)">Accept</button><button class="decline" onclick="event.stopPropagation();handleJoinRequest(\'' + n.reference_id + '\',\'' + n.id + '\',false)">Decline</button></div>';
+                    }
+                    html += '</div></div>';
+                }
             }
             
-            var html = '';
-            for (var i = 0; i < notifications.length; i++) {
-                var n = notifications[i];
-                var iconClass = '';
-                if (n.type === 'group_join_request') iconClass = 'orange';
-                else if (n.type === 'group_request_accepted') iconClass = 'green';
-                else if (n.type === 'friend_request') iconClass = 'blue';
-                else if (n.type === 'group_message') iconClass = 'blue';
-                else if (n.type === 'new_member') iconClass = 'green';
-                
-                html += '<div class="notif-dropdown-item' + (n.is_read ? '' : ' unread') + '" onclick="handleNotifClick(\'' + n.id + '\',\'' + n.type + '\',\'' + (n.reference_id || '') + '\')">';
-                html += '<div class="notif-icon ' + iconClass + '"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg></div>';
-                html += '<div class="notif-content"><h4>' + escapeHtml(n.title || 'Notification') + '</h4><p>' + escapeHtml(n.message || '') + '</p><div class="time">' + formatTimeAgo(n.created_at) + '</div>';
-                
-                // Action buttons for join requests (for admins)
-                if (n.type === 'group_join_request' && !n.is_read && n.reference_id) {
-                    html += '<div class="notif-actions"><button class="accept" onclick="event.stopPropagation();handleJoinRequest(\'' + n.reference_id + '\',\'' + n.id + '\',true)">Accept</button><button class="decline" onclick="event.stopPropagation();handleJoinRequest(\'' + n.reference_id + '\',\'' + n.id + '\',false)">Decline</button></div>';
-                }
-                html += '</div></div>';
-            }
-            container.innerHTML = html;
+            // Update both notification lists
+            var list1 = document.getElementById('notifList');
+            var list2 = document.getElementById('notifList2');
+            if (list1) list1.innerHTML = html;
+            if (list2) list2.innerHTML = html;
         }
         
         function renderMembersList() {
@@ -1920,7 +2006,15 @@
             } catch(e) {}
         }
         
-        function toggleNotifications(e) { if (e) e.stopPropagation(); document.getElementById('notificationDropdown').classList.toggle('show'); }
+        function toggleNotifications(e) { 
+            if (e) e.stopPropagation(); 
+            // Toggle the main dropdown (in groups-header for desktop)
+            var dd2 = document.getElementById('notificationDropdown2');
+            if (dd2) dd2.classList.toggle('show');
+            // Also toggle mobile topbar dropdown if visible
+            var dd1 = document.getElementById('notificationDropdown');
+            if (dd1 && window.innerWidth <= 900) dd1.classList.toggle('show');
+        }
         
         // ============================================
         // REALTIME SUBSCRIPTIONS
@@ -2180,9 +2274,157 @@
         function backToGroups() { document.getElementById('groupsPanel').classList.remove('hidden'); document.getElementById('chatPanel').classList.remove('show'); }
         
         function handleOutsideClick(e) {
-            if (!e.target.closest('.notification-wrapper')) document.getElementById('notificationDropdown').classList.remove('show');
+            if (!e.target.closest('.notification-wrapper')) {
+                var dd1 = document.getElementById('notificationDropdown');
+                var dd2 = document.getElementById('notificationDropdown2');
+                if (dd1) dd1.classList.remove('show');
+                if (dd2) dd2.classList.remove('show');
+            }
             if (!e.target.closest('.chat-header-actions')) closeChatMenu();
             if (!e.target.closest('.emoji-btn')) document.getElementById('emojiPicker').classList.remove('show');
+            if (!e.target.closest('.message-context-menu')) hideContextMenu();
+        }
+        
+        // ============================================
+        // MESSAGE SELECTION & CONTEXT MENU
+        // ============================================
+        function showMessageContextMenu(e, msgId, isSent) {
+            e.preventDefault();
+            var msg = groupMessages.find(function(m) { return m.id === msgId; });
+            if (!msg) return;
+            
+            contextMenuMessageId = msgId;
+            contextMenuMessageContent = msg.content;
+            
+            var menu = document.getElementById('messageContextMenu');
+            var deleteItem = document.getElementById('deleteMenuItem');
+            
+            // Only show delete for own messages
+            deleteItem.style.display = isSent ? 'flex' : 'none';
+            
+            menu.style.left = e.clientX + 'px';
+            menu.style.top = e.clientY + 'px';
+            menu.classList.add('show');
+        }
+        
+        function hideContextMenu() {
+            document.getElementById('messageContextMenu').classList.remove('show');
+        }
+        
+        function copyMessageText() {
+            if (contextMenuMessageContent) {
+                navigator.clipboard.writeText(contextMenuMessageContent);
+                showToast('Copied to clipboard', 'success');
+            }
+            hideContextMenu();
+        }
+        
+        function startSelection() {
+            isSelectionMode = true;
+            if (contextMenuMessageId) {
+                selectedMessages = [contextMenuMessageId];
+            }
+            renderMessages();
+            updateSelectionBar();
+            hideContextMenu();
+        }
+        
+        function enterSelectionMode() {
+            isSelectionMode = true;
+            selectedMessages = [];
+            renderMessages();
+            showToast('Tap messages to select', 'info');
+            closeChatMenu();
+        }
+        
+        function exitSelectionMode() {
+            cancelSelection();
+        }
+        
+        function toggleMessageSelect(msgId) {
+            if (!isSelectionMode) {
+                isSelectionMode = true;
+                selectedMessages = [msgId];
+            } else {
+                var idx = selectedMessages.indexOf(msgId);
+                if (idx !== -1) {
+                    selectedMessages.splice(idx, 1);
+                } else {
+                    selectedMessages.push(msgId);
+                }
+            }
+            
+            if (selectedMessages.length === 0) {
+                cancelSelection();
+            } else {
+                renderMessages();
+                updateSelectionBar();
+            }
+        }
+        
+        function updateSelectionBar() {
+            var bar = document.getElementById('selectionBar');
+            var count = document.getElementById('selectedCount');
+            if (isSelectionMode && selectedMessages.length > 0) {
+                bar.classList.add('show');
+                count.textContent = selectedMessages.length;
+            } else {
+                bar.classList.remove('show');
+            }
+        }
+        
+        function cancelSelection() {
+            isSelectionMode = false;
+            selectedMessages = [];
+            renderMessages();
+            updateSelectionBar();
+        }
+        
+        async function deleteContextMessage() {
+            hideContextMenu();
+            if (!contextMenuMessageId) return;
+            
+            var msg = groupMessages.find(function(m) { return m.id === contextMenuMessageId; });
+            if (!msg || msg.sender_id !== currentUser.id) {
+                showToast('Cannot delete this message', 'error');
+                return;
+            }
+            
+            try {
+                await supabase.from('study_group_messages').update({ is_deleted: true }).eq('id', contextMenuMessageId);
+                groupMessages = groupMessages.filter(function(m) { return m.id !== contextMenuMessageId; });
+                renderMessages();
+                showToast('Message deleted', 'success');
+            } catch(e) {
+                showToast('Failed to delete', 'error');
+            }
+        }
+        
+        async function deleteSelectedMessages() {
+            if (selectedMessages.length === 0) return;
+            
+            // Filter to only own messages
+            var myMsgIds = selectedMessages.filter(function(id) {
+                var msg = groupMessages.find(function(m) { return m.id === id; });
+                return msg && msg.sender_id === currentUser.id;
+            });
+            
+            if (myMsgIds.length === 0) {
+                showToast('You can only delete your own messages', 'error');
+                cancelSelection();
+                return;
+            }
+            
+            try {
+                for (var i = 0; i < myMsgIds.length; i++) {
+                    await supabase.from('study_group_messages').update({ is_deleted: true }).eq('id', myMsgIds[i]);
+                }
+                groupMessages = groupMessages.filter(function(m) { return myMsgIds.indexOf(m.id) === -1; });
+                showToast(myMsgIds.length + ' message(s) deleted', 'success');
+                cancelSelection();
+            } catch(e) {
+                showToast('Failed to delete messages', 'error');
+            }
         }
         
         async function handleLogout() { await updateOnlineStatus(false); await supabase.auth.signOut(); window.location.href = 'index.html'; }

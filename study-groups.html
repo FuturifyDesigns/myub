@@ -17,7 +17,7 @@
             --red: #c41e3a; --white: #ffffff;
             --gray-50: #f8fafc; --gray-100: #f1f5f9; --gray-200: #e2e8f0; --gray-300: #cbd5e1;
             --gray-400: #94a3b8; --gray-500: #64748b; --gray-600: #475569; --gray-700: #334155; --gray-800: #1e293b;
-            --green: #22c55e; --blue: #3b82f6; --blue-light: #dbeafe; --yellow: #eab308;
+            --green: #22c55e; --blue: #3b82f6; --blue-light: #dbeafe; --yellow: #eab308; --orange: #f97316;
         }
         body { font-family: 'Outfit', sans-serif; background: var(--gray-100); min-height: 100vh; }
         
@@ -70,11 +70,21 @@
         .notif-dropdown-item.unread { background: var(--blue-light); }
         .notif-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: var(--gray-100); }
         .notif-icon svg { width: 20px; height: 20px; color: var(--gray-600); }
+        .notif-icon.green { background: #dcfce7; }
+        .notif-icon.green svg { color: var(--green); }
+        .notif-icon.blue { background: var(--blue-light); }
+        .notif-icon.blue svg { color: var(--blue); }
+        .notif-icon.orange { background: #ffedd5; }
+        .notif-icon.orange svg { color: var(--orange); }
         .notif-content { flex: 1; min-width: 0; }
         .notif-content h4 { font-size: 14px; font-weight: 600; color: var(--gray-800); margin-bottom: 2px; }
         .notif-content p { font-size: 13px; color: var(--gray-500); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .notif-content .time { font-size: 11px; color: var(--gray-400); margin-top: 4px; }
         .notif-empty { padding: 40px 20px; text-align: center; color: var(--gray-400); }
+        .notif-actions { display: flex; gap: 8px; margin-top: 8px; }
+        .notif-actions button { padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; }
+        .notif-actions .accept { background: var(--green); color: white; }
+        .notif-actions .decline { background: var(--gray-200); color: var(--gray-600); }
         
         /* Groups Container */
         .groups-container { display: flex; flex: 1; overflow: hidden; }
@@ -108,8 +118,11 @@
         .group-preview { font-size: 13px; color: var(--gray-500); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .group-meta { text-align: right; flex-shrink: 0; }
         .group-time { font-size: 11px; color: var(--gray-400); margin-bottom: 4px; }
-        .group-online { font-size: 11px; color: var(--green); display: flex; align-items: center; gap: 4px; }
+        .group-online { font-size: 11px; color: var(--green); display: flex; align-items: center; gap: 4px; justify-content: flex-end; }
         .group-online::before { content: ''; width: 6px; height: 6px; background: var(--green); border-radius: 50%; }
+        .group-badge { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 600; }
+        .group-badge.private { background: #fef3c7; color: #92400e; }
+        .group-badge.pending { background: #dbeafe; color: #1d4ed8; }
         .groups-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; color: var(--gray-400); text-align: center; }
         .groups-empty svg { width: 64px; height: 64px; margin-bottom: 16px; opacity: 0.5; }
         .groups-empty h3 { font-size: 16px; font-weight: 600; color: var(--gray-600); margin-bottom: 8px; }
@@ -171,18 +184,19 @@
         .chat-empty p { font-size: 14px; color: var(--gray-500); max-width: 300px; }
         
         /* Dropdown Menu */
-        .dropdown-menu { position: absolute; top: 100%; right: 0; background: var(--white); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); min-width: 180px; opacity: 0; visibility: hidden; transform: translateY(-8px); transition: all 0.2s; z-index: 100; overflow: hidden; }
+        .dropdown-menu { position: absolute; top: 100%; right: 0; background: var(--white); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); min-width: 200px; opacity: 0; visibility: hidden; transform: translateY(-8px); transition: all 0.2s; z-index: 100; overflow: hidden; }
         .dropdown-menu.show { opacity: 1; visibility: visible; transform: translateY(4px); }
         .dropdown-item { display: flex; align-items: center; gap: 10px; padding: 12px 16px; font-size: 14px; color: var(--gray-700); cursor: pointer; transition: background 0.2s; }
         .dropdown-item:hover { background: var(--gray-50); }
         .dropdown-item svg { width: 18px; height: 18px; color: var(--gray-500); }
         .dropdown-item.danger { color: var(--red); }
         .dropdown-item.danger svg { color: var(--red); }
+        .dropdown-divider { height: 1px; background: var(--gray-200); margin: 4px 0; }
         
         /* Modal */
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.2s; padding: 20px; }
         .modal.show { opacity: 1; visibility: visible; }
-        .modal-content { background: var(--white); border-radius: 16px; width: 100%; max-width: 440px; transform: scale(0.9); transition: transform 0.2s; max-height: 90vh; overflow-y: auto; }
+        .modal-content { background: var(--white); border-radius: 16px; width: 100%; max-width: 500px; transform: scale(0.9); transition: transform 0.2s; max-height: 90vh; overflow-y: auto; }
         .modal.show .modal-content { transform: scale(1); }
         .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center; }
         .modal-title { font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 700; color: var(--gray-800); }
@@ -203,9 +217,10 @@
         
         /* Avatar Upload */
         .avatar-upload { display: flex; align-items: center; gap: 16px; }
-        .avatar-preview { width: 72px; height: 72px; border-radius: 12px; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .avatar-preview { width: 72px; height: 72px; border-radius: 12px; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: pointer; position: relative; }
         .avatar-preview img { width: 100%; height: 100%; object-fit: cover; }
         .avatar-preview svg { width: 28px; height: 28px; color: var(--white); }
+        .avatar-preview:hover::after { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.3); }
         .avatar-upload-btn { padding: 10px 20px; background: var(--gray-100); border: 2px solid var(--gray-200); border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
         .avatar-upload-btn:hover { background: var(--gray-200); }
         
@@ -218,7 +233,39 @@
         .btn-secondary:hover { background: var(--gray-200); }
         .btn-danger { background: var(--red); color: var(--white); }
         .btn-danger:hover { background: #a91b32; }
+        .btn-success { background: var(--green); color: var(--white); }
+        .btn-success:hover { background: #16a34a; }
         .btn-sm { padding: 8px 14px; font-size: 13px; }
+        .btn-outline { background: transparent; border: 2px solid var(--gray-300); color: var(--gray-600); }
+        .btn-outline:hover { border-color: var(--navy); color: var(--navy); }
+</style>
+</head>
+<style>
+        /* Member Selection (WhatsApp style) */
+        .member-selection { margin-bottom: 20px; }
+        .selected-members { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px; background: var(--gray-50); border-radius: 10px; min-height: 60px; margin-bottom: 12px; }
+        .selected-member { display: flex; align-items: center; gap: 6px; background: var(--navy); color: var(--white); padding: 6px 10px 6px 6px; border-radius: 20px; font-size: 13px; }
+        .selected-member-avatar { width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; overflow: hidden; }
+        .selected-member-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .selected-member-remove { background: none; border: none; color: rgba(255,255,255,0.7); cursor: pointer; padding: 2px; display: flex; }
+        .selected-member-remove:hover { color: white; }
+        .selected-member-remove svg { width: 14px; height: 14px; }
+        .selected-placeholder { color: var(--gray-400); font-size: 13px; display: flex; align-items: center; }
+        .user-search-results { max-height: 200px; overflow-y: auto; border: 2px solid var(--gray-200); border-radius: 10px; }
+        .user-search-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; cursor: pointer; transition: background 0.2s; border-bottom: 1px solid var(--gray-100); }
+        .user-search-item:last-child { border-bottom: none; }
+        .user-search-item:hover { background: var(--gray-50); }
+        .user-search-item.selected { background: var(--blue-light); }
+        .user-search-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); display: flex; align-items: center; justify-content: center; color: var(--white); font-size: 12px; font-weight: 700; overflow: hidden; }
+        .user-search-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .user-search-info { flex: 1; }
+        .user-search-name { font-size: 14px; font-weight: 600; color: var(--gray-800); }
+        .user-search-program { font-size: 12px; color: var(--gray-500); }
+        .user-search-check { width: 20px; height: 20px; border: 2px solid var(--gray-300); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .user-search-item.selected .user-search-check { background: var(--green); border-color: var(--green); }
+        .user-search-check svg { width: 12px; height: 12px; color: white; display: none; }
+        .user-search-item.selected .user-search-check svg { display: block; }
+        .user-search-empty { padding: 20px; text-align: center; color: var(--gray-400); font-size: 13px; }
         
         /* Group Info Modal */
         .group-info-header { text-align: center; padding: 24px; }
@@ -235,16 +282,22 @@
         .stat-label { font-size: 12px; color: var(--gray-500); }
         
         /* Members Section */
-        .members-section h4 { font-size: 14px; font-weight: 600; color: var(--gray-700); margin-bottom: 12px; }
+        .members-section { padding: 0 24px; }
+        .members-section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .members-section-header h4 { font-size: 14px; font-weight: 600; color: var(--gray-700); }
+        .members-section-header button { background: none; border: none; color: var(--navy); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+        .members-section-header button svg { width: 16px; height: 16px; }
         .member-item { display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 10px; transition: background 0.2s; }
         .member-item:hover { background: var(--gray-50); }
-        .member-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: var(--white); overflow: hidden; position: relative; cursor: pointer; }
+        .member-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: var(--white); overflow: hidden; position: relative; cursor: pointer; flex-shrink: 0; }
         .member-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .member-online-dot { position: absolute; bottom: 0; right: 0; width: 12px; height: 12px; background: var(--green); border: 2px solid var(--white); border-radius: 50%; }
-        .member-online-dot.offline { background: var(--gray-400); }
-        .member-info { flex: 1; }
+        .member-status-dot { position: absolute; bottom: 0; right: 0; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--white); }
+        .member-status-dot.online { background: var(--green); }
+        .member-status-dot.offline { background: var(--gray-400); }
+        .member-info { flex: 1; min-width: 0; }
         .member-name { font-size: 14px; font-weight: 600; color: var(--gray-800); display: flex; align-items: center; gap: 8px; }
         .member-role { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 6px; background: var(--yellow); color: var(--gray-900); }
+        .member-role.banned { background: var(--red); color: white; }
         .member-status { font-size: 12px; color: var(--gray-500); }
         .member-actions { display: flex; gap: 4px; }
         .member-action-btn { width: 28px; height: 28px; border: none; background: var(--gray-100); border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
@@ -254,7 +307,7 @@
         .member-action-btn.danger svg { color: var(--red); }
         
         /* Group Actions */
-        .group-actions { padding: 16px 0; border-top: 1px solid var(--gray-200); display: flex; flex-direction: column; gap: 8px; }
+        .group-actions { padding: 16px 24px; border-top: 1px solid var(--gray-200); display: flex; flex-direction: column; gap: 8px; }
         .action-btn { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 10px; background: none; border: none; cursor: pointer; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 500; width: 100%; text-align: left; color: var(--gray-700); transition: background 0.2s; }
         .action-btn:hover { background: var(--gray-50); }
         .action-btn.danger { color: var(--red); }
@@ -265,11 +318,13 @@
         .profile-modal-content { text-align: center; padding: 4px 0; }
         .profile-modal-avatar { width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); display: flex; align-items: center; justify-content: center; color: var(--white); font-family: 'Sora', sans-serif; font-weight: 700; font-size: 24px; margin: 0 auto 12px; position: relative; overflow: hidden; }
         .profile-modal-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .profile-modal-avatar .online-dot { position: absolute; bottom: 0; right: 0; width: 14px; height: 14px; background: var(--green); border-radius: 50%; border: 3px solid var(--white); z-index: 1; }
-        .profile-modal-avatar .online-dot.offline { background: var(--gray-400); }
+        .profile-modal-avatar .status-dot { position: absolute; bottom: 2px; right: 2px; width: 16px; height: 16px; border-radius: 50%; border: 3px solid var(--white); }
+        .profile-modal-avatar .status-dot.online { background: var(--green); }
+        .profile-modal-avatar .status-dot.offline { background: var(--gray-400); }
         .profile-modal-name { font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 700; color: var(--gray-800); margin-bottom: 2px; }
         .profile-modal-program { font-size: 14px; color: var(--gray-500); margin-bottom: 4px; }
-        .profile-modal-status { font-size: 13px; color: var(--green); margin-bottom: 16px; }
+        .profile-modal-status { font-size: 13px; margin-bottom: 16px; }
+        .profile-modal-status.online { color: var(--green); }
         .profile-modal-status.offline { color: var(--gray-400); }
         .profile-modal-actions { display: flex; flex-direction: column; gap: 8px; }
         .profile-modal-actions .btn { width: 100%; justify-content: center; }
@@ -277,19 +332,6 @@
         .profile-modal-link { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 16px; background: var(--gray-50); border: 2px solid var(--gray-200); border-radius: 10px; color: var(--navy); font-size: 13px; font-weight: 600; text-decoration: none; transition: all 0.2s; margin-top: 12px; }
         .profile-modal-link:hover { background: var(--gray-100); border-color: var(--navy); }
         .profile-modal-link svg { width: 14px; height: 14px; }
-        
-        /* Toast */
-        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--gray-800); color: var(--white); padding: 14px 24px; border-radius: 12px; font-size: 14px; font-weight: 500; z-index: 2000; opacity: 0; transition: all 0.3s ease; }
-        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-        .toast.error { background: var(--red); }
-        .toast.success { background: var(--green); }
-        
-        /* Loading */
-        .loading { position: fixed; inset: 0; background: var(--white); display: flex; align-items: center; justify-content: center; z-index: 9999; }
-        .loading-spinner { width: 40px; height: 40px; border: 3px solid var(--gray-200); border-top-color: var(--navy); border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         
         /* Avatar Upload Modal */
         .avatar-choice { display: flex; flex-direction: column; gap: 12px; }
@@ -321,29 +363,19 @@
         .crop-preview-label { font-size: 12px; color: var(--gray-500); font-weight: 500; }
         .upload-step { display: none; }
         .upload-step.active { display: block; }
-        @media (max-width: 480px) {
-            .crop-layout { flex-direction: column; }
-            .crop-sidebar { width: 100%; flex-direction: row; justify-content: center; }
-            .crop-controls { flex-wrap: wrap; }
-        }
         
-        /* Dark Mode */
-        body.dark-mode { background: var(--gray-800); }
-        body.dark-mode .sidebar { background: #0a1628; }
-        body.dark-mode .groups-panel { background: var(--gray-700); border-color: var(--gray-600); }
-        body.dark-mode .groups-header h2, body.dark-mode .group-name { color: var(--white); }
-        body.dark-mode .search-input { background-color: var(--gray-600); border-color: var(--gray-600); color: var(--white); }
-        body.dark-mode .group-item { border-color: var(--gray-600); }
-        body.dark-mode .chat-panel { background: var(--gray-800); }
-        body.dark-mode .chat-header { background: var(--gray-700); border-color: var(--gray-600); }
-        body.dark-mode .chat-group-details h3 { color: var(--white); }
-        body.dark-mode .message-row:not(.sent) .message-bubble { background: var(--gray-700); color: var(--white); }
-        body.dark-mode .chat-input-area { background: var(--gray-700); border-color: var(--gray-600); }
-        body.dark-mode .chat-input-wrapper { background: var(--gray-600); }
-        body.dark-mode .chat-input { color: var(--white); }
-        body.dark-mode .modal-content { background: var(--gray-700); }
-        body.dark-mode .modal-title, body.dark-mode .group-info-name, body.dark-mode .profile-modal-name { color: var(--white); }
-        body.dark-mode .form-input, body.dark-mode .form-textarea, body.dark-mode .form-select { background: var(--gray-600); border-color: var(--gray-600); color: var(--white); }
+        /* Toast */
+        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--gray-800); color: var(--white); padding: 14px 24px; border-radius: 12px; font-size: 14px; font-weight: 500; z-index: 2000; opacity: 0; transition: all 0.3s ease; }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .toast.error { background: var(--red); }
+        .toast.success { background: var(--green); }
+        
+        /* Loading */
+        .loading { position: fixed; inset: 0; background: var(--white); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+        .loading-spinner { width: 40px; height: 40px; border: 3px solid var(--gray-200); border-top-color: var(--navy); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         
         /* Responsive */
         @media (max-width: 900px) {
@@ -362,14 +394,10 @@
             .menu-toggle { display: block; }
             .notification-dropdown { position: fixed; top: 60px; left: 8px; right: 8px; width: auto; border-radius: 16px; max-height: calc(100vh - 80px); }
             .form-row { grid-template-columns: 1fr; }
-        }
-        @media (max-width: 480px) {
-            .groups-header h2 { font-size: 18px; }
-            .group-stats { gap: 16px; }
-            .stat-value { font-size: 16px; }
+            .crop-layout { flex-direction: column; }
+            .crop-sidebar { width: 100%; flex-direction: row; justify-content: center; }
         }
     </style>
-</head>
 <body>
     <div class="loading" id="loadingScreen"><div class="loading-spinner"></div></div>
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
@@ -472,12 +500,17 @@
                         </div>
                     </div>
                     <div class="chat-header-actions">
+                        <button class="chat-action-btn" onclick="openAddMembersModal()" title="Add Members">
+                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+                        </button>
                         <button class="chat-action-btn" onclick="toggleChatMenu(event)">
                             <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/></svg>
                         </button>
                         <div class="dropdown-menu" id="chatMenu">
                             <div class="dropdown-item" onclick="openGroupInfoModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Group Info</div>
-                            <div class="dropdown-item" onclick="openInviteModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>Invite Friends</div>
+                            <div class="dropdown-item" onclick="openAddMembersModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>Add Members</div>
+                            <div class="dropdown-item" id="manageBansItem" style="display:none;" onclick="openManageBansModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>Manage Bans</div>
+                            <div class="dropdown-divider"></div>
                             <div class="dropdown-item danger" onclick="confirmLeaveGroup()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>Leave Group</div>
                         </div>
                     </div>
@@ -510,7 +543,7 @@
                 <div class="form-group">
                     <label class="form-label">Group Avatar</label>
                     <div class="avatar-upload">
-                        <div class="avatar-preview" id="avatarPreview" onclick="openGroupAvatarModal('create')" style="cursor:pointer;" title="Click to add photo"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
+                        <div class="avatar-preview" id="avatarPreview" onclick="openGroupAvatarModal('create')" title="Click to add photo"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
                         <button type="button" class="avatar-upload-btn" onclick="openGroupAvatarModal('create')">Choose Image</button>
                     </div>
                 </div>
@@ -533,10 +566,18 @@
                     <div class="form-group">
                         <label class="form-label">Privacy</label>
                         <select class="form-select" id="groupPrivacyInput">
-                            <option value="public">Public</option>
-                            <option value="private">Private</option>
+                            <option value="public">Public - Anyone can join</option>
+                            <option value="private">Private - Request to join</option>
                         </select>
                     </div>
+                </div>
+                <div class="form-group member-selection">
+                    <label class="form-label">Add Members (Optional)</label>
+                    <div class="selected-members" id="selectedMembers">
+                        <span class="selected-placeholder" id="selectedPlaceholder">Search and select users to add</span>
+                    </div>
+                    <input type="text" class="form-input" id="memberSearchInput" placeholder="Search MyUB users..." oninput="searchUsers()">
+                    <div class="user-search-results" id="userSearchResults" style="display:none;"></div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -548,7 +589,7 @@
     
     <!-- Group Info Modal -->
     <div class="modal" id="groupInfoModal">
-        <div class="modal-content" style="max-width:440px;">
+        <div class="modal-content" style="max-width:480px;">
             <div class="modal-header">
                 <span class="modal-title">Group Info</span>
                 <button class="modal-close" onclick="closeGroupInfoModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button>
@@ -557,8 +598,6 @@
                 <div class="group-info-header">
                     <div class="group-info-avatar" id="infoAvatar" onclick="triggerAvatarUpload()">
                         <span id="infoInitials">SG</span>
-                        <div class="edit-overlay"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
-                        <input type="file" id="infoAvatarInput" accept="image/*" onchange="uploadGroupAvatar(event)" style="display:none;">
                     </div>
                     <div class="group-info-name" id="infoName">Study Group</div>
                     <div class="group-info-desc" id="infoDesc">No description</div>
@@ -568,11 +607,14 @@
                     <div class="stat-item"><div class="stat-value" id="infoOnlineCount">0</div><div class="stat-label">Online</div></div>
                     <div class="stat-item"><div class="stat-value" id="infoMessagesCount">0</div><div class="stat-label">Messages</div></div>
                 </div>
-                <div class="members-section" style="padding:0 24px;">
-                    <h4>Members <span id="memberCountLabel">(0)</span></h4>
+                <div class="members-section">
+                    <div class="members-section-header">
+                        <h4>Members <span id="memberCountLabel">(0)</span></h4>
+                        <button onclick="openAddMembersModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>Add</button>
+                    </div>
                     <div id="membersList" style="max-height:200px;overflow-y:auto;"></div>
                 </div>
-                <div class="group-actions" style="padding:16px 24px;">
+                <div class="group-actions">
                     <button class="action-btn danger" onclick="confirmLeaveGroup()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>Leave Group</button>
                     <button class="action-btn danger" id="deleteGroupBtn" style="display:none;" onclick="confirmDeleteGroup()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>Delete Group</button>
                 </div>
@@ -580,8 +622,35 @@
         </div>
     </div>
     
+    <!-- Add Members Modal -->
+    <div class="modal" id="addMembersModal" style="z-index:1050;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Add Members</span>
+                <button class="modal-close" onclick="closeAddMembersModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" class="form-input" id="addMemberSearchInput" placeholder="Search MyUB users..." oninput="searchUsersToAdd()" style="margin-bottom:12px;">
+                <div class="user-search-results" id="addMemberResults" style="display:block;max-height:300px;"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Manage Bans Modal -->
+    <div class="modal" id="manageBansModal" style="z-index:1050;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Banned Users</span>
+                <button class="modal-close" onclick="closeManageBansModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+            <div class="modal-body">
+                <div id="bannedUsersList"></div>
+            </div>
+        </div>
+    </div>
+    
     <!-- Profile Modal -->
-    <div class="modal" id="profileModal" style="z-index:1050;">
+    <div class="modal" id="profileModal" style="z-index:1060;">
         <div class="modal-content" style="max-width:360px;">
             <div class="modal-header">
                 <span class="modal-title">Profile</span>
@@ -590,28 +659,12 @@
             <div class="modal-body">
                 <div class="profile-modal-content">
                     <div class="profile-blocked-notice" id="profileBlockedNotice" style="display:none;"></div>
-                    <div class="profile-modal-avatar" id="profileAvatar">U<div class="online-dot" id="profileDot"></div></div>
+                    <div class="profile-modal-avatar" id="profileAvatar">U<div class="status-dot offline" id="profileDot"></div></div>
                     <div class="profile-modal-name" id="profileName">User</div>
                     <div class="profile-modal-program" id="profileProgram">Student</div>
-                    <div class="profile-modal-status" id="profileStatus">Offline</div>
+                    <div class="profile-modal-status offline" id="profileStatus">Offline</div>
                     <div class="profile-modal-actions" id="profileActions"></div>
                 </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Invite Friends Modal -->
-    <div class="modal" id="inviteModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <span class="modal-title">Invite Friends</span>
-                <button class="modal-close" onclick="closeInviteModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button>
-            </div>
-            <div class="modal-body">
-                <div class="groups-search" style="padding:0 0 16px;">
-                    <input type="text" class="search-input" id="inviteSearch" placeholder="Search friends..." oninput="searchFriendsToInvite()">
-                </div>
-                <div id="inviteFriendsList" style="max-height:300px;overflow-y:auto;"></div>
             </div>
         </div>
     </div>
@@ -626,7 +679,7 @@
             <div class="modal-body"><p id="confirmMessage">Are you sure?</p></div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeConfirmModal()">Cancel</button>
-                <button class="btn btn-danger" onclick="executeConfirm()">Confirm</button>
+                <button class="btn btn-danger" id="confirmBtn" onclick="executeConfirm()">Confirm</button>
             </div>
         </div>
     </div>
@@ -646,7 +699,7 @@
                         <option value="spam">Spam</option>
                         <option value="harassment">Harassment</option>
                         <option value="hate_speech">Hate Speech</option>
-                        <option value="inappropriate_content">Inappropriate Content</option>
+                        <option value="inappropriate">Inappropriate Content</option>
                         <option value="other">Other</option>
                     </select>
                 </div>
@@ -662,80 +715,44 @@
         </div>
     </div>
     
-    <div class="toast" id="toast"></div>
-    
     <!-- Group Avatar Modal -->
-    <div class="modal" id="groupAvatarModal" style="z-index: 2000;">
-        <div class="modal-content" style="max-width: 520px;">
+    <div class="modal" id="groupAvatarModal" style="z-index:2000;">
+        <div class="modal-content" style="max-width:520px;">
             <div class="modal-header">
                 <span class="modal-title">Group Picture</span>
-                <button class="modal-close" onclick="closeGroupAvatarModal()">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
-                </button>
+                <button class="modal-close" onclick="closeGroupAvatarModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button>
             </div>
             <div class="modal-body">
-                <!-- Step 1: Choice (only if has avatar) -->
                 <div class="upload-step" id="choiceStep">
                     <div class="avatar-choice">
                         <button type="button" class="avatar-choice-btn" onclick="showUploadStep()">
-                            <div class="choice-icon">
-                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                            </div>
-                            <div class="choice-text">
-                                <h4>Change Photo</h4>
-                                <p>Upload a new group picture</p>
-                            </div>
+                            <div class="choice-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>
+                            <div class="choice-text"><h4>Change Photo</h4><p>Upload a new group picture</p></div>
                         </button>
                         <button type="button" class="avatar-choice-btn danger" onclick="removeGroupAvatar()">
-                            <div class="choice-icon">
-                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                            </div>
-                            <div class="choice-text">
-                                <h4>Remove Photo</h4>
-                                <p>Go back to using initials</p>
-                            </div>
+                            <div class="choice-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></div>
+                            <div class="choice-text"><h4>Remove Photo</h4><p>Go back to using initials</p></div>
                         </button>
                     </div>
                 </div>
-
-                <!-- Step 2: Upload -->
                 <div class="upload-step" id="uploadStep">
                     <div class="avatar-upload-area" onclick="document.getElementById('groupAvatarInput').click()">
                         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                         <p>Click to upload an image</p>
                         <span>JPG, PNG, GIF or WebP (max 2MB)</span>
                     </div>
-                    <input type="file" id="groupAvatarInput" accept="image/jpeg,image/png,image/gif,image/webp" style="display: none;" onchange="handleGroupAvatarSelect(event)">
+                    <input type="file" id="groupAvatarInput" accept="image/jpeg,image/png,image/gif,image/webp" style="display:none;" onchange="handleGroupAvatarSelect(event)">
                 </div>
-
-                <!-- Step 3: Crop -->
                 <div class="upload-step" id="cropStep">
                     <div class="crop-layout">
                         <div class="crop-main">
-                            <div class="cropper-wrapper">
-                                <img id="cropperImage" src="" alt="Crop preview">
-                            </div>
+                            <div class="cropper-wrapper"><img id="cropperImage" src="" alt="Crop preview"></div>
                             <div class="crop-controls">
-                                <button type="button" class="crop-btn" onclick="groupCropper.rotate(-90)">
-                                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.5 2v6h6M2.66 15.57a10 10 0 1 0 .57-8.38"/></svg>
-                                    <span>Left</span>
-                                </button>
-                                <button type="button" class="crop-btn" onclick="groupCropper.rotate(90)">
-                                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38"/></svg>
-                                    <span>Right</span>
-                                </button>
-                                <button type="button" class="crop-btn" onclick="groupCropper.zoom(0.1)">
-                                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/></svg>
-                                    <span>Zoom+</span>
-                                </button>
-                                <button type="button" class="crop-btn" onclick="groupCropper.zoom(-0.1)">
-                                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"/></svg>
-                                    <span>Zoom-</span>
-                                </button>
-                                <button type="button" class="crop-btn" onclick="groupCropper.reset()">
-                                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8m0-4v4h4"/></svg>
-                                    <span>Reset</span>
-                                </button>
+                                <button type="button" class="crop-btn" onclick="groupCropper.rotate(-90)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.5 2v6h6M2.66 15.57a10 10 0 1 0 .57-8.38"/></svg><span>Left</span></button>
+                                <button type="button" class="crop-btn" onclick="groupCropper.rotate(90)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38"/></svg><span>Right</span></button>
+                                <button type="button" class="crop-btn" onclick="groupCropper.zoom(0.1)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/></svg><span>Zoom+</span></button>
+                                <button type="button" class="crop-btn" onclick="groupCropper.zoom(-0.1)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"/></svg><span>Zoom-</span></button>
+                                <button type="button" class="crop-btn" onclick="groupCropper.reset()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8m0-4v4h4"/></svg><span>Reset</span></button>
                             </div>
                         </div>
                         <div class="crop-sidebar">
@@ -746,12 +763,14 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" id="avatarBackBtn" onclick="avatarGoBack()" style="display: none;">Back</button>
+                <button class="btn btn-secondary" id="avatarBackBtn" onclick="avatarGoBack()" style="display:none;">Back</button>
                 <button class="btn btn-secondary" onclick="closeGroupAvatarModal()">Cancel</button>
-                <button class="btn btn-primary" id="applyAvatarBtn" onclick="applyGroupAvatar()" style="display: none;">Apply</button>
+                <button class="btn btn-primary" id="applyAvatarBtn" onclick="applyGroupAvatar()" style="display:none;">Apply</button>
             </div>
         </div>
     </div>
+    
+    <div class="toast" id="toast"></div>
     
     <script>
         // ============================================
@@ -778,109 +797,35 @@
         var notifications = [];
         var friends = [];
         var blockedUsers = [];
+        var bannedUsers = [];
         var createdCount = 0;
         var confirmCallback = null;
         var selectedProfileUser = null;
         var reportTargetId = null;
         var friendLastSeen = {};
-        
-        // Cropper state
+        var selectedMembers = [];
+        var searchTimeout = null;
         var groupCropper = null;
         var croppedImageBlob = null;
-        var avatarMode = 'create'; // 'create' or 'edit'
+        var avatarMode = 'create';
+        var pendingRequests = [];
         
         // ============================================
-        // HELPER FUNCTIONS
+        // HELPERS
         // ============================================
-        function hasValidAvatar(url) {
-            return url && url !== 'null' && url !== 'undefined' && url.length > 10;
-        }
-        
-        function getInitials(name) {
-            if (!name) return 'U';
-            return name.split(' ').map(function(w) { return w[0]; }).join('').toUpperCase().slice(0, 2);
-        }
-        
-        function getName(p) {
-            if (!p) return 'User';
-            if (p.full_name) return p.full_name;
-            var first = p.first_name || '';
-            var last = p.last_name || '';
-            return (first + ' ' + last).trim() || 'User';
-        }
-        
-        function filterBadWords(text) {
-            if (!text) return '';
-            return text.replace(BAD_WORD_REGEX, function(m) {
-                return '❤️'.repeat(Math.ceil(m.length / 2));
-            });
-        }
-        
-        function containsBadWords(text) {
-            BAD_WORD_REGEX.lastIndex = 0;
-            return BAD_WORD_REGEX.test(text);
-        }
-        
-        function escapeHtml(text) {
-            var div = document.createElement('div');
-            div.textContent = text || '';
-            return div.innerHTML;
-        }
-        
-        function truncate(str, len) {
-            if (!str) return '';
-            return str.length > len ? str.substring(0, len) + '...' : str;
-        }
-        
-        function formatTimeAgo(date) {
-            if (!date) return '';
-            var s = Math.floor((Date.now() - new Date(date)) / 1000);
-            if (s < 60) return 'Just now';
-            if (s < 3600) return Math.floor(s / 60) + 'm';
-            if (s < 86400) return Math.floor(s / 3600) + 'h';
-            if (s < 604800) return Math.floor(s / 86400) + 'd';
-            return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-        }
-        
-        function formatMessageTime(date) {
-            return new Date(date).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-        }
-        
-        function formatDateDivider(date) {
-            var d = new Date(date);
-            var today = new Date();
-            var yest = new Date(today);
-            yest.setDate(yest.getDate() - 1);
-            if (d.toDateString() === today.toDateString()) return 'Today';
-            if (d.toDateString() === yest.toDateString()) return 'Yesterday';
-            return d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
-        }
-        
-        function getColorFromId(id) {
-            var colors = ['#1a365d','#2c5282','#c41e3a','#8b5cf6','#f97316','#22c55e','#3b82f6','#eab308'];
-            var hash = 0;
-            var str = id || '';
-            for (var i = 0; i < str.length; i++) {
-                hash = str.charCodeAt(i) + ((hash << 5) - hash);
-            }
-            return colors[Math.abs(hash) % colors.length];
-        }
-        
-        function showToast(message, type) {
-            type = type || 'info';
-            var toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.className = 'toast ' + type + ' show';
-            setTimeout(function() { toast.classList.remove('show'); }, 3000);
-        }
-        
-        function playNotificationSound() {
-            try {
-                var audio = new Audio('data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABhgC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAAYYNAAAAAAAAAAAAAAAAAAAA//tQxAAAAAANIAAAAAExBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tQxBgAAADSAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVU=');
-                audio.volume = 0.3;
-                audio.play();
-            } catch(e) {}
-        }
+        function hasValidAvatar(url) { return url && url !== 'null' && url !== 'undefined' && url.length > 10; }
+        function getInitials(name) { if (!name) return 'U'; return name.split(' ').map(function(w) { return w[0]; }).join('').toUpperCase().slice(0, 2); }
+        function getName(p) { if (!p) return 'User'; if (p.full_name) return p.full_name; return ((p.first_name || '') + ' ' + (p.last_name || '')).trim() || 'User'; }
+        function escapeHtml(t) { var d = document.createElement('div'); d.textContent = t || ''; return d.innerHTML; }
+        function truncate(s, l) { return s && s.length > l ? s.substring(0, l) + '...' : s || ''; }
+        function filterBadWords(t) { if (!t) return ''; return t.replace(BAD_WORD_REGEX, function(m) { return '❤️'.repeat(Math.ceil(m.length / 2)); }); }
+        function containsBadWords(t) { BAD_WORD_REGEX.lastIndex = 0; return BAD_WORD_REGEX.test(t); }
+        function formatTimeAgo(d) { if (!d) return ''; var s = Math.floor((Date.now() - new Date(d)) / 1000); if (s < 60) return 'Just now'; if (s < 3600) return Math.floor(s / 60) + 'm'; if (s < 86400) return Math.floor(s / 3600) + 'h'; if (s < 604800) return Math.floor(s / 86400) + 'd'; return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); }
+        function formatMessageTime(d) { return new Date(d).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }); }
+        function formatDateDivider(d) { var dt = new Date(d), today = new Date(), yest = new Date(today); yest.setDate(yest.getDate() - 1); if (dt.toDateString() === today.toDateString()) return 'Today'; if (dt.toDateString() === yest.toDateString()) return 'Yesterday'; return dt.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }); }
+        function getColorFromId(id) { var colors = ['#1a365d','#2c5282','#c41e3a','#8b5cf6','#f97316','#22c55e','#3b82f6','#eab308']; var hash = 0; var str = id || ''; for (var i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash); return colors[Math.abs(hash) % colors.length]; }
+        function showToast(msg, type) { var t = document.getElementById('toast'); t.textContent = msg; t.className = 'toast ' + (type || 'info') + ' show'; setTimeout(function() { t.classList.remove('show'); }, 3000); }
+        function playNotificationSound() { try { var a = new Audio('data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABhgC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAAYYNAAAAAAAAAAAAAAAAAAAA//tQxAAAAAANIAAAAAExBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tQxBgAAADSAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVU='); a.volume = 0.3; a.play(); } catch(e) {} }
         
         // ============================================
         // INIT
@@ -889,30 +834,18 @@
             try {
                 var sessionResult = await supabase.auth.getSession();
                 var session = sessionResult.data.session;
-                if (!session) {
-                    window.location.href = 'index.html';
-                    return;
-                }
+                if (!session) { window.location.href = 'index.html'; return; }
                 currentUser = session.user;
                 
                 await updateOnlineStatus(true);
-                await Promise.all([
-                    loadMyGroups(),
-                    loadNotifications(),
-                    loadFriends(),
-                    loadBlockedUsers(),
-                    loadSidebarBadges()
-                ]);
+                await Promise.all([loadMyGroups(), loadNotifications(), loadFriends(), loadBlockedUsers(), loadSidebarBadges()]);
                 
                 updateCreatedCount();
                 subscribeToRealtime();
                 setupEmojiPicker();
                 startHeartbeat();
                 
-                if (localStorage.getItem('myub_darkMode') === 'true') {
-                    document.body.classList.add('dark-mode');
-                }
-                
+                if (localStorage.getItem('myub_darkMode') === 'true') document.body.classList.add('dark-mode');
                 document.addEventListener('click', handleOutsideClick);
                 window.addEventListener('beforeunload', function() { updateOnlineStatus(false); });
                 
@@ -924,137 +857,94 @@
         }
         
         async function updateOnlineStatus(online) {
-            try {
-                await supabase.from('profiles').update({
-                    is_online: online,
-                    last_seen: new Date().toISOString()
-                }).eq('id', currentUser.id);
-            } catch(e) {}
+            try { await supabase.from('profiles').update({ is_online: online, last_seen: new Date().toISOString() }).eq('id', currentUser.id); } catch(e) {}
         }
         
-        function startHeartbeat() {
-            setInterval(function() { updateOnlineStatus(true); }, 30000);
-        }
+        function startHeartbeat() { setInterval(function() { updateOnlineStatus(true); }, 30000); }
         
         // ============================================
-        // DATA LOADING FUNCTIONS
+        // DATA LOADING
         // ============================================
         async function loadMyGroups() {
             try {
-                var result = await supabase
-                    .from('study_group_members')
-                    .select('group_id, role, study_groups(*)')
-                    .eq('user_id', currentUser.id);
-                
+                var result = await supabase.from('study_group_members').select('group_id, role, study_groups(*)').eq('user_id', currentUser.id);
                 if (result.data) {
                     myGroups = result.data.map(function(m) {
                         if (!m.study_groups) return null;
-                        var group = Object.assign({}, m.study_groups);
-                        group.role = m.role;
-                        return group;
+                        var g = Object.assign({}, m.study_groups);
+                        g.role = m.role;
+                        return g;
                     }).filter(function(g) { return g && g.id; });
                     
                     for (var i = 0; i < myGroups.length; i++) {
                         var g = myGroups[i];
-                        
-                        var msgResult = await supabase
-                            .from('study_group_messages')
-                            .select('content, created_at, profiles:sender_id(first_name)')
-                            .eq('group_id', g.id)
-                            .eq('is_deleted', false)
-                            .order('created_at', { ascending: false })
-                            .limit(1)
-                            .maybeSingle();
+                        var msgResult = await supabase.from('study_group_messages').select('content, created_at, profiles:sender_id(first_name)').eq('group_id', g.id).eq('is_deleted', false).order('created_at', { ascending: false }).limit(1).maybeSingle();
                         g.lastMessage = msgResult.data;
-                        
-                        var membersResult = await supabase
-                            .from('study_group_members')
-                            .select('user_id, profiles:user_id(is_online)')
-                            .eq('group_id', g.id);
+                        var membersResult = await supabase.from('study_group_members').select('user_id, profiles:user_id(is_online)').eq('group_id', g.id);
                         g.membersCount = (membersResult.data || []).length;
-                        g.onlineCount = (membersResult.data || []).filter(function(m) {
-                            return m.profiles && m.profiles.is_online;
-                        }).length;
+                        g.onlineCount = (membersResult.data || []).filter(function(m) { return m.profiles && m.profiles.is_online; }).length;
                     }
-                    
                     myGroups.sort(function(a, b) {
-                        var aTime = a.lastMessage ? new Date(a.lastMessage.created_at) : new Date(a.created_at);
-                        var bTime = b.lastMessage ? new Date(b.lastMessage.created_at) : new Date(b.created_at);
-                        return bTime - aTime;
+                        var aT = a.lastMessage ? new Date(a.lastMessage.created_at) : new Date(a.created_at);
+                        var bT = b.lastMessage ? new Date(b.lastMessage.created_at) : new Date(b.created_at);
+                        return bT - aT;
                     });
                 }
-                
                 document.getElementById('myGroupsCount').textContent = myGroups.length;
                 renderGroups();
-            } catch(e) {
-                console.error('loadMyGroups error:', e);
-            }
+            } catch(e) { console.error('loadMyGroups error:', e); }
         }
         
         async function loadDiscoverGroups() {
             try {
-                var result = await supabase
-                    .from('study_groups')
-                    .select('*')
-                    .eq('is_private', false)
-                    .order('created_at', { ascending: false })
-                    .limit(50);
-                
+                var result = await supabase.from('study_groups').select('*').eq('is_private', false).order('created_at', { ascending: false }).limit(50);
                 var myIds = myGroups.map(function(g) { return g.id; });
-                discoverGroups = (result.data || []).filter(function(g) {
-                    return myIds.indexOf(g.id) === -1;
-                });
+                discoverGroups = (result.data || []).filter(function(g) { return myIds.indexOf(g.id) === -1; });
                 
                 for (var i = 0; i < discoverGroups.length; i++) {
-                    var countResult = await supabase
-                        .from('study_group_members')
-                        .select('*', { count: 'exact', head: true })
-                        .eq('group_id', discoverGroups[i].id);
+                    var countResult = await supabase.from('study_group_members').select('*', { count: 'exact', head: true }).eq('group_id', discoverGroups[i].id);
                     discoverGroups[i].membersCount = countResult.count || 0;
                 }
                 
+                // Also load private groups to show "Ask to Join"
+                var privateResult = await supabase.from('study_groups').select('*').eq('is_private', true).order('created_at', { ascending: false }).limit(50);
+                var privateGroups = (privateResult.data || []).filter(function(g) { return myIds.indexOf(g.id) === -1; });
+                
+                for (var i = 0; i < privateGroups.length; i++) {
+                    var pg = privateGroups[i];
+                    var countResult = await supabase.from('study_group_members').select('*', { count: 'exact', head: true }).eq('group_id', pg.id);
+                    pg.membersCount = countResult.count || 0;
+                    pg.isPrivate = true;
+                    
+                    // Check if user has pending request
+                    var reqResult = await supabase.from('group_join_requests').select('status').eq('group_id', pg.id).eq('user_id', currentUser.id).eq('status', 'pending').maybeSingle();
+                    pg.hasPendingRequest = !!reqResult.data;
+                    discoverGroups.push(pg);
+                }
+                
                 renderGroups();
-            } catch(e) {
-                console.error('loadDiscoverGroups error:', e);
-            }
+            } catch(e) { console.error('loadDiscoverGroups error:', e); }
         }
         
         async function loadGroupMembers() {
             try {
-                var result = await supabase
-                    .from('study_group_members')
-                    .select('*, profiles:user_id(*)')
-                    .eq('group_id', currentGroup.id);
-                currentMembers = result.data || [];
-            } catch(e) {
-                console.error('loadGroupMembers error:', e);
-            }
+                var result = await supabase.from('study_group_members').select('*, profiles:user_id(*)').eq('group_id', currentGroup.id);
+                currentMembers = (result.data || []).filter(function(m) { return m.role !== 'banned'; });
+                bannedUsers = (result.data || []).filter(function(m) { return m.role === 'banned'; });
+            } catch(e) { console.error('loadGroupMembers error:', e); }
         }
         
         async function loadGroupMessages() {
             try {
-                var result = await supabase
-                    .from('study_group_messages')
-                    .select('*, profiles:sender_id(*)')
-                    .eq('group_id', currentGroup.id)
-                    .eq('is_deleted', false)
-                    .order('created_at', { ascending: true })
-                    .limit(100);
+                var result = await supabase.from('study_group_messages').select('*, profiles:sender_id(*)').eq('group_id', currentGroup.id).eq('is_deleted', false).order('created_at', { ascending: true }).limit(100);
                 groupMessages = result.data || [];
                 renderMessages();
-            } catch(e) {
-                console.error('loadGroupMessages error:', e);
-            }
+            } catch(e) { console.error('loadGroupMessages error:', e); }
         }
         
         async function loadNotifications() {
             try {
-                var result = await supabase
-                    .from('notifications')
-                    .select('*')
-                    .eq('user_id', currentUser.id)
-                    .order('created_at', { ascending: false })
-                    .limit(20);
+                var result = await supabase.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(30);
                 notifications = result.data || [];
                 renderNotifications();
             } catch(e) {}
@@ -1062,16 +952,9 @@
         
         async function loadFriends() {
             try {
-                var result = await supabase
-                    .from('friendships')
-                    .select('user_id, friend_id, profiles!friendships_friend_id_fkey(*)')
-                    .eq('status', 'accepted')
-                    .or('user_id.eq.' + currentUser.id + ',friend_id.eq.' + currentUser.id);
-                
+                var result = await supabase.from('friendships').select('user_id, friend_id, profiles!friendships_friend_id_fkey(*)').eq('status', 'accepted').or('user_id.eq.' + currentUser.id + ',friend_id.eq.' + currentUser.id);
                 friends = (result.data || []).map(function(f) {
-                    if (f.user_id === currentUser.id) {
-                        return Object.assign({}, f.profiles, { id: f.friend_id });
-                    }
+                    if (f.user_id === currentUser.id) return Object.assign({}, f.profiles, { id: f.friend_id });
                     return Object.assign({}, f.profiles, { id: f.user_id });
                 }).filter(function(f) { return f && f.id; });
             } catch(e) {}
@@ -1079,45 +962,20 @@
         
         async function loadBlockedUsers() {
             try {
-                var result = await supabase
-                    .from('blocked_users')
-                    .select('blocked_id')
-                    .eq('blocker_id', currentUser.id);
+                var result = await supabase.from('blocked_users').select('blocked_id').eq('blocker_id', currentUser.id);
                 blockedUsers = (result.data || []).map(function(b) { return b.blocked_id; });
             } catch(e) {}
         }
         
         async function loadSidebarBadges() {
             try {
-                // Unread messages
-                var msgResult = await supabase
-                    .from('messages')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('receiver_id', currentUser.id)
-                    .eq('is_read', false);
-                
+                var msgResult = await supabase.from('messages').select('*', { count: 'exact', head: true }).eq('receiver_id', currentUser.id).eq('is_read', false);
                 var msgBadge = document.getElementById('sidebarMsgBadge');
-                if (msgResult.count > 0) {
-                    msgBadge.style.display = 'inline';
-                    msgBadge.textContent = msgResult.count > 9 ? '9+' : msgResult.count;
-                } else {
-                    msgBadge.style.display = 'none';
-                }
+                if (msgResult.count > 0) { msgBadge.style.display = 'inline'; msgBadge.textContent = msgResult.count > 9 ? '9+' : msgResult.count; } else { msgBadge.style.display = 'none'; }
                 
-                // Pending friend requests
-                var frResult = await supabase
-                    .from('friendships')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('friend_id', currentUser.id)
-                    .eq('status', 'pending');
-                
+                var frResult = await supabase.from('friendships').select('*', { count: 'exact', head: true }).eq('friend_id', currentUser.id).eq('status', 'pending');
                 var frBadge = document.getElementById('sidebarFriendsBadge');
-                if (frResult.count > 0) {
-                    frBadge.style.display = 'inline';
-                    frBadge.textContent = frResult.count > 9 ? '9+' : frResult.count;
-                } else {
-                    frBadge.style.display = 'none';
-                }
+                if (frResult.count > 0) { frBadge.style.display = 'inline'; frBadge.textContent = frResult.count > 9 ? '9+' : frResult.count; } else { frBadge.style.display = 'none'; }
             } catch(e) {}
         }
         
@@ -1133,17 +991,12 @@
             
             if (query) {
                 groups = groups.filter(function(g) {
-                    return g.name.toLowerCase().indexOf(query) !== -1 ||
-                           (g.course_code && g.course_code.toLowerCase().indexOf(query) !== -1);
+                    return g.name.toLowerCase().indexOf(query) !== -1 || (g.course_code && g.course_code.toLowerCase().indexOf(query) !== -1);
                 });
             }
             
             if (groups.length === 0) {
-                container.innerHTML = '<div class="groups-empty">' +
-                    '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>' +
-                    '<h3>' + (tab === 'my' ? 'No groups yet' : 'No groups found') + '</h3>' +
-                    '<p>' + (tab === 'my' ? 'Create or join a study group' : 'Try a different search') + '</p>' +
-                    '</div>';
+                container.innerHTML = '<div class="groups-empty"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg><h3>' + (tab === 'my' ? 'No groups yet' : 'No groups found') + '</h3><p>' + (tab === 'my' ? 'Create or join a study group' : 'Try a different search') + '</p></div>';
                 return;
             }
             
@@ -1152,35 +1005,25 @@
                 var g = groups[i];
                 var initials = getInitials(g.name);
                 var isActive = currentGroup && currentGroup.id === g.id;
-                
                 var preview = 'No messages yet';
                 if (g.lastMessage) {
                     var senderName = g.lastMessage.profiles ? g.lastMessage.profiles.first_name : 'Someone';
                     preview = senderName + ': ' + filterBadWords(truncate(g.lastMessage.content, 25));
                 }
                 var time = g.lastMessage ? formatTimeAgo(g.lastMessage.created_at) : '';
+                var avatarHtml = hasValidAvatar(g.avatar_url) ? '<img src="' + escapeHtml(g.avatar_url) + '">' : initials;
                 
-                var avatarHtml = hasValidAvatar(g.avatar_url) ? 
-                    '<img src="' + escapeHtml(g.avatar_url) + '">' : initials;
-                
-                var onclick = tab === 'my' ? 
-                    "openGroup('" + g.id + "')" : 
-                    "joinGroup('" + g.id + "')";
-                
-                html += '<div class="group-item' + (isActive ? ' active' : '') + '" onclick="' + onclick + '">';
+                html += '<div class="group-item' + (isActive ? ' active' : '') + '" onclick="' + (tab === 'my' ? "openGroup('" + g.id + "')" : (g.isPrivate ? (g.hasPendingRequest ? '' : "askToJoin('" + g.id + "')") : "joinGroup('" + g.id + "')")) + '">';
                 html += '<div class="group-avatar">' + avatarHtml + '</div>';
-                html += '<div class="group-info">';
-                html += '<div class="group-name">' + escapeHtml(g.name) + '</div>';
-                html += '<div class="group-preview">' + (tab === 'my' ? preview : g.membersCount + ' members') + '</div>';
-                html += '</div>';
+                html += '<div class="group-info"><div class="group-name">' + escapeHtml(g.name);
+                if (g.isPrivate) html += ' <span class="group-badge private">Private</span>';
+                if (g.hasPendingRequest) html += ' <span class="group-badge pending">Pending</span>';
+                html += '</div><div class="group-preview">' + (tab === 'my' ? preview : g.membersCount + ' members') + '</div></div>';
                 html += '<div class="group-meta">';
                 if (time) html += '<div class="group-time">' + time + '</div>';
-                if (tab === 'my' && g.onlineCount > 0) {
-                    html += '<div class="group-online">' + g.onlineCount + ' online</div>';
-                }
-                if (tab === 'discover') {
-                    html += '<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();joinGroup(\'' + g.id + '\')">Join</button>';
-                }
+                if (tab === 'my' && g.onlineCount > 0) html += '<div class="group-online">' + g.onlineCount + ' online</div>';
+                if (tab === 'discover' && !g.isPrivate) html += '<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();joinGroup(\'' + g.id + '\')">Join</button>';
+                if (tab === 'discover' && g.isPrivate && !g.hasPendingRequest) html += '<button class="btn btn-outline btn-sm" onclick="event.stopPropagation();askToJoin(\'' + g.id + '\')">Ask to Join</button>';
                 html += '</div></div>';
             }
             container.innerHTML = html;
@@ -1188,21 +1031,16 @@
         
         function renderMessages() {
             var container = document.getElementById('chatMessages');
-            
             if (groupMessages.length === 0) {
-                container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--gray-400);">' +
-                    '<p>No messages yet. Start the conversation! 👋</p></div>';
+                container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--gray-400);"><p>No messages yet. Start the conversation! 👋</p></div>';
                 return;
             }
             
             var html = '';
             var lastDate = null;
-            
             for (var i = 0; i < groupMessages.length; i++) {
                 var msg = groupMessages[i];
                 var msgDate = new Date(msg.created_at).toDateString();
-                
-                // Date divider
                 if (msgDate !== lastDate) {
                     html += '<div class="chat-date-divider"><span>' + formatDateDivider(msg.created_at) + '</span></div>';
                     lastDate = msgDate;
@@ -1215,39 +1053,27 @@
                 var time = formatMessageTime(msg.created_at);
                 var isBlocked = blockedUsers.indexOf(msg.sender_id) !== -1;
                 
-                // Blocked user message
                 if (isBlocked && !isSent) {
-                    html += '<div class="message-row">' +
-                        '<div class="message-avatar" style="background:var(--gray-400);">?</div>' +
-                        '<div class="message-bubble" style="background:var(--gray-200);color:var(--gray-500);font-style:italic;">' +
-                        '<div class="message-text">Message from blocked user</div></div></div>';
+                    html += '<div class="message-row"><div class="message-avatar" style="background:var(--gray-400);">?</div><div class="message-bubble" style="background:var(--gray-200);color:var(--gray-500);font-style:italic;"><div class="message-text">Message from blocked user</div></div></div>';
                     continue;
                 }
                 
                 html += '<div class="message-row' + (isSent ? ' sent' : '') + '">';
-                
-                // Avatar for received messages
                 if (!isSent) {
-                    var avatarStyle = 'background:' + getColorFromId(msg.sender_id) + ';';
-                    var avatarContent = hasValidAvatar(sender.avatar_url) ? 
-                        '<img src="' + escapeHtml(sender.avatar_url) + '">' : initials;
-                    html += '<div class="message-avatar" onclick="openProfileModal(\'' + msg.sender_id + '\')" style="' + avatarStyle + '">' + avatarContent + '</div>';
+                    var avatarContent = hasValidAvatar(sender.avatar_url) ? '<img src="' + escapeHtml(sender.avatar_url) + '">' : initials;
+                    html += '<div class="message-avatar" onclick="openProfileModal(\'' + msg.sender_id + '\')" style="background:' + getColorFromId(msg.sender_id) + ';">' + avatarContent + '</div>';
                 }
-                
                 html += '<div class="message-bubble">';
                 if (!isSent) html += '<div class="message-sender">' + escapeHtml(name) + '</div>';
                 html += '<div class="message-text">' + escapeHtml(filterBadWords(msg.content)) + '</div>';
-                html += '<div class="message-meta"><span class="message-time">' + time + '</span></div>';
-                html += '</div></div>';
+                html += '<div class="message-meta"><span class="message-time">' + time + '</span></div></div></div>';
             }
-            
             container.innerHTML = html;
             container.scrollTop = container.scrollHeight;
         }
         
         function renderNotifications() {
             var unread = notifications.filter(function(n) { return !n.is_read; }).length;
-            
             var badge = document.getElementById('notifBadge');
             badge.style.display = unread > 0 ? 'flex' : 'none';
             badge.textContent = unread > 9 ? '9+' : unread;
@@ -1261,9 +1087,20 @@
             var html = '';
             for (var i = 0; i < notifications.length; i++) {
                 var n = notifications[i];
-                html += '<div class="notif-dropdown-item' + (n.is_read ? '' : ' unread') + '" onclick="handleNotifClick(\'' + n.id + '\',\'' + n.type + '\',\'' + (n.reference_id || '') + '\')">' +
-                    '<div class="notif-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg></div>' +
-                    '<div class="notif-content"><h4>' + escapeHtml(n.title || 'Notification') + '</h4><p>' + escapeHtml(n.message || '') + '</p><div class="time">' + formatTimeAgo(n.created_at) + '</div></div></div>';
+                var iconClass = '';
+                if (n.type === 'group_join_request') iconClass = 'orange';
+                else if (n.type === 'group_request_accepted') iconClass = 'green';
+                else if (n.type === 'friend_request') iconClass = 'blue';
+                
+                html += '<div class="notif-dropdown-item' + (n.is_read ? '' : ' unread') + '" onclick="handleNotifClick(\'' + n.id + '\',\'' + n.type + '\',\'' + (n.reference_id || '') + '\')">';
+                html += '<div class="notif-icon ' + iconClass + '"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg></div>';
+                html += '<div class="notif-content"><h4>' + escapeHtml(n.title || 'Notification') + '</h4><p>' + escapeHtml(n.message || '') + '</p><div class="time">' + formatTimeAgo(n.created_at) + '</div>';
+                
+                // Action buttons for join requests (for admins)
+                if (n.type === 'group_join_request' && !n.is_read && n.reference_id) {
+                    html += '<div class="notif-actions"><button class="accept" onclick="event.stopPropagation();handleJoinRequest(\'' + n.reference_id + '\',\'' + n.id + '\',true)">Accept</button><button class="decline" onclick="event.stopPropagation();handleJoinRequest(\'' + n.reference_id + '\',\'' + n.id + '\',false)">Decline</button></div>';
+                }
+                html += '</div></div>';
             }
             container.innerHTML = html;
         }
@@ -1273,6 +1110,13 @@
             var isAdmin = isGroupAdmin();
             var html = '';
             
+            // Show admin actions if admin
+            if (isAdmin && bannedUsers.length > 0) {
+                document.getElementById('manageBansItem').style.display = 'flex';
+            } else {
+                document.getElementById('manageBansItem').style.display = 'none';
+            }
+            
             for (var i = 0; i < currentMembers.length; i++) {
                 var m = currentMembers[i];
                 var p = m.profiles || {};
@@ -1280,12 +1124,10 @@
                 var initials = getInitials(name);
                 var isMe = m.user_id === currentUser.id;
                 var isMemberAdmin = m.role === 'admin';
-                
-                var avatarContent = hasValidAvatar(p.avatar_url) ? 
-                    '<img src="' + escapeHtml(p.avatar_url) + '">' : initials;
+                var avatarContent = hasValidAvatar(p.avatar_url) ? '<img src="' + escapeHtml(p.avatar_url) + '">' : initials;
                 
                 html += '<div class="member-item">';
-                html += '<div class="member-avatar" onclick="openProfileModal(\'' + m.user_id + '\')" style="background:' + getColorFromId(m.user_id) + ';">' + avatarContent + '<div class="member-online-dot' + (p.is_online ? '' : ' offline') + '"></div></div>';
+                html += '<div class="member-avatar" onclick="openProfileModal(\'' + m.user_id + '\')" style="background:' + getColorFromId(m.user_id) + ';">' + avatarContent + '<div class="member-status-dot ' + (p.is_online ? 'online' : 'offline') + '"></div></div>';
                 html += '<div class="member-info"><div class="member-name">' + escapeHtml(name);
                 if (isMemberAdmin) html += ' <span class="member-role">Admin</span>';
                 if (isMe) html += ' <span style="color:var(--gray-400);font-size:11px;">(You)</span>';
@@ -1293,46 +1135,11 @@
                 
                 if (isAdmin && !isMe) {
                     html += '<div class="member-actions">';
-                    if (!isMemberAdmin) {
-                        html += '<button class="member-action-btn" title="Make Admin" onclick="promoteToAdmin(\'' + m.user_id + '\')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg></button>';
-                    }
-                    html += '<button class="member-action-btn danger" title="Remove" onclick="removeMember(\'' + m.user_id + '\')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 7a4 4 0 11-8 0 4 4 0 018 0zM9 14a6 6 0 00-6 6v1h12v-1a6 6 0 00-6-6zM21 12h-6"/></svg></button>';
+                    if (!isMemberAdmin) html += '<button class="member-action-btn" title="Make Admin" onclick="promoteToAdmin(\'' + m.user_id + '\')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg></button>';
+                    html += '<button class="member-action-btn" title="Remove" onclick="removeMember(\'' + m.user_id + '\')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 7a4 4 0 11-8 0 4 4 0 018 0zM9 14a6 6 0 00-6 6v1h12v-1a6 6 0 00-6-6zM21 12h-6"/></svg></button>';
+                    html += '<button class="member-action-btn danger" title="Ban" onclick="banMember(\'' + m.user_id + '\')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg></button>';
                     html += '</div>';
                 }
-                html += '</div>';
-            }
-            container.innerHTML = html;
-        }
-        
-        function renderInviteFriendsList() {
-            var query = document.getElementById('inviteSearch').value.toLowerCase();
-            var memberIds = currentMembers.map(function(m) { return m.user_id; });
-            var list = friends.filter(function(f) { return memberIds.indexOf(f.id) === -1; });
-            
-            if (query) {
-                list = list.filter(function(f) {
-                    return getName(f).toLowerCase().indexOf(query) !== -1;
-                });
-            }
-            
-            var container = document.getElementById('inviteFriendsList');
-            if (list.length === 0) {
-                container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-400);">No friends to invite</div>';
-                return;
-            }
-            
-            var html = '';
-            for (var i = 0; i < list.length; i++) {
-                var f = list[i];
-                var name = getName(f);
-                var initials = getInitials(name);
-                var avatarContent = hasValidAvatar(f.avatar_url) ? 
-                    '<img src="' + escapeHtml(f.avatar_url) + '">' : initials;
-                
-                html += '<div class="member-item">';
-                html += '<div class="member-avatar" style="background:' + getColorFromId(f.id) + ';">' + avatarContent + '</div>';
-                html += '<div class="member-info"><div class="member-name">' + escapeHtml(name) + '</div></div>';
-                html += '<button class="btn btn-primary btn-sm" onclick="inviteFriend(\'' + f.id + '\')">Add</button>';
                 html += '</div>';
             }
             container.innerHTML = html;
@@ -1343,21 +1150,13 @@
         // ============================================
         function switchTab(tab) {
             var tabs = document.querySelectorAll('.tab-btn');
-            for (var i = 0; i < tabs.length; i++) {
-                tabs[i].classList.remove('active');
-            }
+            for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('active');
             document.querySelector('[data-tab="' + tab + '"]').classList.add('active');
-            
-            if (tab === 'discover' && discoverGroups.length === 0) {
-                loadDiscoverGroups();
-            } else {
-                renderGroups();
-            }
+            if (tab === 'discover' && discoverGroups.length === 0) loadDiscoverGroups();
+            else renderGroups();
         }
         
-        function filterGroups() {
-            renderGroups();
-        }
+        function filterGroups() { renderGroups(); }
         
         async function openGroup(groupId) {
             currentGroup = myGroups.find(function(g) { return g.id === groupId; });
@@ -1370,9 +1169,7 @@
             
             var initials = getInitials(currentGroup.name);
             var chatAvatar = document.getElementById('chatAvatar');
-            chatAvatar.innerHTML = hasValidAvatar(currentGroup.avatar_url) ? 
-                '<img src="' + escapeHtml(currentGroup.avatar_url) + '">' : initials;
-            
+            chatAvatar.innerHTML = hasValidAvatar(currentGroup.avatar_url) ? '<img src="' + escapeHtml(currentGroup.avatar_url) + '">' : initials;
             document.getElementById('chatGroupName').textContent = currentGroup.name;
             
             await loadGroupMembers();
@@ -1388,76 +1185,109 @@
         
         function updateMembersDisplay() {
             var total = currentMembers.length;
-            var online = currentMembers.filter(function(m) {
-                return m.profiles && m.profiles.is_online;
-            }).length;
+            var online = currentMembers.filter(function(m) { return m.profiles && m.profiles.is_online; }).length;
             document.getElementById('chatGroupStatus').textContent = total + ' member' + (total !== 1 ? 's' : '') + ' • ' + online + ' online';
         }
         
         async function joinGroup(groupId) {
             try {
-                var result = await supabase.from('study_group_members').insert({
-                    group_id: groupId,
-                    user_id: currentUser.id,
-                    role: 'member'
-                });
-                
-                if (result.error) {
-                    showToast(result.error.code === '23505' ? 'Already a member' : 'Failed to join', 'error');
-                    return;
-                }
-                
+                var result = await supabase.from('study_group_members').insert({ group_id: groupId, user_id: currentUser.id, role: 'member' });
+                if (result.error) { showToast(result.error.code === '23505' ? 'Already a member' : 'Failed to join', 'error'); return; }
                 showToast('Joined!', 'success');
                 await loadMyGroups();
                 switchTab('my');
                 openGroup(groupId);
-            } catch(e) {
-                showToast('Failed to join', 'error');
-            }
+            } catch(e) { showToast('Failed to join', 'error'); }
+        }
+        
+        async function askToJoin(groupId) {
+            try {
+                // Get group info for notification
+                var groupResult = await supabase.from('study_groups').select('name, creator_id').eq('id', groupId).single();
+                var group = groupResult.data;
+                
+                // Create join request
+                var result = await supabase.from('group_join_requests').insert({
+                    group_id: groupId,
+                    user_id: currentUser.id,
+                    status: 'pending'
+                });
+                
+                if (result.error) {
+                    if (result.error.code === '23505') showToast('Request already sent', 'error');
+                    else showToast('Failed to send request', 'error');
+                    return;
+                }
+                
+                // Get user's name for notification
+                var profileResult = await supabase.from('profiles').select('first_name, last_name').eq('id', currentUser.id).single();
+                var userName = getName(profileResult.data);
+                
+                // Notify group admin
+                await supabase.from('notifications').insert({
+                    user_id: group.creator_id,
+                    title: 'Join Request',
+                    message: userName + ' wants to join ' + group.name,
+                    type: 'group_join_request',
+                    reference_id: groupId + ':' + currentUser.id
+                });
+                
+                showToast('Request sent!', 'success');
+                await loadDiscoverGroups();
+            } catch(e) { showToast('Failed to send request', 'error'); console.error(e); }
+        }
+        
+        async function handleJoinRequest(refId, notifId, accept) {
+            try {
+                var parts = refId.split(':');
+                var groupId = parts[0];
+                var userId = parts[1];
+                
+                if (accept) {
+                    // Add user to group
+                    await supabase.from('study_group_members').insert({ group_id: groupId, user_id: userId, role: 'member' });
+                    
+                    // Get group name
+                    var groupResult = await supabase.from('study_groups').select('name').eq('id', groupId).single();
+                    
+                    // Notify the user
+                    await supabase.from('notifications').insert({
+                        user_id: userId,
+                        title: 'Request Accepted',
+                        message: 'You can now join ' + groupResult.data.name,
+                        type: 'group_request_accepted',
+                        reference_id: groupId
+                    });
+                    showToast('User added to group', 'success');
+                } else {
+                    showToast('Request declined', 'success');
+                }
+                
+                // Update request status
+                await supabase.from('group_join_requests').update({ status: accept ? 'accepted' : 'declined' }).eq('group_id', groupId).eq('user_id', userId);
+                
+                // Mark notification as read
+                await supabase.from('notifications').update({ is_read: true }).eq('id', notifId);
+                await loadNotifications();
+                if (currentGroup && currentGroup.id === groupId) await loadGroupMembers();
+            } catch(e) { showToast('Failed', 'error'); console.error(e); }
         }
         
         async function sendMessage() {
             var input = document.getElementById('messageInput');
             var content = input.value.trim();
             if (!content || !currentGroup) return;
-            
             input.value = '';
             input.style.height = 'auto';
-            
             try {
-                var result = await supabase.from('study_group_messages').insert({
-                    group_id: currentGroup.id,
-                    sender_id: currentUser.id,
-                    content: content
-                });
-                
-                if (result.error) {
-                    showToast('Failed to send', 'error');
-                    input.value = content;
-                }
-            } catch(e) {
-                showToast('Failed to send', 'error');
-                input.value = content;
-            }
+                var result = await supabase.from('study_group_messages').insert({ group_id: currentGroup.id, sender_id: currentUser.id, content: content });
+                if (result.error) { showToast('Failed to send', 'error'); input.value = content; }
+            } catch(e) { showToast('Failed to send', 'error'); input.value = content; }
         }
         
-        function handleKeydown(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-            }
-        }
-        
-        function autoResize(el) {
-            el.style.height = 'auto';
-            el.style.height = Math.min(el.scrollHeight, 120) + 'px';
-        }
-        
-        function isGroupAdmin() {
-            var myMember = currentMembers.find(function(m) { return m.user_id === currentUser.id; });
-            return myMember && myMember.role === 'admin';
-        }
-        
+        function handleKeydown(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
+        function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; }
+        function isGroupAdmin() { var m = currentMembers.find(function(m) { return m.user_id === currentUser.id; }); return m && m.role === 'admin'; }
         function updateCreatedCount() {
             createdCount = myGroups.filter(function(g) { return g.creator_id === currentUser.id; }).length;
             document.getElementById('groupsLimit').textContent = 'You can create up to ' + MAX_GROUPS + ' groups (' + createdCount + '/' + MAX_GROUPS + ' used)';
@@ -1466,63 +1296,204 @@
         
         async function promoteToAdmin(userId) {
             try {
-                await supabase.from('study_group_members')
-                    .update({ role: 'admin' })
-                    .eq('group_id', currentGroup.id)
-                    .eq('user_id', userId);
+                await supabase.from('study_group_members').update({ role: 'admin' }).eq('group_id', currentGroup.id).eq('user_id', userId);
                 showToast('Promoted to admin', 'success');
                 await loadGroupMembers();
                 renderMembersList();
-            } catch(e) {
-                showToast('Failed', 'error');
-            }
+            } catch(e) { showToast('Failed', 'error'); }
         }
         
         async function removeMember(userId) {
             try {
-                await supabase.from('study_group_members')
-                    .delete()
-                    .eq('group_id', currentGroup.id)
-                    .eq('user_id', userId);
+                await supabase.from('study_group_members').delete().eq('group_id', currentGroup.id).eq('user_id', userId);
                 showToast('Member removed', 'success');
                 await loadGroupMembers();
                 renderMembersList();
                 updateMembersDisplay();
-            } catch(e) {
-                showToast('Failed', 'error');
-            }
+            } catch(e) { showToast('Failed', 'error'); }
         }
         
-        async function inviteFriend(friendId) {
+        async function banMember(userId) {
+            document.getElementById('confirmTitle').textContent = 'Ban User';
+            document.getElementById('confirmMessage').textContent = 'Ban this user from the group? They will not be able to rejoin.';
+            confirmCallback = async function() {
+                try {
+                    await supabase.from('study_group_members').update({ role: 'banned' }).eq('group_id', currentGroup.id).eq('user_id', userId);
+                    showToast('User banned', 'success');
+                    closeConfirmModal();
+                    await loadGroupMembers();
+                    renderMembersList();
+                    updateMembersDisplay();
+                } catch(e) { showToast('Failed', 'error'); }
+            };
+            document.getElementById('confirmModal').classList.add('show');
+        }
+        
+        async function unbanMember(userId) {
             try {
-                var result = await supabase.from('study_group_members').insert({
-                    group_id: currentGroup.id,
-                    user_id: friendId,
-                    role: 'member'
-                });
-                
-                if (result.error) {
-                    showToast(result.error.code === '23505' ? 'Already a member' : 'Failed', 'error');
-                    return;
-                }
-                
-                showToast('Added!', 'success');
+                await supabase.from('study_group_members').delete().eq('group_id', currentGroup.id).eq('user_id', userId);
+                showToast('User unbanned', 'success');
                 await loadGroupMembers();
-                renderInviteFriendsList();
-                updateMembersDisplay();
-            } catch(e) {
-                showToast('Failed', 'error');
+                renderBannedUsers();
+            } catch(e) { showToast('Failed', 'error'); }
+        }
+        
+        function renderBannedUsers() {
+            var container = document.getElementById('bannedUsersList');
+            if (bannedUsers.length === 0) {
+                container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-400);">No banned users</div>';
+                return;
             }
+            var html = '';
+            for (var i = 0; i < bannedUsers.length; i++) {
+                var b = bannedUsers[i];
+                var p = b.profiles || {};
+                var name = getName(p);
+                var initials = getInitials(name);
+                var avatarContent = hasValidAvatar(p.avatar_url) ? '<img src="' + escapeHtml(p.avatar_url) + '">' : initials;
+                html += '<div class="member-item"><div class="member-avatar" style="background:' + getColorFromId(b.user_id) + ';">' + avatarContent + '</div><div class="member-info"><div class="member-name">' + escapeHtml(name) + ' <span class="member-role banned">Banned</span></div></div><button class="btn btn-sm btn-success" onclick="unbanMember(\'' + b.user_id + '\')">Unban</button></div>';
+            }
+            container.innerHTML = html;
+        }
+        
+        // ============================================
+        // USER SEARCH (for adding members)
+        // ============================================
+        function searchUsers() {
+            clearTimeout(searchTimeout);
+            var query = document.getElementById('memberSearchInput').value.trim();
+            var container = document.getElementById('userSearchResults');
+            
+            if (query.length < 2) { container.style.display = 'none'; return; }
+            
+            searchTimeout = setTimeout(async function() {
+                try {
+                    var result = await supabase.from('profiles').select('id, first_name, last_name, avatar_url, program').or('first_name.ilike.%' + query + '%,last_name.ilike.%' + query + '%').neq('id', currentUser.id).limit(10);
+                    
+                    var users = (result.data || []).filter(function(u) {
+                        return selectedMembers.findIndex(function(s) { return s.id === u.id; }) === -1;
+                    });
+                    
+                    if (users.length === 0) {
+                        container.innerHTML = '<div class="user-search-empty">No users found</div>';
+                    } else {
+                        var html = '';
+                        for (var i = 0; i < users.length; i++) {
+                            var u = users[i];
+                            var name = getName(u);
+                            var initials = getInitials(name);
+                            var avatarContent = hasValidAvatar(u.avatar_url) ? '<img src="' + escapeHtml(u.avatar_url) + '">' : initials;
+                            var isSelected = selectedMembers.findIndex(function(s) { return s.id === u.id; }) !== -1;
+                            
+                            html += '<div class="user-search-item' + (isSelected ? ' selected' : '') + '" onclick="toggleSelectMember(\'' + u.id + '\', \'' + escapeHtml(name) + '\', \'' + escapeHtml(u.avatar_url || '') + '\')">';
+                            html += '<div class="user-search-avatar" style="background:' + getColorFromId(u.id) + ';">' + avatarContent + '</div>';
+                            html += '<div class="user-search-info"><div class="user-search-name">' + escapeHtml(name) + '</div><div class="user-search-program">' + escapeHtml(u.program || 'Student') + '</div></div>';
+                            html += '<div class="user-search-check"><svg fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>';
+                            html += '</div>';
+                        }
+                        container.innerHTML = html;
+                    }
+                    container.style.display = 'block';
+                } catch(e) { console.error(e); }
+            }, 300);
+        }
+        
+        function toggleSelectMember(id, name, avatarUrl) {
+            var idx = selectedMembers.findIndex(function(m) { return m.id === id; });
+            if (idx !== -1) {
+                selectedMembers.splice(idx, 1);
+            } else {
+                selectedMembers.push({ id: id, name: name, avatar_url: avatarUrl });
+            }
+            renderSelectedMembers();
+            searchUsers();
+        }
+        
+        function removeSelectedMember(id) {
+            selectedMembers = selectedMembers.filter(function(m) { return m.id !== id; });
+            renderSelectedMembers();
+        }
+        
+        function renderSelectedMembers() {
+            var container = document.getElementById('selectedMembers');
+            var placeholder = document.getElementById('selectedPlaceholder');
+            
+            if (selectedMembers.length === 0) {
+                placeholder.style.display = 'flex';
+                container.innerHTML = '<span class="selected-placeholder" id="selectedPlaceholder">Search and select users to add</span>';
+                return;
+            }
+            
+            var html = '';
+            for (var i = 0; i < selectedMembers.length; i++) {
+                var m = selectedMembers[i];
+                var initials = getInitials(m.name);
+                var avatarContent = hasValidAvatar(m.avatar_url) ? '<img src="' + escapeHtml(m.avatar_url) + '">' : initials;
+                html += '<div class="selected-member"><div class="selected-member-avatar" style="background:' + getColorFromId(m.id) + ';">' + avatarContent + '</div><span>' + escapeHtml(m.name.split(' ')[0]) + '</span><button class="selected-member-remove" onclick="removeSelectedMember(\'' + m.id + '\')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button></div>';
+            }
+            container.innerHTML = html;
+        }
+        
+        // Search for Add Members modal (existing group)
+        function searchUsersToAdd() {
+            clearTimeout(searchTimeout);
+            var query = document.getElementById('addMemberSearchInput').value.trim();
+            var container = document.getElementById('addMemberResults');
+            
+            if (query.length < 2) {
+                container.innerHTML = '<div class="user-search-empty">Type at least 2 characters to search</div>';
+                return;
+            }
+            
+            searchTimeout = setTimeout(async function() {
+                try {
+                    var memberIds = currentMembers.map(function(m) { return m.user_id; });
+                    var bannedIds = bannedUsers.map(function(b) { return b.user_id; });
+                    var excludeIds = memberIds.concat(bannedIds);
+                    
+                    var result = await supabase.from('profiles').select('id, first_name, last_name, avatar_url, program').or('first_name.ilike.%' + query + '%,last_name.ilike.%' + query + '%').limit(20);
+                    
+                    var users = (result.data || []).filter(function(u) { return excludeIds.indexOf(u.id) === -1; });
+                    
+                    if (users.length === 0) {
+                        container.innerHTML = '<div class="user-search-empty">No users found</div>';
+                    } else {
+                        var html = '';
+                        for (var i = 0; i < users.length; i++) {
+                            var u = users[i];
+                            var name = getName(u);
+                            var initials = getInitials(name);
+                            var avatarContent = hasValidAvatar(u.avatar_url) ? '<img src="' + escapeHtml(u.avatar_url) + '">' : initials;
+                            
+                            html += '<div class="user-search-item" onclick="addMemberToGroup(\'' + u.id + '\')">';
+                            html += '<div class="user-search-avatar" style="background:' + getColorFromId(u.id) + ';">' + avatarContent + '</div>';
+                            html += '<div class="user-search-info"><div class="user-search-name">' + escapeHtml(name) + '</div><div class="user-search-program">' + escapeHtml(u.program || 'Student') + '</div></div>';
+                            html += '<button class="btn btn-primary btn-sm">Add</button>';
+                            html += '</div>';
+                        }
+                        container.innerHTML = html;
+                    }
+                } catch(e) { console.error(e); }
+            }, 300);
+        }
+        
+        async function addMemberToGroup(userId) {
+            try {
+                var result = await supabase.from('study_group_members').insert({ group_id: currentGroup.id, user_id: userId, role: 'member' });
+                if (result.error) { showToast(result.error.code === '23505' ? 'Already a member' : 'Failed', 'error'); return; }
+                showToast('Member added!', 'success');
+                await loadGroupMembers();
+                renderMembersList();
+                updateMembersDisplay();
+                searchUsersToAdd();
+            } catch(e) { showToast('Failed', 'error'); }
         }
         
         // ============================================
         // MODAL FUNCTIONS
         // ============================================
         function openCreateModal() {
-            if (createdCount >= MAX_GROUPS) {
-                showToast('You can only create ' + MAX_GROUPS + ' groups', 'error');
-                return;
-            }
+            if (createdCount >= MAX_GROUPS) { showToast('You can only create ' + MAX_GROUPS + ' groups', 'error'); return; }
             document.getElementById('createModal').classList.add('show');
             document.getElementById('groupNameInput').value = '';
             document.getElementById('groupDescInput').value = '';
@@ -1531,41 +1502,25 @@
             document.getElementById('nameCount').textContent = '0';
             document.getElementById('descCount').textContent = '0';
             document.getElementById('nameError').textContent = '';
-            document.getElementById('avatarInput').value = '';
+            document.getElementById('memberSearchInput').value = '';
+            document.getElementById('userSearchResults').style.display = 'none';
+            selectedMembers = [];
+            renderSelectedMembers();
             croppedImageBlob = null;
         }
         
-        function closeCreateModal() {
-            document.getElementById('createModal').classList.remove('show');
-            croppedImageBlob = null;
-        }
+        function closeCreateModal() { document.getElementById('createModal').classList.remove('show'); croppedImageBlob = null; selectedMembers = []; }
         
         function validateGroupName() {
             var name = document.getElementById('groupNameInput').value;
             document.getElementById('nameCount').textContent = name.length;
             BAD_WORD_REGEX.lastIndex = 0;
-            if (containsBadWords(name)) {
-                document.getElementById('nameError').textContent = 'Name contains inappropriate words';
-                return false;
-            }
+            if (containsBadWords(name)) { document.getElementById('nameError').textContent = 'Name contains inappropriate words'; return false; }
             document.getElementById('nameError').textContent = '';
             return true;
         }
         
-        function updateDescCount() {
-            var desc = document.getElementById('groupDescInput').value;
-            document.getElementById('descCount').textContent = desc.length;
-        }
-        
-        function previewAvatar(event) {
-            var file = event.target.files[0];
-            if (!file) return;
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('avatarPreview').innerHTML = '<img src="' + e.target.result + '">';
-            };
-            reader.readAsDataURL(file);
-        }
+        function updateDescCount() { document.getElementById('descCount').textContent = document.getElementById('groupDescInput').value.length; }
         
         async function createGroup() {
             var name = document.getElementById('groupNameInput').value.trim();
@@ -1573,21 +1528,14 @@
             var course = document.getElementById('groupCourseInput').value.trim();
             var isPrivate = document.getElementById('groupPrivacyInput').value === 'private';
             
-            if (!name) {
-                showToast('Enter a group name', 'error');
-                return;
-            }
+            if (!name) { showToast('Enter a group name', 'error'); return; }
+            if (selectedMembers.length === 0) { showToast('Add at least one member to create a group', 'error'); return; }
             
             BAD_WORD_REGEX.lastIndex = 0;
-            if (!validateGroupName() || containsBadWords(desc)) {
-                showToast('Fix inappropriate content', 'error');
-                return;
-            }
+            if (!validateGroupName() || containsBadWords(desc)) { showToast('Fix inappropriate content', 'error'); return; }
             
             try {
                 var avatarUrl = null;
-                
-                // Use cropped image blob if available
                 if (croppedImageBlob) {
                     var fileName = 'group_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9) + '.jpg';
                     var uploadResult = await supabase.storage.from('avatars').upload(fileName, croppedImageBlob);
@@ -1598,42 +1546,31 @@
                 }
                 
                 var insertResult = await supabase.from('study_groups').insert({
-                    name: name,
-                    description: desc,
-                    course_code: course,
-                    avatar_url: avatarUrl,
-                    is_private: isPrivate,
-                    creator_id: currentUser.id
+                    name: name, description: desc, course_code: course, avatar_url: avatarUrl, is_private: isPrivate, creator_id: currentUser.id
                 }).select().single();
                 
-                if (insertResult.error) {
-                    showToast('Failed to create: ' + (insertResult.error.message || 'Unknown error'), 'error');
-                    console.error('Create group error:', insertResult.error);
-                    return;
-                }
+                if (insertResult.error) { showToast('Failed: ' + (insertResult.error.message || 'Unknown error'), 'error'); return; }
                 
                 var group = insertResult.data;
-                await supabase.from('study_group_members').insert({
-                    group_id: group.id,
-                    user_id: currentUser.id,
-                    role: 'admin'
-                });
                 
-                // Reset cropped image
-                croppedImageBlob = null;
+                // Add creator as admin
+                await supabase.from('study_group_members').insert({ group_id: group.id, user_id: currentUser.id, role: 'admin' });
+                
+                // Add selected members
+                for (var i = 0; i < selectedMembers.length; i++) {
+                    await supabase.from('study_group_members').insert({ group_id: group.id, user_id: selectedMembers[i].id, role: 'member' });
+                }
+                
                 closeCreateModal();
                 showToast('Group created!', 'success');
                 await loadMyGroups();
                 updateCreatedCount();
                 openGroup(group.id);
-            } catch(e) {
-                showToast('Failed to create', 'error');
-            }
+            } catch(e) { showToast('Failed to create', 'error'); console.error(e); }
         }
         
         function openGroupInfoModal() {
             if (!currentGroup) return;
-            
             var initials = getInitials(currentGroup.name);
             var isAdmin = isGroupAdmin();
             var avatar = document.getElementById('infoAvatar');
@@ -1646,13 +1583,12 @@
                 avatar.innerHTML = '<span>' + initials + '</span>' + (isAdmin ? editOverlay : '');
             }
             avatar.style.cursor = isAdmin ? 'pointer' : 'default';
+            avatar.onclick = isAdmin ? function() { openGroupAvatarModal('edit'); } : null;
             
             document.getElementById('infoName').textContent = currentGroup.name;
             document.getElementById('infoDesc').textContent = currentGroup.description || 'No description';
             document.getElementById('infoMembersCount').textContent = currentMembers.length;
-            document.getElementById('infoOnlineCount').textContent = currentMembers.filter(function(m) {
-                return m.profiles && m.profiles.is_online;
-            }).length;
+            document.getElementById('infoOnlineCount').textContent = currentMembers.filter(function(m) { return m.profiles && m.profiles.is_online; }).length;
             document.getElementById('infoMessagesCount').textContent = groupMessages.length;
             document.getElementById('memberCountLabel').textContent = '(' + currentMembers.length + ')';
             document.getElementById('deleteGroupBtn').style.display = currentGroup.creator_id === currentUser.id ? 'flex' : 'none';
@@ -1661,50 +1597,26 @@
             document.getElementById('groupInfoModal').classList.add('show');
         }
         
-        function closeGroupInfoModal() {
-            document.getElementById('groupInfoModal').classList.remove('show');
-        }
+        function closeGroupInfoModal() { document.getElementById('groupInfoModal').classList.remove('show'); }
+        function triggerAvatarUpload() { if (isGroupAdmin()) openGroupAvatarModal('edit'); }
         
-        function triggerAvatarUpload() {
-            if (isGroupAdmin()) {
-                document.getElementById('infoAvatarInput').click();
-            }
+        function openAddMembersModal() {
+            if (!currentGroup) return;
+            document.getElementById('addMemberSearchInput').value = '';
+            document.getElementById('addMemberResults').innerHTML = '<div class="user-search-empty">Type at least 2 characters to search</div>';
+            document.getElementById('addMembersModal').classList.add('show');
         }
+        function closeAddMembersModal() { document.getElementById('addMembersModal').classList.remove('show'); }
         
-        async function uploadGroupAvatar(event) {
-            var file = event.target.files[0];
-            if (!file || !isGroupAdmin()) return;
-            
-            try {
-                var fileName = 'group_' + currentGroup.id + '_' + Date.now() + '.' + file.name.split('.').pop();
-                var uploadResult = await supabase.storage.from('avatars').upload(fileName, file);
-                
-                if (uploadResult.error) {
-                    showToast('Upload failed', 'error');
-                    return;
-                }
-                
-                var urlResult = supabase.storage.from('avatars').getPublicUrl(fileName);
-                var publicUrl = urlResult.data.publicUrl;
-                
-                await supabase.from('study_groups')
-                    .update({ avatar_url: publicUrl })
-                    .eq('id', currentGroup.id);
-                
-                currentGroup.avatar_url = publicUrl;
-                document.getElementById('chatAvatar').innerHTML = '<img src="' + escapeHtml(publicUrl) + '">';
-                openGroupInfoModal();
-                showToast('Avatar updated!', 'success');
-                await loadMyGroups();
-            } catch(e) {
-                showToast('Upload failed', 'error');
-            }
+        function openManageBansModal() {
+            renderBannedUsers();
+            document.getElementById('manageBansModal').classList.add('show');
         }
+        function closeManageBansModal() { document.getElementById('manageBansModal').classList.remove('show'); }
         
         async function openProfileModal(userId) {
             if (userId === currentUser.id) return;
             selectedProfileUser = userId;
-            
             try {
                 var result = await supabase.from('profiles').select('*').eq('id', userId).single();
                 var p = result.data;
@@ -1718,295 +1630,164 @@
                 document.getElementById('profileBlockedNotice').textContent = isBlocked ? 'You have blocked this user' : '';
                 
                 var avatar = document.getElementById('profileAvatar');
-                var avatarContent = hasValidAvatar(p.avatar_url) ? 
-                    '<img src="' + escapeHtml(p.avatar_url) + '">' : initials;
-                avatar.innerHTML = avatarContent + '<div class="online-dot' + (p.is_online ? '' : ' offline') + '"></div>';
+                var avatarContent = hasValidAvatar(p.avatar_url) ? '<img src="' + escapeHtml(p.avatar_url) + '">' : initials;
+                avatar.innerHTML = avatarContent + '<div class="status-dot ' + (p.is_online ? 'online' : 'offline') + '"></div>';
                 avatar.style.background = hasValidAvatar(p.avatar_url) ? 'transparent' : getColorFromId(userId);
                 
                 document.getElementById('profileName').textContent = name;
                 document.getElementById('profileProgram').textContent = p.program || 'Student';
                 document.getElementById('profileStatus').textContent = p.is_online ? 'Online' : 'Last seen ' + formatTimeAgo(p.last_seen);
-                document.getElementById('profileStatus').className = 'profile-modal-status' + (p.is_online ? '' : ' offline');
+                document.getElementById('profileStatus').className = 'profile-modal-status ' + (p.is_online ? 'online' : 'offline');
                 
                 var actions = document.getElementById('profileActions');
-                actions.innerHTML = '<button class="btn btn-primary" onclick="messageUser(\'' + userId + '\')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>Message</button>' +
-                    '<button class="btn btn-secondary" onclick="toggleBlockUser(\'' + userId + '\')">' + (isBlocked ? 'Unblock' : 'Block') + '</button>' +
-                    '<button class="btn btn-danger" onclick="openReportModal(\'' + userId + '\')">Report</button>' +
-                    '<a class="profile-modal-link" href="profile.html?id=' + userId + '" target="_blank"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>View Full Profile</a>';
+                actions.innerHTML = '<button class="btn btn-primary" onclick="messageUser(\'' + userId + '\')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>Message</button><button class="btn btn-secondary" onclick="toggleBlockUser(\'' + userId + '\')">' + (isBlocked ? 'Unblock' : 'Block') + '</button><button class="btn btn-danger" onclick="openReportModal(\'' + userId + '\')">Report</button><a class="profile-modal-link" href="profile.html?id=' + userId + '" target="_blank"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>View Full Profile</a>';
                 
                 document.getElementById('profileModal').classList.add('show');
             } catch(e) {}
         }
         
-        function closeProfileModal() {
-            document.getElementById('profileModal').classList.remove('show');
-            selectedProfileUser = null;
+        function closeProfileModal() { document.getElementById('profileModal').classList.remove('show'); selectedProfileUser = null; }
+        function messageUser(userId) { window.location.href = 'messages.html?user=' + userId; }
+        
+        async function toggleBlockUser(userId) {
+            try {
+                if (blockedUsers.indexOf(userId) !== -1) {
+                    await supabase.from('blocked_users').delete().eq('blocker_id', currentUser.id).eq('blocked_id', userId);
+                    blockedUsers = blockedUsers.filter(function(id) { return id !== userId; });
+                    showToast('Unblocked', 'success');
+                } else {
+                    await supabase.from('blocked_users').insert({ blocker_id: currentUser.id, blocked_id: userId });
+                    blockedUsers.push(userId);
+                    showToast('Blocked', 'success');
+                }
+                openProfileModal(userId);
+                renderMessages();
+            } catch(e) { showToast('Failed', 'error'); }
         }
         
-        function messageUser(userId) {
-            window.location.href = 'messages.html?user=' + userId;
-        }
-        
-        function openInviteModal() {
-            if (!currentGroup) return;
-            document.getElementById('inviteSearch').value = '';
-            renderInviteFriendsList();
-            document.getElementById('inviteModal').classList.add('show');
-        }
-        
-        function closeInviteModal() {
-            document.getElementById('inviteModal').classList.remove('show');
-        }
-        
-        function searchFriendsToInvite() {
-            renderInviteFriendsList();
-        }
-        
-        function openReportModal(userId) {
-            reportTargetId = userId;
-            document.getElementById('reportReason').value = '';
-            document.getElementById('reportDetails').value = '';
-            document.getElementById('reportModal').classList.add('show');
-        }
-        
-        function closeReportModal() {
-            document.getElementById('reportModal').classList.remove('show');
-            reportTargetId = null;
-        }
+        function openReportModal(userId) { reportTargetId = userId; document.getElementById('reportReason').value = ''; document.getElementById('reportDetails').value = ''; document.getElementById('reportModal').classList.add('show'); }
+        function closeReportModal() { document.getElementById('reportModal').classList.remove('show'); reportTargetId = null; }
         
         async function submitReport() {
             var reason = document.getElementById('reportReason').value;
             var details = document.getElementById('reportDetails').value;
-            
-            if (!reason) {
-                showToast('Select a reason', 'error');
-                return;
-            }
-            
+            if (!reason) { showToast('Select a reason', 'error'); return; }
             try {
-                await supabase.from('user_reports').insert({
-                    reporter_id: currentUser.id,
-                    reported_id: reportTargetId,
-                    reason: reason,
-                    details: details,
-                    context: 'study_group',
-                    context_id: currentGroup ? currentGroup.id : null
-                });
-                closeReportModal();
-                closeProfileModal();
+                await supabase.from('user_reports').insert({ reporter_id: currentUser.id, reported_id: reportTargetId, reason: reason, details: details, context: 'study_group', context_id: currentGroup ? currentGroup.id : null });
+                closeReportModal(); closeProfileModal();
                 showToast('Report submitted', 'success');
-            } catch(e) {
-                showToast('Failed to submit', 'error');
-            }
+            } catch(e) { showToast('Failed to submit', 'error'); }
         }
         
         // ============================================
-        // CONFIRM / BLOCK / LEAVE / DELETE
+        // CONFIRM / LEAVE / DELETE
         // ============================================
         function confirmLeaveGroup() {
             if (!currentGroup) return;
-            
             var myMember = currentMembers.find(function(m) { return m.user_id === currentUser.id; });
             var admins = currentMembers.filter(function(m) { return m.role === 'admin'; });
             var isOnlyAdmin = admins.length === 1 && myMember && myMember.role === 'admin';
             
             document.getElementById('confirmTitle').textContent = 'Leave Group';
-            document.getElementById('confirmMessage').textContent = isOnlyAdmin && currentMembers.length > 1 ?
-                'You are the only admin. A random member will become admin.' :
-                'Are you sure you want to leave?';
+            document.getElementById('confirmMessage').textContent = isOnlyAdmin && currentMembers.length > 1 ? 'You are the only admin. A random member will become admin.' : 'Are you sure you want to leave?';
             
             confirmCallback = async function() {
                 try {
                     if (isOnlyAdmin && currentMembers.length > 1) {
                         var others = currentMembers.filter(function(m) { return m.user_id !== currentUser.id; });
                         var random = others[Math.floor(Math.random() * others.length)];
-                        await supabase.from('study_group_members')
-                            .update({ role: 'admin' })
-                            .eq('group_id', currentGroup.id)
-                            .eq('user_id', random.user_id);
+                        await supabase.from('study_group_members').update({ role: 'admin' }).eq('group_id', currentGroup.id).eq('user_id', random.user_id);
                     }
-                    
-                    await supabase.from('study_group_members')
-                        .delete()
-                        .eq('group_id', currentGroup.id)
-                        .eq('user_id', currentUser.id);
-                    
-                    closeConfirmModal();
-                    closeGroupInfoModal();
-                    closeChatMenu();
+                    await supabase.from('study_group_members').delete().eq('group_id', currentGroup.id).eq('user_id', currentUser.id);
+                    closeConfirmModal(); closeGroupInfoModal(); closeChatMenu();
                     currentGroup = null;
-                    
                     document.getElementById('chatEmpty').style.display = 'flex';
                     document.getElementById('chatHeader').style.display = 'none';
                     document.getElementById('chatMessages').style.display = 'none';
                     document.getElementById('chatInputArea').style.display = 'none';
-                    
                     showToast('Left group', 'success');
                     await loadMyGroups();
                     updateCreatedCount();
                     backToGroups();
-                } catch(e) {
-                    showToast('Failed', 'error');
-                }
+                } catch(e) { showToast('Failed', 'error'); }
             };
-            
             document.getElementById('confirmModal').classList.add('show');
         }
         
         function confirmDeleteGroup() {
             if (!currentGroup || currentGroup.creator_id !== currentUser.id) return;
-            
             document.getElementById('confirmTitle').textContent = 'Delete Group';
             document.getElementById('confirmMessage').textContent = 'Delete this group? All messages will be lost.';
             
             confirmCallback = async function() {
                 try {
                     await supabase.from('study_groups').delete().eq('id', currentGroup.id);
-                    
-                    closeConfirmModal();
-                    closeGroupInfoModal();
+                    closeConfirmModal(); closeGroupInfoModal();
                     currentGroup = null;
-                    
                     document.getElementById('chatEmpty').style.display = 'flex';
                     document.getElementById('chatHeader').style.display = 'none';
                     document.getElementById('chatMessages').style.display = 'none';
                     document.getElementById('chatInputArea').style.display = 'none';
-                    
                     showToast('Group deleted', 'success');
                     await loadMyGroups();
                     updateCreatedCount();
                     backToGroups();
-                } catch(e) {
-                    showToast('Failed', 'error');
-                }
+                } catch(e) { showToast('Failed', 'error'); }
             };
-            
             document.getElementById('confirmModal').classList.add('show');
         }
         
-        function closeConfirmModal() {
-            document.getElementById('confirmModal').classList.remove('show');
-            confirmCallback = null;
-        }
-        
-        function executeConfirm() {
-            if (confirmCallback) confirmCallback();
-        }
-        
-        async function toggleBlockUser(userId) {
-            try {
-                if (blockedUsers.indexOf(userId) !== -1) {
-                    await supabase.from('blocked_users')
-                        .delete()
-                        .eq('blocker_id', currentUser.id)
-                        .eq('blocked_id', userId);
-                    blockedUsers = blockedUsers.filter(function(id) { return id !== userId; });
-                    showToast('Unblocked', 'success');
-                } else {
-                    await supabase.from('blocked_users').insert({
-                        blocker_id: currentUser.id,
-                        blocked_id: userId
-                    });
-                    blockedUsers.push(userId);
-                    showToast('Blocked', 'success');
-                }
-                openProfileModal(userId);
-                renderMessages();
-            } catch(e) {
-                showToast('Failed', 'error');
-            }
-        }
+        function closeConfirmModal() { document.getElementById('confirmModal').classList.remove('show'); confirmCallback = null; }
+        function executeConfirm() { if (confirmCallback) confirmCallback(); }
         
         // ============================================
         // NOTIFICATIONS
         // ============================================
         async function handleNotifClick(id, type, refId) {
-            try {
-                await supabase.from('notifications').update({ is_read: true }).eq('id', id);
-            } catch(e) {}
+            try { await supabase.from('notifications').update({ is_read: true }).eq('id', id); } catch(e) {}
             
-            if (type === 'friend_request') {
-                window.location.href = 'friends.html';
-            } else if (type === 'message') {
-                window.location.href = 'messages.html' + (refId ? '?conv=' + refId : '');
-            } else if (type === 'group_message' || type === 'group_invite') {
-                if (refId) openGroup(refId);
-            }
+            if (type === 'friend_request') window.location.href = 'friends.html';
+            else if (type === 'message') window.location.href = 'messages.html' + (refId ? '?conv=' + refId : '');
+            else if (type === 'group_message' || type === 'group_request_accepted') { if (refId) { await loadMyGroups(); openGroup(refId); } }
             toggleNotifications();
         }
         
         async function markAllNotificationsRead() {
             try {
                 await supabase.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id);
-                for (var i = 0; i < notifications.length; i++) {
-                    notifications[i].is_read = true;
-                }
+                for (var i = 0; i < notifications.length; i++) notifications[i].is_read = true;
                 renderNotifications();
             } catch(e) {}
         }
         
-        function toggleNotifications(e) {
-            if (e) e.stopPropagation();
-            document.getElementById('notificationDropdown').classList.toggle('show');
-        }
+        function toggleNotifications(e) { if (e) e.stopPropagation(); document.getElementById('notificationDropdown').classList.toggle('show'); }
         
         // ============================================
         // REALTIME SUBSCRIPTIONS
         // ============================================
         function subscribeToRealtime() {
-            // New messages
-            supabase.channel('sg-messages')
-                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'study_group_messages' }, function(payload) {
-                    if (currentGroup && payload.new.group_id === currentGroup.id) {
-                        loadGroupMessages();
-                    }
-                    loadMyGroups();
-                })
-                .subscribe();
+            supabase.channel('sg-messages').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'study_group_messages' }, function(payload) {
+                if (currentGroup && payload.new.group_id === currentGroup.id) loadGroupMessages();
+                loadMyGroups();
+            }).subscribe();
             
-            // Member changes
-            supabase.channel('sg-members')
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'study_group_members' }, function() {
-                    if (currentGroup) {
-                        loadGroupMembers().then(function() {
-                            updateMembersDisplay();
-                            renderMembersList();
-                        });
-                    }
-                    loadMyGroups();
-                })
-                .subscribe();
+            supabase.channel('sg-members').on('postgres_changes', { event: '*', schema: 'public', table: 'study_group_members' }, function() {
+                if (currentGroup) loadGroupMembers().then(function() { updateMembersDisplay(); renderMembersList(); });
+                loadMyGroups();
+            }).subscribe();
             
-            // Online status
-            supabase.channel('sg-online')
-                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles', filter: 'is_online=eq.true' }, function(payload) {
-                    checkFriendOnline(payload.new);
-                    if (currentGroup) {
-                        loadGroupMembers().then(function() { updateMembersDisplay(); });
-                    }
-                })
-                .subscribe();
+            supabase.channel('sg-online').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles', filter: 'is_online=eq.true' }, function(payload) {
+                checkFriendOnline(payload.new);
+                if (currentGroup) loadGroupMembers().then(function() { updateMembersDisplay(); });
+            }).subscribe();
             
-            // Notifications
-            supabase.channel('sg-notif')
-                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: 'user_id=eq.' + currentUser.id }, function() {
-                    loadNotifications();
-                })
-                .subscribe();
+            supabase.channel('sg-notif').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: 'user_id=eq.' + currentUser.id }, function() {
+                loadNotifications();
+                playNotificationSound();
+            }).subscribe();
             
-            // Message badge
-            supabase.channel('sg-msg-badge')
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: 'receiver_id=eq.' + currentUser.id }, function() {
-                    loadSidebarBadges();
-                })
-                .subscribe();
-            
-            // Friend request badge
-            supabase.channel('sg-fr-badge')
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'friendships', filter: 'friend_id=eq.' + currentUser.id }, function() {
-                    loadSidebarBadges();
-                })
-                .subscribe();
+            supabase.channel('sg-msg-badge').on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: 'receiver_id=eq.' + currentUser.id }, function() { loadSidebarBadges(); }).subscribe();
+            supabase.channel('sg-fr-badge').on('postgres_changes', { event: '*', schema: 'public', table: 'friendships', filter: 'friend_id=eq.' + currentUser.id }, function() { loadSidebarBadges(); }).subscribe();
         }
         
         function checkFriendOnline(profile) {
@@ -2014,9 +1795,7 @@
             if (friendIds.indexOf(profile.id) !== -1 && profile.is_online) {
                 var lastSeen = friendLastSeen[profile.id];
                 var now = Date.now();
-                if (!lastSeen || now - lastSeen > 30000) {
-                    showFriendOnlineToast(profile);
-                }
+                if (!lastSeen || now - lastSeen > 30000) showFriendOnlineToast(profile);
                 friendLastSeen[profile.id] = now;
             }
         }
@@ -2028,49 +1807,33 @@
             toast.innerHTML = '<span style="width:10px;height:10px;background:#fff;border-radius:50%;animation:pulse 1s infinite;"></span>' + escapeHtml(name) + ' is online';
             document.body.appendChild(toast);
             playNotificationSound();
-            setTimeout(function() {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateX(20px)';
-                setTimeout(function() { toast.remove(); }, 300);
-            }, 4000);
+            setTimeout(function() { toast.style.opacity = '0'; toast.style.transform = 'translateX(20px)'; setTimeout(function() { toast.remove(); }, 300); }, 4000);
         }
         
         // ============================================
-        // UI FUNCTIONS
-        // ============================================
-        // IMAGE CROPPER FUNCTIONS (Cropper.js)
+        // IMAGE CROPPER (Cropper.js)
         // ============================================
         function openGroupAvatarModal(mode) {
             avatarMode = mode || 'create';
+            if (groupCropper) { groupCropper.destroy(); groupCropper = null; }
             
-            if (groupCropper) {
-                groupCropper.destroy();
-                groupCropper = null;
-            }
-            
-            // Reset steps
             document.getElementById('choiceStep').classList.remove('active');
             document.getElementById('uploadStep').classList.remove('active');
             document.getElementById('cropStep').classList.remove('active');
             document.getElementById('avatarBackBtn').style.display = 'none';
             document.getElementById('applyAvatarBtn').style.display = 'none';
             
-            // If editing existing group with avatar, show choice
             if (avatarMode === 'edit' && currentGroup && hasValidAvatar(currentGroup.avatar_url)) {
                 document.getElementById('choiceStep').classList.add('active');
             } else {
                 document.getElementById('uploadStep').classList.add('active');
             }
-            
             document.getElementById('groupAvatarModal').classList.add('show');
         }
         
         function closeGroupAvatarModal() {
             document.getElementById('groupAvatarModal').classList.remove('show');
-            if (groupCropper) {
-                groupCropper.destroy();
-                groupCropper = null;
-            }
+            if (groupCropper) { groupCropper.destroy(); groupCropper = null; }
             document.getElementById('groupAvatarInput').value = '';
         }
         
@@ -2088,10 +1851,7 @@
                 document.getElementById('cropStep').classList.remove('active');
                 document.getElementById('uploadStep').classList.add('active');
                 document.getElementById('applyAvatarBtn').style.display = 'none';
-                if (groupCropper) {
-                    groupCropper.destroy();
-                    groupCropper = null;
-                }
+                if (groupCropper) { groupCropper.destroy(); groupCropper = null; }
             } else if (uploadActive) {
                 if (avatarMode === 'edit' && currentGroup && hasValidAvatar(currentGroup.avatar_url)) {
                     document.getElementById('uploadStep').classList.remove('active');
@@ -2107,18 +1867,9 @@
             var file = event.target.files[0];
             if (!file) return;
             
-            // Validate file type
             var validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-            if (validTypes.indexOf(file.type) === -1) {
-                showToast('Please select a valid image file', 'error');
-                return;
-            }
-            
-            // Validate file size (2MB max)
-            if (file.size > 2 * 1024 * 1024) {
-                showToast('Image must be less than 2MB', 'error');
-                return;
-            }
+            if (validTypes.indexOf(file.type) === -1) { showToast('Please select a valid image file', 'error'); return; }
+            if (file.size > 2 * 1024 * 1024) { showToast('Image must be less than 2MB', 'error'); return; }
             
             var reader = new FileReader();
             reader.onload = function(e) {
@@ -2154,111 +1905,82 @@
         function applyGroupAvatar() {
             if (!groupCropper) return;
             
-            var canvas = groupCropper.getCroppedCanvas({
-                width: 400,
-                height: 400,
-                imageSmoothingEnabled: true,
-                imageSmoothingQuality: 'high'
-            });
+            var canvas = groupCropper.getCroppedCanvas({ width: 400, height: 400, imageSmoothingEnabled: true, imageSmoothingQuality: 'high' });
             
             canvas.toBlob(function(blob) {
-                croppedImageBlob = blob;
-                var url = URL.createObjectURL(blob);
-                document.getElementById('avatarPreview').innerHTML = '<img src="' + url + '">';
-                closeGroupAvatarModal();
+                if (avatarMode === 'create') {
+                    croppedImageBlob = blob;
+                    var url = URL.createObjectURL(blob);
+                    document.getElementById('avatarPreview').innerHTML = '<img src="' + url + '">';
+                    closeGroupAvatarModal();
+                } else {
+                    // Upload directly for edit mode
+                    uploadGroupAvatarBlob(blob);
+                }
             }, 'image/jpeg', 0.9);
+        }
+        
+        async function uploadGroupAvatarBlob(blob) {
+            try {
+                var fileName = 'group_' + currentGroup.id + '_' + Date.now() + '.jpg';
+                var uploadResult = await supabase.storage.from('avatars').upload(fileName, blob);
+                
+                if (uploadResult.error) { showToast('Upload failed', 'error'); return; }
+                
+                var urlResult = supabase.storage.from('avatars').getPublicUrl(fileName);
+                var publicUrl = urlResult.data.publicUrl;
+                
+                await supabase.from('study_groups').update({ avatar_url: publicUrl }).eq('id', currentGroup.id);
+                currentGroup.avatar_url = publicUrl;
+                document.getElementById('chatAvatar').innerHTML = '<img src="' + escapeHtml(publicUrl) + '">';
+                closeGroupAvatarModal();
+                openGroupInfoModal();
+                showToast('Avatar updated!', 'success');
+                await loadMyGroups();
+            } catch(e) { showToast('Upload failed', 'error'); }
         }
         
         async function removeGroupAvatar() {
             if (avatarMode === 'edit' && currentGroup) {
-                // Remove from existing group
                 try {
-                    await supabase.from('study_groups')
-                        .update({ avatar_url: null })
-                        .eq('id', currentGroup.id);
-                    
+                    await supabase.from('study_groups').update({ avatar_url: null }).eq('id', currentGroup.id);
                     currentGroup.avatar_url = null;
                     var initials = getInitials(currentGroup.name);
                     document.getElementById('chatAvatar').innerHTML = initials;
                     showToast('Avatar removed', 'success');
                     await loadMyGroups();
-                } catch(e) {
-                    showToast('Failed to remove avatar', 'error');
-                }
+                } catch(e) { showToast('Failed to remove avatar', 'error'); }
             } else {
-                // Creating new group, just clear the preview
                 croppedImageBlob = null;
                 document.getElementById('avatarPreview').innerHTML = '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>';
             }
             closeGroupAvatarModal();
         }
         
-        function previewAvatar(event) {
-            var file = event.target.files[0];
-            if (!file) return;
-            openGroupAvatarModal('create');
-            // Trigger the file select after modal opens
-            setTimeout(function() {
-                handleGroupAvatarSelect(event);
-            }, 100);
-        }
-        
+        // ============================================
+        // UI FUNCTIONS
+        // ============================================
         function setupEmojiPicker() {
             var html = '<div class="emoji-grid">';
-            for (var i = 0; i < EMOJIS.length; i++) {
-                html += '<div class="emoji-item" onclick="insertEmoji(\'' + EMOJIS[i] + '\')">' + EMOJIS[i] + '</div>';
-            }
+            for (var i = 0; i < EMOJIS.length; i++) html += '<div class="emoji-item" onclick="insertEmoji(\'' + EMOJIS[i] + '\')">' + EMOJIS[i] + '</div>';
             html += '</div>';
             document.getElementById('emojiPicker').innerHTML = html;
         }
         
-        function toggleEmojiPicker() {
-            document.getElementById('emojiPicker').classList.toggle('show');
-        }
-        
-        function insertEmoji(emoji) {
-            var input = document.getElementById('messageInput');
-            input.value += emoji;
-            input.focus();
-            toggleEmojiPicker();
-        }
-        
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('open');
-            document.getElementById('sidebarOverlay').classList.toggle('show');
-        }
-        
-        function toggleChatMenu(e) {
-            e.stopPropagation();
-            document.getElementById('chatMenu').classList.toggle('show');
-        }
-        
-        function closeChatMenu() {
-            document.getElementById('chatMenu').classList.remove('show');
-        }
-        
-        function backToGroups() {
-            document.getElementById('groupsPanel').classList.remove('hidden');
-            document.getElementById('chatPanel').classList.remove('show');
-        }
+        function toggleEmojiPicker() { document.getElementById('emojiPicker').classList.toggle('show'); }
+        function insertEmoji(emoji) { var input = document.getElementById('messageInput'); input.value += emoji; input.focus(); toggleEmojiPicker(); }
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('show'); }
+        function toggleChatMenu(e) { e.stopPropagation(); document.getElementById('chatMenu').classList.toggle('show'); }
+        function closeChatMenu() { document.getElementById('chatMenu').classList.remove('show'); }
+        function backToGroups() { document.getElementById('groupsPanel').classList.remove('hidden'); document.getElementById('chatPanel').classList.remove('show'); }
         
         function handleOutsideClick(e) {
-            if (!e.target.closest('.notification-wrapper')) {
-                document.getElementById('notificationDropdown').classList.remove('show');
-            }
-            if (!e.target.closest('.chat-header-actions')) {
-                closeChatMenu();
-            }
-            if (!e.target.closest('.emoji-btn')) {
-                document.getElementById('emojiPicker').classList.remove('show');
-            }
+            if (!e.target.closest('.notification-wrapper')) document.getElementById('notificationDropdown').classList.remove('show');
+            if (!e.target.closest('.chat-header-actions')) closeChatMenu();
+            if (!e.target.closest('.emoji-btn')) document.getElementById('emojiPicker').classList.remove('show');
         }
         
-        async function handleLogout() {
-            await updateOnlineStatus(false);
-            await supabase.auth.signOut();
-            window.location.href = 'index.html';
-        }
+        async function handleLogout() { await updateOnlineStatus(false); await supabase.auth.signOut(); window.location.href = 'index.html'; }
         
         // ============================================
         // START APP

@@ -131,9 +131,10 @@
         .notif-dropdown-item:hover { background: var(--gray-50); }
         .notif-dropdown-item.unread { background: #dbeafe; }
         .notif-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .notif-icon.friend { background: var(--green-light); color: var(--green); }
-        .notif-icon.message { background: var(--blue-light); color: var(--blue); }
-        .notif-icon svg { width: 20px; height: 20px; }
+        .notif-icon.friend { background: var(--green); color: white; }
+        .notif-icon.message { background: var(--blue); color: white; }
+        .notif-icon.group { background: #8b5cf6; color: white; }
+        .notif-icon svg { width: 18px; height: 18px; }
         .notif-content { flex: 1; min-width: 0; }
         .notif-content h4 { font-size: 14px; font-weight: 600; color: var(--gray-800); margin-bottom: 2px; }
         .notif-content p { font-size: 13px; color: var(--gray-500); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -680,8 +681,10 @@
                 return;
             }
             list.innerHTML = notifications.map(n => {
-                const iconClass = n.type.includes('friend') ? 'friend' : 'message';
-                return `<div class="notif-dropdown-item ${n.is_read ? '' : 'unread'}" onclick="handleNotifClick('${n.id}','${n.type}')"><div class="notif-icon ${iconClass}"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg></div><div class="notif-content"><h4>${escapeHtml(n.title)}</h4><p>${escapeHtml(n.body||'')}</p><div class="time">${formatTimeAgo(n.created_at)}</div></div></div>`;
+                const type = n.type || '';
+                const iconClass = type.includes('friend') ? 'friend' : type.includes('message') ? 'message' : 'group';
+                const iconSvg = iconClass === 'friend' ? '<path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>' : iconClass === 'message' ? '<path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>' : '<path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>';
+                return `<div class="notif-dropdown-item ${n.is_read ? '' : 'unread'}" onclick="handleNotifClick('${n.id}','${type}')"><div class="notif-icon ${iconClass}"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">${iconSvg}</svg></div><div class="notif-content"><h4>${escapeHtml(n.title || 'Notification')}</h4><p>${escapeHtml(n.body||'')}</p><div class="time">${formatTimeAgo(n.created_at)}</div></div></div>`;
             }).join('');
         }
 
@@ -690,7 +693,7 @@
             const n = notifications.find(x => x.id === id); if (n) n.is_read = true;
             renderNotifications();
             document.getElementById('notificationDropdown').classList.remove('show');
-            if (type === 'friend_request' || type === 'friend_accepted') window.location.href = 'friends.html';
+            if (type.includes('friend')) window.location.href = 'friends.html';
             else if (type.includes('message')) window.location.href = 'messages.html';
             else if (type.includes('group')) window.location.href = 'study-groups.html';
         }

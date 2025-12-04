@@ -75,7 +75,6 @@
         .search-box input { width: 100%; padding: 12px 16px 12px 44px; border: 1px solid var(--gray-200); border-radius: 12px; font-size: 14px; background: var(--white); transition: all 0.2s; font-family: inherit; }
         .search-box input:focus { outline: none; border-color: var(--navy); box-shadow: 0 0 0 3px rgba(26,54,93,0.1); }
         .search-box svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: var(--gray-400); }
-        .filter-group { display: flex; gap: 8px; }
         .filter-btn { padding: 10px 16px; border: 1px solid var(--gray-200); background: var(--white); border-radius: 10px; font-size: 13px; font-weight: 500; color: var(--gray-600); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
         .filter-btn:hover { border-color: var(--gray-300); background: var(--gray-50); }
         .filter-btn.active { border-color: var(--navy); background: var(--navy); color: var(--white); }
@@ -86,10 +85,6 @@
         .view-btn.active { background: var(--navy); }
         .view-btn.active svg { color: var(--white); }
         .view-btn svg { width: 18px; height: 18px; color: var(--gray-500); }
-        .tag-filter { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
-        .tag-chip { padding: 6px 14px; background: var(--white); border: 1px solid var(--gray-200); border-radius: 20px; font-size: 13px; color: var(--gray-600); cursor: pointer; transition: all 0.2s; }
-        .tag-chip:hover { border-color: var(--gray-300); }
-        .tag-chip.active { background: var(--navy); border-color: var(--navy); color: var(--white); }
         .notes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
         .notes-list { display: none; flex-direction: column; gap: 12px; }
         .notes-list.active { display: flex; }
@@ -111,15 +106,9 @@
         .note-action-btn { width: 28px; height: 28px; border: none; background: var(--gray-100); border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
         .note-action-btn:hover { background: var(--gray-200); }
         .note-action-btn.pinned { background: var(--yellow); color: var(--white); }
-        .note-action-btn.favorited { background: var(--red); color: var(--white); }
         .note-action-btn svg { width: 14px; height: 14px; }
         .note-preview { font-size: 14px; color: var(--gray-500); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 16px; }
         .note-meta { display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: var(--gray-400); }
-        .note-tag { padding: 4px 10px; background: var(--gray-100); border-radius: 6px; font-weight: 500; }
-        .note-icons { display: flex; gap: 8px; }
-        .note-icons svg { width: 14px; height: 14px; }
-        .note-icons .pinned { color: var(--yellow); }
-        .note-icons .favorited { color: var(--red); }
         .note-list-item { display: flex; align-items: center; gap: 16px; background: var(--white); border-radius: 12px; padding: 16px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); cursor: pointer; transition: all 0.2s; border-left: 4px solid transparent; }
         .note-list-item:hover { transform: translateX(4px); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
         .note-list-item.color-blue { border-left-color: var(--blue); }
@@ -133,6 +122,7 @@
         .note-list-title { font-size: 15px; font-weight: 600; color: var(--gray-800); margin-bottom: 4px; }
         .note-list-preview { font-size: 13px; color: var(--gray-500); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .note-list-meta { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+        .note-list-meta .pinned { color: var(--yellow); }
         .empty-state { text-align: center; padding: 80px 20px; }
         .empty-state svg { width: 80px; height: 80px; color: var(--gray-300); margin-bottom: 20px; }
         .empty-state h3 { font-size: 20px; font-weight: 600; color: var(--gray-700); margin-bottom: 8px; }
@@ -207,7 +197,6 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         body.dark-mode { background: #0f172a; }
         body.dark-mode .sidebar { background: #020617; }
-        body.dark-mode .main-content { background: #0f172a; }
         body.dark-mode .topbar { background: #1e293b; border-color: #334155; }
         body.dark-mode .page-title { color: var(--white); }
         body.dark-mode .search-box input, body.dark-mode .filter-btn, body.dark-mode .view-toggle, body.dark-mode .notif-btn { background: #1e293b; border-color: #334155; color: var(--gray-300); }
@@ -219,7 +208,6 @@
         body.dark-mode .form-input, body.dark-mode .toolbar-select { background: #0f172a; border-color: #334155; color: var(--white); }
         body.dark-mode .editor-content { background: #0f172a; border-color: #334155; color: var(--white); }
         body.dark-mode .editor-toolbar { background: #1e293b; border-color: #334155; }
-        body.dark-mode .tag-chip { background: #1e293b; border-color: #334155; color: var(--gray-300); }
         body.dark-mode .notif-dropdown { background: #1e293b; }
         body.dark-mode .notif-header { border-color: #334155; }
         body.dark-mode .notif-header h3 { color: var(--white); }
@@ -227,7 +215,7 @@
         body.dark-mode .notif-dropdown-item .notif-content h4 { color: var(--white); }
         body.dark-mode .notif-dropdown-item.unread { background: #1e3a5f; }
         @media (max-width: 900px) { .sidebar { transform: translateX(-100%); } .sidebar.open { transform: translateX(0); } .sidebar-overlay.show { display: block; } .main-content { margin-left: 0; } .menu-toggle { display: flex; } }
-        @media (max-width: 600px) { .topbar { padding: 12px 16px; } .content-area { padding: 16px; } .page-title { font-size: 18px; } .toolbar { flex-direction: column; align-items: stretch; } .search-box { max-width: none; } .notes-grid { grid-template-columns: 1fr; } .modal { max-height: 100vh; border-radius: 0; } .form-row { flex-direction: column; } .notif-dropdown { position: fixed; top: 60px; left: 16px; right: 16px; width: auto; } }
+        @media (max-width: 600px) { .topbar { padding: 12px 16px; } .content-area { padding: 16px; } .notes-grid { grid-template-columns: 1fr; } .modal { max-height: 100vh; border-radius: 0; } .form-row { flex-direction: column; } .notif-dropdown { position: fixed; top: 60px; left: 16px; right: 16px; width: auto; } }
     </style>
 </head>
 <body>
@@ -270,16 +258,12 @@
         <div class="content-area">
             <div class="toolbar">
                 <div class="search-box"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg><input type="text" id="searchInput" placeholder="Search notes..." oninput="filterNotes()"></div>
-                <div class="filter-group">
-                    <button class="filter-btn" id="pinnedFilter" onclick="toggleFilter('pinned')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>Pinned</button>
-                    <button class="filter-btn" id="favoritesFilter" onclick="toggleFilter('favorites')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>Favorites</button>
-                </div>
+                <button class="filter-btn" id="pinnedFilter" onclick="toggleFilter('pinned')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>Pinned</button>
                 <div class="view-toggle">
                     <button class="view-btn active" id="gridViewBtn" onclick="setView('grid')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg></button>
                     <button class="view-btn" id="listViewBtn" onclick="setView('list')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg></button>
                 </div>
             </div>
-            <div class="tag-filter" id="tagFilter"><button class="tag-chip active" data-tag="all" onclick="filterByTag('all')">All</button></div>
             <div class="notes-grid active" id="notesGrid"></div>
             <div class="notes-list" id="notesList"></div>
             <div class="empty-state" id="emptyState" style="display:none;"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg><h3>No notes yet</h3><p>Click "New Note" to create your first note</p></div>
@@ -291,19 +275,16 @@
             <div class="modal-header"><h2 id="modalTitle">New Note</h2><button class="modal-close" onclick="closeNoteModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button></div>
             <div class="modal-body">
                 <div class="form-group"><label class="form-label">Title</label><input type="text" class="form-input" id="noteTitle" placeholder="Note title..."></div>
-                <div class="form-row">
-                    <div class="form-group"><label class="form-label">Tag (optional)</label><input type="text" class="form-input" id="noteTag" placeholder="e.g. Math, CSC101, Personal..."></div>
-                    <div class="form-group"><label class="form-label">Color</label>
-                        <div class="color-picker">
-                            <div class="color-option default active" data-color="default" onclick="selectColor('default')"></div>
-                            <div class="color-option blue" data-color="blue" onclick="selectColor('blue')"></div>
-                            <div class="color-option green" data-color="green" onclick="selectColor('green')"></div>
-                            <div class="color-option yellow" data-color="yellow" onclick="selectColor('yellow')"></div>
-                            <div class="color-option orange" data-color="orange" onclick="selectColor('orange')"></div>
-                            <div class="color-option red" data-color="red" onclick="selectColor('red')"></div>
-                            <div class="color-option purple" data-color="purple" onclick="selectColor('purple')"></div>
-                            <div class="color-option pink" data-color="pink" onclick="selectColor('pink')"></div>
-                        </div>
+                <div class="form-group"><label class="form-label">Color</label>
+                    <div class="color-picker">
+                        <div class="color-option default active" data-color="default" onclick="selectColor('default')"></div>
+                        <div class="color-option blue" data-color="blue" onclick="selectColor('blue')"></div>
+                        <div class="color-option green" data-color="green" onclick="selectColor('green')"></div>
+                        <div class="color-option yellow" data-color="yellow" onclick="selectColor('yellow')"></div>
+                        <div class="color-option orange" data-color="orange" onclick="selectColor('orange')"></div>
+                        <div class="color-option red" data-color="red" onclick="selectColor('red')"></div>
+                        <div class="color-option purple" data-color="purple" onclick="selectColor('purple')"></div>
+                        <div class="color-option pink" data-color="pink" onclick="selectColor('pink')"></div>
                     </div>
                 </div>
                 <div class="form-group">
@@ -320,7 +301,7 @@
                             <button type="button" class="toolbar-btn" onclick="execCmd('strikeThrough')" title="Strikethrough"><s>S</s></button>
                         </div>
                         <div class="toolbar-group highlight-wrapper">
-                            <button type="button" class="toolbar-btn" id="highlightBtn" onclick="toggleHighlight(event)" title="Highlight"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.39m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.764m3.42 3.42a6.776 6.776 0 00-3.42-3.42"/></svg></button>
+                            <button type="button" class="toolbar-btn" id="highlightBtn" onclick="toggleHighlightPicker(event)" title="Highlight"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.39m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.764m3.42 3.42a6.776 6.776 0 00-3.42-3.42"/></svg></button>
                             <div class="highlight-picker" id="highlightPicker">
                                 <div class="highlight-color" style="background:#fef08a;" onclick="applyHighlight('#fef08a')" title="Yellow"></div>
                                 <div class="highlight-color" style="background:#bbf7d0;" onclick="applyHighlight('#bbf7d0')" title="Green"></div>
@@ -329,7 +310,7 @@
                                 <div class="highlight-color" style="background:#e9d5ff;" onclick="applyHighlight('#e9d5ff')" title="Purple"></div>
                                 <div class="highlight-color" style="background:#fed7aa;" onclick="applyHighlight('#fed7aa')" title="Orange"></div>
                                 <div class="highlight-color" style="background:#fbcfe8;" onclick="applyHighlight('#fbcfe8')" title="Pink"></div>
-                                <div class="highlight-color" style="background:#fff;border:1px solid #ccc;" onclick="applyHighlight('transparent')" title="Remove">✕</div>
+                                <div class="highlight-color" style="background:#fff;border:1px solid #ccc;" onclick="removeHighlight()" title="Remove">✕</div>
                             </div>
                         </div>
                         <div class="toolbar-group">
@@ -362,7 +343,7 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndldXh0d21hcW1iaHNranBqZHlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NTYzMTcsImV4cCI6MjA4MDMzMjMxN30.J-0Nd0MY6-g_ltbBNHwOulqZuQfb8mKIRgx0dAaJ76o';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let currentUser = null, notes = [], notifications = [], currentNoteId = null, selectedColor = 'default', currentView = 'grid', currentFilter = null, currentTag = 'all', deleteNoteId = null;
+        let currentUser = null, notes = [], notifications = [], currentNoteId = null, selectedColor = 'default', currentView = 'grid', currentFilter = null, deleteNoteId = null, savedSelection = null;
 
         async function init() {
             try {
@@ -385,27 +366,15 @@
                 const { data, error } = await supabase.from('notes').select('*').eq('user_id', currentUser.id).order('is_pinned', { ascending: false }).order('updated_at', { ascending: false });
                 if (error) throw error;
                 notes = data || [];
-                updateTags();
                 renderNotes();
             } catch (e) { console.error('Load notes error:', e); }
-        }
-
-        function updateTags() {
-            const tags = [];
-            notes.forEach(n => { if (n.tag && !tags.includes(n.tag)) tags.push(n.tag); });
-            tags.sort();
-            let html = '<button class="tag-chip ' + (currentTag === 'all' ? 'active' : '') + '" data-tag="all" onclick="filterByTag(\'all\')">All</button>';
-            tags.forEach(t => { html += '<button class="tag-chip ' + (currentTag === t ? 'active' : '') + '" data-tag="' + escapeHtml(t) + '" onclick="filterByTag(\'' + escapeHtml(t).replace(/'/g, "\\'") + '\')">' + escapeHtml(t) + '</button>'; });
-            document.getElementById('tagFilter').innerHTML = html;
         }
 
         function renderNotes() {
             let filtered = notes.slice();
             const query = document.getElementById('searchInput').value.toLowerCase();
             if (query) filtered = filtered.filter(n => (n.title && n.title.toLowerCase().includes(query)) || (n.content && n.content.toLowerCase().includes(query)));
-            if (currentTag !== 'all') filtered = filtered.filter(n => n.tag === currentTag);
             if (currentFilter === 'pinned') filtered = filtered.filter(n => n.is_pinned);
-            else if (currentFilter === 'favorites') filtered = filtered.filter(n => n.is_favorite);
 
             if (filtered.length === 0) { document.getElementById('emptyState').style.display = 'block'; document.getElementById('notesGrid').innerHTML = ''; document.getElementById('notesList').innerHTML = ''; return; }
             document.getElementById('emptyState').style.display = 'none';
@@ -419,11 +388,10 @@
                     '<div class="note-header"><div class="note-title">' + escapeHtml(note.title || 'Untitled') + '</div>' +
                     '<div class="note-actions">' +
                     '<button class="note-action-btn ' + (note.is_pinned ? 'pinned' : '') + '" onclick="event.stopPropagation();togglePin(\'' + note.id + '\')" title="Pin"><svg fill="' + (note.is_pinned ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg></button>' +
-                    '<button class="note-action-btn ' + (note.is_favorite ? 'favorited' : '') + '" onclick="event.stopPropagation();toggleFavorite(\'' + note.id + '\')" title="Favorite"><svg fill="' + (note.is_favorite ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg></button>' +
                     '<button class="note-action-btn" onclick="event.stopPropagation();openDeleteConfirm(\'' + note.id + '\')" title="Delete"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>' +
                     '</div></div>' +
                     '<div class="note-preview">' + escapeHtml(preview) + '</div>' +
-                    '<div class="note-meta">' + (note.tag ? '<span class="note-tag">' + escapeHtml(note.tag) + '</span>' : '<span></span>') + '<span>' + timeAgo + '</span></div></div>';
+                    '<div class="note-meta"><span></span><span>' + timeAgo + '</span></div></div>';
             });
             document.getElementById('notesGrid').innerHTML = gridHtml;
 
@@ -434,24 +402,22 @@
                 const colorClass = note.color && note.color !== 'default' ? 'color-' + note.color : '';
                 listHtml += '<div class="note-list-item ' + colorClass + '" onclick="openNoteModal(\'' + note.id + '\')">' +
                     '<div class="note-list-content"><div class="note-list-title">' + escapeHtml(note.title || 'Untitled') + '</div><div class="note-list-preview">' + escapeHtml(preview) + '</div></div>' +
-                    '<div class="note-list-meta"><div class="note-icons">' +
-                    (note.is_pinned ? '<svg class="pinned" fill="currentColor" viewBox="0 0 24 24"><path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>' : '') +
-                    (note.is_favorite ? '<svg class="favorited" fill="currentColor" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>' : '') +
-                    '</div><span style="font-size:12px;color:var(--gray-400);">' + timeAgo + '</span></div></div>';
+                    '<div class="note-list-meta">' +
+                    (note.is_pinned ? '<svg class="pinned" fill="currentColor" viewBox="0 0 24 24" width="14" height="14"><path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>' : '') +
+                    '<span style="font-size:12px;color:var(--gray-400);">' + timeAgo + '</span></div></div>';
             });
             document.getElementById('notesList').innerHTML = listHtml;
         }
 
         function filterNotes() { renderNotes(); }
         function toggleFilter(filter) { if (currentFilter === filter) { currentFilter = null; document.getElementById(filter + 'Filter').classList.remove('active'); } else { if (currentFilter) document.getElementById(currentFilter + 'Filter').classList.remove('active'); currentFilter = filter; document.getElementById(filter + 'Filter').classList.add('active'); } renderNotes(); }
-        function filterByTag(tag) { currentTag = tag; document.querySelectorAll('.tag-chip').forEach(c => c.classList.toggle('active', c.dataset.tag === tag)); renderNotes(); }
         function setView(view) { currentView = view; document.getElementById('gridViewBtn').classList.toggle('active', view === 'grid'); document.getElementById('listViewBtn').classList.toggle('active', view === 'list'); document.getElementById('notesGrid').classList.toggle('active', view === 'grid'); document.getElementById('notesList').classList.toggle('active', view === 'list'); }
 
         function openNoteModal(noteId) {
             currentNoteId = noteId || null;
-            const title = document.getElementById('noteTitle'), tag = document.getElementById('noteTag'), content = document.getElementById('noteContent');
-            if (noteId) { document.getElementById('modalTitle').textContent = 'Edit Note'; const note = notes.find(n => n.id === noteId); if (note) { title.value = note.title || ''; tag.value = note.tag || ''; content.innerHTML = note.content || ''; selectColor(note.color || 'default'); } }
-            else { document.getElementById('modalTitle').textContent = 'New Note'; title.value = ''; tag.value = ''; content.innerHTML = ''; selectColor('default'); }
+            const title = document.getElementById('noteTitle'), content = document.getElementById('noteContent');
+            if (noteId) { document.getElementById('modalTitle').textContent = 'Edit Note'; const note = notes.find(n => n.id === noteId); if (note) { title.value = note.title || ''; content.innerHTML = note.content || ''; selectColor(note.color || 'default'); } }
+            else { document.getElementById('modalTitle').textContent = 'New Note'; title.value = ''; content.innerHTML = ''; selectColor('default'); }
             updateWordCount();
             document.getElementById('noteModal').classList.add('show');
             title.focus();
@@ -461,11 +427,10 @@
 
         async function saveNote() {
             const title = document.getElementById('noteTitle').value.trim();
-            const tag = document.getElementById('noteTag').value.trim();
             const content = document.getElementById('noteContent').innerHTML;
             if (!title && !stripHtml(content).trim()) { showToast('Please add a title or content', 'error'); return; }
             try {
-                const noteData = { title: title || 'Untitled', content: content, color: selectedColor, tag: tag || null, updated_at: new Date().toISOString() };
+                const noteData = { title: title || 'Untitled', content: content, color: selectedColor, updated_at: new Date().toISOString() };
                 if (currentNoteId) { const { error } = await supabase.from('notes').update(noteData).eq('id', currentNoteId); if (error) throw error; showToast('Note updated!', 'success'); }
                 else { noteData.user_id = currentUser.id; const { error } = await supabase.from('notes').insert(noteData); if (error) throw error; showToast('Note created!', 'success'); }
                 closeNoteModal(); await loadNotes();
@@ -473,17 +438,57 @@
         }
 
         async function togglePin(noteId) { const note = notes.find(n => n.id === noteId); if (!note) return; try { await supabase.from('notes').update({ is_pinned: !note.is_pinned, updated_at: new Date().toISOString() }).eq('id', noteId); showToast(note.is_pinned ? 'Unpinned' : 'Pinned', 'success'); await loadNotes(); } catch (e) { showToast('Failed', 'error'); } }
-        async function toggleFavorite(noteId) { const note = notes.find(n => n.id === noteId); if (!note) return; try { await supabase.from('notes').update({ is_favorite: !note.is_favorite, updated_at: new Date().toISOString() }).eq('id', noteId); showToast(note.is_favorite ? 'Removed from favorites' : 'Added to favorites', 'success'); await loadNotes(); } catch (e) { showToast('Failed', 'error'); } }
         function openDeleteConfirm(noteId) { deleteNoteId = noteId; document.getElementById('confirmModal').classList.add('show'); }
         function closeConfirmModal() { document.getElementById('confirmModal').classList.remove('show'); deleteNoteId = null; }
         async function confirmDelete() { if (!deleteNoteId) return; try { await supabase.from('notes').delete().eq('id', deleteNoteId); showToast('Deleted', 'success'); closeConfirmModal(); await loadNotes(); } catch (e) { showToast('Failed', 'error'); } }
 
+        // Rich Text Editor - Fixed highlight
         function execCmd(cmd, value) { document.execCommand(cmd, false, value || null); document.getElementById('noteContent').focus(); }
-        function toggleHighlight(e) { e.stopPropagation(); document.getElementById('highlightPicker').classList.toggle('show'); }
-        function applyHighlight(color) { document.execCommand('backColor', false, color); document.getElementById('highlightPicker').classList.remove('show'); document.getElementById('noteContent').focus(); }
-        function setupEditor() { const editor = document.getElementById('noteContent'); editor.addEventListener('input', updateWordCount); editor.addEventListener('keydown', e => { if (e.key === 'Tab') { e.preventDefault(); document.execCommand('insertText', false, '    '); } }); document.addEventListener('click', e => { const picker = document.getElementById('highlightPicker'), btn = document.getElementById('highlightBtn'); if (!picker.contains(e.target) && !btn.contains(e.target)) picker.classList.remove('show'); }); }
+        
+        function saveSelection() {
+            const sel = window.getSelection();
+            if (sel.rangeCount > 0) { savedSelection = sel.getRangeAt(0).cloneRange(); }
+        }
+        
+        function restoreSelection() {
+            if (savedSelection) {
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(savedSelection);
+            }
+        }
+        
+        function toggleHighlightPicker(e) {
+            e.stopPropagation();
+            saveSelection();
+            document.getElementById('highlightPicker').classList.toggle('show');
+        }
+        
+        function applyHighlight(color) {
+            restoreSelection();
+            document.execCommand('hiliteColor', false, color);
+            document.getElementById('highlightPicker').classList.remove('show');
+            document.getElementById('noteContent').focus();
+        }
+        
+        function removeHighlight() {
+            restoreSelection();
+            document.execCommand('hiliteColor', false, 'transparent');
+            document.getElementById('highlightPicker').classList.remove('show');
+            document.getElementById('noteContent').focus();
+        }
+        
+        function setupEditor() {
+            const editor = document.getElementById('noteContent');
+            editor.addEventListener('input', updateWordCount);
+            editor.addEventListener('mouseup', saveSelection);
+            editor.addEventListener('keyup', saveSelection);
+            editor.addEventListener('keydown', e => { if (e.key === 'Tab') { e.preventDefault(); document.execCommand('insertText', false, '    '); } });
+            document.addEventListener('click', e => { const picker = document.getElementById('highlightPicker'), btn = document.getElementById('highlightBtn'); if (!picker.contains(e.target) && !btn.contains(e.target)) picker.classList.remove('show'); });
+        }
         function updateWordCount() { const text = document.getElementById('noteContent').innerText || ''; const words = text.trim().split(/\s+/).filter(w => w.length > 0).length; document.getElementById('wordCount').textContent = words + ' word' + (words !== 1 ? 's' : ''); }
 
+        // Notifications with consistent styling
         async function loadNotifications() { try { const { data } = await supabase.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(20); notifications = data || []; renderNotifications(); } catch (e) {} }
         function renderNotifications() {
             const list = document.getElementById('notifList'), badge = document.getElementById('notifBadge');
@@ -491,12 +496,13 @@
             if (unread > 0) { badge.textContent = unread > 9 ? '9+' : unread; badge.style.display = 'flex'; } else { badge.style.display = 'none'; }
             if (notifications.length === 0) { list.innerHTML = '<div class="notif-empty"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg><p>No notifications</p></div>'; return; }
             list.innerHTML = notifications.map(n => {
-                const iconClass = (n.type || '').includes('friend') ? 'friend' : (n.type || '').includes('message') ? 'message' : 'group';
+                const type = n.type || '';
+                const iconClass = type.includes('friend') ? 'friend' : type.includes('message') ? 'message' : 'group';
                 const iconSvg = iconClass === 'friend' ? '<path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>' : iconClass === 'message' ? '<path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>' : '<path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>';
-                return '<div class="notif-dropdown-item ' + (n.is_read ? '' : 'unread') + '" onclick="handleNotifClick(\'' + n.id + '\',\'' + (n.type || '') + '\')"><div class="notif-icon ' + iconClass + '"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">' + iconSvg + '</svg></div><div class="notif-content"><h4>' + escapeHtml(n.title || 'Notification') + '</h4><p>' + escapeHtml(n.body || '') + '</p><div class="time">' + formatTimeAgo(n.created_at) + '</div></div></div>';
+                return '<div class="notif-dropdown-item ' + (n.is_read ? '' : 'unread') + '" onclick="handleNotifClick(\'' + n.id + '\',\'' + type + '\')"><div class="notif-icon ' + iconClass + '"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">' + iconSvg + '</svg></div><div class="notif-content"><h4>' + escapeHtml(n.title || 'Notification') + '</h4><p>' + escapeHtml(n.body || '') + '</p><div class="time">' + formatTimeAgo(n.created_at) + '</div></div></div>';
             }).join('');
         }
-        async function handleNotifClick(id, type) { await supabase.from('notifications').update({ is_read: true }).eq('id', id); const n = notifications.find(x => x.id === id); if (n) n.is_read = true; renderNotifications(); document.getElementById('notifDropdown').classList.remove('show'); if (type === 'friend_request' || type === 'friend_accepted') window.location.href = 'friends.html'; else if (type === 'message' || type === 'new_message') window.location.href = 'messages.html'; else if ((type || '').includes('group')) window.location.href = 'study-groups.html'; }
+        async function handleNotifClick(id, type) { await supabase.from('notifications').update({ is_read: true }).eq('id', id); const n = notifications.find(x => x.id === id); if (n) n.is_read = true; renderNotifications(); document.getElementById('notifDropdown').classList.remove('show'); if (type.includes('friend')) window.location.href = 'friends.html'; else if (type.includes('message')) window.location.href = 'messages.html'; else if (type.includes('group')) window.location.href = 'study-groups.html'; }
         async function markAllRead() { await supabase.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id); notifications.forEach(n => n.is_read = true); renderNotifications(); showToast('Marked all as read'); }
         function toggleNotifications(e) { e.stopPropagation(); document.getElementById('notifDropdown').classList.toggle('show'); }
 
@@ -510,8 +516,38 @@
             supabase.channel('notifications_changes').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: 'user_id=eq.' + currentUser.id }, p => { notifications.unshift(p.new); renderNotifications(); playNotificationSound(); showToast(p.new.title || 'New notification', 'success'); }).subscribe();
             supabase.channel('messages_badge').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: 'receiver_id=eq.' + currentUser.id }, () => loadSidebarBadges()).subscribe();
             supabase.channel('friend_requests_badge').on('postgres_changes', { event: '*', schema: 'public', table: 'friend_requests' }, () => loadSidebarBadges()).subscribe();
+            
+            // Friend online status - show toast when friends come online
+            supabase.channel('friends_online_status').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, async (p) => {
+                if (p.new.is_online && !p.old?.is_online) {
+                    // Check if this person is a friend
+                    const { data: friendship } = await supabase.from('friendships').select('*').or(`user_id.eq.${currentUser.id},friend_id.eq.${currentUser.id}`).or(`user_id.eq.${p.new.id},friend_id.eq.${p.new.id}`).maybeSingle();
+                    if (friendship) {
+                        const name = p.new.full_name || p.new.first_name || 'A friend';
+                        showFriendOnlineToast(name);
+                    }
+                }
+            }).subscribe();
         }
         function playNotificationSound() { try { const a = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleT4HJIvS6qN+bziItda6h2Q+SZG7w+W3mYdXUJOuwOq8gX5+Ynt+sPfJn0g='); a.volume = 0.3; a.play().catch(() => {}); } catch (e) {} }
+        
+        function showFriendOnlineToast(friendName) {
+            const existing = document.querySelector('.friend-online-toast');
+            if (existing) existing.remove();
+            const toast = document.createElement('div');
+            toast.className = 'friend-online-toast';
+            toast.innerHTML = '<div style="width:10px;height:10px;background:#22c55e;border-radius:50%;animation:pulse 1s infinite;"></div><span><strong>' + escapeHtml(friendName) + '</strong> is now online</span>';
+            toast.style.cssText = 'position:fixed;top:80px;right:20px;background:linear-gradient(135deg,#065f46,#047857);color:white;padding:14px 20px;border-radius:12px;display:flex;align-items:center;gap:12px;z-index:9999;animation:slideInRight 0.3s ease;box-shadow:0 4px 20px rgba(4,120,87,0.4);font-size:14px;';
+            if (!document.getElementById('friendToastStyles')) {
+                const style = document.createElement('style');
+                style.id = 'friendToastStyles';
+                style.textContent = '@keyframes slideInRight{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}';
+                document.head.appendChild(style);
+            }
+            document.body.appendChild(toast);
+            playNotificationSound();
+            setTimeout(() => { toast.style.animation = 'slideInRight 0.3s ease reverse'; setTimeout(() => toast.remove(), 300); }, 4000);
+        }
 
         function escapeHtml(t) { if (!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
         function stripHtml(h) { const t = document.createElement('div'); t.innerHTML = h; return t.textContent || t.innerText || ''; }

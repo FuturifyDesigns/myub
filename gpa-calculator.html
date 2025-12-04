@@ -1548,7 +1548,7 @@
         }
         async function handleNotifClickModal(id, type) { await supabase.from('notifications').update({ is_read: true }).eq('id', id); closeNotificationsModal(); if (type.includes('friend')) window.location.href = 'friends.html'; else if (type.includes('message')) window.location.href = 'messages.html'; else if (type.includes('group')) window.location.href = 'study-groups.html'; }
         async function markAllNotificationsReadModal() { await supabase.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id); notifications.forEach(n => n.is_read = true); renderNotifications(); await loadAllNotifications(); }
-        async function clearAllNotifications() { if (!confirm('Clear all notifications?')) return; await supabase.from('notifications').delete().eq('user_id', currentUser.id); notifications = []; renderNotifications(); await loadAllNotifications(); }
+        async function clearAllNotifications() { if (!confirm('Clear all notifications?')) return; const { error } = await supabase.from('notifications').delete().eq('user_id', currentUser.id); if (error) { console.error('Delete failed:', error); showToast('Failed to clear. Check database permissions.', 'error'); return; } notifications = []; renderNotifications(); loadAllNotifications(); closeNotificationsModal(); showToast('Notifications cleared', 'success'); }
 
         init();
     </script>

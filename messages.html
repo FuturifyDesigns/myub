@@ -507,12 +507,25 @@
             document.getElementById('confirmMessage').textContent = 'Clear all messages in this conversation? (Only clears for you)';
             confirmCallback = async () => { 
                 // Only mark messages as deleted for the current user
-                // We need to track per-user deletion - for now, only delete messages sent by current user
-                // and mark received messages as "deleted" only in local state
                 await supabase.from('messages').update({ is_deleted: true }).eq('sender_id', currentUser.id).eq('receiver_id', currentConversation); 
+                
+                // Clear local messages
                 messages = []; 
-                renderMessages(); 
-                await loadConversations();
+                renderMessages();
+                
+                // Remove conversation from sidebar since all messages are cleared
+                conversations = conversations.filter(c => c.oderId !== currentConversation && c.user?.id !== currentConversation);
+                renderConversations();
+                
+                // Reset chat panel to empty state
+                currentConversation = null;
+                currentChatUser = null;
+                document.getElementById('chatHeader').style.display = 'none';
+                document.getElementById('chatMessages').style.display = 'none';
+                document.getElementById('chatInputArea').style.display = 'none';
+                document.getElementById('chatBlocked').style.display = 'none';
+                document.getElementById('chatEmpty').style.display = 'flex';
+                
                 showToast('Chat cleared'); 
                 closeConfirmModal(); 
                 closeChatMenu(); 
@@ -607,7 +620,7 @@
         function playNotificationSound() {
             try {
                 const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1bdHiAg4F9eXmCh4iGhIOEhYSDgn98fH+ChYaGhoWEhISDgYB+fn+BhIWGhoaFhIOCgX9+fn+Bg4WGhoaFhYOCgH5+f4GDhYaHhoWEg4KAfn5/gYOFhoeGhYSDgX9+fn+Bg4WGhoWFhIOCgH5+f4GDhYaGhoWEg4F/fn5/gYOFhoaGhYSDgn9+fn+Bg4WGhoaFhIOBf35+f4GDhYaGhoWEg4J/fn5/gYOFhoaGhYSDgX9+fn+Bg4WGhoaFhIOCf35+f4GDhYaGhoWEg4F/fn5/gYOFhoaGhYSDgn9+fn+Bg4WGhoaFhIOBf35+f4GDhYaGhoWEg4J/fn5/gYOFhoaGhYSDgX9+fn+Bg4WGhoWFhIOCgH5+f4GDhYaGhoWEg4F/fn5/gYOFhoaGhYSDgn9+fn+Bg4WGhoaFhIOBf35+f4GDhYaGhoWEg4J/fn5/gYOFhoaGhYSDgX9+fn+Bg4WGhoaFhIOCf35+f4GDhYaGhoWEg4F/fn5/gYOFhoaGhYSDgn9+fn+Bg4WGhoaFhIOBf35+f4GDhYaGhoWEg4J/fn5/gYOFhoaGhYSDgX9+fn+Bg4WGhoaFhIOCf35+f4GDhYaGhoWEg4F/fn5/gYOFhoaGhYSDgn9+fn+Bg4WGhoaFhIOBf35+f4GDhYaGhoWEg4J/fn5/gYOFhoaGhYSDgX9+fn+Bg4WGhoaFhIOCf35+');
-                audio.volume = 0.8;
+                audio.volume = 0.3;
                 audio.play().catch(() => {});
             } catch (e) {}
         }

@@ -635,24 +635,30 @@
 
         function renderRequests() {
             const inContainer = document.getElementById('incomingRequests');
-            document.getElementById('incomingCount').textContent = `${incomingRequests.length} request${incomingRequests.length !== 1 ? 's' : ''}`;
-            if (incomingRequests.length === 0) {
-                inContainer.innerHTML = '<div class="empty-state" style="padding:30px;"><p>No incoming requests</p></div>';
-            } else {
-                inContainer.innerHTML = incomingRequests.map(r => {
-                    const s = r.sender, name = s.full_name || `${s.first_name} ${s.last_name}`, initials = getInitials(name);
-                    return `<div class="request-card"><div class="request-type">Friend Request</div><div class="request-header"><div class="friend-avatar" style="width:48px;height:48px;font-size:16px;">${s.avatar_url ? `<img src="${s.avatar_url}">` : initials}<div class="online-indicator ${s.is_online ? '' : 'offline'}"></div></div><div class="friend-info"><div class="friend-name">${escapeHtml(name)}</div><div class="friend-program">${escapeHtml(s.program_name||'Student')}</div><div class="friend-meta">${formatTimeAgo(r.created_at)}</div></div></div><div class="request-actions"><button class="btn btn-success btn-sm" onclick="acceptRequest('${r.id}','${s.id}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>Accept</button><button class="btn btn-danger btn-sm" onclick="declineRequest('${r.id}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>Decline</button></div></div>`;
-                }).join('');
+            const inCountEl = document.getElementById('incomingCount');
+            if (inCountEl) inCountEl.textContent = `${incomingRequests.length} request${incomingRequests.length !== 1 ? 's' : ''}`;
+            if (inContainer) {
+                if (incomingRequests.length === 0) {
+                    inContainer.innerHTML = '<div class="empty-state" style="padding:30px;"><p>No incoming requests</p></div>';
+                } else {
+                    inContainer.innerHTML = incomingRequests.map(r => {
+                        const s = r.sender, name = s.full_name || `${s.first_name} ${s.last_name}`, initials = getInitials(name);
+                        return `<div class="request-card"><div class="request-type">Friend Request</div><div class="request-header"><div class="friend-avatar" style="width:48px;height:48px;font-size:16px;">${s.avatar_url ? `<img src="${s.avatar_url}">` : initials}<div class="online-indicator ${s.is_online ? '' : 'offline'}"></div></div><div class="friend-info"><div class="friend-name">${escapeHtml(name)}</div><div class="friend-program">${escapeHtml(s.program_name||'Student')}</div><div class="friend-meta">${formatTimeAgo(r.created_at)}</div></div></div><div class="request-actions"><button class="btn btn-success btn-sm" onclick="acceptRequest('${r.id}','${s.id}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>Accept</button><button class="btn btn-danger btn-sm" onclick="declineRequest('${r.id}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>Decline</button></div></div>`;
+                    }).join('');
+                }
             }
             const outContainer = document.getElementById('outgoingRequests');
-            document.getElementById('outgoingCount').textContent = `${outgoingRequests.length} pending`;
-            if (outgoingRequests.length === 0) {
-                outContainer.innerHTML = '<div class="empty-state" style="padding:30px;"><p>No pending sent requests</p></div>';
-            } else {
-                outContainer.innerHTML = outgoingRequests.map(r => {
-                    const rec = r.receiver, name = rec.full_name || `${rec.first_name} ${rec.last_name}`, initials = getInitials(name);
-                    return `<div class="request-card outgoing"><div class="request-type">Sent Request</div><div class="request-header"><div class="friend-avatar" style="width:48px;height:48px;font-size:16px;">${rec.avatar_url ? `<img src="${rec.avatar_url}">` : initials}</div><div class="friend-info"><div class="friend-name">${escapeHtml(name)}</div><div class="friend-program">${escapeHtml(rec.program_name||'Student')}</div><div class="friend-meta">Sent ${formatTimeAgo(r.created_at)}</div></div></div><div class="request-actions"><button class="btn btn-secondary btn-sm" onclick="cancelRequest('${r.id}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>Cancel</button></div></div>`;
-                }).join('');
+            const outCountEl = document.getElementById('outgoingCount');
+            if (outCountEl) outCountEl.textContent = `${outgoingRequests.length} pending`;
+            if (outContainer) {
+                if (outgoingRequests.length === 0) {
+                    outContainer.innerHTML = '<div class="empty-state" style="padding:30px;"><p>No pending sent requests</p></div>';
+                } else {
+                    outContainer.innerHTML = outgoingRequests.map(r => {
+                        const rec = r.receiver, name = rec.full_name || `${rec.first_name} ${rec.last_name}`, initials = getInitials(name);
+                        return `<div class="request-card outgoing"><div class="request-type">Sent Request</div><div class="request-header"><div class="friend-avatar" style="width:48px;height:48px;font-size:16px;">${rec.avatar_url ? `<img src="${rec.avatar_url}">` : initials}</div><div class="friend-info"><div class="friend-name">${escapeHtml(name)}</div><div class="friend-program">${escapeHtml(rec.program_name||'Student')}</div><div class="friend-meta">Sent ${formatTimeAgo(r.created_at)}</div></div></div><div class="request-actions"><button class="btn btn-secondary btn-sm" onclick="cancelRequest('${r.id}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>Cancel</button></div></div>`;
+                    }).join('');
+                }
             }
             const count = incomingRequests.length;
             const badge = document.getElementById('requestsCount');
@@ -812,7 +818,7 @@
         function playNotificationSound() {
             try {
                 const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1bdHiAg4F9eXmCh4iGhIOEhYSDgn98fH+ChYaGhoWEhISDgYB+fn+BhIWGhoaFhIOCgX9+fn+Bg4WGhoaFhYOCgH5+f4GDhYaHhoWEg4KAfn5/gYOFhoeGhYSDgX9+fn+Bg4WGhoWFhIOCgH5+f4GDhYaGhoWEg4F/fn5/gYOFhoaGhYSDgn9+fn+Bg4WGhoaFhIOBf35+f4GDhYaGhoWEg4J/fn5/gYOFhoaGhYSDgX9+fn+Bg4WGhoaFhIOCf35+f4GDhYaGhoWEg4F/fn5/gYOFhoaGhYSDgn9+fn+Bg4WGhoaFhIOBf35+f4GDhYaGhoWEg4J/fn5/gYOFhoaGhYSDgX9+fn+Bg4WGhoWFhIOCgH5+f4GDhYaGhoWEg4F/fn5/gYOFhoaGhYSDgn9+fn+Bg4WGhoaFhIOBf35+f4GDhYaGhoWEg4J/fn5/gYOFhoaGhYSDgX9+fn+Bg4WGhoaFhIOCf35+f4GDhYaGhoWEg4F/fn5/gYOFhoaGhYSDgn9+fn+Bg4WGhoaFhIOBf35+f4GDhYaGhoWEg4J/fn5/gYOFhoaGhYSDgX9+fn+Bg4WGhoaFhIOCf35+');
-                audio.volume = 0.8;
+                audio.volume = 0.3;
                 audio.play().catch(() => {});
             } catch (e) {}
         }

@@ -952,12 +952,34 @@
         
         async function loadFriends() {
             try {
-                var result = await supabase.from('friendships').select('user_id, friend_id, profiles!friendships_friend_id_fkey(*)').eq('status', 'accepted').or('user_id.eq.' + currentUser.id + ',friend_id.eq.' + currentUser.id);
-                friends = (result.data || []).map(function(f) {
-                    if (f.user_id === currentUser.id) return Object.assign({}, f.profiles, { id: f.friend_id });
-                    return Object.assign({}, f.profiles, { id: f.user_id });
-                }).filter(function(f) { return f && f.id; });
-            } catch(e) {}
+                // First get friendships where user is the requester
+                var result1 = await supabase
+                    .from('friendships')
+                    .select('user_id, friend_id')
+                    .eq('status', 'accepted')
+                    .eq('user_id', currentUser.id);
+                
+                // Then get friendships where user is the friend
+                var result2 = await supabase
+                    .from('friendships')
+                    .select('user_id, friend_id')
+                    .eq('status', 'accepted')
+                    .eq('friend_id', currentUser.id);
+                
+                var friendIds = [];
+                (result1.data || []).forEach(function(f) { friendIds.push(f.friend_id); });
+                (result2.data || []).forEach(function(f) { friendIds.push(f.user_id); });
+                
+                if (friendIds.length > 0) {
+                    var profilesResult = await supabase
+                        .from('profiles')
+                        .select('*')
+                        .in('id', friendIds);
+                    friends = profilesResult.data || [];
+                } else {
+                    friends = [];
+                }
+            } catch(e) { console.error('loadFriends error:', e); }
         }
         
         async function loadBlockedUsers() {
@@ -1368,11 +1390,18 @@
             
             searchTimeout = setTimeout(async function() {
                 try {
-                    var result = await supabase.from('profiles').select('id, first_name, last_name, avatar_url, program').or('first_name.ilike.%' + query + '%,last_name.ilike.%' + query + '%').neq('id', currentUser.id).limit(10);
+                    // Search by first_name OR last_name using textSearch or simple ilike
+                    var result = await supabase
+                        .from('profiles')
+                        .select('id, first_name, last_name, avatar_url, program')
+                        .or('first_name.ilike.*' + query + '*,last_name.ilike.*' + query + '*')
+                        .limit(20);
                     
+                    // Filter out current user and already selected members on client side
                     var users = (result.data || []).filter(function(u) {
+                        if (u.id === currentUser.id) return false;
                         return selectedMembers.findIndex(function(s) { return s.id === u.id; }) === -1;
-                    });
+                    }).slice(0, 10);
                     
                     if (users.length === 0) {
                         container.innerHTML = '<div class="user-search-empty">No users found</div>';
@@ -1394,7 +1423,7 @@
                         container.innerHTML = html;
                     }
                     container.style.display = 'block';
-                } catch(e) { console.error(e); }
+                } catch(e) { console.error('Search error:', e); container.innerHTML = '<div class="user-search-empty">Search failed</div>'; container.style.display = 'block'; }
             }, 300);
         }
         
@@ -1451,9 +1480,13 @@
                     var bannedIds = bannedUsers.map(function(b) { return b.user_id; });
                     var excludeIds = memberIds.concat(bannedIds);
                     
-                    var result = await supabase.from('profiles').select('id, first_name, last_name, avatar_url, program').or('first_name.ilike.%' + query + '%,last_name.ilike.%' + query + '%').limit(20);
+                    var result = await supabase
+                        .from('profiles')
+                        .select('id, first_name, last_name, avatar_url, program')
+                        .or('first_name.ilike.*' + query + '*,last_name.ilike.*' + query + '*')
+                        .limit(30);
                     
-                    var users = (result.data || []).filter(function(u) { return excludeIds.indexOf(u.id) === -1; });
+                    var users = (result.data || []).filter(function(u) { return excludeIds.indexOf(u.id) === -1; }).slice(0, 15);
                     
                     if (users.length === 0) {
                         container.innerHTML = '<div class="user-search-empty">No users found</div>';
@@ -1473,7 +1506,7 @@
                         }
                         container.innerHTML = html;
                     }
-                } catch(e) { console.error(e); }
+                } catch(e) { console.error('Search error:', e); }
             }, 300);
         }
         

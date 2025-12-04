@@ -1821,14 +1821,18 @@
 
             // Load pending tasks (with error handling for missing table)
             try {
-                const { count: tasksCount } = await supabase
+                const { count: tasksCount, error: tasksError } = await supabase
                     .from('schedules')
                     .select('*', { count: 'exact', head: true })
                     .eq('user_id', currentUser.id)
                     .eq('is_completed', false)
                     .gte('start_time', new Date().toISOString());
                 
-                document.getElementById('tasksCount').textContent = tasksCount || 0;
+                if (!tasksError) {
+                    document.getElementById('tasksCount').textContent = tasksCount || 0;
+                } else {
+                    document.getElementById('tasksCount').textContent = '0';
+                }
             } catch (e) {
                 document.getElementById('tasksCount').textContent = '0';
             }
@@ -1866,7 +1870,12 @@
                     .order('start_time', { ascending: true })
                     .limit(3);
 
-                if (error) return; // Table might not exist yet
+                if (error) {
+                    // Table might not exist yet - show placeholder
+                    const container = document.getElementById('scheduleList');
+                    if (container) container.innerHTML = '<div style="padding:20px;text-align:center;color:#94a3b8;font-size:14px;">No upcoming events</div>';
+                    return;
+                }
 
                 const container = document.getElementById('scheduleList');
                 if (!container) return;
@@ -1893,9 +1902,13 @@
                             </div>
                         `;
                     }).join('');
+                } else {
+                    container.innerHTML = '<div style="padding:20px;text-align:center;color:#94a3b8;font-size:14px;">No upcoming events</div>';
                 }
             } catch (e) {
                 // Silently handle error - schedules table might not exist
+                const container = document.getElementById('scheduleList');
+                if (container) container.innerHTML = '<div style="padding:20px;text-align:center;color:#94a3b8;font-size:14px;">No upcoming events</div>';
             }
         }
 

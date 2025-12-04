@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule - MyUB</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --navy: #1a365d; --navy-light: #2c5282; --navy-dark: #0f2744;
+            --red: #c41e3a; --white: #ffffff;
+            --gray-50: #f8fafc; --gray-100: #f1f5f9; --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1; --gray-400: #94a3b8; --gray-500: #64748b;
+            --gray-600: #475569; --gray-700: #334155; --gray-800: #1e293b;
+            --green: #22c55e; --yellow: #eab308; --blue: #3b82f6;
+            --purple: #8b5cf6; --pink: #ec4899; --orange: #f97316; --cyan: #06b6d4;
+        }
+        body { font-family: 'Outfit', sans-serif; background: var(--gray-100); min-height: 100vh; }
+        
+        /* Sidebar */
+        .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 260px; background: var(--navy-dark); padding: 20px 0; z-index: 100; transition: transform 0.3s ease; overflow-y: auto; }
+        .sidebar-header { padding: 0 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .sidebar-logo { display: flex; align-items: flex-end; gap: 2px; }
+        .sidebar-logo .logo-icon { position: relative; width: 32px; height: 36px; }
+        .sidebar-logo .logo-m { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); font-family: 'Sora', sans-serif; font-weight: 800; font-size: 28px; color: var(--white); line-height: 1; }
+        .sidebar-logo .cap { position: absolute; top: 0; left: 50%; transform: translateX(-50%); }
+        .sidebar-logo .cap-board { width: 26px; height: 7px; background: var(--white); clip-path: polygon(10% 100%, 0% 0%, 100% 0%, 90% 100%); }
+        .sidebar-logo .cap-crown { width: 13px; height: 5px; background: var(--white); margin: -1px auto 0; border-radius: 0 0 2px 2px; }
+        .sidebar-logo .cap-button { width: 6px; height: 6px; background: var(--white); border-radius: 50%; position: absolute; top: -4px; left: 50%; transform: translateX(-50%); }
+        .sidebar-logo .tassel { position: absolute; top: 2px; right: -1px; width: 2px; height: 12px; background: var(--red); border-radius: 1px; }
+        .sidebar-logo .tassel::after { content: ''; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); width: 6px; height: 6px; background: var(--red); border-radius: 50%; }
+        .sidebar-logo .logo-text { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 20px; color: var(--white); margin-left: -2px; }
+        .nav-section { margin-bottom: 24px; }
+        .nav-section-title { font-size: 11px; font-weight: 600; color: var(--gray-400); text-transform: uppercase; letter-spacing: 1px; padding: 0 20px; margin-bottom: 8px; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 20px; color: var(--gray-300); text-decoration: none; font-size: 14px; font-weight: 500; transition: all 0.2s; cursor: pointer; border: none; background: none; width: 100%; text-align: left; }
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--white); }
+        .nav-item.active { background: rgba(255,255,255,0.1); color: var(--white); border-right: 3px solid var(--red); }
+        .nav-item svg { width: 20px; height: 20px; flex-shrink: 0; }
+        .nav-item .badge { margin-left: auto; background: var(--red); color: var(--white); font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
+
+        /* Main Content */
+        .main-content { margin-left: 260px; min-height: 100vh; }
+        .topbar { background: var(--white); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--gray-200); position: sticky; top: 0; z-index: 50; }
+        .topbar-left { display: flex; align-items: center; gap: 16px; }
+        .menu-toggle { display: none; background: none; border: none; font-size: 24px; cursor: pointer; color: var(--gray-600); }
+        .page-title { font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 700; color: var(--gray-800); }
+        .topbar-right { display: flex; align-items: center; gap: 16px; }
+        .icon-btn { width: 40px; height: 40px; border-radius: 10px; border: none; background: var(--gray-100); cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; transition: all 0.2s; }
+        .icon-btn:hover { background: var(--gray-200); }
+        .icon-btn svg { width: 20px; height: 20px; color: var(--gray-600); }
+        .notification-badge { position: absolute; top: -4px; right: -4px; background: var(--red); color: var(--white); font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; border-radius: 9px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--white); }
+        .user-avatar { width: 40px; height: 40px; border-radius: 10px; overflow: hidden; cursor: pointer; }
+        .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* Notifications */
+        .notification-wrapper { position: relative; }
+        .notification-dropdown { position: absolute; top: calc(100% + 8px); right: 0; width: 360px; max-height: 480px; background: var(--white); border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); display: none; flex-direction: column; overflow: hidden; z-index: 1000; }
+        .notification-dropdown.show { display: flex; }
+        .notif-dropdown-header { padding: 16px 20px; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center; }
+        .notif-dropdown-header h4 { font-size: 16px; font-weight: 600; color: var(--gray-800); }
+        .notif-dropdown-header button { background: none; border: none; color: var(--blue); font-size: 13px; font-weight: 500; cursor: pointer; }
+        .notif-dropdown-list { flex: 1; overflow-y: auto; max-height: 350px; }
+        .notif-dropdown-item { display: flex; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--gray-100); cursor: pointer; transition: background 0.2s; }
+        .notif-dropdown-item:hover { background: var(--gray-50); }
+        .notif-dropdown-item.unread { background: #f0f9ff; }
+        .notif-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .notif-icon.friend { background: #22c55e; }
+        .notif-icon.message { background: #3b82f6; }
+        .notif-icon.group { background: #8b5cf6; }
+        .notif-icon svg { width: 18px; height: 18px; color: white; }
+        .notif-content { flex: 1; min-width: 0; }
+        .notif-content h5 { font-size: 14px; font-weight: 600; color: var(--gray-800); margin-bottom: 2px; }
+        .notif-content p { font-size: 13px; color: var(--gray-500); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .notif-content .time { font-size: 12px; color: var(--gray-400); margin-top: 4px; }
+        .notif-dropdown-empty { padding: 40px 20px; text-align: center; color: var(--gray-400); }
+        .notif-dropdown-footer { padding: 12px 20px; border-top: 1px solid var(--gray-200); text-align: center; }
+        .notif-dropdown-footer a { color: var(--navy); font-size: 14px; font-weight: 600; text-decoration: none; cursor: pointer; }
+
+        /* Page Content */
+        .page-content { padding: 24px; }
+
+        /* Schedule Header */
+        .schedule-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
+        .schedule-header-left { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+        .view-toggle { display: flex; background: var(--white); border-radius: 10px; padding: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .view-toggle button { padding: 8px 16px; border: none; background: none; border-radius: 8px; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 500; color: var(--gray-500); cursor: pointer; transition: all 0.2s; }
+        .view-toggle button.active { background: var(--navy); color: var(--white); }
+        .date-nav { display: flex; align-items: center; gap: 12px; }
+        .date-nav button { width: 36px; height: 36px; border: none; background: var(--white); border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: all 0.2s; }
+        .date-nav button:hover { background: var(--gray-100); }
+        .date-nav button svg { width: 20px; height: 20px; color: var(--gray-600); }
+        .current-date { font-size: 18px; font-weight: 600; color: var(--gray-800); min-width: 200px; text-align: center; }
+        .today-btn { padding: 8px 16px; border: 1px solid var(--gray-200); background: var(--white); border-radius: 8px; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 500; color: var(--gray-600); cursor: pointer; transition: all 0.2s; }
+        .today-btn:hover { border-color: var(--navy); color: var(--navy); }
+        .add-event-btn { padding: 10px 20px; border: none; background: var(--navy); color: var(--white); border-radius: 10px; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
+        .add-event-btn:hover { background: var(--navy-light); }
+        .add-event-btn svg { width: 18px; height: 18px; }
+
+        /* Calendar */
+        .schedule-layout { display: grid; grid-template-columns: 1fr 320px; gap: 24px; }
+        .calendar-container { background: var(--white); border-radius: 16px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .calendar-header { display: grid; grid-template-columns: repeat(7, 1fr); background: var(--gray-50); border-bottom: 1px solid var(--gray-200); }
+        .calendar-header-cell { padding: 16px; text-align: center; font-size: 13px; font-weight: 600; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.5px; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); }
+        .calendar-cell { min-height: 120px; border-right: 1px solid var(--gray-100); border-bottom: 1px solid var(--gray-100); padding: 8px; cursor: pointer; transition: background 0.2s; }
+        .calendar-cell:nth-child(7n) { border-right: none; }
+        .calendar-cell:hover { background: var(--gray-50); }
+        .calendar-cell.other-month { background: var(--gray-50); }
+        .calendar-cell.other-month .day-number { color: var(--gray-300); }
+        .calendar-cell.today { background: #f0f9ff; }
+        .calendar-cell.today .day-number { background: var(--navy); color: var(--white); }
+        .day-number { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; color: var(--gray-700); border-radius: 50%; margin-bottom: 4px; }
+        .calendar-events { display: flex; flex-direction: column; gap: 4px; }
+        .calendar-event { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+        .calendar-event.class { background: #dbeafe; color: #1e40af; border-left: 3px solid var(--blue); }
+        .calendar-event.exam { background: #fee2e2; color: #991b1b; border-left: 3px solid var(--red); }
+        .calendar-event.assignment { background: #ffedd5; color: #9a3412; border-left: 3px solid var(--orange); }
+        .calendar-event.study { background: #f3e8ff; color: #6b21a8; border-left: 3px solid var(--purple); }
+        .calendar-event.other { background: #e0f2fe; color: #0369a1; border-left: 3px solid var(--cyan); }
+        .more-events { font-size: 11px; color: var(--gray-500); padding: 2px 8px; cursor: pointer; }
+
+        /* Week View */
+        .week-view { display: none; }
+        .week-header { display: grid; grid-template-columns: 60px repeat(7, 1fr); border-bottom: 1px solid var(--gray-200); background: var(--gray-50); }
+        .week-header-time { padding: 16px 8px; }
+        .week-header-day { padding: 12px; text-align: center; border-left: 1px solid var(--gray-200); }
+        .week-header-day .day-name { font-size: 12px; font-weight: 600; color: var(--gray-500); text-transform: uppercase; }
+        .week-header-day .day-num { font-size: 24px; font-weight: 700; color: var(--gray-800); margin-top: 4px; }
+        .week-header-day.today .day-num { background: var(--navy); color: var(--white); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 4px auto 0; }
+        .week-body { display: grid; grid-template-columns: 60px repeat(7, 1fr); max-height: calc(100vh - 350px); overflow-y: auto; }
+        .week-time-column { border-right: 1px solid var(--gray-200); }
+        .week-time-slot { height: 60px; padding: 4px 8px; font-size: 12px; color: var(--gray-400); text-align: right; border-bottom: 1px solid var(--gray-100); }
+        .week-day-column { border-right: 1px solid var(--gray-100); position: relative; }
+        .week-hour-slot { height: 60px; border-bottom: 1px solid var(--gray-100); }
+        .week-event { position: absolute; left: 4px; right: 4px; padding: 6px 8px; border-radius: 6px; font-size: 12px; font-weight: 500; overflow: hidden; cursor: pointer; z-index: 1; }
+        .week-event .event-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .week-event .event-time { font-size: 11px; opacity: 0.8; margin-top: 2px; }
+        .week-event.class { background: #dbeafe; color: #1e40af; border-left: 3px solid var(--blue); }
+        .week-event.exam { background: #fee2e2; color: #991b1b; border-left: 3px solid var(--red); }
+        .week-event.assignment { background: #ffedd5; color: #9a3412; border-left: 3px solid var(--orange); }
+        .week-event.study { background: #f3e8ff; color: #6b21a8; border-left: 3px solid var(--purple); }
+        .week-event.other { background: #e0f2fe; color: #0369a1; border-left: 3px solid var(--cyan); }
+
+        /* List View */
+        .list-view { display: none; }
+        .list-day-group { margin-bottom: 24px; }
+        .list-day-header { padding: 12px 20px; background: var(--gray-50); font-size: 14px; font-weight: 600; color: var(--gray-600); border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: 12px; }
+        .list-day-header .day-badge { padding: 4px 10px; background: var(--navy); color: var(--white); border-radius: 6px; font-size: 12px; }
+        .list-day-header.today .day-badge { background: var(--red); }
+        .list-event-item { display: flex; align-items: flex-start; gap: 16px; padding: 16px 20px; border-bottom: 1px solid var(--gray-100); cursor: pointer; transition: background 0.2s; }
+        .list-event-item:hover { background: var(--gray-50); }
+        .list-event-time { min-width: 80px; text-align: right; }
+        .list-event-time .time { font-size: 14px; font-weight: 600; color: var(--gray-800); }
+        .list-event-time .duration { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
+        .list-event-indicator { width: 4px; min-height: 50px; border-radius: 2px; flex-shrink: 0; }
+        .list-event-indicator.class { background: var(--blue); }
+        .list-event-indicator.exam { background: var(--red); }
+        .list-event-indicator.assignment { background: var(--orange); }
+        .list-event-indicator.study { background: var(--purple); }
+        .list-event-indicator.other { background: var(--cyan); }
+        .list-event-details { flex: 1; }
+        .list-event-details h4 { font-size: 15px; font-weight: 600; color: var(--gray-800); margin-bottom: 4px; }
+        .list-event-details p { font-size: 13px; color: var(--gray-500); }
+        .list-event-details .event-meta { display: flex; align-items: center; gap: 16px; margin-top: 8px; }
+        .list-event-details .event-meta span { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--gray-400); }
+        .list-event-details .event-meta svg { width: 14px; height: 14px; }
+        .list-event-actions { display: flex; gap: 8px; opacity: 0; transition: opacity 0.2s; }
+        .list-event-item:hover .list-event-actions { opacity: 1; }
+        .list-event-actions button { width: 32px; height: 32px; border: none; background: var(--gray-100); border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .list-event-actions button:hover { background: var(--gray-200); }
+        .list-event-actions button svg { width: 16px; height: 16px; color: var(--gray-500); }
+        .list-event-actions button.delete:hover { background: #fee2e2; }
+        .list-event-actions button.delete:hover svg { color: var(--red); }
+
+        /* Upcoming Sidebar */
+        .upcoming-sidebar { background: var(--white); border-radius: 16px; padding: 20px; height: fit-content; position: sticky; top: 100px; }
+        .upcoming-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .upcoming-header h3 { font-size: 16px; font-weight: 600; color: var(--gray-800); }
+        .upcoming-list { display: flex; flex-direction: column; gap: 12px; }
+        .upcoming-item { display: flex; gap: 12px; padding: 12px; background: var(--gray-50); border-radius: 10px; cursor: pointer; transition: all 0.2s; }
+        .upcoming-item:hover { background: var(--gray-100); }
+        .upcoming-item-indicator { width: 4px; border-radius: 2px; flex-shrink: 0; }
+        .upcoming-item-indicator.class { background: var(--blue); }
+        .upcoming-item-indicator.exam { background: var(--red); }
+        .upcoming-item-indicator.assignment { background: var(--orange); }
+        .upcoming-item-indicator.study { background: var(--purple); }
+        .upcoming-item-indicator.other { background: var(--cyan); }
+        .upcoming-item-content h4 { font-size: 14px; font-weight: 600; color: var(--gray-800); margin-bottom: 4px; }
+        .upcoming-item-content p { font-size: 12px; color: var(--gray-500); }
+        .upcoming-item-content .time { font-size: 11px; color: var(--gray-400); margin-top: 4px; }
+        .upcoming-empty { text-align: center; padding: 30px; color: var(--gray-400); }
+        .upcoming-empty svg { width: 48px; height: 48px; margin-bottom: 12px; opacity: 0.5; }
+
+        /* Legend */
+        .legend { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--gray-200); }
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--gray-600); }
+        .legend-dot { width: 12px; height: 12px; border-radius: 3px; }
+        .legend-dot.class { background: var(--blue); }
+        .legend-dot.exam { background: var(--red); }
+        .legend-dot.assignment { background: var(--orange); }
+        .legend-dot.study { background: var(--purple); }
+        .legend-dot.other { background: var(--cyan); }
+
+        /* Modal */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-overlay.show { display: flex; }
+        .modal { background: var(--white); border-radius: 16px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+        .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h3 { font-size: 18px; font-weight: 600; color: var(--gray-800); }
+        .modal-close { background: none; border: none; cursor: pointer; padding: 8px; border-radius: 8px; }
+        .modal-close:hover { background: var(--gray-100); }
+        .modal-close svg { width: 20px; height: 20px; color: var(--gray-500); }
+        .modal-body { padding: 24px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 14px; font-weight: 500; color: var(--gray-700); margin-bottom: 8px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 14px; border: 1px solid var(--gray-200); border-radius: 10px; font-family: 'Outfit', sans-serif; font-size: 14px; color: var(--gray-800); }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--navy); }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .modal-footer { padding: 16px 24px; border-top: 1px solid var(--gray-200); display: flex; justify-content: flex-end; gap: 12px; }
+        .btn { padding: 10px 20px; border-radius: 10px; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; }
+        .btn-secondary { background: var(--gray-100); border: 1px solid var(--gray-200); color: var(--gray-600); }
+        .btn-secondary:hover { background: var(--gray-200); }
+        .btn-primary { background: var(--navy); border: none; color: var(--white); }
+        .btn-primary:hover { background: var(--navy-light); }
+        .btn-danger { background: #fee2e2; border: 1px solid #fecaca; color: var(--red); }
+        .btn-danger:hover { background: #fecaca; }
+
+        /* Toast */
+        .toast { position: fixed; bottom: 24px; right: 24px; padding: 14px 20px; background: var(--gray-800); color: var(--white); border-radius: 10px; font-size: 14px; font-weight: 500; z-index: 2000; display: none; }
+        .toast.show { display: flex; animation: slideIn 0.3s ease; }
+        .toast.success { background: var(--green); }
+        .toast.error { background: var(--red); }
+        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        /* Friend Online Toast */
+        .friend-online-toast { position: fixed; bottom: 24px; left: 24px; background: var(--white); padding: 14px 20px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); display: none; align-items: center; gap: 12px; z-index: 2000; }
+        .friend-online-toast.show { display: flex; animation: slideInLeft 0.3s ease; }
+        @keyframes slideInLeft { from { transform: translateX(-20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .friend-online-toast .online-dot { width: 10px; height: 10px; background: var(--green); border-radius: 50%; }
+
+        /* Empty State */
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--gray-400); }
+        .empty-state svg { width: 64px; height: 64px; margin-bottom: 16px; opacity: 0.5; }
+        .empty-state h3 { font-size: 18px; font-weight: 600; color: var(--gray-600); margin-bottom: 8px; }
+
+        /* Dark Mode */
+        body.dark-mode { background: #0f172a; }
+        body.dark-mode .sidebar { background: #020617; }
+        body.dark-mode .topbar, body.dark-mode .calendar-container, body.dark-mode .upcoming-sidebar, body.dark-mode .modal { background: #1e293b; border-color: #334155; }
+        body.dark-mode .page-title, body.dark-mode .current-date, body.dark-mode .day-number, body.dark-mode .upcoming-item-content h4, body.dark-mode .list-event-details h4 { color: var(--gray-100); }
+        body.dark-mode .calendar-cell { border-color: #334155; }
+        body.dark-mode .calendar-header, body.dark-mode .week-header, body.dark-mode .list-day-header { background: #0f172a; }
+        body.dark-mode .view-toggle, body.dark-mode .date-nav button, body.dark-mode .today-btn { background: #334155; border-color: #475569; color: var(--gray-300); }
+        body.dark-mode .icon-btn { background: #334155; }
+        body.dark-mode .form-group input, body.dark-mode .form-group select, body.dark-mode .form-group textarea { background: #0f172a; border-color: #334155; color: var(--gray-100); }
+        body.dark-mode .notification-dropdown { background: #1e293b; }
+        body.dark-mode .notif-dropdown-header, body.dark-mode .notif-dropdown-footer { border-color: #334155; }
+        body.dark-mode .notif-content h5 { color: var(--gray-100); }
+
+        /* Responsive */
+        @media (max-width: 1200px) { .schedule-layout { grid-template-columns: 1fr; } .upcoming-sidebar { position: static; } }
+        @media (max-width: 768px) { .sidebar { transform: translateX(-100%); } .sidebar.open { transform: translateX(0); } .main-content { margin-left: 0; } .menu-toggle { display: block; } .schedule-header { flex-direction: column; align-items: stretch; } .schedule-header-left { flex-direction: column; } .calendar-cell { min-height: 80px; padding: 4px; } .day-number { width: 24px; height: 24px; font-size: 12px; } .form-row { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <div class="logo-icon">
+                    <div class="cap"><div class="cap-button"></div><div class="cap-board"></div><div class="cap-crown"></div><div class="tassel"></div></div>
+                    <span class="logo-m">M</span>
+                </div>
+                <span class="logo-text">yUB</span>
+            </div>
+        </div>
+        <nav>
+            <div class="nav-section">
+                <div class="nav-section-title">Main Menu</div>
+                <a href="dashboard.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Dashboard</a>
+                <a href="schedule.html" class="nav-item active"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>Schedule</a>
+                <a href="gpa-calculator.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>GPA Calculator</a>
+                <a href="notes.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>Notes</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Social</div>
+                <a href="study-groups.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Study Groups</a>
+                <a href="friends.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>Friends<span class="badge" id="friendsBadge" style="display:none;">0</span></a>
+                <a href="messages.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>Messages<span class="badge" id="msgBadge" style="display:none;">0</span></a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Account</div>
+                <a href="profile.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>Profile</a>
+                <button class="nav-item" onclick="logout()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>Logout</button>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+                <h1 class="page-title">Schedule</h1>
+            </div>
+            <div class="topbar-right">
+                <div class="notification-wrapper">
+                    <button class="icon-btn" onclick="toggleNotifications(event)">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                        <span class="notification-badge" id="notifBadge" style="display:none;">0</span>
+                    </button>
+                    <div class="notification-dropdown" id="notificationDropdown">
+                        <div class="notif-dropdown-header"><h4>Notifications</h4><button onclick="markAllRead()">Mark all read</button></div>
+                        <div class="notif-dropdown-list" id="notifList"></div>
+                        <div class="notif-dropdown-footer"><a onclick="openNotificationsModal()" style="cursor:pointer;">View All Notifications</a></div>
+                    </div>
+                </div>
+                <button class="icon-btn" onclick="toggleDarkMode()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg></button>
+                <div class="user-avatar" onclick="location.href='profile.html'"><img id="userAvatar" src="https://ui-avatars.com/api/?name=User&background=1a365d&color=fff" alt="Profile"></div>
+            </div>
+        </header>
+
+        <main class="page-content">
+            <div class="schedule-header">
+                <div class="schedule-header-left">
+                    <div class="view-toggle">
+                        <button class="active" data-view="month" onclick="setView('month')">Month</button>
+                        <button data-view="week" onclick="setView('week')">Week</button>
+                        <button data-view="list" onclick="setView('list')">List</button>
+                    </div>
+                    <div class="date-nav">
+                        <button onclick="navigateDate(-1)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg></button>
+                        <span class="current-date" id="currentDate">December 2025</span>
+                        <button onclick="navigateDate(1)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+                    </div>
+                    <button class="today-btn" onclick="goToToday()">Today</button>
+                </div>
+                <button class="add-event-btn" onclick="openEventModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>Add Event</button>
+            </div>
+
+            <div class="schedule-layout">
+                <div class="calendar-container" id="calendarContainer">
+                    <div class="month-view-content">
+                        <div class="calendar-header">
+                            <div class="calendar-header-cell">Sun</div><div class="calendar-header-cell">Mon</div><div class="calendar-header-cell">Tue</div><div class="calendar-header-cell">Wed</div><div class="calendar-header-cell">Thu</div><div class="calendar-header-cell">Fri</div><div class="calendar-header-cell">Sat</div>
+                        </div>
+                        <div class="calendar-grid" id="calendarGrid"></div>
+                    </div>
+                    <div class="week-view" id="weekView"><div class="week-header" id="weekHeader"></div><div class="week-body" id="weekBody"></div></div>
+                    <div class="list-view" id="listView"></div>
+                </div>
+
+                <div class="upcoming-sidebar">
+                    <div class="upcoming-header"><h3>Upcoming Events</h3></div>
+                    <div class="upcoming-list" id="upcomingList"></div>
+                    <div class="legend">
+                        <div class="legend-item"><div class="legend-dot class"></div><span>Class</span></div>
+                        <div class="legend-item"><div class="legend-dot exam"></div><span>Exam</span></div>
+                        <div class="legend-item"><div class="legend-dot assignment"></div><span>Assignment</span></div>
+                        <div class="legend-item"><div class="legend-dot study"></div><span>Study</span></div>
+                        <div class="legend-item"><div class="legend-dot other"></div><span>Other</span></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Event Modal -->
+    <div class="modal-overlay" id="eventModal" onclick="if(event.target===this)closeEventModal()">
+        <div class="modal">
+            <div class="modal-header"><h3 id="modalTitle">Add Event</h3><button class="modal-close" onclick="closeEventModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button></div>
+            <div class="modal-body">
+                <input type="hidden" id="eventId">
+                <div class="form-group"><label>Event Title *</label><input type="text" id="eventTitle" placeholder="e.g., Database Systems Lecture"></div>
+                <div class="form-row">
+                    <div class="form-group"><label>Event Type</label><select id="eventType"><option value="class">Class</option><option value="exam">Exam</option><option value="assignment">Assignment</option><option value="study">Study Session</option><option value="other">Other</option></select></div>
+                    <div class="form-group"><label>Course Code</label><input type="text" id="courseCode" placeholder="e.g., CSI 311"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Start Date & Time *</label><input type="datetime-local" id="startTime"></div>
+                    <div class="form-group"><label>End Date & Time</label><input type="datetime-local" id="endTime"></div>
+                </div>
+                <div class="form-group"><label>Location</label><input type="text" id="eventLocation" placeholder="e.g., Room 204, Block B"></div>
+                <div class="form-group"><label>Description</label><textarea id="eventDescription" placeholder="Add any notes or details..."></textarea></div>
+                <div class="form-group"><label>Reminder</label><select id="eventReminder"><option value="0">No reminder</option><option value="15">15 minutes before</option><option value="30" selected>30 minutes before</option><option value="60">1 hour before</option><option value="1440">1 day before</option></select></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" id="deleteEventBtn" style="display:none;margin-right:auto;" onclick="deleteEvent()">Delete</button>
+                <button class="btn btn-secondary" onclick="closeEventModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveEvent()">Save Event</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- All Notifications Modal -->
+    <div class="modal-overlay" id="notificationsModal" onclick="if(event.target===this)closeNotificationsModal()">
+        <div class="modal" style="max-width:500px;">
+            <div class="modal-header"><h3>All Notifications</h3><button class="modal-close" onclick="closeNotificationsModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button></div>
+            <div style="display:flex;gap:10px;padding:16px 24px;border-bottom:1px solid var(--gray-200);"><button class="btn btn-secondary" onclick="markAllNotificationsReadModal()">Mark All Read</button><button class="btn btn-danger" onclick="clearAllNotifications()">Clear All</button></div>
+            <div id="allNotifList" style="max-height:400px;overflow-y:auto;"></div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+    <div class="friend-online-toast" id="friendOnlineToast"><div class="online-dot"></div><span id="friendOnlineName">Friend is now online</span></div>
+    <script>
+        const SUPABASE_URL = 'https://weuxtwmaqmbhskjpjdyi.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndldXh0d21hcW1iaHNranBqZHlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NTYzMTcsImV4cCI6MjA4MDMzMjMxN30.J-0Nd0MY6-g_ltbBNHwOulqZuQfb8mKIRgx0dAaJ76o';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let currentUser = null;
+        let schedules = [];
+        let notifications = [];
+        let currentView = 'month';
+        let currentDate = new Date();
+        let editingEventId = null;
+
+        async function init() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) { window.location.href = 'index.html'; return; }
+            currentUser = session.user;
+            await loadProfile();
+            await loadSchedules();
+            await loadNotifications();
+            loadSidebarBadges();
+            renderCalendar();
+            renderUpcoming();
+            setupRealtimeSubscriptions();
+            if (localStorage.getItem('darkMode') === 'true') document.body.classList.add('dark-mode');
+        }
+
+        async function loadProfile() {
+            const { data } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
+            if (data) {
+                const name = data.full_name || data.first_name || 'User';
+                document.getElementById('userAvatar').src = data.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=1a365d&color=fff`;
+            }
+        }
+
+        async function loadSchedules() {
+            const { data, error } = await supabase.from('schedules').select('*').eq('user_id', currentUser.id).order('start_time', { ascending: true });
+            if (!error && data) schedules = data;
+        }
+
+        async function loadSidebarBadges() {
+            const { count: msgCount } = await supabase.from('messages').select('*', { count: 'exact', head: true }).eq('receiver_id', currentUser.id).eq('is_read', false);
+            const msgBadge = document.getElementById('msgBadge');
+            if (msgCount > 0) { msgBadge.textContent = msgCount; msgBadge.style.display = 'inline'; } else { msgBadge.style.display = 'none'; }
+            const { count: friendCount } = await supabase.from('friendships').select('*', { count: 'exact', head: true }).eq('friend_id', currentUser.id).eq('status', 'pending');
+            const friendsBadge = document.getElementById('friendsBadge');
+            if (friendCount > 0) { friendsBadge.textContent = friendCount; friendsBadge.style.display = 'inline'; } else { friendsBadge.style.display = 'none'; }
+        }
+
+        function setView(view) {
+            currentView = view;
+            document.querySelectorAll('.view-toggle button').forEach(btn => btn.classList.toggle('active', btn.dataset.view === view));
+            document.querySelector('.month-view-content').style.display = 'none';
+            document.getElementById('weekView').style.display = 'none';
+            document.getElementById('listView').style.display = 'none';
+            if (view === 'month') { document.querySelector('.month-view-content').style.display = 'block'; renderMonthView(); }
+            else if (view === 'week') { document.getElementById('weekView').style.display = 'block'; renderWeekView(); }
+            else { document.getElementById('listView').style.display = 'block'; renderListView(); }
+            updateDateDisplay();
+        }
+
+        function renderCalendar() { setView(currentView); }
+
+        function renderMonthView() {
+            const grid = document.getElementById('calendarGrid');
+            const year = currentDate.getFullYear(), month = currentDate.getMonth();
+            const firstDay = new Date(year, month, 1);
+            const startDate = new Date(firstDay); startDate.setDate(startDate.getDate() - firstDay.getDay());
+            const today = new Date(); today.setHours(0, 0, 0, 0);
+            let html = '', curr = new Date(startDate);
+            for (let i = 0; i < 42; i++) {
+                const isOther = curr.getMonth() !== month;
+                const isToday = curr.toDateString() === today.toDateString();
+                const dateStr = curr.toISOString().split('T')[0];
+                const dayEvents = schedules.filter(s => new Date(s.start_time).toISOString().split('T')[0] === dateStr);
+                html += `<div class="calendar-cell ${isOther ? 'other-month' : ''} ${isToday ? 'today' : ''}" onclick="openEventModal('${dateStr}')">
+                    <div class="day-number">${curr.getDate()}</div>
+                    <div class="calendar-events">${dayEvents.slice(0, 3).map(e => `<div class="calendar-event ${e.event_type}" onclick="event.stopPropagation();openEventModal(null,'${e.id}')">${escapeHtml(e.title)}</div>`).join('')}${dayEvents.length > 3 ? `<div class="more-events">+${dayEvents.length - 3} more</div>` : ''}</div></div>`;
+                curr.setDate(curr.getDate() + 1);
+            }
+            grid.innerHTML = html;
+        }
+
+        function renderWeekView() {
+            const weekStart = new Date(currentDate); weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+            const today = new Date(); today.setHours(0, 0, 0, 0);
+            const dayNames = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+            let headerHtml = '<div class="week-header-time"></div>';
+            for (let i = 0; i < 7; i++) {
+                const day = new Date(weekStart); day.setDate(day.getDate() + i);
+                headerHtml += `<div class="week-header-day ${day.toDateString() === today.toDateString() ? 'today' : ''}"><div class="day-name">${dayNames[i]}</div><div class="day-num">${day.getDate()}</div></div>`;
+            }
+            document.getElementById('weekHeader').innerHTML = headerHtml;
+            let bodyHtml = '<div class="week-time-column">';
+            for (let h = 0; h < 24; h++) { const hour = h === 0 ? '12 AM' : h < 12 ? `${h} AM` : h === 12 ? '12 PM' : `${h - 12} PM`; bodyHtml += `<div class="week-time-slot">${hour}</div>`; }
+            bodyHtml += '</div>';
+            for (let d = 0; d < 7; d++) {
+                const day = new Date(weekStart); day.setDate(day.getDate() + d);
+                const dateStr = day.toISOString().split('T')[0];
+                const dayEvents = schedules.filter(s => new Date(s.start_time).toISOString().split('T')[0] === dateStr);
+                bodyHtml += '<div class="week-day-column">';
+                for (let h = 0; h < 24; h++) bodyHtml += `<div class="week-hour-slot" onclick="openEventModal('${dateStr}T${String(h).padStart(2,'0')}:00')"></div>`;
+                dayEvents.forEach(e => {
+                    const st = new Date(e.start_time), et = e.end_time ? new Date(e.end_time) : new Date(st.getTime() + 3600000);
+                    const top = (st.getHours() + st.getMinutes() / 60) * 60, height = Math.max((et - st) / 3600000 * 60, 30);
+                    bodyHtml += `<div class="week-event ${e.event_type}" style="top:${top}px;height:${height}px;" onclick="openEventModal(null,'${e.id}')"><div class="event-title">${escapeHtml(e.title)}</div><div class="event-time">${formatTime(st)}</div></div>`;
+                });
+                bodyHtml += '</div>';
+            }
+            document.getElementById('weekBody').innerHTML = bodyHtml;
+        }
+
+        function renderListView() {
+            const listView = document.getElementById('listView');
+            const today = new Date(); today.setHours(0, 0, 0, 0);
+            const endDate = new Date(today); endDate.setDate(endDate.getDate() + 30);
+            const upcoming = schedules.filter(s => { const d = new Date(s.start_time); return d >= today && d <= endDate; }).sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+            if (upcoming.length === 0) { listView.innerHTML = '<div class="empty-state"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg><h3>No Upcoming Events</h3><p>Click "Add Event" to create your first event</p></div>'; return; }
+            const grouped = {};
+            upcoming.forEach(e => { const ds = new Date(e.start_time).toDateString(); if (!grouped[ds]) grouped[ds] = []; grouped[ds].push(e); });
+            let html = '';
+            Object.entries(grouped).forEach(([ds, events]) => {
+                const date = new Date(ds), isToday = date.toDateString() === today.toDateString();
+                const dayLabel = isToday ? 'Today' : date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+                html += `<div class="list-day-group"><div class="list-day-header ${isToday ? 'today' : ''}"><span class="day-badge">${date.getDate()}</span>${dayLabel}</div><div class="list-events">${events.map(e => {
+                    const st = new Date(e.start_time), et = e.end_time ? new Date(e.end_time) : null;
+                    const dur = et ? Math.round((et - st) / 60000) : null;
+                    const durStr = dur ? (dur >= 60 ? `${Math.floor(dur/60)}h ${dur%60}m` : `${dur}m`) : '';
+                    return `<div class="list-event-item" onclick="openEventModal(null,'${e.id}')"><div class="list-event-time"><div class="time">${formatTime(st)}</div>${durStr ? `<div class="duration">${durStr}</div>` : ''}</div><div class="list-event-indicator ${e.event_type}"></div><div class="list-event-details"><h4>${escapeHtml(e.title)}</h4>${e.course_code ? `<p>${escapeHtml(e.course_code)}</p>` : ''}<div class="event-meta">${e.location ? `<span><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>${escapeHtml(e.location)}</span>` : ''}</div></div><div class="list-event-actions"><button onclick="event.stopPropagation();openEventModal(null,'${e.id}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button><button class="delete" onclick="event.stopPropagation();deleteEventDirect('${e.id}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button></div></div>`;
+                }).join('')}</div></div>`;
+            });
+            listView.innerHTML = html;
+        }
+
+        function renderUpcoming() {
+            const list = document.getElementById('upcomingList');
+            const now = new Date();
+            const upcoming = schedules.filter(s => new Date(s.start_time) >= now).sort((a, b) => new Date(a.start_time) - new Date(b.start_time)).slice(0, 5);
+            if (upcoming.length === 0) { list.innerHTML = '<div class="upcoming-empty"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg><p>No upcoming events</p></div>'; return; }
+            list.innerHTML = upcoming.map(e => {
+                const date = new Date(e.start_time), isToday = date.toDateString() === now.toDateString();
+                const isTomorrow = date.toDateString() === new Date(now.getTime() + 86400000).toDateString();
+                const dayLabel = isToday ? 'Today' : isTomorrow ? 'Tomorrow' : date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+                return `<div class="upcoming-item" onclick="openEventModal(null,'${e.id}')"><div class="upcoming-item-indicator ${e.event_type}"></div><div class="upcoming-item-content"><h4>${escapeHtml(e.title)}</h4><p>${e.course_code || e.location || ''}</p><div class="time">${dayLabel} at ${formatTime(date)}</div></div></div>`;
+            }).join('');
+        }
+
+        function updateDateDisplay() {
+            const display = document.getElementById('currentDate');
+            if (currentView === 'month') display.textContent = currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            else if (currentView === 'week') {
+                const ws = new Date(currentDate); ws.setDate(ws.getDate() - ws.getDay());
+                const we = new Date(ws); we.setDate(we.getDate() + 6);
+                display.textContent = `${ws.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${we.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+            } else display.textContent = 'Upcoming Events';
+        }
+
+        function navigateDate(dir) {
+            if (currentView === 'month') currentDate.setMonth(currentDate.getMonth() + dir);
+            else if (currentView === 'week') currentDate.setDate(currentDate.getDate() + dir * 7);
+            renderCalendar();
+        }
+
+        function goToToday() { currentDate = new Date(); renderCalendar(); }
+
+        function openEventModal(dateStr = null, eventId = null) {
+            const modal = document.getElementById('eventModal'), title = document.getElementById('modalTitle'), deleteBtn = document.getElementById('deleteEventBtn');
+            document.getElementById('eventId').value = '';
+            document.getElementById('eventTitle').value = '';
+            document.getElementById('eventType').value = 'class';
+            document.getElementById('courseCode').value = '';
+            document.getElementById('startTime').value = '';
+            document.getElementById('endTime').value = '';
+            document.getElementById('eventLocation').value = '';
+            document.getElementById('eventDescription').value = '';
+            document.getElementById('eventReminder').value = '30';
+            if (eventId) {
+                const event = schedules.find(s => s.id === eventId);
+                if (event) {
+                    title.textContent = 'Edit Event'; deleteBtn.style.display = 'block'; editingEventId = eventId;
+                    document.getElementById('eventId').value = event.id;
+                    document.getElementById('eventTitle').value = event.title;
+                    document.getElementById('eventType').value = event.event_type || 'class';
+                    document.getElementById('courseCode').value = event.course_code || '';
+                    document.getElementById('startTime').value = formatDateTimeLocal(event.start_time);
+                    document.getElementById('endTime').value = event.end_time ? formatDateTimeLocal(event.end_time) : '';
+                    document.getElementById('eventLocation').value = event.location || '';
+                    document.getElementById('eventDescription').value = event.description || '';
+                    document.getElementById('eventReminder').value = event.reminder_minutes || '30';
+                }
+            } else {
+                title.textContent = 'Add Event'; deleteBtn.style.display = 'none'; editingEventId = null;
+                if (dateStr) document.getElementById('startTime').value = dateStr.includes('T') ? dateStr : dateStr + 'T09:00';
+                else { const now = new Date(); now.setMinutes(0); now.setHours(now.getHours() + 1); document.getElementById('startTime').value = formatDateTimeLocal(now.toISOString()); }
+            }
+            modal.classList.add('show');
+        }
+
+        function closeEventModal() { document.getElementById('eventModal').classList.remove('show'); editingEventId = null; }
+
+        async function saveEvent() {
+            const title = document.getElementById('eventTitle').value.trim(), startTime = document.getElementById('startTime').value;
+            if (!title) { showToast('Please enter an event title', 'error'); return; }
+            if (!startTime) { showToast('Please select a start time', 'error'); return; }
+            const eventData = { user_id: currentUser.id, title, event_type: document.getElementById('eventType').value, course_code: document.getElementById('courseCode').value.trim() || null, start_time: new Date(startTime).toISOString(), end_time: document.getElementById('endTime').value ? new Date(document.getElementById('endTime').value).toISOString() : null, location: document.getElementById('eventLocation').value.trim() || null, description: document.getElementById('eventDescription').value.trim() || null, reminder_minutes: parseInt(document.getElementById('eventReminder').value) };
+            let error;
+            if (editingEventId) error = (await supabase.from('schedules').update(eventData).eq('id', editingEventId)).error;
+            else error = (await supabase.from('schedules').insert(eventData)).error;
+            if (error) { console.error('Error saving event:', error); showToast('Failed to save event', 'error'); return; }
+            showToast(editingEventId ? 'Event updated!' : 'Event created!', 'success');
+            closeEventModal(); await loadSchedules(); renderCalendar(); renderUpcoming();
+        }
+
+        async function deleteEvent() {
+            if (!editingEventId || !confirm('Delete this event?')) return;
+            const { error } = await supabase.from('schedules').delete().eq('id', editingEventId);
+            if (error) { showToast('Failed to delete event', 'error'); return; }
+            showToast('Event deleted', 'success'); closeEventModal(); await loadSchedules(); renderCalendar(); renderUpcoming();
+        }
+
+        async function deleteEventDirect(eventId) {
+            if (!confirm('Delete this event?')) return;
+            const { error } = await supabase.from('schedules').delete().eq('id', eventId);
+            if (error) { showToast('Failed to delete event', 'error'); return; }
+            showToast('Event deleted', 'success'); await loadSchedules(); renderCalendar(); renderUpcoming();
+        }
+
+        async function loadNotifications() {
+            const { data } = await supabase.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(20);
+            notifications = data || []; renderNotifications();
+        }
+
+        function renderNotifications() {
+            const list = document.getElementById('notifList'), badge = document.getElementById('notifBadge');
+            const unread = notifications.filter(n => !n.is_read).length;
+            badge.textContent = unread; badge.style.display = unread > 0 ? 'flex' : 'none';
+            if (notifications.length === 0) { list.innerHTML = '<div class="notif-dropdown-empty">No notifications</div>'; return; }
+            list.innerHTML = notifications.slice(0, 10).map(n => {
+                const type = n.type || '', iconClass = type.includes('friend') ? 'friend' : type.includes('message') ? 'message' : 'group';
+                const iconSvg = iconClass === 'friend' ? '<path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>' : iconClass === 'message' ? '<path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>' : '<path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>';
+                return `<div class="notif-dropdown-item ${n.is_read ? '' : 'unread'}" onclick="handleNotifClick('${n.id}','${type}')"><div class="notif-icon ${iconClass}"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">${iconSvg}</svg></div><div class="notif-content"><h5>${escapeHtml(n.title || 'Notification')}</h5><p>${escapeHtml(n.body || '')}</p><div class="time">${formatTimeAgo(n.created_at)}</div></div></div>`;
+            }).join('');
+        }
+
+        async function handleNotifClick(id, type) {
+            await supabase.from('notifications').update({ is_read: true }).eq('id', id);
+            document.getElementById('notificationDropdown').classList.remove('show');
+            if (type.includes('friend')) location.href = 'friends.html';
+            else if (type.includes('message')) location.href = 'messages.html';
+            else if (type.includes('group')) location.href = 'study-groups.html';
+        }
+
+        async function markAllRead() {
+            await supabase.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id);
+            notifications.forEach(n => n.is_read = true); renderNotifications();
+        }
+
+        function openNotificationsModal() { document.getElementById('notificationDropdown').classList.remove('show'); document.getElementById('notificationsModal').classList.add('show'); loadAllNotifications(); }
+        function closeNotificationsModal() { document.getElementById('notificationsModal').classList.remove('show'); }
+
+        async function loadAllNotifications() {
+            const { data } = await supabase.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(100);
+            const allNotifs = data || [], list = document.getElementById('allNotifList');
+            if (allNotifs.length === 0) { list.innerHTML = '<div style="padding:40px;text-align:center;color:#94a3b8;">No notifications</div>'; return; }
+            list.innerHTML = allNotifs.map(n => {
+                const type = n.type || '', iconClass = type.includes('friend') ? 'friend' : type.includes('message') ? 'message' : 'group';
+                const bgColor = iconClass === 'friend' ? '#22c55e' : iconClass === 'message' ? '#3b82f6' : '#8b5cf6';
+                const iconSvg = iconClass === 'friend' ? '<path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>' : iconClass === 'message' ? '<path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>' : '<path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>';
+                return `<div style="display:flex;gap:12px;padding:14px 20px;border-bottom:1px solid #f1f5f9;cursor:pointer;background:${n.is_read ? 'white' : '#f0f9ff'};" onclick="handleNotifClickModal('${n.id}','${type}')"><div style="width:40px;height:40px;border-radius:50%;background:${bgColor};display:flex;align-items:center;justify-content:center;"><svg width="18" height="18" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24">${iconSvg}</svg></div><div style="flex:1;"><h4 style="font-size:14px;font-weight:600;color:#1e293b;margin-bottom:2px;">${escapeHtml(n.title || 'Notification')}</h4><p style="font-size:13px;color:#64748b;margin-bottom:4px;">${escapeHtml(n.body || '')}</p><div style="font-size:12px;color:#94a3b8;">${formatTimeAgo(n.created_at)}</div></div></div>`;
+            }).join('');
+        }
+
+        async function handleNotifClickModal(id, type) { await supabase.from('notifications').update({ is_read: true }).eq('id', id); closeNotificationsModal(); if (type.includes('friend')) location.href = 'friends.html'; else if (type.includes('message')) location.href = 'messages.html'; else if (type.includes('group')) location.href = 'study-groups.html'; }
+        async function markAllNotificationsReadModal() { await supabase.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id); notifications.forEach(n => n.is_read = true); renderNotifications(); loadAllNotifications(); }
+        async function clearAllNotifications() { if (!confirm('Clear all notifications?')) return; const { error } = await supabase.from('notifications').delete().eq('user_id', currentUser.id); if (error) { showToast('Failed to clear. Check database permissions.', 'error'); return; } notifications = []; renderNotifications(); loadAllNotifications(); closeNotificationsModal(); showToast('Notifications cleared', 'success'); }
+
+        function setupRealtimeSubscriptions() {
+            supabase.channel('schedule_notifications').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${currentUser.id}` }, p => { notifications.unshift(p.new); renderNotifications(); }).subscribe();
+            supabase.channel('schedule_messages').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `receiver_id=eq.${currentUser.id}` }, () => loadSidebarBadges()).subscribe();
+            supabase.channel('schedule_friends').on('postgres_changes', { event: '*', schema: 'public', table: 'friendships' }, () => loadSidebarBadges()).subscribe();
+            supabase.channel('friends_online_status').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, async p => {
+                if (p.new.is_online && !p.old?.is_online) {
+                    const { data: f } = await supabase.from('friendships').select('*').or(`user_id.eq.${currentUser.id},friend_id.eq.${currentUser.id}`).or(`user_id.eq.${p.new.id},friend_id.eq.${p.new.id}`).eq('status', 'accepted').maybeSingle();
+                    if (f) showFriendOnlineToast(p.new.full_name || p.new.first_name || 'A friend');
+                }
+            }).subscribe();
+        }
+
+        function showFriendOnlineToast(name) { const t = document.getElementById('friendOnlineToast'); document.getElementById('friendOnlineName').textContent = `${name} is now online`; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 4000); }
+        function toggleNotifications(e) { e.stopPropagation(); document.getElementById('notificationDropdown').classList.toggle('show'); }
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+        function toggleDarkMode() { document.body.classList.toggle('dark-mode'); localStorage.setItem('darkMode', document.body.classList.contains('dark-mode')); }
+        function logout() { supabase.auth.signOut().then(() => location.href = 'index.html'); }
+        function showToast(msg, type = '') { const t = document.getElementById('toast'); t.textContent = msg; t.className = 'toast show ' + type; setTimeout(() => t.classList.remove('show'), 3000); }
+        function escapeHtml(str) { if (!str) return ''; const div = document.createElement('div'); div.textContent = str; return div.innerHTML; }
+        function formatTime(date) { return new Date(date).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }); }
+        function formatTimeAgo(date) { const s = Math.floor((new Date() - new Date(date)) / 1000); if (s < 60) return 'Just now'; if (s < 3600) return `${Math.floor(s / 60)}m ago`; if (s < 86400) return `${Math.floor(s / 3600)}h ago`; return `${Math.floor(s / 86400)}d ago`; }
+        function formatDateTimeLocal(iso) { const d = new Date(iso); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}T${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; }
+
+        document.addEventListener('click', e => { if (!e.target.closest('.notification-wrapper')) document.getElementById('notificationDropdown').classList.remove('show'); });
+        init();
+    </script>
+</body>
+</html>

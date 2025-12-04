@@ -1819,7 +1819,10 @@
             
             document.getElementById('groupsCount').textContent = groupsCount || 0;
 
-            // Load pending tasks (with error handling for missing table)
+            // Load pending tasks - DISABLED until schedules table is created
+            // Uncomment after running schedules_table.sql in Supabase
+            document.getElementById('tasksCount').textContent = '0';
+            /*
             try {
                 const { count: tasksCount, error: tasksError } = await supabase
                     .from('schedules')
@@ -1836,9 +1839,12 @@
             } catch (e) {
                 document.getElementById('tasksCount').textContent = '0';
             }
+            */
 
-            // Load upcoming schedule
-            await loadUpcomingSchedule();
+            // Load upcoming schedule - DISABLED until schedules table is created
+            // await loadUpcomingSchedule();
+            const scheduleContainer = document.getElementById('scheduleList');
+            if (scheduleContainer) scheduleContainer.innerHTML = '<div style="padding:20px;text-align:center;color:#94a3b8;font-size:14px;">No upcoming events</div>';
 
             // Load unread messages
             const { count: unreadCount } = await supabase

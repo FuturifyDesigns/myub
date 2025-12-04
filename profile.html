@@ -1456,15 +1456,20 @@
                 playNotificationSound();
             }).subscribe();
             
-            // Friend online status
+            // Friend online status - only notify on fresh logins (offline > 30 seconds)
             supabase.channel('profile-online-status').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, (p) => {
                 const friend = friends.find(f => f.id === p.new.id);
                 if (friend) {
                     const wasOffline = !friend.is_online;
+                    const lastSeen = friend.last_seen ? new Date(friend.last_seen) : null;
+                    const now = new Date();
+                    const offlineDuration = lastSeen ? (now - lastSeen) / 1000 : 999;
+                    
                     friend.is_online = p.new.is_online;
-                    if (wasOffline && p.new.is_online) {
-                        showToast(`${friend.full_name || friend.first_name} is now online`, 'success');
-                        playNotificationSound();
+                    friend.last_seen = p.new.last_seen;
+                    
+                    if (wasOffline && p.new.is_online && offlineDuration > 30) {
+                        showFriendOnlineToast(friend.full_name || friend.first_name);
                     }
                 }
             }).subscribe();
@@ -1477,9 +1482,24 @@
         function playNotificationSound() {
             try {
                 const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleVlhjtXr4JlYMTlqqdTm2I1LIzWFxevnvGw8KVmW1+3iomA4M2yq2erem1AkLnayz/Dgo2I2L2qm1ebgjU4pOIK+3eTCaz0nVprU5d6RUSktiL/i58mFWDQ4daTU4NqJSyQwhL7j5sSAUjI1cZ/Q3dWFSiYvgbzh5L5+Ty42bpzO2tKBRyUsgrrg4rx7TS00a5nL1s5+RiQrfbff4bh4Sis0Z5XI0sl7RSMpebjc37V1SCo0ZJLFzsZ4QyInc7TZ3LFyRSgzYY/Cyr51QiIldLHW2a5vQicyXoy/x7pzQCEjca3T1qprPyYwW4m8xLdxPyAhbqrQz6RmPiUuWIa5wa1sPR8fa6bMzqFkPCQsVYO2wKpqOx4daKLIypxhOyMrUn+zvqZnOhwbZZ7Fx5hfOSIpT3yxvKNkOBsZYprCw5VcNyEnS3muuZ5hNhkYX5a/wJJaNiAlSHaqtppeMxgWXJK8vY9YNCAfQ3GmspVaMBcVWY65uoxWMyAdQG6jrpFWLhUUV4q1t4lTMh8cPmufrI1SLBQTVIaysoZQMRscPGebqIlOKhITV4OuqH5JLRkaNmCVo4RJKBETVYCqpHtGKxgYNF2SmYBGJhASU32no3hDKRYXMlqPlHxDJRAQUHqjnnU/JhUWMFeNkHk/Ig4PUXennXI9JBMULlOKjHY8IA0OUXWS');
-                audio.volume = 0.8;
+                audio.volume = 0.3;
                 audio.play().catch(() => {});
             } catch (e) {}
+        }
+
+        function showFriendOnlineToast(friendName) {
+            const existing = document.querySelector('.friend-online-toast');
+            if (existing) existing.remove();
+            const toast = document.createElement('div');
+            toast.className = 'friend-online-toast';
+            toast.innerHTML = `<div style="width:10px;height:10px;background:#22c55e;border-radius:50%;animation:pulse 1s infinite;"></div><span><strong>${friendName}</strong> is now online</span>`;
+            toast.style.cssText = 'position:fixed;top:80px;right:20px;background:linear-gradient(135deg,#065f46,#047857);color:white;padding:14px 20px;border-radius:12px;display:flex;align-items:center;gap:12px;z-index:9999;animation:slideInRight 0.3s ease;box-shadow:0 4px 20px rgba(4,120,87,0.4);font-size:14px;';
+            const style = document.createElement('style');
+            style.textContent = '@keyframes slideInRight{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}';
+            document.head.appendChild(style);
+            document.body.appendChild(toast);
+            playNotificationSound();
+            setTimeout(() => { toast.style.animation = 'slideInRight 0.3s ease reverse'; setTimeout(() => toast.remove(), 300); }, 4000);
         }
 
         let viewingUserId = null; // ID of user being viewed (null = own profile)
@@ -1555,9 +1575,19 @@
             const name = user.full_name || `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'User';
             const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
 
-            // Hide edit sections, show view-only mode
-            document.querySelectorAll('.card').forEach((el, i) => { if (i > 0) el.style.display = 'none'; });
+            // Hide ALL edit cards and forms - keep only the profile header card
+            document.querySelectorAll('.card').forEach((el, i) => { 
+                if (i > 0) el.style.display = 'none'; 
+            });
+            
+            // Remove edit button from avatar
             document.querySelector('.avatar-edit-btn')?.remove();
+            
+            // Disable all form inputs in case any are in the first card
+            document.querySelectorAll('input, textarea, select').forEach(el => {
+                el.disabled = true;
+                el.style.pointerEvents = 'none';
+            });
             
             // Update profile avatar
             const avatarEl = document.getElementById('profileAvatar');
@@ -1569,15 +1599,15 @@
                 }
             }
 
-            // Update profile info
+            // Update profile info with correct data
             const nameEl = document.getElementById('profileName');
             if (nameEl) nameEl.textContent = name;
             
             const studentIdEl = document.getElementById('profileStudentId');
-            if (studentIdEl) studentIdEl.textContent = user.program_name || 'Student';
+            if (studentIdEl) studentIdEl.textContent = user.student_id ? `Student ID: ${user.student_id}` : 'Student';
             
             const programEl = document.getElementById('profileProgram');
-            if (programEl) programEl.textContent = user.year_of_study ? `Year ${user.year_of_study}` : 'Student';
+            if (programEl) programEl.textContent = user.program_name || 'Student';
 
             // Update status
             const statusDot = document.getElementById('statusDot');
@@ -1588,10 +1618,34 @@
             const memberSince = document.getElementById('memberSince');
             if (memberSince) memberSince.textContent = `Member since ${new Date(user.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`;
 
-            // Add action buttons after the first card
+            // Add a details card showing more info
             const firstCard = document.querySelector('.card');
             if (firstCard) {
-                const actionsHtml = `
+                const detailsHtml = `
+                    <div class="card" id="otherUserDetails" style="margin-top:20px;">
+                        <div class="card-header">
+                            <div>
+                                <h2 class="card-title">About ${user.first_name || 'User'}</h2>
+                                <p class="card-subtitle">Profile information</p>
+                            </div>
+                        </div>
+                        <div style="padding:20px;">
+                            <div style="display:grid;gap:16px;">
+                                <div style="display:flex;justify-content:space-between;padding:12px;background:var(--gray-50);border-radius:8px;">
+                                    <span style="color:var(--gray-500);">Program</span>
+                                    <span style="font-weight:600;color:var(--gray-900);">${user.program_name || 'Not specified'}</span>
+                                </div>
+                                <div style="display:flex;justify-content:space-between;padding:12px;background:var(--gray-50);border-radius:8px;">
+                                    <span style="color:var(--gray-500);">Year of Study</span>
+                                    <span style="font-weight:600;color:var(--gray-900);">${user.year_of_study ? 'Year ' + user.year_of_study : 'Not specified'}</span>
+                                </div>
+                                ${user.bio ? `<div style="padding:12px;background:var(--gray-50);border-radius:8px;">
+                                    <span style="color:var(--gray-500);display:block;margin-bottom:8px;">Bio</span>
+                                    <span style="color:var(--gray-900);">${escapeHtml(user.bio)}</span>
+                                </div>` : ''}
+                            </div>
+                        </div>
+                    </div>
                     <div class="card" style="margin-top:20px;">
                         <div class="card-header">
                             <div>
@@ -1611,7 +1665,7 @@
                         </div>
                     </div>
                 `;
-                firstCard.insertAdjacentHTML('afterend', actionsHtml);
+                firstCard.insertAdjacentHTML('afterend', detailsHtml);
             }
         }
 

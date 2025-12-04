@@ -840,14 +840,19 @@
                 // Update friends list
                 const idx = friends.findIndex(f => f.id === p.new.id);
                 if (idx !== -1) { 
-                    const wasOff = !friends[idx].is_online; 
+                    const wasOff = !friends[idx].is_online;
+                    const lastSeen = friends[idx].last_seen ? new Date(friends[idx].last_seen) : null;
+                    const now = new Date();
+                    const offlineDuration = lastSeen ? (now - lastSeen) / 1000 : 999;
+                    
                     friends[idx].is_online = p.new.is_online; 
                     friends[idx].last_seen = p.new.last_seen; 
                     renderFriends(); 
                     updateStats(); 
-                    if (wasOff && p.new.is_online) {
-                        showToast(`${friends[idx].full_name||friends[idx].first_name} is now online`, 'success');
-                        playNotificationSound();
+                    
+                    // Only show notification if they were offline for more than 30 seconds
+                    if (wasOff && p.new.is_online && offlineDuration > 30) {
+                        showFriendOnlineToast(friends[idx].full_name || friends[idx].first_name);
                     }
                 }
                 // Update discover list
@@ -861,6 +866,21 @@
             
             // Sidebar messages badge real-time
             supabase.channel('friends-messages').on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: `receiver_id=eq.${currentUser.id}` }, () => loadSidebarBadges()).subscribe();
+        }
+
+        function showFriendOnlineToast(friendName) {
+            const existing = document.querySelector('.friend-online-toast');
+            if (existing) existing.remove();
+            const toast = document.createElement('div');
+            toast.className = 'friend-online-toast';
+            toast.innerHTML = `<div style="width:10px;height:10px;background:#22c55e;border-radius:50%;animation:pulse 1s infinite;"></div><span><strong>${friendName}</strong> is now online</span>`;
+            toast.style.cssText = 'position:fixed;top:80px;right:20px;background:linear-gradient(135deg,#065f46,#047857);color:white;padding:14px 20px;border-radius:12px;display:flex;align-items:center;gap:12px;z-index:9999;animation:slideInRight 0.3s ease;box-shadow:0 4px 20px rgba(4,120,87,0.4);font-size:14px;';
+            const style = document.createElement('style');
+            style.textContent = '@keyframes slideInRight{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}';
+            document.head.appendChild(style);
+            document.body.appendChild(toast);
+            playNotificationSound();
+            setTimeout(() => { toast.style.animation = 'slideInRight 0.3s ease reverse'; setTimeout(() => toast.remove(), 300); }, 4000);
         }
 
         async function loadSidebarBadges() {

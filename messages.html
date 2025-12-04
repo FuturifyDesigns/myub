@@ -350,7 +350,7 @@
         
         // Notification sound with higher volume
         const notificationSound = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleVlhjtXr4JlYMTlqqdTm2I1LIzWFxevnvGw8KVmW1+3iomA4M2yq2erem1AkLnayz/Dgo2I2L2qm1ebgjU4pOIK+3eTCaz0nVprU5d6RUSktiL/i58mFWDQ4daTU4NqJSyQwhL7j5sSAUjI1cZ/Q3dWFSiYvgbzh5L5+Ty42bpzO2tKBRyUsgrrg4rx7TS00a5nL1s5+RiQrfbff4bh4Sis0Z5XI0sl7RSMpebjc37V1SCo0ZJLFzsZ4QyInc7TZ3LFyRSgzYY/Cyr51QiIldLHW2a5vQicyXoy/x7pzQCEjca3T1qprPyYwW4m8xLdxPyAhbqrQz6RmPiUuWIa5wa1sPR8fa6bMzqFkPCQsVYO2wKpqOx4daKLIypxhOyMrUn+zvqZnOhwbZZ7Fx5hfOSIpT3yxvKNkOBsZYprCw5VcNyEnS3muuZ5hNhkYX5a/wJJaNiAlSHaqtppeMxgWXJK8vY9YNCAfQ3GmspVaMBcVWY65uoxWMyAdQG6jrpFWLhUUV4q1t4lTMh8cPmufrI1SLBQTVIaysoZQMRscPGebqIlOKhITV4OuqH5JLRkaNmCVo4RJKBETVYCqpHtGKxgYNF2SmYBGJhASU32no3hDKRYXMlqPlHxDJRAQUHqjnnU/JhUWMFeNkHk/Ig4PUXennXI9JBMULlOKjHY8IA0OUXWS');
-        notificationSound.volume = 0.8;
+        notificationSound.volume = 0.3;
 
         async function init() {
             const { data: { session } } = await supabase.auth.getSession();
@@ -637,14 +637,19 @@
             supabase.channel('online-status-messages').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, (payload) => {
                 if (currentChatUser && currentChatUser.id === payload.new.id) { currentChatUser.is_online = payload.new.is_online; currentChatUser.last_seen = payload.new.last_seen; const statusEl = document.getElementById('chatUserStatus'); statusEl.textContent = payload.new.is_online ? 'Online' : `Last seen ${formatTimeAgo(payload.new.last_seen)}`; statusEl.className = 'chat-user-status' + (payload.new.is_online ? '' : ' offline'); }
                 const conv = conversations.find(c => c.oderId === payload.new.id); if (conv && conv.user) { conv.user.is_online = payload.new.is_online; conv.user.last_seen = payload.new.last_seen; renderConversations(); }
-                // Friend online toast
+                // Friend online toast - only on fresh logins (offline > 30 seconds)
                 const friend = friends.find(f => f.id === payload.new.id);
                 if (friend) {
                     const wasOffline = !friend.is_online;
+                    const lastSeen = friend.last_seen ? new Date(friend.last_seen) : null;
+                    const now = new Date();
+                    const offlineDuration = lastSeen ? (now - lastSeen) / 1000 : 999;
+                    
                     friend.is_online = payload.new.is_online;
-                    if (wasOffline && payload.new.is_online) {
-                        showToast(`${friend.full_name || friend.first_name} is now online`, 'success');
-                        playNotificationSound();
+                    friend.last_seen = payload.new.last_seen;
+                    
+                    if (wasOffline && payload.new.is_online && offlineDuration > 30) {
+                        showFriendOnlineToast(friend.full_name || friend.first_name);
                     }
                 }
             }).subscribe();
@@ -656,6 +661,21 @@
             }).subscribe();
             // Friend requests real-time for sidebar badge
             supabase.channel('messages-friend-requests').on('postgres_changes', { event: '*', schema: 'public', table: 'friend_requests', filter: `receiver_id=eq.${currentUser.id}` }, () => loadSidebarFriendsBadge()).subscribe();
+        }
+
+        function showFriendOnlineToast(friendName) {
+            const existing = document.querySelector('.friend-online-toast');
+            if (existing) existing.remove();
+            const toast = document.createElement('div');
+            toast.className = 'friend-online-toast';
+            toast.innerHTML = `<div style="width:10px;height:10px;background:#22c55e;border-radius:50%;animation:pulse 1s infinite;"></div><span><strong>${friendName}</strong> is now online</span>`;
+            toast.style.cssText = 'position:fixed;top:80px;right:20px;background:linear-gradient(135deg,#065f46,#047857);color:white;padding:14px 20px;border-radius:12px;display:flex;align-items:center;gap:12px;z-index:9999;animation:slideInRight 0.3s ease;box-shadow:0 4px 20px rgba(4,120,87,0.4);font-size:14px;';
+            const style = document.createElement('style');
+            style.textContent = '@keyframes slideInRight{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}';
+            document.head.appendChild(style);
+            document.body.appendChild(toast);
+            playNotificationSound();
+            setTimeout(() => { toast.style.animation = 'slideInRight 0.3s ease reverse'; setTimeout(() => toast.remove(), 300); }, 4000);
         }
 
         function updateUnreadBadge() { const totalUnread = conversations.reduce((sum, c) => sum + (c.unreadCount || 0), 0); const badge = document.getElementById('sidebarMsgBadge'); if (totalUnread > 0) { badge.textContent = totalUnread > 99 ? '99+' : totalUnread; badge.style.display = 'inline'; } else badge.style.display = 'none'; }

@@ -317,13 +317,14 @@
 
         async function uploadGroupAvatar(event) {
             const file = event.target.files[0]; if (!file || !isGroupAdmin()) return;
-            const fileName = `group_${currentGroup.id}_${Date.now()}.${file.name.split('.').pop()}`;
+            const fileName = 'group_' + currentGroup.id + '_' + Date.now() + '.' + file.name.split('.').pop();
             const { error: ue } = await supabase.storage.from('avatars').upload(fileName, file);
             if (ue) { showToast('Upload failed', 'error'); return; }
-            const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(fileName);
+            const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(fileName);
+            const publicUrl = urlData.publicUrl;
             await supabase.from('study_groups').update({ avatar_url: publicUrl }).eq('id', currentGroup.id);
             currentGroup.avatar_url = publicUrl;
-            document.getElementById('chatAvatar').innerHTML = `<img src="${publicUrl}">`;
+            document.getElementById('chatAvatar').innerHTML = '<img src="' + publicUrl + '">';
             openGroupInfoModal();
             showToast('Avatar updated!', 'success');
             await loadMyGroups();
@@ -337,7 +338,7 @@
                 const p = m.profiles || {}, name = p.full_name || `${p.first_name || ''} ${p.last_name || ''}`.trim() || 'User';
                 const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
                 const isMe = m.user_id === currentUser.id, isMemberAdmin = m.role === 'admin';
-                return `<div class="member-item"><div class="member-avatar" onclick="openProfileModal('${m.user_id}')" style="background:${getColorFromId(m.user_id)};">${p.avatar_url ? `<img src="${p.avatar_url}">` : initials}<div class="member-online-dot ${p.is_online ? '' : 'offline'}"></div></div><div class="member-info"><div class="member-name">${escapeHtml(name)} ${isMemberAdmin ? '<span class="member-role">Admin</span>' : ''} ${isMe ? '<span style="color:var(--gray-400);font-size:11px;">(You)</span>' : ''}</div><div class="member-status">${p.is_online ? 'Online' : 'Offline'}</div></div>${isAdmin && !isMe ? `<div class="member-actions">${!isMemberAdmin ? `<button class="member-action-btn" title="Make Admin" onclick="promoteToAdmin('${m.user_id}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg></button>` : ''}<button class="member-action-btn danger" title="Remove" onclick="removeMember('${m.user_id}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 7a4 4 0 11-8 0 4 4 0 018 0zM9 14a6 6 0 00-6 6v1h12v-1a6 6 0 00-6-6zM21 12h-6"/></svg></button></div>` : ''}</div>`;
+                return '<div class="member-item"><div class="member-avatar" onclick="openProfileModal(\'' + m.user_id + '\')" style="background:' + getColorFromId(m.user_id) + ';">' + (p.avatar_url && p.avatar_url !== 'null' && p.avatar_url !== 'undefined' ? '<img src="' + p.avatar_url + '">' : initials) + '<div class="member-online-dot ' + (p.is_online ? '' : 'offline') + '"></div></div><div class="member-info"><div class="member-name">' + escapeHtml(name) + ' ' + (isMemberAdmin ? '<span class="member-role">Admin</span>' : '') + ' ' + (isMe ? '<span style="color:var(--gray-400);font-size:11px;">(You)</span>' : '') + '</div><div class="member-status">' + (p.is_online ? 'Online' : 'Offline') + '</div></div>' + (isAdmin && !isMe ? '<div class="member-actions">' + (!isMemberAdmin ? '<button class="member-action-btn" title="Make Admin" onclick="promoteToAdmin(\'' + m.user_id + '\')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg></button>' : '') + '<button class="member-action-btn danger" title="Remove" onclick="removeMember(\'' + m.user_id + '\')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 7a4 4 0 11-8 0 4 4 0 018 0zM9 14a6 6 0 00-6 6v1h12v-1a6 6 0 00-6-6zM21 12h-6"/></svg></button></div>' : '') + '</div>';
             }).join('');
         }
 
@@ -362,7 +363,7 @@
             document.getElementById('profileBlockedNotice').style.display = isBlocked ? 'block' : 'none';
             document.getElementById('profileBlockedNotice').textContent = isBlocked ? 'You have blocked this user' : '';
             const avatar = document.getElementById('profileAvatar');
-            avatar.innerHTML = (p.avatar_url ? `<img src="${p.avatar_url}">` : initials) + `<div class="online-dot ${p.is_online ? '' : 'offline'}"></div>`;
+            avatar.innerHTML = (p.avatar_url && p.avatar_url !== 'null' && p.avatar_url !== 'undefined' ? '<img src="' + p.avatar_url + '">' : initials) + '<div class="online-dot ' + (p.is_online ? '' : 'offline') + '"></div>';
             avatar.style.background = p.avatar_url ? 'transparent' : getColorFromId(userId);
             document.getElementById('profileName').textContent = name;
             document.getElementById('profileProgram').textContent = p.program || 'Student';
@@ -419,7 +420,7 @@
             container.innerHTML = list.map(f => {
                 const name = f.full_name || `${f.first_name || ''} ${f.last_name || ''}`.trim() || 'User';
                 const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-                return `<div class="member-item"><div class="member-avatar" style="background:${getColorFromId(f.id)};">${f.avatar_url ? `<img src="${f.avatar_url}">` : initials}</div><div class="member-info"><div class="member-name">${escapeHtml(name)}</div></div><button class="btn btn-primary btn-sm" onclick="inviteFriend('${f.id}')">Add</button></div>`;
+                return '<div class="member-item"><div class="member-avatar" style="background:' + getColorFromId(f.id) + ';">' + (f.avatar_url && f.avatar_url !== 'null' && f.avatar_url !== 'undefined' ? '<img src="' + f.avatar_url + '">' : initials) + '</div><div class="member-info"><div class="member-name">' + escapeHtml(name) + '</div></div><button class="btn btn-primary btn-sm" onclick="inviteFriend(\'' + f.id + '\')">Add</button></div>';
             }).join('');
         }
         function searchFriendsToInvite() { renderInviteFriendsList(); }

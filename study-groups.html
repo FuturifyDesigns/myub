@@ -952,26 +952,21 @@
         
         async function loadFriends() {
             try {
-                // First get friendships where user is the requester
-                var result1 = await supabase
-                    .from('friendships')
-                    .select('user_id, friend_id')
-                    .match({ status: 'accepted', user_id: currentUser.id });
-                
-                // Then get friendships where user is the friend
-                var result2 = await supabase
-                    .from('friendships')
-                    .select('user_id, friend_id')
-                    .match({ status: 'accepted', friend_id: currentUser.id });
+                // Use same approach as friends.html (no status column filter)
+                var result1 = await supabase.from('friendships').select('friend_id').eq('user_id', currentUser.id);
+                var result2 = await supabase.from('friendships').select('user_id').eq('friend_id', currentUser.id);
                 
                 var friendIds = [];
                 (result1.data || []).forEach(function(f) { friendIds.push(f.friend_id); });
                 (result2.data || []).forEach(function(f) { friendIds.push(f.user_id); });
                 
+                // Dedupe
+                friendIds = friendIds.filter(function(id, i, arr) { return arr.indexOf(id) === i; });
+                
                 if (friendIds.length > 0) {
                     var profilesResult = await supabase
                         .from('profiles')
-                        .select('*')
+                        .select('id, first_name, last_name, full_name, program_name, avatar_url, is_online, last_seen')
                         .in('id', friendIds);
                     friends = profilesResult.data || [];
                 } else {
@@ -995,18 +990,16 @@
                 var msgResult = await supabase
                     .from('messages')
                     .select('id', { count: 'exact', head: true })
-                    .match({ receiver_id: currentUser.id, is_read: false });
+                    .eq('receiver_id', currentUser.id)
+                    .eq('is_read', false);
                 var msgBadge = document.getElementById('sidebarMsgBadge');
                 if (msgResult.count > 0) { msgBadge.style.display = 'inline'; msgBadge.textContent = msgResult.count > 9 ? '9+' : msgResult.count; } else { msgBadge.style.display = 'none'; }
             } catch(e) { console.error('msg badge error:', e); }
             
             try {
-                var frResult = await supabase
-                    .from('friendships')
-                    .select('id', { count: 'exact', head: true })
-                    .match({ friend_id: currentUser.id, status: 'pending' });
+                // For friend requests, check friend_requests table or just skip if not exists
                 var frBadge = document.getElementById('sidebarFriendsBadge');
-                if (frResult.count > 0) { frBadge.style.display = 'inline'; frBadge.textContent = frResult.count > 9 ? '9+' : frResult.count; } else { frBadge.style.display = 'none'; }
+                frBadge.style.display = 'none';
             } catch(e) { console.error('fr badge error:', e); }
         }
         
@@ -1399,33 +1392,18 @@
             
             searchTimeout = setTimeout(async function() {
                 try {
-                    // Use textSearch or simple ilike on first_name
+                    // Use same query format as friends.html which works
                     var result = await supabase
                         .from('profiles')
-                        .select('id, first_name, last_name, avatar_url, program')
-                        .ilike('first_name', '%' + query + '%')
+                        .select('id, first_name, last_name, full_name, program_name, avatar_url, is_online')
+                        .or('full_name.ilike.%' + query + '%,first_name.ilike.%' + query + '%,last_name.ilike.%' + query + '%')
+                        .neq('id', currentUser.id)
                         .limit(20);
                     
-                    // Also search by last_name
-                    var result2 = await supabase
-                        .from('profiles')
-                        .select('id, first_name, last_name, avatar_url, program')
-                        .ilike('last_name', '%' + query + '%')
-                        .limit(20);
-                    
-                    // Combine and dedupe results
-                    var allUsers = (result.data || []).concat(result2.data || []);
-                    var seen = {};
-                    var users = [];
-                    for (var i = 0; i < allUsers.length; i++) {
-                        var u = allUsers[i];
-                        if (u.id === currentUser.id) continue;
-                        if (seen[u.id]) continue;
-                        if (selectedMembers.findIndex(function(s) { return s.id === u.id; }) !== -1) continue;
-                        seen[u.id] = true;
-                        users.push(u);
-                        if (users.length >= 10) break;
-                    }
+                    // Filter out already selected members
+                    var users = (result.data || []).filter(function(u) {
+                        return selectedMembers.findIndex(function(s) { return s.id === u.id; }) === -1;
+                    }).slice(0, 10);
                     
                     if (users.length === 0) {
                         container.innerHTML = '<div class="user-search-empty">No users found</div>';
@@ -1433,14 +1411,14 @@
                         var html = '';
                         for (var i = 0; i < users.length; i++) {
                             var u = users[i];
-                            var name = getName(u);
+                            var name = u.full_name || getName(u);
                             var initials = getInitials(name);
                             var avatarContent = hasValidAvatar(u.avatar_url) ? '<img src="' + escapeHtml(u.avatar_url) + '">' : initials;
                             var isSelected = selectedMembers.findIndex(function(s) { return s.id === u.id; }) !== -1;
                             
                             html += '<div class="user-search-item' + (isSelected ? ' selected' : '') + '" onclick="toggleSelectMember(\'' + u.id + '\', \'' + escapeHtml(name) + '\', \'' + escapeHtml(u.avatar_url || '') + '\')">';
                             html += '<div class="user-search-avatar" style="background:' + getColorFromId(u.id) + ';">' + avatarContent + '</div>';
-                            html += '<div class="user-search-info"><div class="user-search-name">' + escapeHtml(name) + '</div><div class="user-search-program">' + escapeHtml(u.program || 'Student') + '</div></div>';
+                            html += '<div class="user-search-info"><div class="user-search-name">' + escapeHtml(name) + '</div><div class="user-search-program">' + escapeHtml(u.program_name || 'Student') + '</div></div>';
                             html += '<div class="user-search-check"><svg fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>';
                             html += '</div>';
                         }
@@ -1504,32 +1482,14 @@
                     var bannedIds = bannedUsers.map(function(b) { return b.user_id; });
                     var excludeIds = memberIds.concat(bannedIds);
                     
-                    // Search by first_name
-                    var result1 = await supabase
+                    // Use same query format as friends.html
+                    var result = await supabase
                         .from('profiles')
-                        .select('id, first_name, last_name, avatar_url, program')
-                        .ilike('first_name', '%' + query + '%')
-                        .limit(20);
+                        .select('id, first_name, last_name, full_name, program_name, avatar_url, is_online')
+                        .or('full_name.ilike.%' + query + '%,first_name.ilike.%' + query + '%,last_name.ilike.%' + query + '%')
+                        .limit(30);
                     
-                    // Search by last_name
-                    var result2 = await supabase
-                        .from('profiles')
-                        .select('id, first_name, last_name, avatar_url, program')
-                        .ilike('last_name', '%' + query + '%')
-                        .limit(20);
-                    
-                    // Combine and dedupe
-                    var allUsers = (result1.data || []).concat(result2.data || []);
-                    var seen = {};
-                    var users = [];
-                    for (var i = 0; i < allUsers.length; i++) {
-                        var u = allUsers[i];
-                        if (excludeIds.indexOf(u.id) !== -1) continue;
-                        if (seen[u.id]) continue;
-                        seen[u.id] = true;
-                        users.push(u);
-                        if (users.length >= 15) break;
-                    }
+                    var users = (result.data || []).filter(function(u) { return excludeIds.indexOf(u.id) === -1; }).slice(0, 15);
                     
                     if (users.length === 0) {
                         container.innerHTML = '<div class="user-search-empty">No users found</div>';
@@ -1537,13 +1497,13 @@
                         var html = '';
                         for (var i = 0; i < users.length; i++) {
                             var u = users[i];
-                            var name = getName(u);
+                            var name = u.full_name || getName(u);
                             var initials = getInitials(name);
                             var avatarContent = hasValidAvatar(u.avatar_url) ? '<img src="' + escapeHtml(u.avatar_url) + '">' : initials;
                             
                             html += '<div class="user-search-item" onclick="addMemberToGroup(\'' + u.id + '\')">';
                             html += '<div class="user-search-avatar" style="background:' + getColorFromId(u.id) + ';">' + avatarContent + '</div>';
-                            html += '<div class="user-search-info"><div class="user-search-name">' + escapeHtml(name) + '</div><div class="user-search-program">' + escapeHtml(u.program || 'Student') + '</div></div>';
+                            html += '<div class="user-search-info"><div class="user-search-name">' + escapeHtml(name) + '</div><div class="user-search-program">' + escapeHtml(u.program_name || 'Student') + '</div></div>';
                             html += '<button class="btn btn-primary btn-sm">Add</button>';
                             html += '</div>';
                         }

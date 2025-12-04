@@ -345,6 +345,12 @@
         let currentUser = null, conversations = [], currentConversation = null, currentChatUser = null;
         let messages = [], notifications = [], friends = [], blockedUsers = [], blockedByUsers = [];
         let selectedMessages = new Set(), isSelectionMode = false, confirmCallback = null, forwardToUsers = new Set();
+        let friendIds = [], outgoingRequestIds = [], incomingRequestIds = [];
+        let selectedProfileUser = null;
+        
+        // Notification sound with higher volume
+        const notificationSound = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleVlhjtXr4JlYMTlqqdTm2I1LIzWFxevnvGw8KVmW1+3iomA4M2yq2erem1AkLnayz/Dgo2I2L2qm1ebgjU4pOIK+3eTCaz0nVprU5d6RUSktiL/i58mFWDQ4daTU4NqJSyQwhL7j5sSAUjI1cZ/Q3dWFSiYvgbzh5L5+Ty42bpzO2tKBRyUsgrrg4rx7TS00a5nL1s5+RiQrfbff4bh4Sis0Z5XI0sl7RSMpebjc37V1SCo0ZJLFzsZ4QyInc7TZ3LFyRSgzYY/Cyr51QiIldLHW2a5vQicyXoy/x7pzQCEjca3T1qprPyYwW4m8xLdxPyAhbqrQz6RmPiUuWIa5wa1sPR8fa6bMzqFkPCQsVYO2wKpqOx4daKLIypxhOyMrUn+zvqZnOhwbZZ7Fx5hfOSIpT3yxvKNkOBsZYprCw5VcNyEnS3muuZ5hNhkYX5a/wJJaNiAlSHaqtppeMxgWXJK8vY9YNCAfQ3GmspVaMBcVWY65uoxWMyAdQG6jrpFWLhUUV4q1t4lTMh8cPmufrI1SLBQTVIaysoZQMRscPGebqIlOKhITV4OuqH5JLRkaNmCVo4RJKBETVYCqpHtGKxgYNF2SmYBGJhASU32no3hDKRYXMlqPlHxDJRAQUHqjnnU/JhUWMFeNkHk/Ig4PUXennXI9JBMULlOKjHY8IA0OUXWS');
+        notificationSound.volume = 0.8;
 
         async function init() {
             const { data: { session } } = await supabase.auth.getSession();
@@ -352,7 +358,7 @@
             currentUser = session.user;
             if (localStorage.getItem('myub_darkMode') === 'true') document.body.classList.add('dark-mode');
             await updateOnlineStatus(true);
-            await Promise.all([loadConversations(), loadFriends(), loadBlockedUsers(), loadNotifications()]);
+            await Promise.all([loadConversations(), loadFriends(), loadBlockedUsers(), loadNotifications(), loadFriendRequests()]);
             subscribeToRealtime();
             startHeartbeat();
             const urlParams = new URLSearchParams(window.location.search);
@@ -392,6 +398,14 @@
             blockedUsers = (blocked || []).map(b => b.blocked_id);
             const { data: blockedBy } = await supabase.from('blocked_users').select('blocker_id').eq('blocked_id', currentUser.id);
             blockedByUsers = (blockedBy || []).map(b => b.blocker_id);
+        }
+
+        async function loadFriendRequests() {
+            const { data: outgoing } = await supabase.from('friend_requests').select('receiver_id').eq('sender_id', currentUser.id).eq('status', 'pending');
+            outgoingRequestIds = (outgoing || []).map(r => r.receiver_id);
+            const { data: incoming } = await supabase.from('friend_requests').select('sender_id').eq('receiver_id', currentUser.id).eq('status', 'pending');
+            incomingRequestIds = (incoming || []).map(r => r.sender_id);
+            friendIds = friends.map(f => f.id);
         }
 
         async function loadMessages(userId) {
@@ -625,7 +639,6 @@
         // NEW CHAT MODAL - User Search
         // =============================================
         let searchTimeout = null;
-        let selectedProfileUser = null;
         let reportingUserId = null;
 
         function openNewChatModal() {
@@ -721,6 +734,9 @@
             const initials = getInitials(name);
             const isBlocked = blockedUsers.includes(userId);
             const isBlockedBy = blockedByUsers.includes(userId);
+            const isFriend = friendIds.includes(userId);
+            const isPendingOut = outgoingRequestIds.includes(userId);
+            const isPendingIn = incomingRequestIds.includes(userId);
             const memberSince = new Date(user.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 
             let bodyHtml = `
@@ -736,7 +752,7 @@
                         <span>${user.is_online ? 'Online now' : (user.last_seen ? `Last seen ${formatTimeAgo(user.last_seen)}` : 'Offline')}</span>
                     </div>
                     ${user.bio ? `<div class="profile-modal-bio">${escapeHtml(user.bio)}</div>` : ''}
-                    <div class="profile-modal-meta">Member since ${memberSince}</div>
+                    <div class="profile-modal-meta"><span class="label">Member since</span><span class="value">${memberSince}</span></div>
                 </div>`;
 
             if (isBlockedBy) {
@@ -751,28 +767,55 @@
             let footerHtml = '<div class="profile-modal-actions">';
             
             if (isBlockedBy) {
-                footerHtml += '</div>';
+                // No actions for blocked by
             } else if (isBlocked) {
                 footerHtml += `<button class="btn btn-secondary" onclick="unblockUser('${userId}', '${escapeHtml(name)}')">
                     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
                     Unblock User
                 </button>`;
             } else {
-                footerHtml += `
-                    <button class="btn btn-primary" onclick="startConversationFromProfile('${userId}')">
+                // Add Friend / Message buttons
+                if (isFriend) {
+                    footerHtml += `<button class="btn btn-primary" onclick="startConversationFromProfile('${userId}')">
                         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
                         Message
+                    </button>`;
+                } else if (isPendingOut) {
+                    footerHtml += `<button class="btn btn-secondary" onclick="cancelFriendRequest('${userId}')">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                        Cancel Request
+                    </button>`;
+                } else if (isPendingIn) {
+                    footerHtml += `<button class="btn btn-success" onclick="acceptFriendRequest('${userId}')">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                        Accept Request
+                    </button>`;
+                } else {
+                    footerHtml += `<button class="btn btn-primary" onclick="sendFriendRequest('${userId}', '${escapeHtml(name)}')">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+                        Add Friend
+                    </button>`;
+                }
+                
+                // Message button if not friend
+                if (!isFriend) {
+                    footerHtml += `<button class="btn btn-secondary" onclick="startConversationFromProfile('${userId}')">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                        Message
+                    </button>`;
+                }
+                
+                // Block and Report buttons
+                footerHtml += `<div class="btn-row">
+                    <button class="btn btn-outline-danger" onclick="blockUser('${userId}', '${escapeHtml(name)}')">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                        Block
                     </button>
-                    <div class="btn-row">
-                        <button class="btn btn-outline-danger" onclick="blockUser('${userId}', '${escapeHtml(name)}')">
-                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
-                            Block
-                        </button>
-                        <button class="btn btn-warning" onclick="reportUser('${userId}')">
-                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                            Report
-                        </button>
-                    </div>`;
+                    <button class="btn btn-warning" onclick="reportUser('${userId}')">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        Report
+                    </button>
+                </div>`;
             }
             
             footerHtml += `
@@ -797,6 +840,56 @@
         function startConversationFromProfile(userId) {
             closeProfileModal();
             openConversation(userId);
+        }
+
+        // =============================================
+        // FRIEND REQUEST FUNCTIONS
+        // =============================================
+        async function sendFriendRequest(userId, userName) {
+            // Check if already friends
+            const { data: friendship } = await supabase.from('friendships').select('id').or(`and(user_id.eq.${currentUser.id},friend_id.eq.${userId}),and(user_id.eq.${userId},friend_id.eq.${currentUser.id})`).maybeSingle();
+            if (friendship) { showToast('Already friends!', 'error'); return; }
+            
+            // Check for existing pending request
+            const { data: existing } = await supabase.from('friend_requests').select('id, status').or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${userId}),and(sender_id.eq.${userId},receiver_id.eq.${currentUser.id})`).maybeSingle();
+            
+            if (existing) {
+                if (existing.status === 'pending') {
+                    showToast('Request already pending', 'error'); 
+                    return;
+                }
+                await supabase.from('friend_requests').delete().eq('id', existing.id);
+            }
+            
+            await supabase.from('friend_requests').insert({ sender_id: currentUser.id, receiver_id: userId });
+            showToast(`Request sent to ${userName}!`, 'success');
+            await loadFriendRequests();
+            // Refresh modal if open
+            if (selectedProfileUser && selectedProfileUser.id === userId) {
+                openProfileModal(userId);
+            }
+        }
+
+        async function cancelFriendRequest(userId) {
+            await supabase.from('friend_requests').delete().eq('sender_id', currentUser.id).eq('receiver_id', userId);
+            showToast('Request cancelled');
+            await loadFriendRequests();
+            if (selectedProfileUser && selectedProfileUser.id === userId) {
+                openProfileModal(userId);
+            }
+        }
+
+        async function acceptFriendRequest(userId) {
+            // Delete the request
+            await supabase.from('friend_requests').delete().eq('sender_id', userId).eq('receiver_id', currentUser.id);
+            // Create friendship
+            await supabase.from('friendships').insert({ user_id: currentUser.id, friend_id: userId });
+            showToast('Friend request accepted!', 'success');
+            await loadFriends();
+            await loadFriendRequests();
+            if (selectedProfileUser && selectedProfileUser.id === userId) {
+                openProfileModal(userId);
+            }
         }
 
         // =============================================
@@ -830,7 +923,13 @@
                 await supabase.from('blocked_users').delete().eq('blocker_id', currentUser.id).eq('blocked_id', userId);
                 blockedUsers = blockedUsers.filter(id => id !== userId);
                 showToast(`${userName} has been unblocked`, 'success');
-                closeProfileModal();
+                // Refresh the modal to show updated buttons
+                if (selectedProfileUser && selectedProfileUser.id === userId) {
+                    await loadFriendRequests();
+                    openProfileModal(userId);
+                } else {
+                    closeProfileModal();
+                }
             } catch (e) {
                 showToast('Failed to unblock user', 'error');
             }

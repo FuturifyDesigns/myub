@@ -291,7 +291,7 @@
         .member-item:hover { background: var(--gray-50); }
         .member-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: var(--white); overflow: hidden; position: relative; cursor: pointer; flex-shrink: 0; }
         .member-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .member-status-dot { position: absolute; bottom: 0; right: 0; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--white); }
+        .member-status-dot { position: absolute; bottom: -2px; right: -2px; width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--white); box-shadow: 0 0 0 1px rgba(0,0,0,0.1); }
         .member-status-dot.online { background: var(--green); }
         .member-status-dot.offline { background: var(--gray-400); }
         .member-info { flex: 1; min-width: 0; }
@@ -928,18 +928,56 @@
         
         async function loadGroupMembers() {
             try {
-                var result = await supabase.from('study_group_members').select('*, profiles:user_id(*)').eq('group_id', currentGroup.id);
+                var result = await supabase
+                    .from('study_group_members')
+                    .select('*, profiles:user_id(id, first_name, last_name, full_name, avatar_url, is_online, last_seen)')
+                    .eq('group_id', currentGroup.id);
+                
+                if (result.error) {
+                    console.error('loadGroupMembers error:', result.error);
+                    currentMembers = [];
+                    bannedUsers = [];
+                    return;
+                }
+                
                 currentMembers = (result.data || []).filter(function(m) { return m.role !== 'banned'; });
                 bannedUsers = (result.data || []).filter(function(m) { return m.role === 'banned'; });
-            } catch(e) { console.error('loadGroupMembers error:', e); }
+                
+                // Update the group's member count in myGroups
+                var groupInList = myGroups.find(function(g) { return g.id === currentGroup.id; });
+                if (groupInList) {
+                    groupInList.membersCount = currentMembers.length;
+                    groupInList.onlineCount = currentMembers.filter(function(m) { return m.profiles && m.profiles.is_online; }).length;
+                }
+            } catch(e) { 
+                console.error('loadGroupMembers error:', e); 
+                currentMembers = [];
+                bannedUsers = [];
+            }
         }
         
         async function loadGroupMessages() {
             try {
-                var result = await supabase.from('study_group_messages').select('*, profiles:sender_id(*)').eq('group_id', currentGroup.id).eq('is_deleted', false).order('created_at', { ascending: true }).limit(100);
-                groupMessages = result.data || [];
+                var result = await supabase
+                    .from('study_group_messages')
+                    .select('*, profiles:sender_id(id, first_name, last_name, full_name, avatar_url)')
+                    .eq('group_id', currentGroup.id)
+                    .eq('is_deleted', false)
+                    .order('created_at', { ascending: true })
+                    .limit(100);
+                
+                if (result.error) {
+                    console.error('loadGroupMessages error:', result.error);
+                    groupMessages = [];
+                } else {
+                    groupMessages = result.data || [];
+                }
                 renderMessages();
-            } catch(e) { console.error('loadGroupMessages error:', e); }
+            } catch(e) { 
+                console.error('loadGroupMessages error:', e); 
+                groupMessages = [];
+                renderMessages();
+            }
         }
         
         async function loadNotifications() {
@@ -1516,13 +1554,30 @@
         async function addMemberToGroup(userId) {
             try {
                 var result = await supabase.from('study_group_members').insert({ group_id: currentGroup.id, user_id: userId, role: 'member' });
-                if (result.error) { showToast(result.error.code === '23505' ? 'Already a member' : 'Failed', 'error'); return; }
+                if (result.error) { 
+                    showToast(result.error.code === '23505' ? 'Already a member' : 'Failed: ' + result.error.message, 'error'); 
+                    console.error('Add member error:', result.error);
+                    return; 
+                }
                 showToast('Member added!', 'success');
+                
+                // Reload and update all displays
                 await loadGroupMembers();
                 renderMembersList();
                 updateMembersDisplay();
+                renderGroups();
+                
+                // Update info modal counters
+                document.getElementById('infoMembersCount').textContent = currentMembers.length;
+                document.getElementById('infoOnlineCount').textContent = currentMembers.filter(function(m) { return m.profiles && m.profiles.is_online; }).length;
+                document.getElementById('memberCountLabel').textContent = '(' + currentMembers.length + ')';
+                
+                // Refresh search results
                 searchUsersToAdd();
-            } catch(e) { showToast('Failed', 'error'); }
+            } catch(e) { 
+                showToast('Failed', 'error'); 
+                console.error('Add member exception:', e);
+            }
         }
         
         // ============================================
@@ -1802,28 +1857,54 @@
         // REALTIME SUBSCRIPTIONS
         // ============================================
         function subscribeToRealtime() {
+            // Messages channel
             supabase.channel('sg-messages').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'study_group_messages' }, function(payload) {
-                if (currentGroup && payload.new.group_id === currentGroup.id) loadGroupMessages();
+                if (currentGroup && payload.new.group_id === currentGroup.id) {
+                    loadGroupMessages();
+                    // Update message count in info modal
+                    document.getElementById('infoMessagesCount').textContent = groupMessages.length + 1;
+                }
                 loadMyGroups();
             }).subscribe();
             
-            supabase.channel('sg-members').on('postgres_changes', { event: '*', schema: 'public', table: 'study_group_members' }, function() {
-                if (currentGroup) loadGroupMembers().then(function() { updateMembersDisplay(); renderMembersList(); });
+            // Members channel - update counters in real-time
+            supabase.channel('sg-members').on('postgres_changes', { event: '*', schema: 'public', table: 'study_group_members' }, function(payload) {
+                if (currentGroup) {
+                    loadGroupMembers().then(function() { 
+                        updateMembersDisplay(); 
+                        renderMembersList();
+                        renderGroups(); // Refresh group list to show updated counts
+                        // Update info modal counters
+                        document.getElementById('infoMembersCount').textContent = currentMembers.length;
+                        document.getElementById('infoOnlineCount').textContent = currentMembers.filter(function(m) { return m.profiles && m.profiles.is_online; }).length;
+                        document.getElementById('memberCountLabel').textContent = '(' + currentMembers.length + ')';
+                    });
+                }
                 loadMyGroups();
             }).subscribe();
             
-            supabase.channel('sg-online').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles', filter: 'is_online=eq.true' }, function(payload) {
-                checkFriendOnline(payload.new);
-                if (currentGroup) loadGroupMembers().then(function() { updateMembersDisplay(); });
+            // Online status channel - update when any profile's online status changes
+            supabase.channel('sg-online').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, function(payload) {
+                if (payload.new.is_online) checkFriendOnline(payload.new);
+                if (currentGroup) {
+                    loadGroupMembers().then(function() { 
+                        updateMembersDisplay(); 
+                        renderMembersList();
+                        renderGroups();
+                        // Update info modal online count
+                        document.getElementById('infoOnlineCount').textContent = currentMembers.filter(function(m) { return m.profiles && m.profiles.is_online; }).length;
+                    });
+                }
             }).subscribe();
             
+            // Notifications channel
             supabase.channel('sg-notif').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: 'user_id=eq.' + currentUser.id }, function() {
                 loadNotifications();
                 playNotificationSound();
             }).subscribe();
             
+            // Sidebar badges
             supabase.channel('sg-msg-badge').on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: 'receiver_id=eq.' + currentUser.id }, function() { loadSidebarBadges(); }).subscribe();
-            supabase.channel('sg-fr-badge').on('postgres_changes', { event: '*', schema: 'public', table: 'friendships', filter: 'friend_id=eq.' + currentUser.id }, function() { loadSidebarBadges(); }).subscribe();
         }
         
         function checkFriendOnline(profile) {

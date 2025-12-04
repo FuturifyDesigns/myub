@@ -289,6 +289,26 @@
         @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         
+        /* Image Cropper Modal */
+        .crop-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.3s; }
+        .crop-modal.show { opacity: 1; visibility: visible; }
+        .crop-container { background: var(--white); border-radius: 16px; width: 90%; max-width: 500px; overflow: hidden; }
+        .crop-header { padding: 16px 20px; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center; }
+        .crop-header h3 { font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 700; color: var(--gray-800); }
+        .crop-close { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--gray-500); }
+        .crop-area { position: relative; width: 100%; height: 300px; background: #000; overflow: hidden; }
+        .crop-image { position: absolute; max-width: none; transform-origin: center; cursor: grab; }
+        .crop-image:active { cursor: grabbing; }
+        .crop-overlay { position: absolute; inset: 0; pointer-events: none; }
+        .crop-circle { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 200px; height: 200px; border: 3px solid var(--white); border-radius: 50%; box-shadow: 0 0 0 9999px rgba(0,0,0,0.5); }
+        .crop-controls { padding: 16px 20px; background: var(--gray-50); }
+        .zoom-control { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .zoom-control label { font-size: 13px; font-weight: 600; color: var(--gray-600); min-width: 50px; }
+        .zoom-slider { flex: 1; height: 6px; border-radius: 3px; background: var(--gray-200); appearance: none; cursor: pointer; }
+        .zoom-slider::-webkit-slider-thumb { appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--navy); cursor: pointer; }
+        .crop-actions { display: flex; gap: 12px; }
+        .crop-actions .btn { flex: 1; }
+        
         /* Dark Mode */
         body.dark-mode { background: var(--gray-800); }
         body.dark-mode .sidebar { background: #0a1628; }
@@ -626,6 +646,31 @@
     
     <div class="toast" id="toast"></div>
     
+    <!-- Image Cropper Modal -->
+    <div class="crop-modal" id="cropModal">
+        <div class="crop-container">
+            <div class="crop-header">
+                <h3>Crop Image</h3>
+                <button class="crop-close" onclick="closeCropModal()">&times;</button>
+            </div>
+            <div class="crop-area" id="cropArea">
+                <img id="cropImage" class="crop-image" draggable="false">
+                <div class="crop-overlay"><div class="crop-circle"></div></div>
+            </div>
+            <div class="crop-controls">
+                <div class="zoom-control">
+                    <label>Zoom</label>
+                    <input type="range" class="zoom-slider" id="zoomSlider" min="100" max="300" value="100" oninput="handleZoom(this.value)">
+                </div>
+                <div class="crop-actions">
+                    <button class="btn btn-secondary" onclick="closeCropModal()">Cancel</button>
+                    <button class="btn btn-danger" onclick="removeImage()">Remove</button>
+                    <button class="btn btn-primary" onclick="applyCrop()">Apply</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <script>
         // ============================================
         // CONFIGURATION
@@ -656,6 +701,16 @@
         var selectedProfileUser = null;
         var reportTargetId = null;
         var friendLastSeen = {};
+        
+        // Cropper state
+        var cropperImage = null;
+        var cropperScale = 1;
+        var cropperX = 0;
+        var cropperY = 0;
+        var isDragging = false;
+        var dragStartX = 0;
+        var dragStartY = 0;
+        var croppedImageBlob = null;
         
         // ============================================
         // HELPER FUNCTIONS
@@ -802,6 +857,157 @@
         
         function startHeartbeat() {
             setInterval(function() { updateOnlineStatus(true); }, 30000);
+        }
+        
+        // ============================================
+        // DATA LOADING FUNCTIONS
+        // ============================================
+        async function loadMyGroups() {
+            try {
+                var result = await supabase
+                    .from('study_group_members')
+                    .select('group_id, role, study_groups(*)')
+                    .eq('user_id', currentUser.id);
+                
+                if (result.data) {
+                    myGroups = result.data.map(function(m) {
+                        if (!m.study_groups) return null;
+                        var group = Object.assign({}, m.study_groups);
+                        group.role = m.role;
+                        return group;
+                    }).filter(function(g) { return g && g.id; });
+                    
+                    for (var i = 0; i < myGroups.length; i++) {
+                        var g = myGroups[i];
+                        
+                        var msgResult = await supabase
+                            .from('study_group_messages')
+                            .select('content, created_at, profiles:sender_id(first_name)')
+                            .eq('group_id', g.id)
+                            .eq('is_deleted', false)
+                            .order('created_at', { ascending: false })
+                            .limit(1)
+                            .maybeSingle();
+                        g.lastMessage = msgResult.data;
+                        
+                        var membersResult = await supabase
+                            .from('study_group_members')
+                            .select('user_id, profiles:user_id(is_online)')
+                            .eq('group_id', g.id);
+                        g.membersCount = (membersResult.data || []).length;
+                        g.onlineCount = (membersResult.data || []).filter(function(m) {
+                            return m.profiles && m.profiles.is_online;
+                        }).length;
+                    }
+                    
+                    myGroups.sort(function(a, b) {
+                        var aTime = a.lastMessage ? new Date(a.lastMessage.created_at) : new Date(a.created_at);
+                        var bTime = b.lastMessage ? new Date(b.lastMessage.created_at) : new Date(b.created_at);
+                        return bTime - aTime;
+                    });
+                }
+                
+                document.getElementById('myGroupsCount').textContent = myGroups.length;
+                renderGroups();
+            } catch(e) {
+                console.error('loadMyGroups error:', e);
+            }
+        }
+        
+        async function loadDiscoverGroups() {
+            try {
+                var result = await supabase
+                    .from('study_groups')
+                    .select('*')
+                    .eq('is_private', false)
+                    .order('created_at', { ascending: false })
+                    .limit(50);
+                
+                var myIds = myGroups.map(function(g) { return g.id; });
+                discoverGroups = (result.data || []).filter(function(g) {
+                    return myIds.indexOf(g.id) === -1;
+                });
+                
+                for (var i = 0; i < discoverGroups.length; i++) {
+                    var countResult = await supabase
+                        .from('study_group_members')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('group_id', discoverGroups[i].id);
+                    discoverGroups[i].membersCount = countResult.count || 0;
+                }
+                
+                renderGroups();
+            } catch(e) {
+                console.error('loadDiscoverGroups error:', e);
+            }
+        }
+        
+        async function loadGroupMembers() {
+            try {
+                var result = await supabase
+                    .from('study_group_members')
+                    .select('*, profiles:user_id(*)')
+                    .eq('group_id', currentGroup.id);
+                currentMembers = result.data || [];
+            } catch(e) {
+                console.error('loadGroupMembers error:', e);
+            }
+        }
+        
+        async function loadGroupMessages() {
+            try {
+                var result = await supabase
+                    .from('study_group_messages')
+                    .select('*, profiles:sender_id(*)')
+                    .eq('group_id', currentGroup.id)
+                    .eq('is_deleted', false)
+                    .order('created_at', { ascending: true })
+                    .limit(100);
+                groupMessages = result.data || [];
+                renderMessages();
+            } catch(e) {
+                console.error('loadGroupMessages error:', e);
+            }
+        }
+        
+        async function loadNotifications() {
+            try {
+                var result = await supabase
+                    .from('notifications')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .order('created_at', { ascending: false })
+                    .limit(20);
+                notifications = result.data || [];
+                renderNotifications();
+            } catch(e) {}
+        }
+        
+        async function loadFriends() {
+            try {
+                var result = await supabase
+                    .from('friendships')
+                    .select('user_id, friend_id, profiles!friendships_friend_id_fkey(*)')
+                    .eq('status', 'accepted')
+                    .or('user_id.eq.' + currentUser.id + ',friend_id.eq.' + currentUser.id);
+                
+                friends = (result.data || []).map(function(f) {
+                    if (f.user_id === currentUser.id) {
+                        return Object.assign({}, f.profiles, { id: f.friend_id });
+                    }
+                    return Object.assign({}, f.profiles, { id: f.user_id });
+                }).filter(function(f) { return f && f.id; });
+            } catch(e) {}
+        }
+        
+        async function loadBlockedUsers() {
+            try {
+                var result = await supabase
+                    .from('blocked_users')
+                    .select('blocked_id')
+                    .eq('blocker_id', currentUser.id);
+                blockedUsers = (result.data || []).map(function(b) { return b.blocked_id; });
+            } catch(e) {}
         }
         
         async function loadSidebarBadges() {
@@ -1248,10 +1454,13 @@
             document.getElementById('nameCount').textContent = '0';
             document.getElementById('descCount').textContent = '0';
             document.getElementById('nameError').textContent = '';
+            document.getElementById('avatarInput').value = '';
+            croppedImageBlob = null;
         }
         
         function closeCreateModal() {
             document.getElementById('createModal').classList.remove('show');
+            croppedImageBlob = null;
         }
         
         function validateGroupName() {
@@ -1300,11 +1509,11 @@
             
             try {
                 var avatarUrl = null;
-                var file = document.getElementById('avatarInput').files[0];
                 
-                if (file) {
-                    var fileName = 'group_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9) + '.' + file.name.split('.').pop();
-                    var uploadResult = await supabase.storage.from('avatars').upload(fileName, file);
+                // Use cropped image blob if available
+                if (croppedImageBlob) {
+                    var fileName = 'group_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9) + '.jpg';
+                    var uploadResult = await supabase.storage.from('avatars').upload(fileName, croppedImageBlob);
                     if (!uploadResult.error) {
                         var urlResult = supabase.storage.from('avatars').getPublicUrl(fileName);
                         avatarUrl = urlResult.data.publicUrl;
@@ -1321,7 +1530,8 @@
                 }).select().single();
                 
                 if (insertResult.error) {
-                    showToast('Failed to create', 'error');
+                    showToast('Failed to create: ' + (insertResult.error.message || 'Unknown error'), 'error');
+                    console.error('Create group error:', insertResult.error);
                     return;
                 }
                 
@@ -1332,6 +1542,8 @@
                     role: 'admin'
                 });
                 
+                // Reset cropped image
+                croppedImageBlob = null;
                 closeCreateModal();
                 showToast('Group created!', 'success');
                 await loadMyGroups();
@@ -1749,6 +1961,136 @@
         // ============================================
         // UI FUNCTIONS
         // ============================================
+        // ============================================
+        // IMAGE CROPPER FUNCTIONS
+        // ============================================
+        function openCropModal(file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                cropperImage = e.target.result;
+                var img = document.getElementById('cropImage');
+                img.src = cropperImage;
+                img.onload = function() {
+                    resetCropper();
+                    document.getElementById('cropModal').classList.add('show');
+                    setupCropDrag();
+                };
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function closeCropModal() {
+            document.getElementById('cropModal').classList.remove('show');
+            cropperImage = null;
+            document.getElementById('avatarInput').value = '';
+        }
+        
+        function resetCropper() {
+            cropperScale = 1;
+            cropperX = 0;
+            cropperY = 0;
+            document.getElementById('zoomSlider').value = 100;
+            updateCropperTransform();
+        }
+        
+        function handleZoom(value) {
+            cropperScale = value / 100;
+            updateCropperTransform();
+        }
+        
+        function updateCropperTransform() {
+            var img = document.getElementById('cropImage');
+            img.style.transform = 'translate(' + cropperX + 'px, ' + cropperY + 'px) scale(' + cropperScale + ')';
+        }
+        
+        function setupCropDrag() {
+            var img = document.getElementById('cropImage');
+            var area = document.getElementById('cropArea');
+            
+            img.onmousedown = function(e) {
+                e.preventDefault();
+                isDragging = true;
+                dragStartX = e.clientX - cropperX;
+                dragStartY = e.clientY - cropperY;
+            };
+            
+            area.onmousemove = function(e) {
+                if (!isDragging) return;
+                cropperX = e.clientX - dragStartX;
+                cropperY = e.clientY - dragStartY;
+                updateCropperTransform();
+            };
+            
+            area.onmouseup = function() { isDragging = false; };
+            area.onmouseleave = function() { isDragging = false; };
+            
+            // Touch support
+            img.ontouchstart = function(e) {
+                e.preventDefault();
+                isDragging = true;
+                var touch = e.touches[0];
+                dragStartX = touch.clientX - cropperX;
+                dragStartY = touch.clientY - cropperY;
+            };
+            
+            area.ontouchmove = function(e) {
+                if (!isDragging) return;
+                var touch = e.touches[0];
+                cropperX = touch.clientX - dragStartX;
+                cropperY = touch.clientY - dragStartY;
+                updateCropperTransform();
+            };
+            
+            area.ontouchend = function() { isDragging = false; };
+        }
+        
+        function applyCrop() {
+            var img = document.getElementById('cropImage');
+            var canvas = document.createElement('canvas');
+            var ctx = canvas.getContext('2d');
+            var size = 200;
+            canvas.width = size;
+            canvas.height = size;
+            
+            var cropArea = document.getElementById('cropArea');
+            var areaRect = cropArea.getBoundingClientRect();
+            var centerX = areaRect.width / 2;
+            var centerY = areaRect.height / 2;
+            
+            var imgWidth = img.naturalWidth * cropperScale;
+            var imgHeight = img.naturalHeight * cropperScale;
+            var imgX = centerX + cropperX - imgWidth / 2;
+            var imgY = centerY + cropperY - imgHeight / 2;
+            
+            var cropX = centerX - size / 2;
+            var cropY = centerY - size / 2;
+            
+            var sourceX = (cropX - imgX) / cropperScale;
+            var sourceY = (cropY - imgY) / cropperScale;
+            var sourceSize = size / cropperScale;
+            
+            ctx.drawImage(img, sourceX, sourceY, sourceSize, sourceSize, 0, 0, size, size);
+            
+            canvas.toBlob(function(blob) {
+                croppedImageBlob = blob;
+                var url = URL.createObjectURL(blob);
+                document.getElementById('avatarPreview').innerHTML = '<img src="' + url + '">';
+                closeCropModal();
+            }, 'image/jpeg', 0.9);
+        }
+        
+        function removeImage() {
+            croppedImageBlob = null;
+            document.getElementById('avatarPreview').innerHTML = '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>';
+            closeCropModal();
+        }
+        
+        function previewAvatar(event) {
+            var file = event.target.files[0];
+            if (!file) return;
+            openCropModal(file);
+        }
+        
         function setupEmojiPicker() {
             var html = '<div class="emoji-grid">';
             for (var i = 0; i < EMOJIS.length; i++) {

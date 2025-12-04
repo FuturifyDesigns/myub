@@ -180,6 +180,15 @@
         .send-btn:hover { background: var(--navy-light); transform: scale(1.05); }
         .send-btn:disabled { background: var(--gray-300); cursor: not-allowed; transform: none; }
         .send-btn svg { width: 22px; height: 22px; color: var(--white); }
+        .emoji-btn { width: 44px; height: 44px; border: none; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; transition: all 0.2s; border: 2px solid var(--gray-200); }
+        .emoji-btn:hover { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-color: #fbbf24; transform: scale(1.05); }
+        .emoji-btn svg { width: 22px; height: 22px; color: var(--gray-600); }
+        .emoji-btn:hover svg { color: #f59e0b; }
+        .emoji-picker { position: absolute; bottom: calc(100% + 10px); left: 0; background: var(--white); border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); padding: 12px; display: none; z-index: 1000; }
+        .emoji-picker.show { display: block; }
+        .emoji-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; }
+        .emoji-item { font-size: 20px; cursor: pointer; padding: 6px; border-radius: 8px; text-align: center; transition: all 0.15s; display: flex; align-items: center; justify-content: center; line-height: 1; width: 32px; height: 32px; }
+        .emoji-item:hover { background: var(--gray-100); transform: scale(1.2); }
         .chat-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--gray-100); text-align: center; padding: 40px; }
         .chat-empty svg { width: 80px; height: 80px; color: var(--gray-300); margin-bottom: 20px; }
         .chat-empty h3 { font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 700; color: var(--gray-700); margin-bottom: 8px; }
@@ -295,7 +304,7 @@
                 <div class="chat-header" id="chatHeader" style="display: none;"><button class="chat-header-back" onclick="backToConversations()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg></button><div class="chat-user-info" onclick="viewUserProfile()"><div class="chat-avatar" id="chatAvatar"><span id="chatAvatarText">--</span><div class="online-dot" id="chatOnlineDot"></div></div><div class="chat-user-details"><h3 id="chatUserName">Loading...</h3><div class="chat-user-status" id="chatUserStatus">Online</div></div></div><div class="chat-header-actions"><button class="chat-action-btn" onclick="enterSelectionMode()" title="Select"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg></button><div style="position: relative;"><button class="chat-action-btn" onclick="toggleChatMenu(event)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/></svg></button><div class="dropdown-menu" id="chatMenu"><div class="dropdown-item" onclick="viewUserProfile()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>View Profile</div><div class="dropdown-item" onclick="clearConversation()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>Clear Chat</div><div class="dropdown-item danger" onclick="deleteConversation()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>Delete Conversation</div></div></div></div></div>
                 <div class="chat-blocked" id="chatBlocked" style="display: none;"><p id="blockedMessage">You cannot send messages to this user.</p></div>
                 <div class="chat-messages" id="chatMessages"></div>
-                <div class="chat-input-area" id="chatInputArea" style="display: none;"><div class="chat-input-wrapper"><textarea class="chat-input" id="messageInput" placeholder="Type a message..." rows="1" oninput="autoResize(this)"></textarea></div><button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg></button></div>
+                <div class="chat-input-area" id="chatInputArea" style="display: none;"><button class="emoji-btn" onclick="toggleEmojiPicker(event)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><div class="emoji-picker" id="emojiPicker"></div></button><div class="chat-input-wrapper"><textarea class="chat-input" id="messageInput" placeholder="Type a message..." rows="1" oninput="autoResize(this)"></textarea></div><button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg></button></div>
                 <div class="chat-empty" id="chatEmpty"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg><h3>Select a conversation</h3><p>Choose a conversation or start a new chat</p></div>
             </div>
         </div>
@@ -341,6 +350,7 @@
         const SUPABASE_URL = 'https://weuxtwmaqmbhskjpjdyi.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndldXh0d21hcW1iaHNranBqZHlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NTYzMTcsImV4cCI6MjA4MDMzMjMxN30.J-0Nd0MY6-g_ltbBNHwOulqZuQfb8mKIRgx0dAaJ76o';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const EMOJIS = ['😀','😂','😊','😍','🥰','😎','🤔','😮','😢','😡','👍','👎','❤️','🔥','⭐','🎉','💯','🙌','👏','💪','🤝','🙏','✨','💡','📚','✅','❌','⚠️','💬','📝'];
 
         let currentUser = null, conversations = [], currentConversation = null, currentChatUser = null;
         let messages = [], notifications = [], friends = [], blockedUsers = [], blockedByUsers = [];
@@ -352,6 +362,32 @@
         const notificationSound = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleVlhjtXr4JlYMTlqqdTm2I1LIzWFxevnvGw8KVmW1+3iomA4M2yq2erem1AkLnayz/Dgo2I2L2qm1ebgjU4pOIK+3eTCaz0nVprU5d6RUSktiL/i58mFWDQ4daTU4NqJSyQwhL7j5sSAUjI1cZ/Q3dWFSiYvgbzh5L5+Ty42bpzO2tKBRyUsgrrg4rx7TS00a5nL1s5+RiQrfbff4bh4Sis0Z5XI0sl7RSMpebjc37V1SCo0ZJLFzsZ4QyInc7TZ3LFyRSgzYY/Cyr51QiIldLHW2a5vQicyXoy/x7pzQCEjca3T1qprPyYwW4m8xLdxPyAhbqrQz6RmPiUuWIa5wa1sPR8fa6bMzqFkPCQsVYO2wKpqOx4daKLIypxhOyMrUn+zvqZnOhwbZZ7Fx5hfOSIpT3yxvKNkOBsZYprCw5VcNyEnS3muuZ5hNhkYX5a/wJJaNiAlSHaqtppeMxgWXJK8vY9YNCAfQ3GmspVaMBcVWY65uoxWMyAdQG6jrpFWLhUUV4q1t4lTMh8cPmufrI1SLBQTVIaysoZQMRscPGebqIlOKhITV4OuqH5JLRkaNmCVo4RJKBETVYCqpHtGKxgYNF2SmYBGJhASU32no3hDKRYXMlqPlHxDJRAQUHqjnnU/JhUWMFeNkHk/Ig4PUXennXI9JBMULlOKjHY8IA0OUXWS');
         notificationSound.volume = 0.3;
 
+        function initEmojiPicker() {
+            const picker = document.getElementById('emojiPicker');
+            if (!picker) return;
+            let html = '<div class="emoji-grid">';
+            EMOJIS.forEach(e => { html += '<div class="emoji-item" onclick="insertEmoji(\'' + e + '\')">' + e + '</div>'; });
+            html += '</div>';
+            picker.innerHTML = html;
+        }
+        
+        function toggleEmojiPicker(e) {
+            if (e) e.stopPropagation();
+            const picker = document.getElementById('emojiPicker');
+            picker.classList.toggle('show');
+        }
+        
+        function insertEmoji(emoji) {
+            const input = document.getElementById('messageInput');
+            const start = input.selectionStart;
+            const end = input.selectionEnd;
+            const text = input.value;
+            input.value = text.substring(0, start) + emoji + text.substring(end);
+            input.selectionStart = input.selectionEnd = start + emoji.length;
+            input.focus();
+            document.getElementById('sendBtn').disabled = !input.value.trim();
+        }
+
         async function init() {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) { window.location.href = 'index.html'; return; }
@@ -361,6 +397,7 @@
             await Promise.all([loadConversations(), loadFriends(), loadBlockedUsers(), loadNotifications(), loadFriendRequests(), loadSidebarFriendsBadge()]);
             subscribeToRealtime();
             startHeartbeat();
+            initEmojiPicker();
             const urlParams = new URLSearchParams(window.location.search);
             const userId = urlParams.get('user');
             if (userId) await openConversation(userId);
@@ -692,7 +729,7 @@
         function viewUserProfile() { if (currentChatUser) { openProfileModal(currentChatUser.id); } closeChatMenu(); }
         function toggleChatMenu(event) { event.stopPropagation(); document.getElementById('chatMenu').classList.toggle('show'); }
         function closeChatMenu() { document.getElementById('chatMenu').classList.remove('show'); }
-        function handleOutsideClick(e) { if (!e.target.closest('.notification-wrapper')) document.getElementById('notificationDropdown').classList.remove('show'); if (!e.target.closest('.chat-header-actions')) closeChatMenu(); }
+        function handleOutsideClick(e) { if (!e.target.closest('.notification-wrapper')) document.getElementById('notificationDropdown').classList.remove('show'); if (!e.target.closest('.chat-header-actions')) closeChatMenu(); if (!e.target.closest('.emoji-btn')) { const picker = document.getElementById('emojiPicker'); if (picker) picker.classList.remove('show'); } }
         function closeConfirmModal() { document.getElementById('confirmModal').classList.remove('show'); confirmCallback = null; }
         function confirmAction() { if (confirmCallback) confirmCallback(); }
         function toggleNotifications(event) { event.stopPropagation(); document.getElementById('notificationDropdown').classList.toggle('show'); }

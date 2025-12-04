@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Study Groups - MyUB</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
@@ -289,25 +291,41 @@
         @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         
-        /* Image Cropper Modal */
-        .crop-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.3s; }
-        .crop-modal.show { opacity: 1; visibility: visible; }
-        .crop-container { background: var(--white); border-radius: 16px; width: 90%; max-width: 500px; overflow: hidden; }
-        .crop-header { padding: 16px 20px; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center; }
-        .crop-header h3 { font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 700; color: var(--gray-800); }
-        .crop-close { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--gray-500); }
-        .crop-area { position: relative; width: 100%; height: 300px; background: #000; overflow: hidden; }
-        .crop-image { position: absolute; max-width: none; transform-origin: center; cursor: grab; }
-        .crop-image:active { cursor: grabbing; }
-        .crop-overlay { position: absolute; inset: 0; pointer-events: none; }
-        .crop-circle { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 200px; height: 200px; border: 3px solid var(--white); border-radius: 50%; box-shadow: 0 0 0 9999px rgba(0,0,0,0.5); }
-        .crop-controls { padding: 16px 20px; background: var(--gray-50); }
-        .zoom-control { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-        .zoom-control label { font-size: 13px; font-weight: 600; color: var(--gray-600); min-width: 50px; }
-        .zoom-slider { flex: 1; height: 6px; border-radius: 3px; background: var(--gray-200); appearance: none; cursor: pointer; }
-        .zoom-slider::-webkit-slider-thumb { appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--navy); cursor: pointer; }
-        .crop-actions { display: flex; gap: 12px; }
-        .crop-actions .btn { flex: 1; }
+        /* Avatar Upload Modal */
+        .avatar-choice { display: flex; flex-direction: column; gap: 12px; }
+        .avatar-choice-btn { display: flex; align-items: center; gap: 16px; padding: 16px; border: 2px solid var(--gray-200); border-radius: 12px; background: var(--white); cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; }
+        .avatar-choice-btn:hover { border-color: var(--navy); background: var(--gray-50); }
+        .avatar-choice-btn.danger:hover { border-color: var(--red); background: #fef2f2; }
+        .choice-icon { width: 48px; height: 48px; border-radius: 12px; background: var(--gray-100); display: flex; align-items: center; justify-content: center; }
+        .choice-icon svg { width: 24px; height: 24px; color: var(--gray-600); }
+        .avatar-choice-btn.danger .choice-icon { background: #fef2f2; }
+        .avatar-choice-btn.danger .choice-icon svg { color: var(--red); }
+        .choice-text h4 { font-size: 15px; font-weight: 600; color: var(--gray-800); margin-bottom: 2px; }
+        .choice-text p { font-size: 13px; color: var(--gray-500); }
+        .avatar-upload-area { border: 2px dashed var(--gray-300); border-radius: 12px; padding: 40px 20px; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .avatar-upload-area:hover { border-color: var(--navy); background: var(--gray-50); }
+        .avatar-upload-area svg { width: 48px; height: 48px; color: var(--gray-400); margin-bottom: 12px; }
+        .avatar-upload-area p { font-size: 15px; font-weight: 500; color: var(--gray-700); margin-bottom: 4px; }
+        .avatar-upload-area span { font-size: 13px; color: var(--gray-400); }
+        .crop-layout { display: flex; gap: 20px; align-items: flex-start; }
+        .crop-main { flex: 1; min-width: 0; }
+        .cropper-wrapper { width: 100%; height: 220px; background: var(--gray-100); border-radius: 12px; overflow: hidden; }
+        .cropper-wrapper img { max-width: 100%; display: block; }
+        .crop-controls { display: flex; justify-content: center; gap: 6px; margin-top: 12px; }
+        .crop-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 12px; border-radius: 8px; border: none; background: var(--gray-100); cursor: pointer; transition: all 0.2s; }
+        .crop-btn:hover { background: var(--gray-200); }
+        .crop-btn svg { width: 18px; height: 18px; color: var(--gray-600); }
+        .crop-btn span { font-size: 10px; color: var(--gray-500); font-weight: 500; }
+        .crop-sidebar { width: 110px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .crop-preview { width: 100px; height: 100px; border-radius: 12px; overflow: hidden; border: 3px solid var(--gray-200); background: var(--gray-100); }
+        .crop-preview-label { font-size: 12px; color: var(--gray-500); font-weight: 500; }
+        .upload-step { display: none; }
+        .upload-step.active { display: block; }
+        @media (max-width: 480px) {
+            .crop-layout { flex-direction: column; }
+            .crop-sidebar { width: 100%; flex-direction: row; justify-content: center; }
+            .crop-controls { flex-wrap: wrap; }
+        }
         
         /* Dark Mode */
         body.dark-mode { background: var(--gray-800); }
@@ -492,8 +510,8 @@
                 <div class="form-group">
                     <label class="form-label">Group Avatar</label>
                     <div class="avatar-upload">
-                        <div class="avatar-preview" id="avatarPreview"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
-                        <label class="avatar-upload-btn"><input type="file" accept="image/*" id="avatarInput" onchange="previewAvatar(event)" style="display:none;">Choose Image</label>
+                        <div class="avatar-preview" id="avatarPreview" onclick="openGroupAvatarModal('create')" style="cursor:pointer;" title="Click to add photo"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
+                        <button type="button" class="avatar-upload-btn" onclick="openGroupAvatarModal('create')">Choose Image</button>
                     </div>
                 </div>
                 <div class="form-group">
@@ -646,27 +664,91 @@
     
     <div class="toast" id="toast"></div>
     
-    <!-- Image Cropper Modal -->
-    <div class="crop-modal" id="cropModal">
-        <div class="crop-container">
-            <div class="crop-header">
-                <h3>Crop Image</h3>
-                <button class="crop-close" onclick="closeCropModal()">&times;</button>
+    <!-- Group Avatar Modal -->
+    <div class="modal" id="groupAvatarModal" style="z-index: 2000;">
+        <div class="modal-content" style="max-width: 520px;">
+            <div class="modal-header">
+                <span class="modal-title">Group Picture</span>
+                <button class="modal-close" onclick="closeGroupAvatarModal()">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
             </div>
-            <div class="crop-area" id="cropArea">
-                <img id="cropImage" class="crop-image" draggable="false">
-                <div class="crop-overlay"><div class="crop-circle"></div></div>
+            <div class="modal-body">
+                <!-- Step 1: Choice (only if has avatar) -->
+                <div class="upload-step" id="choiceStep">
+                    <div class="avatar-choice">
+                        <button type="button" class="avatar-choice-btn" onclick="showUploadStep()">
+                            <div class="choice-icon">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            </div>
+                            <div class="choice-text">
+                                <h4>Change Photo</h4>
+                                <p>Upload a new group picture</p>
+                            </div>
+                        </button>
+                        <button type="button" class="avatar-choice-btn danger" onclick="removeGroupAvatar()">
+                            <div class="choice-icon">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            </div>
+                            <div class="choice-text">
+                                <h4>Remove Photo</h4>
+                                <p>Go back to using initials</p>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Upload -->
+                <div class="upload-step" id="uploadStep">
+                    <div class="avatar-upload-area" onclick="document.getElementById('groupAvatarInput').click()">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <p>Click to upload an image</p>
+                        <span>JPG, PNG, GIF or WebP (max 2MB)</span>
+                    </div>
+                    <input type="file" id="groupAvatarInput" accept="image/jpeg,image/png,image/gif,image/webp" style="display: none;" onchange="handleGroupAvatarSelect(event)">
+                </div>
+
+                <!-- Step 3: Crop -->
+                <div class="upload-step" id="cropStep">
+                    <div class="crop-layout">
+                        <div class="crop-main">
+                            <div class="cropper-wrapper">
+                                <img id="cropperImage" src="" alt="Crop preview">
+                            </div>
+                            <div class="crop-controls">
+                                <button type="button" class="crop-btn" onclick="groupCropper.rotate(-90)">
+                                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.5 2v6h6M2.66 15.57a10 10 0 1 0 .57-8.38"/></svg>
+                                    <span>Left</span>
+                                </button>
+                                <button type="button" class="crop-btn" onclick="groupCropper.rotate(90)">
+                                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38"/></svg>
+                                    <span>Right</span>
+                                </button>
+                                <button type="button" class="crop-btn" onclick="groupCropper.zoom(0.1)">
+                                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/></svg>
+                                    <span>Zoom+</span>
+                                </button>
+                                <button type="button" class="crop-btn" onclick="groupCropper.zoom(-0.1)">
+                                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"/></svg>
+                                    <span>Zoom-</span>
+                                </button>
+                                <button type="button" class="crop-btn" onclick="groupCropper.reset()">
+                                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8m0-4v4h4"/></svg>
+                                    <span>Reset</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="crop-sidebar">
+                            <div class="crop-preview" id="cropPreview"></div>
+                            <span class="crop-preview-label">Preview</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="crop-controls">
-                <div class="zoom-control">
-                    <label>Zoom</label>
-                    <input type="range" class="zoom-slider" id="zoomSlider" min="100" max="300" value="100" oninput="handleZoom(this.value)">
-                </div>
-                <div class="crop-actions">
-                    <button class="btn btn-secondary" onclick="closeCropModal()">Cancel</button>
-                    <button class="btn btn-danger" onclick="removeImage()">Remove</button>
-                    <button class="btn btn-primary" onclick="applyCrop()">Apply</button>
-                </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="avatarBackBtn" onclick="avatarGoBack()" style="display: none;">Back</button>
+                <button class="btn btn-secondary" onclick="closeGroupAvatarModal()">Cancel</button>
+                <button class="btn btn-primary" id="applyAvatarBtn" onclick="applyGroupAvatar()" style="display: none;">Apply</button>
             </div>
         </div>
     </div>
@@ -703,14 +785,9 @@
         var friendLastSeen = {};
         
         // Cropper state
-        var cropperImage = null;
-        var cropperScale = 1;
-        var cropperX = 0;
-        var cropperY = 0;
-        var isDragging = false;
-        var dragStartX = 0;
-        var dragStartY = 0;
+        var groupCropper = null;
         var croppedImageBlob = null;
+        var avatarMode = 'create'; // 'create' or 'edit'
         
         // ============================================
         // HELPER FUNCTIONS
@@ -1382,7 +1459,7 @@
         }
         
         function updateCreatedCount() {
-            createdCount = myGroups.filter(function(g) { return g.created_by === currentUser.id; }).length;
+            createdCount = myGroups.filter(function(g) { return g.creator_id === currentUser.id; }).length;
             document.getElementById('groupsLimit').textContent = 'You can create up to ' + MAX_GROUPS + ' groups (' + createdCount + '/' + MAX_GROUPS + ' used)';
             document.getElementById('createBtn').disabled = createdCount >= MAX_GROUPS;
         }
@@ -1526,7 +1603,7 @@
                     course_code: course,
                     avatar_url: avatarUrl,
                     is_private: isPrivate,
-                    created_by: currentUser.id
+                    creator_id: currentUser.id
                 }).select().single();
                 
                 if (insertResult.error) {
@@ -1578,7 +1655,7 @@
             }).length;
             document.getElementById('infoMessagesCount').textContent = groupMessages.length;
             document.getElementById('memberCountLabel').textContent = '(' + currentMembers.length + ')';
-            document.getElementById('deleteGroupBtn').style.display = currentGroup.created_by === currentUser.id ? 'flex' : 'none';
+            document.getElementById('deleteGroupBtn').style.display = currentGroup.creator_id === currentUser.id ? 'flex' : 'none';
             
             renderMembersList();
             document.getElementById('groupInfoModal').classList.add('show');
@@ -1777,7 +1854,7 @@
         }
         
         function confirmDeleteGroup() {
-            if (!currentGroup || currentGroup.created_by !== currentUser.id) return;
+            if (!currentGroup || currentGroup.creator_id !== currentUser.id) return;
             
             document.getElementById('confirmTitle').textContent = 'Delete Group';
             document.getElementById('confirmMessage').textContent = 'Delete this group? All messages will be lost.';
@@ -1961,134 +2038,169 @@
         // ============================================
         // UI FUNCTIONS
         // ============================================
+        // IMAGE CROPPER FUNCTIONS (Cropper.js)
         // ============================================
-        // IMAGE CROPPER FUNCTIONS
-        // ============================================
-        function openCropModal(file) {
+        function openGroupAvatarModal(mode) {
+            avatarMode = mode || 'create';
+            
+            if (groupCropper) {
+                groupCropper.destroy();
+                groupCropper = null;
+            }
+            
+            // Reset steps
+            document.getElementById('choiceStep').classList.remove('active');
+            document.getElementById('uploadStep').classList.remove('active');
+            document.getElementById('cropStep').classList.remove('active');
+            document.getElementById('avatarBackBtn').style.display = 'none';
+            document.getElementById('applyAvatarBtn').style.display = 'none';
+            
+            // If editing existing group with avatar, show choice
+            if (avatarMode === 'edit' && currentGroup && hasValidAvatar(currentGroup.avatar_url)) {
+                document.getElementById('choiceStep').classList.add('active');
+            } else {
+                document.getElementById('uploadStep').classList.add('active');
+            }
+            
+            document.getElementById('groupAvatarModal').classList.add('show');
+        }
+        
+        function closeGroupAvatarModal() {
+            document.getElementById('groupAvatarModal').classList.remove('show');
+            if (groupCropper) {
+                groupCropper.destroy();
+                groupCropper = null;
+            }
+            document.getElementById('groupAvatarInput').value = '';
+        }
+        
+        function showUploadStep() {
+            document.getElementById('choiceStep').classList.remove('active');
+            document.getElementById('uploadStep').classList.add('active');
+            document.getElementById('avatarBackBtn').style.display = 'inline-flex';
+        }
+        
+        function avatarGoBack() {
+            var cropActive = document.getElementById('cropStep').classList.contains('active');
+            var uploadActive = document.getElementById('uploadStep').classList.contains('active');
+            
+            if (cropActive) {
+                document.getElementById('cropStep').classList.remove('active');
+                document.getElementById('uploadStep').classList.add('active');
+                document.getElementById('applyAvatarBtn').style.display = 'none';
+                if (groupCropper) {
+                    groupCropper.destroy();
+                    groupCropper = null;
+                }
+            } else if (uploadActive) {
+                if (avatarMode === 'edit' && currentGroup && hasValidAvatar(currentGroup.avatar_url)) {
+                    document.getElementById('uploadStep').classList.remove('active');
+                    document.getElementById('choiceStep').classList.add('active');
+                    document.getElementById('avatarBackBtn').style.display = 'none';
+                } else {
+                    closeGroupAvatarModal();
+                }
+            }
+        }
+        
+        function handleGroupAvatarSelect(event) {
+            var file = event.target.files[0];
+            if (!file) return;
+            
+            // Validate file type
+            var validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            if (validTypes.indexOf(file.type) === -1) {
+                showToast('Please select a valid image file', 'error');
+                return;
+            }
+            
+            // Validate file size (2MB max)
+            if (file.size > 2 * 1024 * 1024) {
+                showToast('Image must be less than 2MB', 'error');
+                return;
+            }
+            
             var reader = new FileReader();
             reader.onload = function(e) {
-                cropperImage = e.target.result;
-                var img = document.getElementById('cropImage');
-                img.src = cropperImage;
-                img.onload = function() {
-                    resetCropper();
-                    document.getElementById('cropModal').classList.add('show');
-                    setupCropDrag();
-                };
+                document.getElementById('uploadStep').classList.remove('active');
+                document.getElementById('cropStep').classList.add('active');
+                document.getElementById('avatarBackBtn').style.display = 'inline-flex';
+                document.getElementById('applyAvatarBtn').style.display = 'inline-flex';
+                
+                var image = document.getElementById('cropperImage');
+                image.src = e.target.result;
+                
+                if (groupCropper) groupCropper.destroy();
+                
+                setTimeout(function() {
+                    groupCropper = new Cropper(image, {
+                        aspectRatio: 1,
+                        viewMode: 1,
+                        dragMode: 'move',
+                        autoCropArea: 1,
+                        cropBoxResizable: true,
+                        cropBoxMovable: true,
+                        guides: true,
+                        center: true,
+                        highlight: false,
+                        background: false,
+                        preview: '#cropPreview'
+                    });
+                }, 50);
             };
             reader.readAsDataURL(file);
         }
         
-        function closeCropModal() {
-            document.getElementById('cropModal').classList.remove('show');
-            cropperImage = null;
-            document.getElementById('avatarInput').value = '';
-        }
-        
-        function resetCropper() {
-            cropperScale = 1;
-            cropperX = 0;
-            cropperY = 0;
-            document.getElementById('zoomSlider').value = 100;
-            updateCropperTransform();
-        }
-        
-        function handleZoom(value) {
-            cropperScale = value / 100;
-            updateCropperTransform();
-        }
-        
-        function updateCropperTransform() {
-            var img = document.getElementById('cropImage');
-            img.style.transform = 'translate(' + cropperX + 'px, ' + cropperY + 'px) scale(' + cropperScale + ')';
-        }
-        
-        function setupCropDrag() {
-            var img = document.getElementById('cropImage');
-            var area = document.getElementById('cropArea');
+        function applyGroupAvatar() {
+            if (!groupCropper) return;
             
-            img.onmousedown = function(e) {
-                e.preventDefault();
-                isDragging = true;
-                dragStartX = e.clientX - cropperX;
-                dragStartY = e.clientY - cropperY;
-            };
-            
-            area.onmousemove = function(e) {
-                if (!isDragging) return;
-                cropperX = e.clientX - dragStartX;
-                cropperY = e.clientY - dragStartY;
-                updateCropperTransform();
-            };
-            
-            area.onmouseup = function() { isDragging = false; };
-            area.onmouseleave = function() { isDragging = false; };
-            
-            // Touch support
-            img.ontouchstart = function(e) {
-                e.preventDefault();
-                isDragging = true;
-                var touch = e.touches[0];
-                dragStartX = touch.clientX - cropperX;
-                dragStartY = touch.clientY - cropperY;
-            };
-            
-            area.ontouchmove = function(e) {
-                if (!isDragging) return;
-                var touch = e.touches[0];
-                cropperX = touch.clientX - dragStartX;
-                cropperY = touch.clientY - dragStartY;
-                updateCropperTransform();
-            };
-            
-            area.ontouchend = function() { isDragging = false; };
-        }
-        
-        function applyCrop() {
-            var img = document.getElementById('cropImage');
-            var canvas = document.createElement('canvas');
-            var ctx = canvas.getContext('2d');
-            var size = 200;
-            canvas.width = size;
-            canvas.height = size;
-            
-            var cropArea = document.getElementById('cropArea');
-            var areaRect = cropArea.getBoundingClientRect();
-            var centerX = areaRect.width / 2;
-            var centerY = areaRect.height / 2;
-            
-            var imgWidth = img.naturalWidth * cropperScale;
-            var imgHeight = img.naturalHeight * cropperScale;
-            var imgX = centerX + cropperX - imgWidth / 2;
-            var imgY = centerY + cropperY - imgHeight / 2;
-            
-            var cropX = centerX - size / 2;
-            var cropY = centerY - size / 2;
-            
-            var sourceX = (cropX - imgX) / cropperScale;
-            var sourceY = (cropY - imgY) / cropperScale;
-            var sourceSize = size / cropperScale;
-            
-            ctx.drawImage(img, sourceX, sourceY, sourceSize, sourceSize, 0, 0, size, size);
+            var canvas = groupCropper.getCroppedCanvas({
+                width: 400,
+                height: 400,
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: 'high'
+            });
             
             canvas.toBlob(function(blob) {
                 croppedImageBlob = blob;
                 var url = URL.createObjectURL(blob);
                 document.getElementById('avatarPreview').innerHTML = '<img src="' + url + '">';
-                closeCropModal();
+                closeGroupAvatarModal();
             }, 'image/jpeg', 0.9);
         }
         
-        function removeImage() {
-            croppedImageBlob = null;
-            document.getElementById('avatarPreview').innerHTML = '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>';
-            closeCropModal();
+        async function removeGroupAvatar() {
+            if (avatarMode === 'edit' && currentGroup) {
+                // Remove from existing group
+                try {
+                    await supabase.from('study_groups')
+                        .update({ avatar_url: null })
+                        .eq('id', currentGroup.id);
+                    
+                    currentGroup.avatar_url = null;
+                    var initials = getInitials(currentGroup.name);
+                    document.getElementById('chatAvatar').innerHTML = initials;
+                    showToast('Avatar removed', 'success');
+                    await loadMyGroups();
+                } catch(e) {
+                    showToast('Failed to remove avatar', 'error');
+                }
+            } else {
+                // Creating new group, just clear the preview
+                croppedImageBlob = null;
+                document.getElementById('avatarPreview').innerHTML = '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>';
+            }
+            closeGroupAvatarModal();
         }
         
         function previewAvatar(event) {
             var file = event.target.files[0];
             if (!file) return;
-            openCropModal(file);
+            openGroupAvatarModal('create');
+            // Trigger the file select after modal opens
+            setTimeout(function() {
+                handleGroupAvatarSelect(event);
+            }, 100);
         }
         
         function setupEmojiPicker() {

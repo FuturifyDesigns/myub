@@ -167,7 +167,7 @@
         .emoji-picker { position: absolute; bottom: 100%; left: 0; background: var(--white); border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); padding: 12px; display: none; z-index: 100; width: 280px; margin-bottom: 8px; }
         .emoji-picker.show { display: block; }
         .emoji-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; }
-        .emoji-item { padding: 8px; text-align: center; cursor: pointer; border-radius: 8px; font-size: 20px; transition: background 0.2s; }
+        .emoji-item { font-size: 22px; cursor: pointer; padding: 6px; border-radius: 8px; text-align: center; transition: background 0.2s; display: flex; align-items: center; justify-content: center; }
         .emoji-item:hover { background: var(--gray-100); }
         .chat-input-wrapper { flex: 1; background: var(--gray-100); border-radius: 24px; padding: 4px 16px; display: flex; align-items: flex-end; }
         .chat-input { flex: 1; border: none; background: transparent; font-family: 'Outfit', sans-serif; font-size: 15px; padding: 10px 0; resize: none; max-height: 120px; line-height: 1.4; }
@@ -466,9 +466,24 @@
             <div class="groups-panel" id="groupsPanel">
                 <div class="groups-header">
                     <h2>Study Groups</h2>
-                    <button class="create-btn" id="createBtn" onclick="openCreateModal()" title="Create Group">
-                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
-                    </button>
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        <div class="notification-wrapper">
+                            <button class="icon-btn" onclick="toggleNotifications(event)" style="width:40px;height:40px;border-radius:50%;background:var(--gray-100);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative;">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                                <span class="notification-badge" id="notifBadge2" style="display:none;position:absolute;top:-2px;right:-2px;background:var(--red);color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;min-width:16px;text-align:center;">0</span>
+                            </button>
+                            <div class="notification-dropdown" id="notificationDropdown">
+                                <div class="notif-dropdown-header">
+                                    <h3>Notifications</h3>
+                                    <button onclick="markAllNotificationsRead()">Mark all read</button>
+                                </div>
+                                <div class="notif-dropdown-list" id="notifList"></div>
+                            </div>
+                        </div>
+                        <button class="create-btn" id="createBtn" onclick="openCreateModal()" title="Create Group">
+                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
+                        </button>
+                    </div>
                 </div>
                 <div class="groups-tabs">
                     <button class="tab-btn active" data-tab="my" onclick="switchTab('my')">My Groups <span class="count" id="myGroupsCount">0</span></button>
@@ -1136,9 +1151,19 @@
         
         function renderNotifications() {
             var unread = notifications.filter(function(n) { return !n.is_read; }).length;
-            var badge = document.getElementById('notifBadge');
-            badge.style.display = unread > 0 ? 'flex' : 'none';
-            badge.textContent = unread > 9 ? '9+' : unread;
+            
+            // Update both notification badges
+            var badge1 = document.getElementById('notifBadge');
+            var badge2 = document.getElementById('notifBadge2');
+            
+            if (badge1) {
+                badge1.style.display = unread > 0 ? 'flex' : 'none';
+                badge1.textContent = unread > 9 ? '9+' : unread;
+            }
+            if (badge2) {
+                badge2.style.display = unread > 0 ? 'inline-block' : 'none';
+                badge2.textContent = unread > 9 ? '9+' : unread;
+            }
             
             var container = document.getElementById('notifList');
             if (notifications.length === 0) {
@@ -1153,6 +1178,8 @@
                 if (n.type === 'group_join_request') iconClass = 'orange';
                 else if (n.type === 'group_request_accepted') iconClass = 'green';
                 else if (n.type === 'friend_request') iconClass = 'blue';
+                else if (n.type === 'group_message') iconClass = 'blue';
+                else if (n.type === 'new_member') iconClass = 'green';
                 
                 html += '<div class="notif-dropdown-item' + (n.is_read ? '' : ' unread') + '" onclick="handleNotifClick(\'' + n.id + '\',\'' + n.type + '\',\'' + (n.reference_id || '') + '\')">';
                 html += '<div class="notif-icon ' + iconClass + '"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg></div>';
@@ -1339,12 +1366,54 @@
             var input = document.getElementById('messageInput');
             var content = input.value.trim();
             if (!content || !currentGroup) return;
+            
+            var tempContent = content;
             input.value = '';
             input.style.height = 'auto';
+            
+            // Optimistic update - show message immediately
+            var tempMsg = {
+                id: 'temp-' + Date.now(),
+                group_id: currentGroup.id,
+                sender_id: currentUser.id,
+                content: tempContent,
+                created_at: new Date().toISOString(),
+                profiles: {
+                    id: currentUser.id,
+                    first_name: 'You',
+                    last_name: '',
+                    full_name: 'You',
+                    avatar_url: null
+                }
+            };
+            groupMessages.push(tempMsg);
+            renderMessages();
+            
             try {
-                var result = await supabase.from('study_group_messages').insert({ group_id: currentGroup.id, sender_id: currentUser.id, content: content });
-                if (result.error) { showToast('Failed to send', 'error'); input.value = content; }
-            } catch(e) { showToast('Failed to send', 'error'); input.value = content; }
+                var result = await supabase.from('study_group_messages').insert({ 
+                    group_id: currentGroup.id, 
+                    sender_id: currentUser.id, 
+                    content: tempContent 
+                }).select('*, profiles:sender_id(id, first_name, last_name, full_name, avatar_url)').single();
+                
+                if (result.error) { 
+                    // Remove temp message on error
+                    groupMessages = groupMessages.filter(function(m) { return m.id !== tempMsg.id; });
+                    renderMessages();
+                    showToast('Failed to send', 'error'); 
+                    input.value = tempContent; 
+                } else {
+                    // Replace temp message with real one
+                    groupMessages = groupMessages.filter(function(m) { return m.id !== tempMsg.id; });
+                    groupMessages.push(result.data);
+                    renderMessages();
+                }
+            } catch(e) { 
+                groupMessages = groupMessages.filter(function(m) { return m.id !== tempMsg.id; });
+                renderMessages();
+                showToast('Failed to send', 'error'); 
+                input.value = tempContent; 
+            }
         }
         
         function handleKeydown(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
@@ -1857,12 +1926,27 @@
         // REALTIME SUBSCRIPTIONS
         // ============================================
         function subscribeToRealtime() {
-            // Messages channel
-            supabase.channel('sg-messages').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'study_group_messages' }, function(payload) {
+            // Messages channel - handle new messages in real-time
+            supabase.channel('sg-messages').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'study_group_messages' }, async function(payload) {
                 if (currentGroup && payload.new.group_id === currentGroup.id) {
-                    loadGroupMessages();
+                    // Only add if not already in list (avoid duplicates from optimistic update)
+                    var exists = groupMessages.some(function(m) { return m.id === payload.new.id; });
+                    if (!exists) {
+                        // Fetch the full message with profile data
+                        var result = await supabase
+                            .from('study_group_messages')
+                            .select('*, profiles:sender_id(id, first_name, last_name, full_name, avatar_url)')
+                            .eq('id', payload.new.id)
+                            .single();
+                        
+                        if (result.data) {
+                            groupMessages.push(result.data);
+                            renderMessages();
+                        }
+                    }
                     // Update message count in info modal
-                    document.getElementById('infoMessagesCount').textContent = groupMessages.length + 1;
+                    var infoCount = document.getElementById('infoMessagesCount');
+                    if (infoCount) infoCount.textContent = groupMessages.length;
                 }
                 loadMyGroups();
             }).subscribe();
@@ -1875,9 +1959,12 @@
                         renderMembersList();
                         renderGroups(); // Refresh group list to show updated counts
                         // Update info modal counters
-                        document.getElementById('infoMembersCount').textContent = currentMembers.length;
-                        document.getElementById('infoOnlineCount').textContent = currentMembers.filter(function(m) { return m.profiles && m.profiles.is_online; }).length;
-                        document.getElementById('memberCountLabel').textContent = '(' + currentMembers.length + ')';
+                        var infoMembers = document.getElementById('infoMembersCount');
+                        var infoOnline = document.getElementById('infoOnlineCount');
+                        var memberLabel = document.getElementById('memberCountLabel');
+                        if (infoMembers) infoMembers.textContent = currentMembers.length;
+                        if (infoOnline) infoOnline.textContent = currentMembers.filter(function(m) { return m.profiles && m.profiles.is_online; }).length;
+                        if (memberLabel) memberLabel.textContent = '(' + currentMembers.length + ')';
                     });
                 }
                 loadMyGroups();
@@ -1892,7 +1979,8 @@
                         renderMembersList();
                         renderGroups();
                         // Update info modal online count
-                        document.getElementById('infoOnlineCount').textContent = currentMembers.filter(function(m) { return m.profiles && m.profiles.is_online; }).length;
+                        var infoOnline = document.getElementById('infoOnlineCount');
+                        if (infoOnline) infoOnline.textContent = currentMembers.filter(function(m) { return m.profiles && m.profiles.is_online; }).length;
                     });
                 }
             }).subscribe();

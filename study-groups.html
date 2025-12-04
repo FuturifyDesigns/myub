@@ -59,7 +59,7 @@
         
         /* Notification Dropdown */
         .notification-wrapper { position: relative; }
-        .notification-dropdown { position: absolute; top: calc(100% + 8px); right: 0; width: 360px; max-height: 480px; background: var(--white); border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.2s; z-index: 1000; overflow: hidden; }
+        .notification-dropdown { position: fixed; top: auto; right: 20px; width: 360px; max-height: 480px; background: var(--white); border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.2s; z-index: 1001; overflow: hidden; }
         .notification-dropdown.show { opacity: 1; visibility: visible; transform: translateY(0); }
         .notif-dropdown-header { padding: 16px 20px; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center; }
         .notif-dropdown-header h3 { font-size: 16px; font-weight: 700; color: var(--gray-800); }
@@ -164,8 +164,11 @@
         .chat-input-area { padding: 16px 20px; background: var(--white); border-top: 1px solid var(--gray-200); display: flex; align-items: flex-end; gap: 12px; }
         .emoji-btn { width: 40px; height: 40px; border: none; background: var(--gray-100); border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; }
         .emoji-btn svg { width: 20px; height: 20px; color: var(--gray-500); }
-        .emoji-picker { position: absolute; bottom: calc(100% + 10px); left: 0; background: var(--white); border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); padding: 16px; display: none; z-index: 1000; width: 320px; }
+        .emoji-picker { position: absolute; bottom: calc(100% + 10px); left: 0; background: var(--white); border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); padding: 12px; display: none; z-index: 1000; width: 280px; max-height: 200px; overflow-y: auto; }
         .emoji-picker.show { display: block; }
+        .emoji-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+        .emoji-item { font-size: 22px; cursor: pointer; padding: 6px; border-radius: 8px; text-align: center; transition: all 0.15s; display: flex; align-items: center; justify-content: center; line-height: 1; aspect-ratio: 1; }
+        .emoji-item:hover { background: var(--gray-100); transform: scale(1.15); }
         
         /* Selection Mode */
         .selection-header { padding: 12px 20px; background: var(--navy); display: none; align-items: center; gap: 12px; border-radius: 0; }
@@ -175,6 +178,8 @@
         .selection-btn { padding: 8px 14px; border: none; border-radius: 8px; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s; }
         .selection-btn svg { width: 16px; height: 16px; }
         .selection-btn.cancel { background: rgba(255,255,255,0.2); color: var(--white); }
+        .selection-btn.forward { background: var(--white); color: var(--navy); }
+        .selection-btn.report { background: var(--orange); color: var(--white); }
         .selection-btn.delete { background: var(--red); color: var(--white); }
         .selection-btn.delete:hover { background: #a01830; }
         .message-select { width: 22px; height: 22px; min-width: 22px; border: 2px solid var(--gray-300); border-radius: 50%; cursor: pointer; display: none; align-items: center; justify-content: center; background: var(--white); transition: all 0.15s; flex-shrink: 0; margin-right: 8px; }
@@ -182,9 +187,6 @@
         .message-select.checked { background: var(--navy); border-color: var(--navy); }
         .message-select.checked::after { content: '✓'; color: var(--white); font-size: 11px; font-weight: 700; }
         .message-bubble.selected { outline: 3px solid var(--blue); outline-offset: 2px; }
-        .emoji-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; }
-        .emoji-item { font-size: 20px; cursor: pointer; padding: 8px; border-radius: 8px; text-align: center; transition: background 0.2s; display: flex; align-items: center; justify-content: center; line-height: 1; }
-        .emoji-item:hover { background: var(--gray-100); transform: scale(1.1); }
         
         /* Message Selection */
         .message-select { width: 22px; height: 22px; min-width: 22px; border: 2px solid var(--gray-300); border-radius: 50%; cursor: pointer; display: none; align-items: center; justify-content: center; background: var(--white); transition: all 0.15s; flex-shrink: 0; margin-right: 8px; }
@@ -423,6 +425,8 @@
             .chat-panel { position: absolute; left: 0; top: 0; right: 0; bottom: 0; display: none; }
             .chat-panel.show { display: flex; }
             .chat-header-back { display: flex; }
+            .selection-bar-actions { gap: 6px; }
+            .selection-bar-actions button { padding: 8px 12px; font-size: 12px; }
         }
         @media (max-width: 768px) {
             .sidebar { transform: translateX(-100%); }
@@ -431,10 +435,23 @@
             .main-content { margin-left: 0; }
             .topbar { display: flex; }
             .menu-toggle { display: block; }
-            .notification-dropdown { position: fixed; top: 60px; left: 8px; right: 8px; width: auto; border-radius: 16px; max-height: calc(100vh - 80px); }
+            .notification-dropdown { position: fixed; top: auto; left: 10px; right: 10px; width: auto; border-radius: 16px; max-height: 60vh; }
             .form-row { grid-template-columns: 1fr; }
             .crop-layout { flex-direction: column; }
             .crop-sidebar { width: 100%; flex-direction: row; justify-content: center; }
+            .emoji-picker { width: 260px; left: auto; right: 0; max-height: 180px; }
+            .emoji-grid { grid-template-columns: repeat(6, 1fr); }
+            .emoji-item { font-size: 20px; padding: 5px; }
+            .selection-bar { padding: 12px 16px; }
+            .selection-bar-actions { flex-wrap: wrap; }
+            .selection-bar-actions button { padding: 6px 10px; font-size: 11px; }
+            .selection-bar-actions button svg { width: 14px; height: 14px; }
+        }
+        @media (max-width: 480px) {
+            .emoji-picker { width: 220px; }
+            .emoji-grid { grid-template-columns: repeat(5, 1fr); }
+            .selection-bar-actions button span { display: none; }
+            .selection-bar-actions button { padding: 8px; }
         }
     </style>
 <body>
@@ -597,6 +614,14 @@
         </div>
         <div class="selection-bar-actions">
             <button class="cancel-btn" onclick="cancelSelection()">Cancel</button>
+            <button class="report-btn" onclick="openMessageReportModal()" style="background:var(--orange);color:white;">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                Report
+            </button>
+            <button class="forward-btn" onclick="openForwardModal()" style="background:var(--white);color:var(--navy);">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 5l7 7-7 7M5 5l7 7-7 7"/></svg>
+                Forward
+            </button>
             <button class="delete-btn" onclick="deleteSelectedMessages()">
                 <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                 Delete
@@ -610,9 +635,17 @@
             <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
             Copy
         </div>
+        <div class="context-menu-item" onclick="forwardContextMessage()">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 5l7 7-7 7M5 5l7 7-7 7"/></svg>
+            Forward
+        </div>
         <div class="context-menu-item" onclick="startSelection()">
             <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             Select
+        </div>
+        <div class="context-menu-item" id="reportMenuItem" onclick="reportContextMessage()">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            Report
         </div>
         <div class="context-menu-item danger" id="deleteMenuItem" onclick="deleteContextMessage()">
             <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
@@ -858,6 +891,58 @@
         </div>
     </div>
     
+    <!-- Forward Modal -->
+    <div class="modal" id="forwardModal" style="z-index:1100;">
+        <div class="modal-content" style="max-width:400px;">
+            <div class="modal-header">
+                <span class="modal-title">Forward Message</span>
+                <button class="modal-close" onclick="closeForwardModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+            <div class="modal-body" style="padding:0;">
+                <div style="padding:16px;border-bottom:1px solid var(--gray-200);">
+                    <input type="text" class="search-input" id="forwardSearchInput" placeholder="Search friends..." oninput="searchForwardUsers()">
+                </div>
+                <div id="forwardUsersList" style="max-height:300px;overflow-y:auto;padding:8px 0;"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeForwardModal()">Cancel</button>
+                <button class="btn btn-primary" id="forwardBtn" onclick="forwardMessages()" disabled>Forward</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Message Report Modal -->
+    <div class="modal" id="messageReportModal" style="z-index:1100;">
+        <div class="modal-content" style="max-width:360px;">
+            <div class="modal-header">
+                <span class="modal-title">Report Message</span>
+                <button class="modal-close" onclick="closeMessageReportModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Reason</label>
+                    <select class="form-select" id="messageReportReason">
+                        <option value="">Select a reason</option>
+                        <option value="spam">Spam</option>
+                        <option value="harassment">Harassment</option>
+                        <option value="hate_speech">Hate Speech</option>
+                        <option value="inappropriate">Inappropriate Content</option>
+                        <option value="threats">Threats or Violence</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Details (optional)</label>
+                    <textarea class="form-textarea" id="messageReportDetails" placeholder="Provide details..." rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeMessageReportModal()">Cancel</button>
+                <button class="btn btn-danger" onclick="submitMessageReport()">Report</button>
+            </div>
+        </div>
+    </div>
+    
     <div class="toast" id="toast"></div>
     
     <script>
@@ -901,6 +986,8 @@
         var selectedMessages = [];
         var contextMenuMessageId = null;
         var contextMenuMessageContent = null;
+        var forwardToUsers = [];
+        var messageReportTarget = null;
         
         // ============================================
         // HELPERS
@@ -2008,12 +2095,27 @@
         
         function toggleNotifications(e) { 
             if (e) e.stopPropagation(); 
-            // Toggle the main dropdown (in groups-header for desktop)
             var dd2 = document.getElementById('notificationDropdown2');
-            if (dd2) dd2.classList.toggle('show');
+            if (dd2) {
+                dd2.classList.toggle('show');
+                // Position the dropdown
+                if (dd2.classList.contains('show')) {
+                    var btn = e.currentTarget;
+                    var rect = btn.getBoundingClientRect();
+                    dd2.style.top = (rect.bottom + 8) + 'px';
+                    dd2.style.right = (window.innerWidth - rect.right) + 'px';
+                }
+            }
             // Also toggle mobile topbar dropdown if visible
             var dd1 = document.getElementById('notificationDropdown');
-            if (dd1 && window.innerWidth <= 900) dd1.classList.toggle('show');
+            if (dd1 && window.innerWidth <= 900) {
+                dd1.classList.toggle('show');
+                if (dd1.classList.contains('show')) {
+                    var btn2 = e.currentTarget;
+                    var rect2 = btn2.getBoundingClientRect();
+                    dd1.style.top = (rect2.bottom + 8) + 'px';
+                }
+            }
         }
         
         // ============================================
@@ -2425,6 +2527,171 @@
             } catch(e) {
                 showToast('Failed to delete messages', 'error');
             }
+        }
+        
+        // ============================================
+        // FORWARD MESSAGES
+        // ============================================
+        function openForwardModal() {
+            if (selectedMessages.length === 0 && !contextMenuMessageId) {
+                showToast('No messages selected', 'error');
+                return;
+            }
+            forwardToUsers = [];
+            document.getElementById('forwardSearchInput').value = '';
+            renderForwardUsersList();
+            document.getElementById('forwardModal').classList.add('show');
+            document.getElementById('forwardBtn').disabled = true;
+        }
+        
+        function closeForwardModal() {
+            document.getElementById('forwardModal').classList.remove('show');
+        }
+        
+        function searchForwardUsers() {
+            renderForwardUsersList();
+        }
+        
+        function renderForwardUsersList() {
+            var container = document.getElementById('forwardUsersList');
+            var query = document.getElementById('forwardSearchInput').value.toLowerCase().trim();
+            
+            var filtered = friends.filter(function(f) {
+                if (!query) return true;
+                var name = getName(f).toLowerCase();
+                return name.indexOf(query) !== -1;
+            });
+            
+            if (filtered.length === 0) {
+                container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--gray-400);">No friends found</div>';
+                return;
+            }
+            
+            var html = '';
+            for (var i = 0; i < filtered.length; i++) {
+                var f = filtered[i];
+                var name = getName(f);
+                var initials = getInitials(name);
+                var isSelected = forwardToUsers.indexOf(f.id) !== -1;
+                var avatarContent = hasValidAvatar(f.avatar_url) ? '<img src="' + escapeHtml(f.avatar_url) + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">' : initials;
+                
+                html += '<div class="user-search-item" onclick="toggleForwardUser(\'' + f.id + '\')" style="' + (isSelected ? 'background:var(--blue-light);' : '') + '">';
+                html += '<div class="user-search-avatar" style="background:' + getColorFromId(f.id) + ';">' + avatarContent;
+                html += '<div class="online-indicator ' + (f.is_online ? '' : 'offline') + '"></div></div>';
+                html += '<div class="user-search-info"><div class="user-search-name">' + escapeHtml(name) + '</div>';
+                html += '<div class="user-search-program">' + escapeHtml(f.program_name || 'Student') + '</div></div>';
+                if (isSelected) {
+                    html += '<div style="width:24px;height:24px;background:var(--navy);border-radius:50%;display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" fill="none" stroke="white" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>';
+                }
+                html += '</div>';
+            }
+            container.innerHTML = html;
+        }
+        
+        function toggleForwardUser(userId) {
+            var idx = forwardToUsers.indexOf(userId);
+            if (idx !== -1) {
+                forwardToUsers.splice(idx, 1);
+            } else {
+                forwardToUsers.push(userId);
+            }
+            renderForwardUsersList();
+            document.getElementById('forwardBtn').disabled = forwardToUsers.length === 0;
+        }
+        
+        async function forwardMessages() {
+            if (forwardToUsers.length === 0) return;
+            
+            var msgIds = selectedMessages.length > 0 ? selectedMessages : [contextMenuMessageId];
+            var messagesToForward = groupMessages.filter(function(m) { return msgIds.indexOf(m.id) !== -1; });
+            
+            if (messagesToForward.length === 0) {
+                showToast('No messages to forward', 'error');
+                return;
+            }
+            
+            try {
+                for (var i = 0; i < forwardToUsers.length; i++) {
+                    var userId = forwardToUsers[i];
+                    for (var j = 0; j < messagesToForward.length; j++) {
+                        var msg = messagesToForward[j];
+                        await supabase.from('messages').insert({
+                            sender_id: currentUser.id,
+                            receiver_id: userId,
+                            content: '[Forwarded from ' + (currentGroup ? currentGroup.name : 'group') + ']: ' + msg.content
+                        });
+                    }
+                }
+                showToast('Message(s) forwarded', 'success');
+                closeForwardModal();
+                cancelSelection();
+                hideContextMenu();
+            } catch(e) {
+                showToast('Failed to forward', 'error');
+            }
+        }
+        
+        function forwardContextMessage() {
+            hideContextMenu();
+            if (!contextMenuMessageId) return;
+            selectedMessages = [];
+            openForwardModal();
+        }
+        
+        // ============================================
+        // REPORT MESSAGES
+        // ============================================
+        function openMessageReportModal() {
+            if (selectedMessages.length === 0 && !contextMenuMessageId) {
+                showToast('No messages selected', 'error');
+                return;
+            }
+            document.getElementById('messageReportReason').value = '';
+            document.getElementById('messageReportDetails').value = '';
+            document.getElementById('messageReportModal').classList.add('show');
+        }
+        
+        function closeMessageReportModal() {
+            document.getElementById('messageReportModal').classList.remove('show');
+        }
+        
+        async function submitMessageReport() {
+            var reason = document.getElementById('messageReportReason').value;
+            if (!reason) {
+                showToast('Please select a reason', 'error');
+                return;
+            }
+            
+            var details = document.getElementById('messageReportDetails').value;
+            var msgIds = selectedMessages.length > 0 ? selectedMessages : [contextMenuMessageId];
+            var messagesToReport = groupMessages.filter(function(m) { return msgIds.indexOf(m.id) !== -1; });
+            
+            try {
+                for (var i = 0; i < messagesToReport.length; i++) {
+                    var msg = messagesToReport[i];
+                    await supabase.from('reports').insert({
+                        reporter_id: currentUser.id,
+                        reported_id: msg.sender_id,
+                        type: 'group_message',
+                        reason: reason,
+                        details: details + ' [Message: ' + msg.content.substring(0, 100) + '] [Group: ' + (currentGroup ? currentGroup.name : 'Unknown') + ']',
+                        reference_id: msg.id
+                    });
+                }
+                showToast('Report submitted', 'success');
+                closeMessageReportModal();
+                cancelSelection();
+                hideContextMenu();
+            } catch(e) {
+                showToast('Failed to submit report', 'error');
+            }
+        }
+        
+        function reportContextMessage() {
+            hideContextMenu();
+            if (!contextMenuMessageId) return;
+            selectedMessages = [];
+            openMessageReportModal();
         }
         
         async function handleLogout() { await updateOnlineStatus(false); await supabase.auth.signOut(); window.location.href = 'index.html'; }

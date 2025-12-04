@@ -402,12 +402,15 @@
             document.getElementById('sendBtn').disabled = !input.value.trim();
         }
 
+        let deletedConversations = {}; // Map of other_user_id -> deleted_at timestamp
+
         async function init() {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) { window.location.href = 'index.html'; return; }
             currentUser = session.user;
             if (localStorage.getItem('myub_darkMode') === 'true') document.body.classList.add('dark-mode');
             await updateOnlineStatus(true);
+            await loadDeletedConversations();
             await Promise.all([loadConversations(), loadFriends(), loadBlockedUsers(), loadNotifications(), loadFriendRequests(), loadSidebarFriendsBadge()]);
             subscribeToRealtime();
             startHeartbeat();
@@ -424,12 +427,50 @@
         async function updateOnlineStatus(isOnline) { await supabase.from('profiles').update({ is_online: isOnline, last_seen: new Date().toISOString() }).eq('id', currentUser.id); }
         function startHeartbeat() { setInterval(() => updateOnlineStatus(true), 30000); window.addEventListener('beforeunload', () => updateOnlineStatus(false)); }
 
+        async function loadDeletedConversations() {
+            const { data } = await supabase.from('deleted_conversations').select('other_user_id, deleted_at').eq('user_id', currentUser.id);
+            deletedConversations = {};
+            (data || []).forEach(d => { 
+                // Store as timestamp for consistent comparison
+                deletedConversations[d.other_user_id] = new Date(d.deleted_at).getTime(); 
+            });
+        }
+
         async function loadConversations() {
-            const { data: sentMsgs } = await supabase.from('messages').select('receiver_id, content, created_at, is_read').eq('sender_id', currentUser.id).is('group_id', null).neq('is_deleted', true).order('created_at', { ascending: false });
-            const { data: receivedMsgs } = await supabase.from('messages').select('sender_id, content, created_at, is_read').eq('receiver_id', currentUser.id).is('group_id', null).neq('is_deleted', true).order('created_at', { ascending: false });
+            // Reload deleted conversations to ensure we have latest data
+            await loadDeletedConversations();
+            
+            const { data: sentMsgs } = await supabase.from('messages').select('receiver_id, content, created_at, is_read').eq('sender_id', currentUser.id).is('group_id', null).order('created_at', { ascending: false });
+            const { data: receivedMsgs } = await supabase.from('messages').select('sender_id, content, created_at, is_read').eq('receiver_id', currentUser.id).is('group_id', null).order('created_at', { ascending: false });
             const convMap = new Map();
-            (sentMsgs || []).forEach(msg => { const oderId = msg.receiver_id; if (!convMap.has(oderId) || new Date(msg.created_at) > new Date(convMap.get(oderId).lastMessageTime)) convMap.set(oderId, { oderId, lastMessage: msg.content, lastMessageTime: msg.created_at, unreadCount: convMap.get(oderId)?.unreadCount || 0 }); });
-            (receivedMsgs || []).forEach(msg => { const oderId = msg.sender_id; const existing = convMap.get(oderId); const unreadCount = (existing?.unreadCount || 0) + (msg.is_read ? 0 : 1); if (!existing || new Date(msg.created_at) > new Date(existing.lastMessageTime)) convMap.set(oderId, { oderId, lastMessage: msg.content, lastMessageTime: msg.created_at, unreadCount }); else existing.unreadCount = unreadCount; });
+            
+            // Process sent messages - filter by deleted timestamp
+            (sentMsgs || []).forEach(msg => { 
+                const oderId = msg.receiver_id; 
+                const deletedAt = deletedConversations[oderId];
+                const msgTime = new Date(msg.created_at).getTime();
+                // Skip if message was created before or at deletion time
+                if (deletedAt && msgTime <= deletedAt) return;
+                
+                if (!convMap.has(oderId) || new Date(msg.created_at) > new Date(convMap.get(oderId).lastMessageTime)) 
+                    convMap.set(oderId, { oderId, lastMessage: msg.content, lastMessageTime: msg.created_at, unreadCount: convMap.get(oderId)?.unreadCount || 0 }); 
+            });
+            
+            // Process received messages - filter by deleted timestamp
+            (receivedMsgs || []).forEach(msg => { 
+                const oderId = msg.sender_id; 
+                const deletedAt = deletedConversations[oderId];
+                const msgTime = new Date(msg.created_at).getTime();
+                // Skip if message was created before or at deletion time
+                if (deletedAt && msgTime <= deletedAt) return;
+                
+                const existing = convMap.get(oderId); 
+                const unreadCount = (existing?.unreadCount || 0) + (msg.is_read ? 0 : 1); 
+                if (!existing || new Date(msg.created_at) > new Date(existing.lastMessageTime)) 
+                    convMap.set(oderId, { oderId, lastMessage: msg.content, lastMessageTime: msg.created_at, unreadCount }); 
+                else if (existing) existing.unreadCount = unreadCount; 
+            });
+            
             const userIds = Array.from(convMap.keys());
             if (userIds.length > 0) { const { data: profiles } = await supabase.from('profiles').select('id, first_name, last_name, full_name, avatar_url, is_online, last_seen').in('id', userIds); conversations = Array.from(convMap.values()).map(conv => { const profile = profiles?.find(p => p.id === conv.oderId); return { ...conv, user: profile }; }).filter(c => c.user).sort((a, b) => new Date(b.lastMessageTime) - new Date(a.lastMessageTime)); }
             else conversations = [];
@@ -460,8 +501,23 @@
         }
 
         async function loadMessages(userId) {
-            const { data } = await supabase.from('messages').select('*').or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${userId}),and(sender_id.eq.${userId},receiver_id.eq.${currentUser.id})`).is('group_id', null).eq('is_deleted', false).order('created_at', { ascending: true });
-            messages = data || []; renderMessages();
+            // Check if conversation was deleted - only show messages after deletion time
+            const deletedAt = deletedConversations[userId];
+            let query = supabase.from('messages').select('*')
+                .or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${userId}),and(sender_id.eq.${userId},receiver_id.eq.${currentUser.id})`)
+                .is('group_id', null)
+                .order('created_at', { ascending: true });
+            
+            // If conversation was deleted, only get messages after that time
+            if (deletedAt) {
+                // Convert timestamp back to ISO string for query
+                const deletedAtISO = new Date(deletedAt).toISOString();
+                query = query.gt('created_at', deletedAtISO);
+            }
+            
+            const { data } = await query;
+            messages = data || []; 
+            renderMessages();
             await supabase.from('messages').update({ is_read: true }).eq('sender_id', userId).eq('receiver_id', currentUser.id).eq('is_read', false);
             const conv = conversations.find(c => c.oderId === userId); if (conv) conv.unreadCount = 0;
             renderConversations(); updateUnreadBadge();
@@ -504,6 +560,9 @@
         function filterConversations() { renderConversations(); }
 
         async function openConversation(userId) {
+            // Reload deleted conversations to ensure we have latest data
+            await loadDeletedConversations();
+            
             const { data: user } = await supabase.from('profiles').select('id, first_name, last_name, full_name, avatar_url, is_online, last_seen').eq('id', userId).single();
             if (!user) { showToast('User not found', 'error'); return; }
             currentChatUser = user; currentConversation = userId;
@@ -554,18 +613,39 @@
         }
 
         function clearConversation() {
+            const convToClear = currentConversation;
+            if (!convToClear) return;
+            
             document.getElementById('confirmTitle').textContent = 'Clear Chat';
             document.getElementById('confirmMessage').textContent = 'Clear all messages in this conversation? (Only clears for you)';
             confirmCallback = async () => { 
-                // Only mark messages as deleted for the current user
-                await supabase.from('messages').update({ is_deleted: true }).eq('sender_id', currentUser.id).eq('receiver_id', currentConversation); 
+                // Insert or update deleted_conversations with current timestamp
+                const now = new Date().toISOString();
+                const nowTimestamp = new Date(now).getTime();
                 
-                // Clear local messages
+                const { error } = await supabase.from('deleted_conversations')
+                    .upsert({ 
+                        user_id: currentUser.id, 
+                        other_user_id: convToClear, 
+                        deleted_at: now 
+                    }, { onConflict: 'user_id,other_user_id' });
+                
+                if (error) {
+                    console.error('Clear error:', error);
+                    showToast('Failed to clear chat', 'error');
+                    closeConfirmModal();
+                    return;
+                }
+                
+                // Update local state with timestamp
+                deletedConversations[convToClear] = nowTimestamp;
+                
+                // Clear messages array
                 messages = []; 
                 renderMessages();
                 
-                // Remove conversation from sidebar since all messages are cleared
-                conversations = conversations.filter(c => c.oderId !== currentConversation && c.user?.id !== currentConversation);
+                // Remove from conversations list
+                conversations = conversations.filter(c => c.oderId !== convToClear && c.user?.id !== convToClear);
                 renderConversations();
                 
                 // Reset chat panel to empty state
@@ -586,16 +666,34 @@
 
         function deleteConversation() {
             const convToDelete = currentConversation;
+            if (!convToDelete) return;
+            
             document.getElementById('confirmTitle').textContent = 'Delete Conversation';
             document.getElementById('confirmMessage').textContent = 'Delete this conversation? (Only deletes for you)';
             confirmCallback = async () => { 
-                // Only delete messages sent by current user to preserve the other user's view
-                await supabase.from('messages').update({ is_deleted: true }).eq('sender_id', currentUser.id).eq('receiver_id', convToDelete);
+                // Insert or update deleted_conversations with current timestamp
+                const now = new Date().toISOString();
+                const nowTimestamp = new Date(now).getTime();
                 
-                // Clear local state
+                const { error } = await supabase.from('deleted_conversations')
+                    .upsert({ 
+                        user_id: currentUser.id, 
+                        other_user_id: convToDelete, 
+                        deleted_at: now 
+                    }, { onConflict: 'user_id,other_user_id' });
+                
+                if (error) {
+                    console.error('Delete error:', error);
+                    showToast('Failed to delete conversation', 'error');
+                    closeConfirmModal();
+                    return;
+                }
+                
+                // Update local state with timestamp
+                deletedConversations[convToDelete] = nowTimestamp;
                 messages = [];
                 
-                // Remove from conversations array immediately (check both oderId and user.id)
+                // Remove from conversations list
                 conversations = conversations.filter(c => c.oderId !== convToDelete && c.user?.id !== convToDelete);
                 renderConversations();
                 
@@ -695,9 +793,24 @@
         function subscribeToRealtime() {
             supabase.channel('messages-channel').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `receiver_id=eq.${currentUser.id}` }, async (payload) => {
                 const msg = payload.new;
+                const senderId = msg.sender_id;
+                
+                // Check if conversation was deleted - only show if message is AFTER deletion
+                const deletedAt = deletedConversations[senderId];
+                const msgTime = new Date(msg.created_at).getTime();
+                if (deletedAt && msgTime <= deletedAt) {
+                    // Message was created before we deleted, ignore it
+                    return;
+                }
+                
                 playNotificationSound();
-                if (currentConversation === msg.sender_id) { messages.push(msg); renderMessages(); await supabase.from('messages').update({ is_read: true }).eq('id', msg.id); }
-                else { showToast('New message received', 'success'); }
+                if (currentConversation === senderId) { 
+                    messages.push(msg); 
+                    renderMessages(); 
+                    await supabase.from('messages').update({ is_read: true }).eq('id', msg.id); 
+                } else { 
+                    showToast('New message received', 'success'); 
+                }
                 await loadConversations();
             }).subscribe();
             supabase.channel('message-reads').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'messages', filter: `sender_id=eq.${currentUser.id}` }, (payload) => { const msgIdx = messages.findIndex(m => m.id === payload.new.id); if (msgIdx !== -1) { messages[msgIdx].is_read = payload.new.is_read; renderMessages(); } }).subscribe();

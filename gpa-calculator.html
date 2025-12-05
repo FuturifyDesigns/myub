@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content, maximum-scale=1.0, user-scalable=no">
     <title>GPA Calculator - MyUB</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -40,16 +40,18 @@
         }
 
         html {
-            height: auto;
-            overflow-x: hidden;
+            height: 100%;
+            overflow: hidden;
         }
 
         body {
             font-family: 'Outfit', sans-serif;
             background: var(--gray-100);
-            min-height: 100vh;
+            height: 100%;
+            overflow-y: auto;
             overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
+            overscroll-behavior: none;
         }
 
         /* ========== SIDEBAR ========== */

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content, maximum-scale=1.0, user-scalable=no">
     <title>Messages - MyUB</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,8 +12,8 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; }
         :root { --navy: #1a365d; --navy-light: #2c5282; --navy-dark: #0f2744; --red: #c41e3a; --white: #ffffff; --gray-50: #f8fafc; --gray-100: #f1f5f9; --gray-200: #e2e8f0; --gray-300: #cbd5e1; --gray-400: #94a3b8; --gray-500: #64748b; --gray-600: #475569; --gray-700: #334155; --gray-800: #1e293b; --green: #22c55e; --green-light: #dcfce7; --blue: #3b82f6; --blue-light: #dbeafe; --orange: #f97316; }
-        html { height: auto; overflow-x: hidden; }
-        body { font-family: 'Outfit', sans-serif; background: var(--gray-100); min-height: 100vh; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+        html { height: 100%; overflow: hidden; }
+        body { font-family: 'Outfit', sans-serif; background: var(--gray-100); height: 100%; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior: none; }
         .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 260px; background: var(--navy-dark); padding: 20px 0; z-index: 100; transition: transform 0.3s ease; overflow-y: auto; }
         .sidebar-header { padding: 0 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
 

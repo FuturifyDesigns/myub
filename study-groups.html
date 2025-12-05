@@ -1118,7 +1118,7 @@
                 await Promise.all([loadMyGroups(), loadNotifications(), loadFriends(), loadBlockedUsers(), loadSidebarBadges()]);
                 
                 updateCreatedCount();
-                if (!window.MyUBUtils) subscribeToRealtime();
+                subscribeToRealtime(); // Setup real-time subscriptions
                 setupEmojiPicker();
                 startHeartbeat();
                 

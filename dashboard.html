@@ -1676,6 +1676,9 @@
             await loadFriends();
             await loadSidebarBadges();
             
+            // Setup real-time subscriptions
+            subscribeToNotifications();
+            
             // Update date
             updateDate();
             
@@ -2136,11 +2139,8 @@
             }
         }
 
-        // Legacy subscriptions (only used if MyUBUtils not available)
+        // Real-time subscriptions
         function subscribeToNotifications() {
-            // Skip if using consolidated subscriptions
-            if (window.MyUBUtils) return;
-            
             supabase.channel('dashboard-notifications')
                 .on('postgres_changes', {
                     event: 'INSERT',

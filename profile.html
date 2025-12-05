@@ -1575,7 +1575,7 @@
             await loadNotifications();
             await loadFriendsForOnline();
             await loadSidebarBadges();
-            if (!window.MyUBUtils) subscribeToNotifications();
+            subscribeToNotifications(); // Setup real-time subscriptions
 
             // Close dropdowns on outside click
             document.addEventListener('click', (e) => {

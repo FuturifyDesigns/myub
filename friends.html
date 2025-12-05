@@ -643,7 +643,7 @@
             await updateOnlineStatus(true);
             await Promise.all([loadFriends(), loadRequests(), loadNotifications(), loadBlockedUsers()]);
             await loadSidebarBadges();
-            if (!window.MyUBUtils) subscribeToRealtime();
+            subscribeToRealtime(); // Setup real-time subscriptions
             startHeartbeat();
             document.getElementById('loadingScreen').style.display = 'none';
             document.getElementById('mainContent').style.display = 'block';

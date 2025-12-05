@@ -438,7 +438,7 @@
                 
                 await updateOnlineStatus(true);
                 await Promise.all([loadNotes(), loadNotifications(), loadSidebarBadges()]);
-                if (!window.MyUBUtils) setupRealtime();
+                setupRealtime(); // Setup real-time subscriptions
                 setupEditor();
                 if (localStorage.getItem('myub_darkMode') === 'true') document.body.classList.add('dark-mode');
                 document.getElementById('loadingScreen').style.display = 'none';

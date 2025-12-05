@@ -544,7 +544,7 @@
             await loadSchedules();
             await loadNotifications();
             loadSidebarBadges();
-            if (!window.MyUBUtils) setupRealtimeSubscriptions();
+            setupRealtimeSubscriptions(); // Setup real-time subscriptions
             if (localStorage.getItem('darkMode') === 'true') document.body.classList.add('dark-mode');
             const loadingScreen = document.getElementById('loadingScreen');
             if (loadingScreen) loadingScreen.style.display = 'none';

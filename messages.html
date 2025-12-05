@@ -526,7 +526,7 @@
             await updateOnlineStatus(true);
             await loadDeletedConversations();
             await Promise.all([loadConversations(), loadFriends(), loadBlockedUsers(), loadNotifications(), loadFriendRequests(), loadSidebarFriendsBadge()]);
-            if (!window.MyUBUtils) subscribeToRealtime(); // Fallback if utils not loaded
+            subscribeToRealtime(); // Setup real-time subscriptions
             startHeartbeat();
             initEmojiPicker();
             const urlParams = new URLSearchParams(window.location.search);

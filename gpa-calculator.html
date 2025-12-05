@@ -884,7 +884,7 @@
             await loadNotifications();
             await loadFriends();
             await loadSidebarBadges();
-            if (!window.MyUBUtils) subscribeToNotifications();
+            subscribeToNotifications(); // Setup real-time subscriptions
             
             if (localStorage.getItem('myub_darkMode') === 'true') document.body.classList.add('dark-mode');
             document.getElementById('loadingState').style.display = 'none';

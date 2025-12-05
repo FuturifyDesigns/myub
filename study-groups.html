@@ -2061,7 +2061,7 @@
             document.getElementById('infoOnlineCount').textContent = currentMembers.filter(function(m) { return m.profiles && m.profiles.is_online; }).length;
             document.getElementById('infoMessagesCount').textContent = groupMessages.length;
             document.getElementById('memberCountLabel').textContent = '(' + currentMembers.length + ')';
-            document.getElementById('deleteGroupBtn').style.display = currentGroup.creator_id === currentUser.id ? 'flex' : 'none';
+            document.getElementById('deleteGroupBtn').style.display = isGroupAdmin() ? 'flex' : 'none';
             
             renderMembersList();
             document.getElementById('groupInfoModal').classList.add('show');
@@ -2185,7 +2185,7 @@
         }
         
         function confirmDeleteGroup() {
-            if (!currentGroup || currentGroup.creator_id !== currentUser.id) return;
+            if (!currentGroup || !isGroupAdmin()) return;
             document.getElementById('confirmTitle').textContent = 'Delete Group';
             document.getElementById('confirmMessage').textContent = 'Delete this group? All messages will be lost.';
             

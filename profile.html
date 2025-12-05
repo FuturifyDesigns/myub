@@ -32,10 +32,17 @@
             --green: #22c55e;
         }
 
+        html {
+            height: auto;
+            overflow-x: hidden;
+        }
+
         body {
             font-family: 'Outfit', sans-serif;
             background: var(--gray-100);
             min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
         }
 
         /* ========== SIDEBAR ========== */
@@ -818,20 +825,37 @@
             .sidebar.open { transform: translateX(0); }
             .main-content { margin-left: 0; }
             .menu-toggle { display: block; }
-            .profile-page { padding: 16px; }
+            .profile-page { padding: 16px; padding-top: 70px; }
 
             .profile-header-content {
                 flex-direction: column;
                 text-align: center;
             }
 
-            .profile-status { margin-left: 0; text-align: center; margin-top: 16px; }
-            .online-status { justify-content: center; }
+            .profile-header-card {
+                padding: 20px;
+                border-radius: 16px;
+            }
+
+            .profile-avatar {
+                width: 80px;
+                height: 80px;
+                font-size: 28px;
+            }
+
+            .profile-header-info h1 { font-size: 20px; }
+            .profile-header-info .student-id { font-size: 13px; }
+            .profile-header-info .program-badge { font-size: 12px; padding: 5px 12px; }
+
+            .profile-status { margin-left: 0; text-align: center; margin-top: 12px; }
+            .online-status { justify-content: center; font-size: 13px; }
+            .member-since { font-size: 12px; }
+
             .profile-form, .info-grid { grid-template-columns: 1fr; }
             .form-group.full-width, .info-item.full-width { grid-column: 1; }
-            .profile-header-card { padding: 24px; }
-            .profile-avatar { width: 100px; height: 100px; font-size: 36px; }
-            .profile-header-info h1 { font-size: 22px; }
+
+            .card { padding: 16px; margin-bottom: 16px; }
+            .card-header h2 { font-size: 16px; }
 
             .crop-layout { flex-direction: column; }
             .crop-sidebar { width: 100%; flex-direction: row; justify-content: center; }
@@ -849,6 +873,13 @@
         }
 
         @media (max-width: 480px) {
+            .profile-page { padding: 12px; padding-top: 65px; }
+            .profile-header-card { padding: 16px; }
+            .profile-avatar { width: 70px; height: 70px; font-size: 24px; }
+            .profile-header-info h1 { font-size: 18px; }
+            .avatar-edit-btn { width: 28px; height: 28px; }
+            .avatar-edit-btn svg { width: 14px; height: 14px; }
+
             .notification-dropdown {
                 top: 60px;
                 left: 5px;
@@ -857,7 +888,7 @@
             }
             .form-actions { flex-direction: column; }
             .form-actions .btn { width: 100%; justify-content: center; }
-            .modal { margin: 10px; }
+            .modal { margin: 10px; max-height: 90vh; }
             .crop-controls { flex-wrap: wrap; }
         }
 

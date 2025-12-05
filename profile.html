@@ -1578,6 +1578,7 @@
             await loadFriendsForOnline();
             await loadSidebarBadges();
             subscribeToNotifications(); // Setup real-time subscriptions
+            startNotificationPolling(); // Poll for notifications as fallback
 
             // Close dropdowns on outside click
             document.addEventListener('click', (e) => {
@@ -1588,6 +1589,23 @@
 
             document.getElementById('loadingState').style.display = 'none';
             document.getElementById('mainContent').style.display = 'block';
+        }
+        
+        function startNotificationPolling() {
+            setInterval(async () => {
+                const lastNotifId = notificationsList.length > 0 ? notificationsList[0].id : null;
+                const { data: newNotifs } = await supabase.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(5);
+                if (newNotifs && newNotifs.length > 0 && (!lastNotifId || newNotifs[0].id !== lastNotifId)) {
+                    const existingIds = notificationsList.map(n => n.id);
+                    const trulyNew = newNotifs.filter(n => !existingIds.includes(n.id));
+                    if (trulyNew.length > 0) {
+                        trulyNew.forEach(n => notificationsList.unshift(n));
+                        renderNotifications();
+                        playNotificationSound();
+                        showToast(trulyNew[0].title || 'New notification', 'success');
+                    }
+                }
+            }, 30000);
         }
 
         // Load another user's profile (view only)

@@ -887,6 +887,7 @@
             await loadFriends();
             await loadSidebarBadges();
             subscribeToNotifications(); // Setup real-time subscriptions
+            startNotificationPolling(); // Poll for notifications as fallback
             
             if (localStorage.getItem('myub_darkMode') === 'true') document.body.classList.add('dark-mode');
             document.getElementById('loadingState').style.display = 'none';
@@ -899,6 +900,23 @@
                     document.getElementById('notificationDropdown').classList.remove('show');
                 }
             });
+        }
+        
+        function startNotificationPolling() {
+            setInterval(async () => {
+                const lastNotifId = notifications.length > 0 ? notifications[0].id : null;
+                const { data: newNotifs } = await supabase.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(5);
+                if (newNotifs && newNotifs.length > 0 && (!lastNotifId || newNotifs[0].id !== lastNotifId)) {
+                    const existingIds = notifications.map(n => n.id);
+                    const trulyNew = newNotifs.filter(n => !existingIds.includes(n.id));
+                    if (trulyNew.length > 0) {
+                        trulyNew.forEach(n => notifications.unshift(n));
+                        renderNotifications();
+                        playNotificationSound();
+                        showToast(trulyNew[0].title || 'New notification', 'success');
+                    }
+                }
+            }, 30000);
         }
 
         async function loadProfile() {

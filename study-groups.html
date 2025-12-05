@@ -1121,6 +1121,7 @@
                 subscribeToRealtime(); // Setup real-time subscriptions
                 setupEmojiPicker();
                 startHeartbeat();
+                startNotificationPolling(); // Poll for notifications as fallback
                 
                 if (localStorage.getItem('myub_darkMode') === 'true') document.body.classList.add('dark-mode');
                 document.addEventListener('click', handleOutsideClick);
@@ -1131,6 +1132,24 @@
                 console.error('Init error:', err);
                 document.getElementById('loadingScreen').style.display = 'none';
             }
+        }
+        
+        function startNotificationPolling() {
+            setInterval(async function() {
+                var lastNotifId = notificationsList.length > 0 ? notificationsList[0].id : null;
+                var result = await supabase.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(5);
+                var newNotifs = result.data;
+                if (newNotifs && newNotifs.length > 0 && (!lastNotifId || newNotifs[0].id !== lastNotifId)) {
+                    var existingIds = notificationsList.map(function(n) { return n.id; });
+                    var trulyNew = newNotifs.filter(function(n) { return existingIds.indexOf(n.id) === -1; });
+                    if (trulyNew.length > 0) {
+                        trulyNew.forEach(function(n) { notificationsList.unshift(n); });
+                        renderNotifications();
+                        playNotificationSound();
+                        showToast(trulyNew[0].title || 'New notification', 'success');
+                    }
+                }
+            }, 30000);
         }
         
         async function updateOnlineStatus(online) {

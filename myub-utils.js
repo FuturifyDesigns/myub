@@ -31,12 +31,16 @@
                 this.supabase = supabase;
                 this.userId = userId;
                 this.connectionId = this.generateId();
+                
+                console.log('MyUB: Initializing connection manager...');
 
                 try {
                     // Check current capacity
                     var countResult = await supabase
                         .from('active_connections')
                         .select('*', { count: 'exact', head: true });
+                    
+                    console.log('MyUB: Capacity check result:', countResult);
 
                     var currentCount = countResult.count || 0;
 
@@ -47,14 +51,22 @@
                     }
 
                     // Register this connection
-                    await supabase.from('active_connections').upsert({
+                    var insertResult = await supabase.from('active_connections').upsert({
                         id: this.connectionId,
                         user_id: userId,
                         last_heartbeat: new Date().toISOString(),
                         page: window.location.pathname
                     });
+                    
+                    console.log('MyUB: Connection insert result:', insertResult);
+                    
+                    if (insertResult.error) {
+                        console.error('MyUB: Failed to register connection:', insertResult.error);
+                        return true; // Still allow user to use the app
+                    }
 
                     this.isConnected = true;
+                    console.log('MyUB: Connection registered successfully');
 
                     // Show capacity bar if above 70%
                     var capacityPercent = Math.round((currentCount / MyUBUtils.maxConnections) * 100);
@@ -72,7 +84,7 @@
 
                 } catch (err) {
                     // Table doesn't exist yet - allow connection (graceful degradation)
-                    console.log('MyUB: Connection tracking not enabled, proceeding normally');
+                    console.log('MyUB: Connection tracking error:', err);
                     return true;
                 }
             },
@@ -256,6 +268,7 @@
                 document.addEventListener('visibilitychange', function() {
                     if (document.hidden) {
                         self.unsubscribe();
+                        console.log('📴 Disconnected (tab hidden) - saving resources');
                     } else {
                         setTimeout(function() {
                             self.subscribe(self.handlers);
@@ -300,6 +313,7 @@
                     .subscribe(function(status) {
                         if (status === 'SUBSCRIBED') {
                             self.isSubscribed = true;
+                            console.log('✅ Connected (1 subscription instead of 8)');
                         }
                     });
             },

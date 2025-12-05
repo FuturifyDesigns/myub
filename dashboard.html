@@ -2141,21 +2141,25 @@
 
         // Real-time subscriptions
         function subscribeToNotifications() {
-            supabase.channel('dashboard-notifications')
+            const notifChannel = supabase.channel('dashboard-notifications-' + currentUser.id)
                 .on('postgres_changes', {
                     event: 'INSERT',
                     schema: 'public',
                     table: 'notifications',
                     filter: `user_id=eq.${currentUser.id}`
                 }, (payload) => {
+                    console.log('New notification received:', payload);
                     notifications.unshift(payload.new);
                     renderNotifications();
                     playNotificationSound();
+                    showToast(payload.new.title || 'New notification', 'success');
                 })
-                .subscribe();
+                .subscribe((status) => {
+                    console.log('Notification subscription status:', status);
+                });
             
             // Friend online status - only notify on fresh logins (offline > 30 seconds)
-            supabase.channel('dashboard-online-status')
+            supabase.channel('dashboard-online-status-' + currentUser.id)
                 .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, (p) => {
                     const friend = friends.find(f => f.id === p.new.id);
                     if (friend) {

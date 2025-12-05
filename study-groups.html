@@ -2321,13 +2321,15 @@
             }).subscribe();
             
             // Notifications channel
-            supabase.channel('sg-notif').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: 'user_id=eq.' + currentUser.id }, function() {
+            supabase.channel('sg-notif-' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: 'user_id=eq.' + currentUser.id }, function(payload) {
+                console.log('Study Groups: New notification received:', payload);
                 loadNotifications();
                 playNotificationSound();
-            }).subscribe();
+                showToast(payload.new.title || 'New notification', 'success');
+            }).subscribe(function(status) { console.log('Study Groups notification subscription:', status); });
             
             // Sidebar badges
-            supabase.channel('sg-msg-badge').on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: 'receiver_id=eq.' + currentUser.id }, function() { loadSidebarBadges(); }).subscribe();
+            supabase.channel('sg-msg-badge-' + currentUser.id).on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: 'receiver_id=eq.' + currentUser.id }, function() { loadSidebarBadges(); }).subscribe();
         }
         
         function checkFriendOnline(profile) {

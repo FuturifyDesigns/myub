@@ -1465,14 +1465,16 @@
         }
 
         function subscribeToNotifications() {
-            supabase.channel('profile-notifications').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${currentUser.id}` }, (p) => { 
+            supabase.channel('profile-notifications-' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${currentUser.id}` }, (p) => { 
+                console.log('Profile: New notification received:', p);
                 notificationsList.unshift(p.new); 
                 renderNotifications(); 
                 playNotificationSound();
-            }).subscribe();
+                showToast(p.new.title || 'New notification', 'success');
+            }).subscribe((status) => console.log('Profile notification subscription:', status));
             
             // Friend online status - only notify on fresh logins (offline > 30 seconds)
-            supabase.channel('profile-online-status').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, (p) => {
+            supabase.channel('profile-online-status-' + currentUser.id).on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, (p) => {
                 const friend = friends.find(f => f.id === p.new.id);
                 if (friend) {
                     const wasOffline = !friend.is_online;
@@ -1490,8 +1492,8 @@
             }).subscribe();
             
             // Sidebar badges real-time
-            supabase.channel('profile-messages').on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: `receiver_id=eq.${currentUser.id}` }, () => loadSidebarBadges()).subscribe();
-            supabase.channel('profile-friend-requests').on('postgres_changes', { event: '*', schema: 'public', table: 'friend_requests', filter: `receiver_id=eq.${currentUser.id}` }, () => loadSidebarBadges()).subscribe();
+            supabase.channel('profile-messages-' + currentUser.id).on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: `receiver_id=eq.${currentUser.id}` }, () => loadSidebarBadges()).subscribe();
+            supabase.channel('profile-friend-requests-' + currentUser.id).on('postgres_changes', { event: '*', schema: 'public', table: 'friend_requests', filter: `receiver_id=eq.${currentUser.id}` }, () => loadSidebarBadges()).subscribe();
         }
         
         function playNotificationSound() {

@@ -906,13 +906,14 @@
             supabase.channel('friend-requests-out').on('postgres_changes', { event: '*', schema: 'public', table: 'friend_requests', filter: `sender_id=eq.${currentUser.id}` }, () => { loadRequests(); renderDiscoverUsers(); }).subscribe();
             // Listen for friendship changes
             supabase.channel('friendships').on('postgres_changes', { event: '*', schema: 'public', table: 'friendships' }, () => { loadFriends(); loadRequests(); }).subscribe();
-            supabase.channel('notifications').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${currentUser.id}` }, (p) => { 
+            supabase.channel('notifications-friends-' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${currentUser.id}` }, (p) => { 
+                console.log('Friends page: New notification received:', p);
                 notifications.unshift(p.new); 
                 renderNotifications(); 
                 playNotificationSound();
-                showToast(p.new.title, 'success'); 
-            }).subscribe();
-            supabase.channel('online-status').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, (p) => {
+                showToast(p.new.title || 'New notification', 'success'); 
+            }).subscribe((status) => console.log('Friends notification subscription:', status));
+            supabase.channel('online-status-friends-' + currentUser.id).on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, (p) => {
                 // Update friends list
                 const idx = friends.findIndex(f => f.id === p.new.id);
                 if (idx !== -1) { 
@@ -941,7 +942,7 @@
             }).subscribe();
             
             // Sidebar messages badge real-time
-            supabase.channel('friends-messages').on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: `receiver_id=eq.${currentUser.id}` }, () => loadSidebarBadges()).subscribe();
+            supabase.channel('friends-messages-' + currentUser.id).on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: `receiver_id=eq.${currentUser.id}` }, () => loadSidebarBadges()).subscribe();
         }
 
         function showFriendOnlineToast(friendName) {

@@ -840,12 +840,18 @@
         async function clearAllNotifications() { if (!confirm('Clear all notifications?')) return; const { error } = await supabase.from('notifications').delete().eq('user_id', currentUser.id); if (error) { showToast('Failed to clear. Check database permissions.', 'error'); return; } notifications = []; renderNotifications(); loadAllNotifications(); closeNotificationsModal(); showToast('Notifications cleared', 'success'); }
 
         function setupRealtimeSubscriptions() {
-            supabase.channel('schedule_notifications').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${currentUser.id}` }, p => { notifications.unshift(p.new); renderNotifications(); playNotificationSound(); }).subscribe();
-            supabase.channel('schedule_messages').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `receiver_id=eq.${currentUser.id}` }, () => loadSidebarBadges()).subscribe();
-            supabase.channel('schedule_friends').on('postgres_changes', { event: '*', schema: 'public', table: 'friendships' }, () => loadSidebarBadges()).subscribe();
-            supabase.channel('friends_online_status').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, async p => {
+            supabase.channel('schedule_notifications_' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${currentUser.id}` }, p => { 
+                console.log('Schedule: New notification received:', p);
+                notifications.unshift(p.new); 
+                renderNotifications(); 
+                playNotificationSound(); 
+                showToast(p.new.title || 'New notification', 'success');
+            }).subscribe((status) => console.log('Schedule notification subscription:', status));
+            supabase.channel('schedule_messages_' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `receiver_id=eq.${currentUser.id}` }, () => loadSidebarBadges()).subscribe();
+            supabase.channel('schedule_friends_' + currentUser.id).on('postgres_changes', { event: '*', schema: 'public', table: 'friendships' }, () => loadSidebarBadges()).subscribe();
+            supabase.channel('friends_online_status_' + currentUser.id).on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, async p => {
                 if (p.new.is_online && !p.old?.is_online) {
-                    const { data: f } = await supabase.from('friendships').select('*').or(`user_id.eq.${currentUser.id},friend_id.eq.${currentUser.id}`).or(`user_id.eq.${p.new.id},friend_id.eq.${p.new.id}`).eq('status', 'accepted').maybeSingle();
+                    const { data: f } = await supabase.from('friendships').select('*').or(`user_id.eq.${currentUser.id},friend_id.eq.${currentUser.id}`).or(`user_id.eq.${p.new.id},friend_id.eq.${p.new.id}`).maybeSingle();
                     if (f) showFriendOnlineToast(p.new.full_name || p.new.first_name || 'A friend');
                 }
             }).subscribe();

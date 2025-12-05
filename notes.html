@@ -613,13 +613,19 @@
         }
 
         function setupRealtime() {
-            supabase.channel('notes_changes').on('postgres_changes', { event: '*', schema: 'public', table: 'notes', filter: 'user_id=eq.' + currentUser.id }, () => loadNotes()).subscribe();
-            supabase.channel('notifications_changes').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: 'user_id=eq.' + currentUser.id }, p => { notifications.unshift(p.new); renderNotifications(); playNotificationSound(); showToast(p.new.title || 'New notification', 'success'); }).subscribe();
-            supabase.channel('messages_badge').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: 'receiver_id=eq.' + currentUser.id }, () => loadSidebarBadges()).subscribe();
-            supabase.channel('friend_requests_badge').on('postgres_changes', { event: '*', schema: 'public', table: 'friend_requests' }, () => loadSidebarBadges()).subscribe();
+            supabase.channel('notes_changes_' + currentUser.id).on('postgres_changes', { event: '*', schema: 'public', table: 'notes', filter: 'user_id=eq.' + currentUser.id }, () => loadNotes()).subscribe();
+            supabase.channel('notifications_changes_' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: 'user_id=eq.' + currentUser.id }, p => { 
+                console.log('Notes: New notification received:', p);
+                notifications.unshift(p.new); 
+                renderNotifications(); 
+                playNotificationSound(); 
+                showToast(p.new.title || 'New notification', 'success'); 
+            }).subscribe((status) => console.log('Notes notification subscription:', status));
+            supabase.channel('messages_badge_' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: 'receiver_id=eq.' + currentUser.id }, () => loadSidebarBadges()).subscribe();
+            supabase.channel('friend_requests_badge_' + currentUser.id).on('postgres_changes', { event: '*', schema: 'public', table: 'friend_requests' }, () => loadSidebarBadges()).subscribe();
             
             // Friend online status - show toast when friends come online
-            supabase.channel('friends_online_status').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, async (p) => {
+            supabase.channel('friends_online_status_' + currentUser.id).on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, async (p) => {
                 if (p.new.is_online && !p.old?.is_online) {
                     // Check if this person is a friend
                     const { data: friendship } = await supabase.from('friendships').select('*').or(`user_id.eq.${currentUser.id},friend_id.eq.${currentUser.id}`).or(`user_id.eq.${p.new.id},friend_id.eq.${p.new.id}`).maybeSingle();

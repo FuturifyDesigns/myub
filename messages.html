@@ -958,14 +958,15 @@
                     }
                 }
             }).subscribe();
-            supabase.channel('notifications-messages').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${currentUser.id}` }, (payload) => { 
+            supabase.channel('notifications-messages-' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${currentUser.id}` }, (payload) => { 
+                console.log('Messages page: New notification received:', payload);
                 notifications.unshift(payload.new); 
                 renderNotifications(); 
                 playNotificationSound();
-                showToast(payload.new.title, 'success');
-            }).subscribe();
+                showToast(payload.new.title || 'New notification', 'success');
+            }).subscribe((status) => console.log('Messages notification subscription:', status));
             // Friend requests real-time for sidebar badge
-            supabase.channel('messages-friend-requests').on('postgres_changes', { event: '*', schema: 'public', table: 'friend_requests', filter: `receiver_id=eq.${currentUser.id}` }, () => loadSidebarFriendsBadge()).subscribe();
+            supabase.channel('messages-friend-requests-' + currentUser.id).on('postgres_changes', { event: '*', schema: 'public', table: 'friend_requests', filter: `receiver_id=eq.${currentUser.id}` }, () => loadSidebarFriendsBadge()).subscribe();
         }
 
         function showFriendOnlineToast(friendName) {

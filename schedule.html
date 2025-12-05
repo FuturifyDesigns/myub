@@ -524,7 +524,8 @@
             if (window.MyUBUtils) {
                 const canConnect = await MyUBUtils.ConnectionManager.init(supabase, currentUser.id);
                 if (!canConnect) {
-                    document.getElementById('loadingScreen').style.display = 'none';
+                    const ls = document.getElementById('loadingScreen');
+                    if (ls) ls.style.display = 'none';
                     return;
                 }
                 MyUBUtils.SubscriptionManager.init(supabase, currentUser.id);
@@ -539,11 +540,16 @@
             await loadSchedules();
             await loadNotifications();
             loadSidebarBadges();
-            renderCalendar();
-            renderUpcoming();
             if (!window.MyUBUtils) setupRealtimeSubscriptions();
             if (localStorage.getItem('darkMode') === 'true') document.body.classList.add('dark-mode');
-            document.getElementById('loadingScreen').style.display = 'none';
+            const loadingScreen = document.getElementById('loadingScreen');
+            if (loadingScreen) loadingScreen.style.display = 'none';
+            
+            // Render calendar after a short delay to ensure DOM is ready
+            setTimeout(() => {
+                renderCalendar();
+                renderUpcoming();
+            }, 50);
         }
 
         async function loadProfile() {

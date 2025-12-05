@@ -147,7 +147,24 @@
         .status-badge.inactive { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
         .status-badge.pending { background: rgba(234, 179, 8, 0.1); color: var(--yellow); }
         .status-badge.banned { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .status-badge.resolved { background: rgba(34, 197, 94, 0.1); color: var(--green); }
+        .status-badge.dismissed { background: rgba(148, 163, 184, 0.2); color: var(--gray-500); }
+        .status-badge.reviewed { background: rgba(59, 130, 246, 0.1); color: var(--blue); }
+        .status-badge.user { background: rgba(139, 92, 246, 0.1); color: var(--purple); }
+        .status-badge.message { background: rgba(59, 130, 246, 0.1); color: var(--blue); }
+        .status-badge.group { background: rgba(6, 182, 212, 0.1); color: var(--cyan); }
         .status-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+        
+        /* Icon button colors */
+        .btn-icon.text-green { color: var(--green); }
+        .btn-icon.text-green:hover { background: rgba(34, 197, 94, 0.1); }
+        .btn-icon.text-red { color: var(--red); }
+        .btn-icon.text-red:hover { background: rgba(239, 68, 68, 0.1); }
+        .btn-icon.text-orange { color: var(--orange); }
+        .btn-icon.text-orange:hover { background: rgba(249, 115, 22, 0.1); }
+        
+        .btn-success { background: var(--green); color: white; }
+        .btn-success:hover { background: #16a34a; }
 
         /* Buttons */
         .btn { padding: 8px 16px; border-radius: 8px; font-weight: 500; cursor: pointer; transition: all 0.2s; border: none; font-size: 14px; display: inline-flex; align-items: center; gap: 6px; }
@@ -215,6 +232,7 @@
         .toast { padding: 12px 20px; border-radius: 10px; background: var(--gray-800); color: white; font-size: 14px; animation: slideIn 0.3s ease; display: flex; align-items: center; gap: 10px; }
         .toast.success { background: var(--green); }
         .toast.error { background: var(--red); }
+        .toast.info { background: var(--blue); }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
         /* Pagination */
@@ -321,6 +339,7 @@
             <div class="admin-tabs">
                 <button class="admin-tab active" onclick="switchTab('analytics')">Analytics</button>
                 <button class="admin-tab" onclick="switchTab('users')">Users</button>
+                <button class="admin-tab" onclick="switchTab('reports')">Reports <span id="reportsTabBadge" class="nav-badge" style="display:none;">0</span></button>
                 <button class="admin-tab" onclick="switchTab('groups')">Study Groups</button>
                 <button class="admin-tab" onclick="switchTab('content')">Content</button>
                 <button class="admin-tab" onclick="switchTab('announcements')">Announcements</button>
@@ -405,6 +424,47 @@
                             </table>
                         </div>
                         <div class="pagination" id="usersPagination"></div>
+                    </div>
+                </div>
+
+                <!-- Reports Tab -->
+                <div id="tab-reports" class="tab-panel">
+                    <div class="search-filters">
+                        <select class="filter-select" id="reportStatusFilter" onchange="filterReports()">
+                            <option value="all">All Reports</option>
+                            <option value="pending" selected>Pending</option>
+                            <option value="reviewed">Reviewed</option>
+                            <option value="resolved">Resolved</option>
+                            <option value="dismissed">Dismissed</option>
+                        </select>
+                        <select class="filter-select" id="reportTypeFilter" onchange="filterReports()">
+                            <option value="all">All Types</option>
+                            <option value="user">User Reports</option>
+                            <option value="message">Message Reports</option>
+                            <option value="group">Group Reports</option>
+                        </select>
+                    </div>
+                    <div class="admin-card">
+                        <div class="card-header">
+                            <span class="card-title">User Reports (<span id="reportCount">0</span>)</span>
+                        </div>
+                        <div style="overflow-x: auto;">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Reporter</th>
+                                        <th>Reported User</th>
+                                        <th>Type</th>
+                                        <th>Reason</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="reportsTableBody">
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
@@ -675,13 +735,59 @@
             await Promise.all([
                 loadAnalytics(),
                 loadUsers(),
+                loadReports(),
                 loadGroups(),
                 loadNotes(),
                 loadAnnouncements()
             ]);
             
             loadSidebarBadges();
+            
+            // Setup real-time subscriptions for reports
+            setupRealtimeSubscriptions();
         });
+
+        // Real-time subscriptions for new reports
+        function setupRealtimeSubscriptions() {
+            supabase.channel('admin-reports')
+                .on('postgres_changes', {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'user_reports'
+                }, (payload) => {
+                    console.log('New report received:', payload);
+                    showToast('New report received!', 'info');
+                    loadReports();
+                    updateReportsBadge();
+                })
+                .on('postgres_changes', {
+                    event: 'UPDATE',
+                    schema: 'public',
+                    table: 'user_reports'
+                }, () => {
+                    loadReports();
+                })
+                .subscribe();
+        }
+        
+        // Update reports badge
+        async function updateReportsBadge() {
+            try {
+                const { count } = await supabase.from('user_reports')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('status', 'pending');
+                
+                const badge = document.getElementById('reportsTabBadge');
+                if (count > 0) {
+                    badge.textContent = count;
+                    badge.style.display = 'inline';
+                } else {
+                    badge.style.display = 'none';
+                }
+            } catch (e) {
+                console.error('Error updating reports badge:', e);
+            }
+        }
 
         // Tab switching
         function switchTab(tabId) {
@@ -783,6 +889,164 @@
                     </div>
                 </div>
             `).join('');
+        }
+
+        // Reports Management
+        let allReports = [];
+        
+        async function loadReports() {
+            try {
+                const { data, error } = await supabase
+                    .from('user_reports')
+                    .select(`
+                        *,
+                        reporter:reporter_id(id, full_name, avatar_url),
+                        reported:reported_id(id, full_name, avatar_url)
+                    `)
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                allReports = data || [];
+                document.getElementById('reportCount').textContent = allReports.length;
+                renderReportsTable();
+                updateReportsBadge();
+            } catch (e) {
+                console.error('Error loading reports:', e);
+                allReports = [];
+                renderReportsTable();
+            }
+        }
+        
+        function filterReports() {
+            renderReportsTable();
+        }
+        
+        function renderReportsTable() {
+            const statusFilter = document.getElementById('reportStatusFilter').value;
+            const typeFilter = document.getElementById('reportTypeFilter').value;
+            
+            let filtered = allReports.filter(r => {
+                const matchStatus = statusFilter === 'all' || r.status === statusFilter;
+                const matchType = typeFilter === 'all' || r.report_type === typeFilter;
+                return matchStatus && matchType;
+            });
+            
+            document.getElementById('reportCount').textContent = filtered.length;
+            
+            const tbody = document.getElementById('reportsTableBody');
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--gray-500);">No reports found</td></tr>';
+            } else {
+                tbody.innerHTML = filtered.map(r => `
+                    <tr>
+                        <td>
+                            <div class="user-info">
+                                <div class="user-info-avatar">
+                                    ${r.reporter?.avatar_url ? `<img src="${r.reporter.avatar_url}" alt="">` : (r.reporter?.full_name || 'U')[0].toUpperCase()}
+                                </div>
+                                <div class="user-info-details">
+                                    <div class="user-info-name">${escapeHtml(r.reporter?.full_name || 'Unknown')}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="user-info">
+                                <div class="user-info-avatar">
+                                    ${r.reported?.avatar_url ? `<img src="${r.reported.avatar_url}" alt="">` : (r.reported?.full_name || 'U')[0].toUpperCase()}
+                                </div>
+                                <div class="user-info-details">
+                                    <div class="user-info-name">${escapeHtml(r.reported?.full_name || 'Unknown')}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="status-badge ${r.report_type}">${r.report_type}</span></td>
+                        <td>${escapeHtml(r.reason || '-')}</td>
+                        <td><span class="status-badge ${r.status || 'pending'}">${r.status || 'pending'}</span></td>
+                        <td>${formatTimeAgo(r.created_at)}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-icon" title="View Details" onclick="viewReportDetails('${r.id}')">
+                                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                </button>
+                                <button class="btn-icon text-green" title="Mark Resolved" onclick="updateReportStatus('${r.id}', 'resolved')">
+                                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                                </button>
+                                <button class="btn-icon text-red" title="Dismiss" onclick="updateReportStatus('${r.id}', 'dismissed')">
+                                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                                </button>
+                                <button class="btn-icon text-orange" title="Warn User" onclick="openWarningModal('${r.reported?.id}', '${escapeHtml(r.reported?.full_name || 'User')}')">
+                                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+        
+        async function updateReportStatus(reportId, status) {
+            try {
+                const { error } = await supabase
+                    .from('user_reports')
+                    .update({ status, reviewed_at: new Date().toISOString() })
+                    .eq('id', reportId);
+                
+                if (error) throw error;
+                showToast(`Report marked as ${status}`, 'success');
+                loadReports();
+            } catch (e) {
+                console.error('Error updating report:', e);
+                showToast('Failed to update report', 'error');
+            }
+        }
+        
+        function viewReportDetails(reportId) {
+            const report = allReports.find(r => r.id === reportId);
+            if (!report) return;
+            
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay show';
+            modal.id = 'reportDetailsModal';
+            modal.innerHTML = `
+                <div class="modal">
+                    <div class="modal-header">
+                        <h3 class="modal-title">Report Details</h3>
+                        <button class="modal-close" onclick="document.getElementById('reportDetailsModal').remove()">
+                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div style="margin-bottom: 16px;">
+                            <strong>Reporter:</strong> ${escapeHtml(report.reporter?.full_name || 'Unknown')}
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <strong>Reported User:</strong> ${escapeHtml(report.reported?.full_name || 'Unknown')}
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <strong>Type:</strong> <span class="status-badge ${report.report_type}">${report.report_type}</span>
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <strong>Reason:</strong> ${escapeHtml(report.reason || '-')}
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <strong>Description:</strong>
+                            <div style="background: var(--gray-100); padding: 12px; border-radius: 8px; margin-top: 8px; white-space: pre-wrap;">${escapeHtml(report.description || 'No additional details provided.')}</div>
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <strong>Status:</strong> <span class="status-badge ${report.status || 'pending'}">${report.status || 'pending'}</span>
+                        </div>
+                        <div>
+                            <strong>Submitted:</strong> ${new Date(report.created_at).toLocaleString()}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" onclick="document.getElementById('reportDetailsModal').remove()">Close</button>
+                        <button class="btn btn-success" onclick="updateReportStatus('${report.id}', 'resolved'); document.getElementById('reportDetailsModal').remove();">Mark Resolved</button>
+                        <button class="btn btn-danger" onclick="updateReportStatus('${report.id}', 'dismissed'); document.getElementById('reportDetailsModal').remove();">Dismiss</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
         }
 
         // Users Management

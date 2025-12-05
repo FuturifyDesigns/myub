@@ -269,9 +269,9 @@
         .modal-title { font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 700; color: var(--gray-800); }
         .modal-close { width: 32px; height: 32px; border: none; background: var(--gray-100); border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .modal-close svg { width: 18px; height: 18px; color: var(--gray-600); }
-        .modal-body { padding: 24px; max-height: 400px; overflow-y: auto; }
+        .modal-body { padding: 20px; max-height: 400px; overflow-y: auto; }
         .modal-footer { padding: 16px 24px; border-top: 1px solid var(--gray-200); display: flex; justify-content: flex-end; gap: 12px; }
-        #profileModalFooter { display: block; border-top: none; padding-top: 0; }
+        #profileModalFooter { display: block; border-top: none; padding: 0 20px 20px 20px; }
         .forward-user-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 10px; cursor: pointer; }
         .forward-user-item:hover { background: var(--gray-50); }
         .forward-user-item.selected { background: var(--blue-light); }
@@ -594,8 +594,9 @@
         async function loadFriends() {
             const { data: f1 } = await supabase.from('friendships').select('friend_id').eq('user_id', currentUser.id);
             const { data: f2 } = await supabase.from('friendships').select('user_id').eq('friend_id', currentUser.id);
-            const friendIds = [...(f1||[]).map(f => f.friend_id), ...(f2||[]).map(f => f.user_id)];
-            if (friendIds.length > 0) { const { data: profiles } = await supabase.from('profiles').select('id, first_name, last_name, full_name, avatar_url, is_online').in('id', friendIds); friends = profiles || []; }
+            const ids = [...(f1||[]).map(f => f.friend_id), ...(f2||[]).map(f => f.user_id)];
+            friendIds = ids; // Update global friendIds
+            if (ids.length > 0) { const { data: profiles } = await supabase.from('profiles').select('id, first_name, last_name, full_name, avatar_url, is_online').in('id', ids); friends = profiles || []; }
             else friends = [];
         }
 
@@ -611,7 +612,6 @@
             outgoingRequestIds = (outgoing || []).map(r => r.receiver_id);
             const { data: incoming } = await supabase.from('friend_requests').select('sender_id').eq('receiver_id', currentUser.id).eq('status', 'pending');
             incomingRequestIds = (incoming || []).map(r => r.sender_id);
-            friendIds = friends.map(f => f.id);
         }
 
         async function loadMessages(userId) {
@@ -1110,6 +1110,9 @@
         // PROFILE PREVIEW MODAL
         // =============================================
         async function openProfileModal(userId) {
+            // Refresh friend data to ensure sync
+            await Promise.all([loadFriends(), loadFriendRequests()]);
+            
             const { data: user, error } = await supabase
                 .from('profiles')
                 .select('id, first_name, last_name, full_name, avatar_url, program_name, year_of_study, bio, is_online, last_seen, created_at')

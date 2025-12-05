@@ -58,90 +58,42 @@
         }
 
         .sidebar-logo {
-            display: flex;
-            align-items: flex-end;
-            gap: 2px;
+            display: inline-flex;
+            align-items: baseline;
             text-decoration: none;
+            background: white;
+            padding: 30px 15px 10px 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        .sidebar-logo .logo-icon {
+        .sidebar-logo-m-wrapper {
             position: relative;
-            width: 32px;
-            height: 36px;
+            display: inline-block;
         }
 
-        .sidebar-logo .logo-m {
+        .sidebar-logo-cap {
+            width: 45px;
+            height: 26px;
             position: absolute;
-            bottom: 0;
+            top: -22px;
             left: 50%;
             transform: translateX(-50%);
-            font-family: 'Sora', sans-serif;
-            font-weight: 800;
-            font-size: 28px;
-            color: var(--white);
+        }
+
+        .sidebar-logo-m {
+            font-family: 'Times New Roman', Georgia, serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--navy);
             line-height: 1;
         }
 
-        .sidebar-logo .cap {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .sidebar-logo .cap-board {
-            width: 26px;
-            height: 7px;
-            background: var(--white);
-            clip-path: polygon(10% 100%, 0% 0%, 100% 0%, 90% 100%);
-        }
-
-        .sidebar-logo .cap-crown {
-            width: 13px;
-            height: 5px;
-            background: var(--white);
-            margin: -1px auto 0;
-            border-radius: 0 0 2px 2px;
-        }
-
-        .sidebar-logo .cap-button {
-            width: 6px;
-            height: 6px;
-            background: var(--white);
-            border-radius: 50%;
-            position: absolute;
-            top: -4px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .sidebar-logo .tassel {
-            position: absolute;
-            top: 2px;
-            right: -1px;
-            width: 2px;
-            height: 12px;
-            background: var(--red);
-            border-radius: 1px;
-        }
-
-        .sidebar-logo .tassel::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 6px;
-            height: 6px;
-            background: var(--red);
-            border-radius: 50%;
-        }
-
-        .sidebar-logo .logo-text {
-            font-family: 'Sora', sans-serif;
+        .sidebar-logo-yub {
+            font-family: 'Times New Roman', Georgia, serif;
+            font-size: 1.6rem;
             font-weight: 700;
-            font-size: 20px;
-            color: var(--white);
+            color: var(--navy);
             margin-left: -2px;
         }
 
@@ -262,7 +214,7 @@
 
         .notification-badge { position: absolute; top: -4px; right: -4px; background: var(--red); color: var(--white); font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; border-radius: 9px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--white); }
         .notification-wrapper { position: relative; }
-        .notification-dropdown { position: absolute; top: calc(100% + 8px); right: 0; width: 360px; max-height: 480px; background: var(--white); border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.2s; z-index: 1000; overflow: hidden; }
+        .notification-dropdown { position: absolute; top: calc(100% + 8px); right: 0; width: 360px; max-height: 480px; background: var(--white); border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.2s; z-index: 2000; overflow: hidden; }
         .notification-dropdown.show { opacity: 1; visibility: visible; transform: translateY(0); }
         .notif-dropdown-header { padding: 16px 20px; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center; }
         .notif-dropdown-header h3 { font-size: 16px; font-weight: 700; color: var(--gray-800); }
@@ -884,16 +836,23 @@
 
             .notification-dropdown {
                 position: fixed;
-                top: 60px;
-                left: 8px;
-                right: 8px;
+                top: 70px;
+                left: 10px;
+                right: 10px;
                 width: auto;
                 border-radius: 16px;
-                max-height: calc(100vh - 80px);
+                max-height: calc(100vh - 90px);
+                z-index: 2000;
             }
         }
 
         @media (max-width: 480px) {
+            .notification-dropdown {
+                top: 60px;
+                left: 5px;
+                right: 5px;
+                max-height: calc(100vh - 70px);
+            }
             .form-actions { flex-direction: column; }
             .form-actions .btn { width: 100%; justify-content: center; }
             .modal { margin: 10px; }
@@ -964,17 +923,21 @@
 
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <a href="dashboard.html" class="sidebar-logo">
-                <div class="logo-icon">
-                    <div class="cap">
-                        <div class="cap-button"></div>
-                        <div class="cap-board"></div>
-                        <div class="cap-crown"></div>
-                        <div class="tassel"></div>
-                    </div>
-                    <span class="logo-m">M</span>
+                                    <a href="dashboard.html" class="sidebar-logo">
+                <div class="sidebar-logo-m-wrapper">
+                    <svg class="sidebar-logo-cap" viewBox="0 0 100 70">
+                        <polygon points="50,8 95,25 50,42 5,25" fill="#1a365d"/>
+                        <circle cx="50" cy="25" r="5" fill="#ffffff" stroke="#1a365d" stroke-width="2"/>
+                        <rect x="32" y="38" width="36" height="18" rx="3" fill="#1a365d"/>
+                        <g class="tassel">
+                            <circle cx="78" cy="25" r="4" fill="#c41e3a"/>
+                            <path d="M78 29 Q82 45 80 55" stroke="#c41e3a" stroke-width="3" fill="none"/>
+                            <ellipse cx="80" cy="58" rx="5" ry="8" fill="#c41e3a"/>
+                        </g>
+                    </svg>
+                    <span class="sidebar-logo-m">M</span>
                 </div>
-                <span class="logo-text">yUB</span>
+                <span class="sidebar-logo-yub">yUB</span>
             </a>
         </div>
 

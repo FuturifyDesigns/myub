@@ -37,15 +37,46 @@
         /* Sidebar */
         .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 260px; background: var(--navy-dark); padding: 20px 0; z-index: 100; transition: transform 0.3s ease; overflow-y: auto; }
         .sidebar-header { padding: 0 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
-        .sidebar-logo { display: flex; align-items: flex-end; gap: 2px; text-decoration: none; }
-        .sidebar-logo .logo-icon { position: relative; width: 32px; height: 36px; }
-        .sidebar-logo .logo-m { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); font-family: 'Sora', sans-serif; font-weight: 800; font-size: 28px; color: var(--white); line-height: 1; }
-        .sidebar-logo .cap { position: absolute; top: 0; left: 50%; transform: translateX(-50%); }
-        .sidebar-logo .cap-board { width: 26px; height: 7px; background: var(--white); clip-path: polygon(10% 100%, 0% 0%, 100% 0%, 90% 100%); }
-        .sidebar-logo .cap-crown { width: 13px; height: 3px; background: var(--white); margin: 0 auto; border-radius: 1px 1px 0 0; }
-        .sidebar-logo .cap-button { width: 5px; height: 5px; background: var(--red); border-radius: 50%; margin: -1px auto 0; }
-        .sidebar-logo .logo-text { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 24px; color: var(--white); line-height: 1; padding-bottom: 2px; }
-        .sidebar-logo .logo-text span { color: var(--red); }
+
+        .sidebar-logo {
+            display: inline-flex;
+            align-items: baseline;
+            text-decoration: none;
+            background: white;
+            padding: 30px 15px 10px 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-logo-m-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .sidebar-logo-cap {
+            width: 45px;
+            height: 26px;
+            position: absolute;
+            top: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .sidebar-logo-m {
+            font-family: 'Times New Roman', Georgia, serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--navy);
+            line-height: 1;
+        }
+
+        .sidebar-logo-yub {
+            font-family: 'Times New Roman', Georgia, serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--navy);
+            margin-left: -2px;
+        }
         .sidebar-nav { list-style: none; }
         .sidebar-nav a { display: flex; align-items: center; gap: 12px; padding: 12px 20px; color: rgba(255,255,255,0.7); text-decoration: none; transition: all 0.2s; border-left: 3px solid transparent; }
         .sidebar-nav a:hover { background: rgba(255,255,255,0.05); color: var(--white); }
@@ -136,7 +167,7 @@
         .filter-select { padding: 10px 15px; border: 1px solid var(--gray-300); border-radius: 8px; font-size: 14px; background: white; min-width: 150px; }
 
         /* Modal */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; }
         .modal-overlay.show { display: flex; }
         .modal { background: white; border-radius: 16px; width: 100%; max-width: 600px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; }
         .modal-header { padding: 20px; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center; }
@@ -242,13 +273,22 @@
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <a href="dashboard.html" class="sidebar-logo">
-                    <div class="logo-icon">
-                        <div class="cap"><div class="cap-crown"></div><div class="cap-board"></div></div>
-                        <span class="logo-m">M</span>
-                    </div>
-                    <span class="logo-text">y<span>UB</span></span>
-                </a>
+                                        <a href="dashboard.html" class="sidebar-logo">
+                <div class="sidebar-logo-m-wrapper">
+                    <svg class="sidebar-logo-cap" viewBox="0 0 100 70">
+                        <polygon points="50,8 95,25 50,42 5,25" fill="#1a365d"/>
+                        <circle cx="50" cy="25" r="5" fill="#ffffff" stroke="#1a365d" stroke-width="2"/>
+                        <rect x="32" y="38" width="36" height="18" rx="3" fill="#1a365d"/>
+                        <g class="tassel">
+                            <circle cx="78" cy="25" r="4" fill="#c41e3a"/>
+                            <path d="M78 29 Q82 45 80 55" stroke="#c41e3a" stroke-width="3" fill="none"/>
+                            <ellipse cx="80" cy="58" rx="5" ry="8" fill="#c41e3a"/>
+                        </g>
+                    </svg>
+                    <span class="sidebar-logo-m">M</span>
+                </div>
+                <span class="sidebar-logo-yub">yUB</span>
+            </a>
             </div>
             <nav>
                 <ul class="sidebar-nav">

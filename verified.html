@@ -6,7 +6,7 @@
     <title>Email Verified - MyUB</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -14,8 +14,19 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --navy: #1a365d;
+            --navy-light: #2c5282;
+            --red: #c41e3a;
+            --white: #ffffff;
+            --gray-500: #64748b;
+            --gray-400: #94a3b8;
+            --gray-200: #e2e8f0;
+            --gray-100: #f1f5f9;
+        }
+
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Outfit', sans-serif;
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -78,49 +89,55 @@
             }
         }
 
+        /* Logo - matching signup.html design */
         .logo {
-            display: flex;
-            align-items: center;
+            display: inline-flex;
+            align-items: baseline;
             justify-content: center;
-            gap: 2px;
             margin-bottom: 24px;
+            padding-top: 25px;
+        }
+
+        .logo-m-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .graduation-cap {
+            width: 45px;
+            height: 26px;
+            position: absolute;
+            top: -22px;
+            left: 50%;
+            transform: translateX(-50%);
         }
 
         .logo-m {
-            font-family: 'Playfair Display', serif;
-            font-size: 32px;
-            font-weight: 600;
-            color: #1a365d;
-            position: relative;
+            font-family: 'Times New Roman', Georgia, serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--navy);
+            line-height: 1;
         }
 
-        .logo-m::after {
-            content: '';
-            position: absolute;
-            top: -2px;
-            right: -4px;
-            width: 8px;
-            height: 8px;
-            background: #c41e3a;
-            border-radius: 50%;
-        }
-
-        .logo-text {
-            font-family: 'Inter', sans-serif;
-            font-size: 28px;
-            font-weight: 600;
-            color: #1a365d;
+        .logo-yub {
+            font-family: 'Times New Roman', Georgia, serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--navy);
+            margin-left: -2px;
         }
 
         h1 {
+            font-family: 'Sora', sans-serif;
             font-size: 24px;
             font-weight: 700;
-            color: #1a365d;
+            color: var(--navy);
             margin-bottom: 12px;
         }
 
         p {
-            color: #64748b;
+            color: var(--gray-500);
             font-size: 15px;
             line-height: 1.6;
             margin-bottom: 32px;
@@ -130,6 +147,7 @@
             display: inline-block;
             padding: 14px 32px;
             border-radius: 12px;
+            font-family: 'Outfit', sans-serif;
             font-size: 15px;
             font-weight: 600;
             text-decoration: none;
@@ -138,59 +156,23 @@
             border: none;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
-            color: white;
-            margin-bottom: 12px;
-            width: 100%;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(26, 54, 93, 0.3);
-        }
-
         .btn-secondary {
-            background: #f1f5f9;
-            color: #64748b;
+            background: var(--gray-100);
+            color: var(--gray-500);
             width: 100%;
         }
 
         .btn-secondary:hover {
-            background: #e2e8f0;
+            background: var(--gray-200);
             color: #475569;
-        }
-
-        .divider {
-            display: flex;
-            align-items: center;
-            margin: 20px 0;
-            color: #94a3b8;
-            font-size: 13px;
-        }
-
-        .divider::before,
-        .divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: #e2e8f0;
-        }
-
-        .divider::before {
-            margin-right: 12px;
-        }
-
-        .divider::after {
-            margin-left: 12px;
         }
 
         .footer {
             margin-top: 32px;
             padding-top: 20px;
-            border-top: 1px solid #f1f5f9;
+            border-top: 1px solid var(--gray-100);
             font-size: 12px;
-            color: #94a3b8;
+            color: var(--gray-400);
         }
 
         @media (max-width: 480px) {
@@ -211,6 +193,20 @@
                 width: 35px;
                 height: 35px;
             }
+
+            .graduation-cap {
+                width: 38px;
+                height: 22px;
+                top: -18px;
+            }
+
+            .logo-m {
+                font-size: 2rem;
+            }
+
+            .logo-yub {
+                font-size: 1.3rem;
+            }
         }
     </style>
 </head>
@@ -223,17 +219,25 @@
         </div>
 
         <div class="logo">
-            <span class="logo-m">M</span>
-            <span class="logo-text">yUB</span>
+            <div class="logo-m-wrapper">
+                <svg class="graduation-cap" viewBox="0 0 100 70">
+                    <polygon points="50,8 95,25 50,42 5,25" fill="#1a365d"/>
+                    <circle cx="50" cy="25" r="5" fill="#ffffff" stroke="#1a365d" stroke-width="2"/>
+                    <rect x="32" y="38" width="36" height="18" rx="3" fill="#1a365d"/>
+                    <g class="tassel">
+                        <circle cx="78" cy="25" r="4" fill="#c41e3a"/>
+                        <path d="M78 29 Q82 45 80 55" stroke="#c41e3a" stroke-width="3" fill="none"/>
+                        <ellipse cx="80" cy="58" rx="5" ry="8" fill="#c41e3a"/>
+                    </g>
+                </svg>
+                <span class="logo-m">M</span>
+            </div>
+            <span class="logo-yub">yUB</span>
         </div>
 
         <h1>Email Verified! 🎉</h1>
         <p>Your email has been successfully verified. You can now sign in to your MyUB account and start exploring.</p>
 
-        <a href="index.html" class="btn btn-primary">Go to Sign In</a>
-        
-        <div class="divider">or</div>
-        
         <button class="btn btn-secondary" onclick="window.close()">Close This Tab</button>
 
         <div class="footer">

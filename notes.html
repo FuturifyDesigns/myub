@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="myub-utils.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         :root { --navy: #1a365d; --navy-light: #2c5282; --navy-dark: #0f2744; --red: #c41e3a; --white: #ffffff; --gray-50: #f8fafc; --gray-100: #f1f5f9; --gray-200: #e2e8f0; --gray-300: #cbd5e1; --gray-400: #94a3b8; --gray-500: #64748b; --gray-600: #475569; --gray-700: #334155; --gray-800: #1e293b; --green: #22c55e; --blue: #3b82f6; --orange: #f97316; --yellow: #eab308; --purple: #8b5cf6; --pink: #ec4899; }
@@ -418,9 +419,25 @@
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) { window.location.href = 'index.html'; return; }
                 currentUser = session.user;
+                
+                // Initialize connection manager
+                if (window.MyUBUtils) {
+                    const canConnect = await MyUBUtils.ConnectionManager.init(supabase, currentUser.id);
+                    if (!canConnect) {
+                        document.getElementById('loadingScreen').style.display = 'none';
+                        return;
+                    }
+                    MyUBUtils.SubscriptionManager.init(supabase, currentUser.id);
+                    MyUBUtils.SubscriptionManager.subscribe({
+                        messages: () => loadSidebarBadges(),
+                        notifications: () => loadNotifications(),
+                        friend_requests: () => loadSidebarBadges()
+                    });
+                }
+                
                 await updateOnlineStatus(true);
                 await Promise.all([loadNotes(), loadNotifications(), loadSidebarBadges()]);
-                setupRealtime();
+                if (!window.MyUBUtils) setupRealtime();
                 setupEditor();
                 if (localStorage.getItem('myub_darkMode') === 'true') document.body.classList.add('dark-mode');
                 document.getElementById('loadingScreen').style.display = 'none';

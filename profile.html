@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="myub-utils.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; }
@@ -1488,6 +1489,21 @@
             if (!session) { window.location.href = 'index.html'; return; }
             currentUser = session.user;
 
+            // Initialize connection manager
+            if (window.MyUBUtils) {
+                const canConnect = await MyUBUtils.ConnectionManager.init(supabase, currentUser.id);
+                if (!canConnect) {
+                    document.getElementById('loadingState').style.display = 'none';
+                    return;
+                }
+                MyUBUtils.SubscriptionManager.init(supabase, currentUser.id);
+                MyUBUtils.SubscriptionManager.subscribe({
+                    messages: () => loadSidebarBadges(),
+                    notifications: () => loadNotifications(),
+                    friend_requests: () => loadSidebarBadges()
+                });
+            }
+
             // Check if viewing another user's profile
             const urlParams = new URLSearchParams(window.location.search);
             viewingUserId = urlParams.get('user');
@@ -1524,7 +1540,7 @@
             await loadNotifications();
             await loadFriendsForOnline();
             await loadSidebarBadges();
-            subscribeToNotifications();
+            if (!window.MyUBUtils) subscribeToNotifications();
 
             // Close dropdowns on outside click
             document.addEventListener('click', (e) => {

@@ -1053,9 +1053,31 @@
         }
 
         // Handle Signup
+        // ========== VALIDATION ==========
+        const badWords = ['fuck', 'shit', 'ass', 'bitch', 'damn', 'crap', 'piss', 'dick', 'cock', 'pussy', 'asshole', 'bastard', 'slut', 'whore', 'nigger', 'nigga', 'fag', 'faggot', 'retard', 'cunt', 'twat', 'wanker', 'bollocks', 'arse', 'motherfucker', 'fucker'];
+        function containsBadWords(text) { if (!text) return false; const lower = text.toLowerCase(); return badWords.some(word => new RegExp('\\b' + word + '\\b', 'i').test(lower)); }
+        function validateNameField(name, fieldName) {
+            if (!name || !name.trim()) return { valid: false, error: fieldName + ' is required' };
+            if (name.trim().length < 2) return { valid: false, error: fieldName + ' must be at least 2 characters' };
+            if (name.trim().length > 50) return { valid: false, error: fieldName + ' must be less than 50 characters' };
+            if (containsBadWords(name)) return { valid: false, error: fieldName + ' contains inappropriate language' };
+            if (!/^[a-zA-Z\s\-']+$/.test(name.trim())) return { valid: false, error: fieldName + ' can only contain letters' };
+            return { valid: true };
+        }
+        
         async function handleSignup(e) {
             e.preventDefault();
             hideAlert();
+            
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            
+            // Validate names
+            const firstNameVal = validateNameField(firstName, 'First name');
+            if (!firstNameVal.valid) { showAlert(firstNameVal.error); return; }
+            
+            const lastNameVal = validateNameField(lastName, 'Last name');
+            if (!lastNameVal.valid) { showAlert(lastNameVal.error); return; }
             
             const studentIdInput = document.getElementById('studentId');
             if (!validateStudentId(studentIdInput)) {
@@ -1068,6 +1090,9 @@
             
             if (pw !== confirm) { showAlert('Passwords do not match'); return; }
             if (pw.length < 8) { showAlert('Password must be at least 8 characters'); return; }
+            if (!/[A-Z]/.test(pw)) { showAlert('Password must contain at least one uppercase letter'); return; }
+            if (!/[a-z]/.test(pw)) { showAlert('Password must contain at least one lowercase letter'); return; }
+            if (!/[0-9]/.test(pw)) { showAlert('Password must contain at least one number'); return; }
             
             setLoading('signupBtn', true);
             
@@ -1079,13 +1104,13 @@
                     password: pw,
                     options: {
                         data: {
-                            first_name: document.getElementById('firstName').value,
-                            last_name: document.getElementById('lastName').value,
+                            first_name: firstName,
+                            last_name: lastName,
                             student_id: document.getElementById('studentId').value,
                             year_of_study: document.getElementById('yearOfStudy').value,
                             program_type: document.getElementById('programType').value,
                             program_name: document.getElementById('programName').value,
-                            full_name: `${document.getElementById('firstName').value} ${document.getElementById('lastName').value}`
+                            full_name: `${firstName} ${lastName}`
                         },
                         emailRedirectTo: window.location.origin + '/myub/verified.html'
                     }

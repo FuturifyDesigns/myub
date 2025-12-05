@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="myub-utils.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
@@ -361,8 +362,6 @@
                         <div class="notif-dropdown-footer"><a onclick="openNotificationsModal()" style="cursor:pointer;">View All Notifications</a></div>
                     </div>
                 </div>
-                <button class="icon-btn" onclick="toggleDarkMode()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg></button>
-                <div class="user-avatar" onclick="location.href='profile.html'"><img id="userAvatar" src="https://ui-avatars.com/api/?name=User&background=1a365d&color=fff" alt="Profile"></div>
             </div>
         </header>
 
@@ -520,14 +519,31 @@
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) { window.location.href = 'index.html'; return; }
             currentUser = session.user;
+            
+            // Initialize connection manager
+            if (window.MyUBUtils) {
+                const canConnect = await MyUBUtils.ConnectionManager.init(supabase, currentUser.id);
+                if (!canConnect) {
+                    document.getElementById('loadingScreen').style.display = 'none';
+                    return;
+                }
+                MyUBUtils.SubscriptionManager.init(supabase, currentUser.id);
+                MyUBUtils.SubscriptionManager.subscribe({
+                    messages: () => loadSidebarBadges(),
+                    notifications: () => loadNotifications(),
+                    friend_requests: () => loadSidebarBadges()
+                });
+            }
+            
             await loadProfile();
             await loadSchedules();
             await loadNotifications();
             loadSidebarBadges();
             renderCalendar();
             renderUpcoming();
-            setupRealtimeSubscriptions();
+            if (!window.MyUBUtils) setupRealtimeSubscriptions();
             if (localStorage.getItem('darkMode') === 'true') document.body.classList.add('dark-mode');
+            document.getElementById('loadingScreen').style.display = 'none';
         }
 
         async function loadProfile() {
@@ -544,10 +560,10 @@
         }
 
         async function loadSidebarBadges() {
-            const { count: msgCount } = await supabase.from('messages').select('*', { count: 'exact', head: true }).eq('receiver_id', currentUser.id).eq('is_read', false);
+            const { count: msgCount } = await supabase.from('messages').select('*', { count: 'exact', head: true }).eq('receiver_id', currentUser.id).eq('is_read', false).neq('is_deleted', true);
             const msgBadge = document.getElementById('msgBadge');
             if (msgCount > 0) { msgBadge.textContent = msgCount; msgBadge.style.display = 'inline'; } else { msgBadge.style.display = 'none'; }
-            const { count: friendCount } = await supabase.from('friendships').select('*', { count: 'exact', head: true }).eq('friend_id', currentUser.id).eq('status', 'pending');
+            const { count: friendCount } = await supabase.from('friend_requests').select('*', { count: 'exact', head: true }).eq('receiver_id', currentUser.id).eq('status', 'pending');
             const friendsBadge = document.getElementById('friendsBadge');
             if (friendCount > 0) { friendsBadge.textContent = friendCount; friendsBadge.style.display = 'inline'; } else { friendsBadge.style.display = 'none'; }
         }

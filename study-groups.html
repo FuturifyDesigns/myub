@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="myub-utils.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         :root {
@@ -1079,11 +1080,26 @@
                 if (!session) { window.location.href = 'index.html'; return; }
                 currentUser = session.user;
                 
+                // Initialize connection manager
+                if (window.MyUBUtils) {
+                    var canConnect = await MyUBUtils.ConnectionManager.init(supabase, currentUser.id);
+                    if (!canConnect) {
+                        document.getElementById('loadingScreen').style.display = 'none';
+                        return;
+                    }
+                    MyUBUtils.SubscriptionManager.init(supabase, currentUser.id);
+                    MyUBUtils.SubscriptionManager.subscribe({
+                        messages: function() { loadSidebarBadges(); },
+                        notifications: function() { loadNotifications(); },
+                        friend_requests: function() { loadSidebarBadges(); }
+                    });
+                }
+                
                 await updateOnlineStatus(true);
                 await Promise.all([loadMyGroups(), loadNotifications(), loadFriends(), loadBlockedUsers(), loadSidebarBadges()]);
                 
                 updateCreatedCount();
-                subscribeToRealtime();
+                if (!window.MyUBUtils) subscribeToRealtime();
                 setupEmojiPicker();
                 startHeartbeat();
                 
@@ -1271,15 +1287,20 @@
                     .from('messages')
                     .select('id', { count: 'exact', head: true })
                     .eq('receiver_id', currentUser.id)
-                    .eq('is_read', false);
+                    .eq('is_read', false)
+                    .neq('is_deleted', true);
                 var msgBadge = document.getElementById('sidebarMsgBadge');
                 if (msgResult.count > 0) { msgBadge.style.display = 'inline'; msgBadge.textContent = msgResult.count > 9 ? '9+' : msgResult.count; } else { msgBadge.style.display = 'none'; }
             } catch(e) { console.error('msg badge error:', e); }
             
             try {
-                // For friend requests, check friend_requests table or just skip if not exists
+                var frResult = await supabase
+                    .from('friend_requests')
+                    .select('id', { count: 'exact', head: true })
+                    .eq('receiver_id', currentUser.id)
+                    .eq('status', 'pending');
                 var frBadge = document.getElementById('sidebarFriendsBadge');
-                frBadge.style.display = 'none';
+                if (frResult.count > 0) { frBadge.style.display = 'inline'; frBadge.textContent = frResult.count > 9 ? '9+' : frResult.count; } else { frBadge.style.display = 'none'; }
             } catch(e) { console.error('fr badge error:', e); }
         }
         

@@ -155,6 +155,9 @@
         .calendar-event.other { background: #e0f2fe; color: #0369a1; border-left: 3px solid var(--cyan); }
         .more-events { font-size: 11px; color: var(--gray-500); padding: 2px 8px; cursor: pointer; }
 
+        /* Month View - visible by default */
+        .month-view-content { display: block; }
+
         /* Week View */
         .week-view { display: none; }
         .week-header { display: grid; grid-template-columns: 60px repeat(7, 1fr); border-bottom: 1px solid var(--gray-200); background: var(--gray-50); }
@@ -545,18 +548,20 @@
             const loadingScreen = document.getElementById('loadingScreen');
             if (loadingScreen) loadingScreen.style.display = 'none';
             
-            // Render calendar after a short delay to ensure DOM is ready
-            setTimeout(() => {
-                renderCalendar();
-                renderUpcoming();
-            }, 50);
+            // Render calendar and upcoming - ensure DOM is ready
+            updateDateDisplay();
+            renderMonthView();
+            renderUpcoming();
         }
 
         async function loadProfile() {
             const { data } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
             if (data) {
                 const name = data.full_name || data.first_name || 'User';
-                document.getElementById('userAvatar').src = data.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=1a365d&color=fff`;
+                const avatarEl = document.getElementById('userAvatar');
+                if (avatarEl) {
+                    avatarEl.src = data.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=1a365d&color=fff`;
+                }
             }
         }
 

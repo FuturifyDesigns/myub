@@ -768,6 +768,40 @@
                     loadReports();
                 })
                 .subscribe();
+            
+            // Real-time updates for analytics
+            supabase.channel('admin-profiles')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => {
+                    loadAnalytics();
+                    loadUsers();
+                })
+                .subscribe();
+            
+            supabase.channel('admin-groups')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'study_groups' }, () => {
+                    loadAnalytics();
+                    loadGroups();
+                })
+                .subscribe();
+            
+            supabase.channel('admin-notes')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'notes' }, () => {
+                    loadAnalytics();
+                    loadNotes();
+                })
+                .subscribe();
+            
+            supabase.channel('admin-messages')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, () => {
+                    loadAnalytics();
+                })
+                .subscribe();
+            
+            supabase.channel('admin-schedules')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'schedule_items' }, () => {
+                    loadAnalytics();
+                })
+                .subscribe();
         }
         
         // Update reports badge

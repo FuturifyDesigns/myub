@@ -2047,9 +2047,10 @@
             if (n) n.is_read = true;
             renderNotifications();
             document.getElementById('notificationDropdown').classList.remove('show');
-            if (type.includes('friend')) window.location.href = 'friends.html';
-            else if (type.includes('message')) window.location.href = 'messages.html';
-            else if (type.includes('group')) window.location.href = 'study-groups.html';
+            if (type === 'friend_request' || type === 'friend_accept') window.location.href = 'friends.html';
+            else if (type === 'message') window.location.href = 'messages.html';
+            else if (type === 'study_group') window.location.href = 'study-groups.html';
+            else if (type === 'admin_warning' || type === 'announcement') { /* Stay on dashboard, it's displayed here */ }
         }
 
         async function markAllNotificationsRead() {
@@ -2363,9 +2364,10 @@
         async function handleNotifClickModal(id, type) {
             await supabase.from('notifications').update({ is_read: true }).eq('id', id);
             closeNotificationsModal();
-            if (type.includes('friend')) window.location.href = 'friends.html';
-            else if (type.includes('message')) window.location.href = 'messages.html';
-            else if (type.includes('group')) window.location.href = 'study-groups.html';
+            if (type === 'friend_request' || type === 'friend_accept') window.location.href = 'friends.html';
+            else if (type === 'message') window.location.href = 'messages.html';
+            else if (type === 'study_group') window.location.href = 'study-groups.html';
+            else if (type === 'admin_warning' || type === 'announcement') { /* Stay on dashboard */ }
         }
         
         async function markAllNotificationsReadModal() {

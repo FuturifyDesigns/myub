@@ -89,42 +89,44 @@
         .user-search-status.offline { color: var(--gray-400); }
         .search-loading, .search-empty { padding: 40px 20px; text-align: center; color: var(--gray-400); font-size: 14px; }
         
-        /* Profile Modal Styles */
-        .profile-modal-content { text-align: center; padding: 8px 0; }
-        .profile-modal-avatar { width: 88px; height: 88px; border-radius: 50%; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); display: flex; align-items: center; justify-content: center; color: var(--white); font-family: 'Sora', sans-serif; font-weight: 700; font-size: 28px; margin: 0 auto 16px; position: relative; box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15); }
+        /* Profile Modal Styles - Matching friends.html */
+        .profile-modal-content { text-align: center; }
+        .profile-modal-avatar { width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); display: flex; align-items: center; justify-content: center; color: var(--white); font-family: 'Sora', sans-serif; font-weight: 700; font-size: 24px; margin: 0 auto 12px; position: relative; }
         .profile-modal-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-        .profile-modal-avatar .online-dot { position: absolute; bottom: 2px; right: 2px; width: 16px; height: 16px; background: var(--green); border-radius: 50%; border: 3px solid var(--white); z-index: 1; }
+        .profile-modal-avatar .online-dot { position: absolute; bottom: 0; right: 0; width: 14px; height: 14px; background: var(--green); border-radius: 50%; border: 3px solid var(--white); z-index: 1; }
         .profile-modal-avatar .online-dot.offline { background: var(--gray-400); }
-        .profile-modal-name { font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 700; color: var(--gray-800); margin-bottom: 4px; }
-        .profile-modal-program { font-size: 14px; color: var(--gray-500); margin-bottom: 8px; }
-        .profile-modal-status { font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 16px; color: var(--gray-600); }
-        .profile-modal-status .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
-        .profile-modal-status .dot.offline { background: var(--gray-400); }
-        .profile-modal-status span { color: var(--gray-600); }
-        .profile-modal-bio { background: var(--gray-50); padding: 12px 16px; border-radius: 12px; font-size: 14px; color: var(--gray-600); text-align: left; margin-bottom: 16px; line-height: 1.5; }
-        .profile-modal-meta { font-size: 12px; color: var(--gray-500); margin-bottom: 16px; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px 0; border-top: 1px solid var(--gray-100); border-bottom: 1px solid var(--gray-100); }
-        .profile-modal-meta .label { font-size: 11px; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.5px; }
-        .profile-modal-meta .value { font-family: 'Sora', sans-serif; font-weight: 600; color: var(--gray-700); font-size: 15px; }
+        .profile-modal-name { font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 700; color: var(--gray-800); margin-bottom: 2px; }
+        .profile-modal-program { font-size: 13px; color: var(--gray-500); margin-bottom: 4px; }
+        .profile-modal-status { font-size: 12px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .profile-modal-status.online { color: var(--green); }
+        .profile-modal-status.offline { color: var(--gray-400); }
+        .profile-modal-bio { font-size: 13px; color: var(--gray-600); background: var(--gray-50); padding: 10px 14px; border-radius: 10px; margin-bottom: 12px; text-align: left; }
+        .profile-modal-bio:empty { display: none; }
+        .profile-modal-meta { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 12px 0; margin-bottom: 4px; }
+        .profile-modal-meta .label { font-size: 10px; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.5px; }
+        .profile-modal-meta .value { font-family: 'Sora', sans-serif; font-weight: 600; color: var(--gray-700); font-size: 14px; }
         .profile-modal-actions { display: flex; flex-direction: column; gap: 10px; }
-        .profile-modal-actions .btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 18px; font-size: 14px; font-weight: 600; border-radius: 12px; cursor: pointer; transition: all 0.2s; border: none; width: 100%; }
-        .profile-modal-actions .btn svg { width: 18px; height: 18px; }
+        .profile-modal-actions .btn { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 12px 16px; font-size: 13px; font-weight: 600; border-radius: 10px; cursor: pointer; transition: all 0.2s; border: none; width: 100%; }
+        .profile-modal-actions .btn svg { width: 16px; height: 16px; }
         .profile-modal-actions .btn-primary { background: var(--navy); color: var(--white); }
-        .profile-modal-actions .btn-primary:hover { background: var(--navy-light); transform: translateY(-1px); }
+        .profile-modal-actions .btn-primary:hover { background: var(--navy-light); }
         .profile-modal-actions .btn-success { background: var(--green); color: var(--white); }
         .profile-modal-actions .btn-success:hover { background: #059669; }
+        .profile-modal-actions .btn-secondary { background: var(--gray-100); border: 2px solid var(--gray-200); color: var(--gray-700); }
+        .profile-modal-actions .btn-secondary:hover { background: var(--gray-200); }
+        .profile-modal-actions .btn-danger { background: var(--red); color: var(--white); }
+        .profile-modal-actions .btn-danger:hover { background: #dc2626; }
         .profile-modal-actions .btn-row { display: flex; gap: 10px; }
-        .profile-modal-actions .btn-row .btn { flex: 1; padding: 12px 14px; font-size: 13px; }
+        .profile-modal-actions .btn-row .btn { flex: 1; padding: 10px 12px; font-size: 12px; }
         .profile-modal-actions .btn-outline-danger { background: #fef2f2; border: 2px solid #fecaca; color: var(--red); }
         .profile-modal-actions .btn-outline-danger:hover { background: #fee2e2; }
         .profile-modal-actions .btn-warning { background: #fffbeb; border: 2px solid #fde68a; color: #b45309; }
         .profile-modal-actions .btn-warning:hover { background: #fef3c7; }
-        .profile-modal-actions .btn-secondary { background: var(--gray-100); border: 2px solid var(--gray-200); color: var(--gray-700); }
-        .profile-modal-actions .btn-secondary:hover { background: var(--gray-200); }
-        .profile-modal-link-container { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--gray-200); }
-        .profile-modal-link { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 18px; background: var(--gray-50); border: 2px solid var(--gray-200); border-radius: 12px; color: var(--navy); font-size: 14px; font-weight: 600; text-decoration: none; transition: all 0.2s; }
+        .profile-modal-link-container { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--gray-200); }
+        .profile-modal-link { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 16px; background: var(--gray-50); border: 2px solid var(--gray-200); border-radius: 10px; color: var(--navy); font-size: 13px; font-weight: 600; text-decoration: none; transition: all 0.2s; }
         .profile-modal-link:hover { background: var(--gray-100); border-color: var(--navy); text-decoration: none; }
-        .profile-modal-link svg { width: 16px; height: 16px; }
-        .profile-blocked-notice { background: #fee2e2; color: var(--red); padding: 12px; border-radius: 10px; font-size: 14px; margin-bottom: 16px; text-align: center; font-weight: 500; }
+        .profile-modal-link svg { width: 14px; height: 14px; }
+        .profile-blocked-notice { background: #fee2e2; color: var(--red); padding: 10px; border-radius: 8px; font-size: 13px; margin-bottom: 12px; text-align: center; }
         /* Ensure confirm modal appears above profile modal */
         #confirmModal { z-index: 1100; }
         #userReportModal { z-index: 1100; }
@@ -890,8 +892,10 @@
             renderNotifications(); 
             document.getElementById('notificationDropdown').classList.remove('show');
             const dd3 = document.getElementById('notificationDropdown3'); if (dd3) dd3.classList.remove('show');
-            if (type.includes('friend')) window.location.href = 'friends.html';
-            else if (type.includes('group')) window.location.href = 'study-groups.html';
+            if (type === 'friend_request' || type === 'friend_accept') window.location.href = 'friends.html';
+            else if (type === 'study_group') window.location.href = 'study-groups.html';
+            else if (type === 'admin_warning' || type === 'announcement') window.location.href = 'dashboard.html';
+            // For message notifications, stay on this page
         }
         async function markAllNotificationsRead() { await supabase.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id); notifications.forEach(n => n.is_read = true); renderNotifications(); }
 
@@ -1422,7 +1426,7 @@
                 return `<div class="notif-dropdown-item ${n.is_read ? '' : 'unread'}" onclick="handleNotifClickModal('${n.id}','${type}')"><div class="notif-icon ${iconClass}"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">${iconSvg}</svg></div><div class="notif-content"><h4>${escapeHtml(n.title || 'Notification')}</h4><p>${escapeHtml(n.body || '')}</p><div class="time">${formatTimeAgo(n.created_at)}</div></div></div>`;
             }).join('');
         }
-        async function handleNotifClickModal(id, type) { await supabase.from('notifications').update({ is_read: true }).eq('id', id); closeNotificationsModal(); if (type.includes('friend')) window.location.href = 'friends.html'; else if (type.includes('group')) window.location.href = 'study-groups.html'; }
+        async function handleNotifClickModal(id, type) { await supabase.from('notifications').update({ is_read: true }).eq('id', id); closeNotificationsModal(); if (type === 'friend_request' || type === 'friend_accept') window.location.href = 'friends.html'; else if (type === 'study_group') window.location.href = 'study-groups.html'; else if (type === 'admin_warning' || type === 'announcement') window.location.href = 'dashboard.html'; }
         async function markAllNotificationsReadModal() { await supabase.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id); notifications.forEach(n => n.is_read = true); renderNotifications(); await loadAllNotifications(); showToast('All marked as read'); }
         async function clearAllNotifications() { if (!confirm('Clear all notifications?')) return; const { error } = await supabase.from('notifications').delete().eq('user_id', currentUser.id); if (error) { console.error('Delete failed:', error); showToast('Failed to clear. Check database permissions.', 'error'); return; } notifications = []; renderNotifications(); loadAllNotifications(); closeNotificationsModal(); showToast('Notifications cleared', 'success'); }
 

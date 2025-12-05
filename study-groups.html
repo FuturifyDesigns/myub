@@ -1534,6 +1534,19 @@
         
         async function joinGroup(groupId) {
             try {
+                // Check if user is banned from this group
+                var banCheck = await supabase.from('study_group_members')
+                    .select('role')
+                    .eq('group_id', groupId)
+                    .eq('user_id', currentUser.id)
+                    .eq('role', 'banned')
+                    .maybeSingle();
+                
+                if (banCheck.data) {
+                    showToast('You are banned from this group', 'error');
+                    return;
+                }
+                
                 var result = await supabase.from('study_group_members').insert({ group_id: groupId, user_id: currentUser.id, role: 'member' });
                 if (result.error) { showToast(result.error.code === '23505' ? 'Already a member' : 'Failed to join', 'error'); return; }
                 showToast('Joined!', 'success');
@@ -1545,6 +1558,19 @@
         
         async function askToJoin(groupId) {
             try {
+                // Check if user is banned from this group
+                var banCheck = await supabase.from('study_group_members')
+                    .select('role')
+                    .eq('group_id', groupId)
+                    .eq('user_id', currentUser.id)
+                    .eq('role', 'banned')
+                    .maybeSingle();
+                
+                if (banCheck.data) {
+                    showToast('You are banned from this group', 'error');
+                    return;
+                }
+                
                 // Get group info for notification
                 var groupResult = await supabase.from('study_groups').select('name, creator_id').eq('id', groupId).single();
                 var group = groupResult.data;
@@ -1571,7 +1597,7 @@
                     user_id: group.creator_id,
                     title: 'Join Request',
                     message: userName + ' wants to join ' + group.name,
-                    type: 'group_join_request',
+                    type: 'study_group',
                     reference_id: groupId + ':' + currentUser.id
                 });
                 
@@ -1598,7 +1624,7 @@
                         user_id: userId,
                         title: 'Request Accepted',
                         message: 'You can now join ' + groupResult.data.name,
-                        type: 'group_request_accepted',
+                        type: 'study_group',
                         reference_id: groupId
                     });
                     showToast('User added to group', 'success');
@@ -2160,9 +2186,11 @@
         async function handleNotifClick(id, type, refId) {
             try { await supabase.from('notifications').update({ is_read: true }).eq('id', id); } catch(e) {}
             
-            if (type === 'friend_request') window.location.href = 'friends.html';
+            if (type === 'friend_request' || type === 'friend_accept') window.location.href = 'friends.html';
             else if (type === 'message') window.location.href = 'messages.html' + (refId ? '?conv=' + refId : '');
-            else if (type === 'group_message' || type === 'group_request_accepted') { if (refId) { await loadMyGroups(); openGroup(refId); } }
+            else if (type === 'study_group' || type === 'group_message' || type === 'group_request_accepted') { if (refId) { await loadMyGroups(); openGroup(refId.split(':')[0]); } }
+            else if (type === 'admin_warning') { /* Stay on current page */ }
+            else if (type === 'announcement') { window.location.href = 'dashboard.html'; }
             toggleNotifications();
         }
         
@@ -2812,7 +2840,9 @@
             await supabase.from('notifications').update({ is_read: true }).eq('id', id);
             closeNotificationsModal();
             if (type.includes('friend')) window.location.href = 'friends.html';
-            else if (type.includes('message')) window.location.href = 'messages.html';
+            else if (type === 'message') window.location.href = 'messages.html';
+            else if (type === 'study_group') { /* Already on study groups */ await loadMyGroups(); }
+            else if (type === 'announcement' || type === 'admin_warning') window.location.href = 'dashboard.html';
         }
         
         async function markAllNotificationsReadModal() {

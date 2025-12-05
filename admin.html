@@ -593,6 +593,40 @@
         </div>
     </div>
 
+    <!-- Warning Message Modal -->
+    <div class="modal-overlay" id="warningModal">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">Send Warning to User</span>
+                <button class="modal-close" onclick="closeWarningModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Sending warning to:</label>
+                    <p id="warningUserName" style="font-weight:600;color:var(--navy);"></p>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Warning Type</label>
+                    <select class="form-select" id="warningType">
+                        <option value="behavior">Inappropriate Behavior</option>
+                        <option value="content">Inappropriate Content</option>
+                        <option value="spam">Spam/Abuse</option>
+                        <option value="harassment">Harassment</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Warning Message *</label>
+                    <textarea class="form-textarea" id="warningMessage" placeholder="Enter the warning message to send to this user..." rows="4"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeWarningModal()">Cancel</button>
+                <button class="btn btn-primary" style="background:var(--red);" onclick="sendWarning()">Send Warning</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
 
@@ -806,6 +840,7 @@
                         <td><span class="status-badge ${u.is_banned ? 'banned' : 'active'}">${u.is_banned ? 'Banned' : 'Active'}</span></td>
                         <td>
                             <button class="btn btn-sm btn-outline" onclick="viewUser('${u.id}')">View</button>
+                            ${u.id !== ADMIN_USER_ID ? `<button class="btn btn-sm" style="background:var(--orange);color:white;" onclick="openWarningModal('${u.id}', '${escapeHtml(u.full_name || 'User')}')">Warn</button>` : ''}
                             ${u.id !== ADMIN_USER_ID ? `<button class="btn btn-sm ${u.is_banned ? 'btn-primary' : 'btn-danger'}" onclick="toggleBan('${u.id}', ${!u.is_banned})">${u.is_banned ? 'Unban' : 'Ban'}</button>` : ''}
                         </td>
                     </tr>
@@ -1203,6 +1238,58 @@
 
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        // ========== WARNING MESSAGE FUNCTIONS ==========
+        let warningTargetUserId = null;
+        
+        function openWarningModal(userId, userName) {
+            warningTargetUserId = userId;
+            document.getElementById('warningUserName').textContent = userName;
+            document.getElementById('warningType').value = 'behavior';
+            document.getElementById('warningMessage').value = '';
+            document.getElementById('warningModal').classList.add('show');
+        }
+        
+        function closeWarningModal() {
+            document.getElementById('warningModal').classList.remove('show');
+            warningTargetUserId = null;
+        }
+        
+        async function sendWarning() {
+            if (!warningTargetUserId) return;
+            
+            const warningType = document.getElementById('warningType').value;
+            const warningMessage = document.getElementById('warningMessage').value.trim();
+            
+            if (!warningMessage) {
+                showToast('Please enter a warning message', 'error');
+                return;
+            }
+            
+            if (warningMessage.length < 10) {
+                showToast('Warning message must be at least 10 characters', 'error');
+                return;
+            }
+            
+            try {
+                // Create a notification for the user
+                const { error } = await supabase.from('notifications').insert({
+                    user_id: warningTargetUserId,
+                    type: 'admin_warning',
+                    title: '⚠️ Admin Warning: ' + warningType.charAt(0).toUpperCase() + warningType.slice(1),
+                    body: warningMessage,
+                    is_read: false
+                });
+                
+                if (error) throw error;
+                
+                showToast('Warning sent successfully', 'success');
+                closeWarningModal();
+            } catch (e) {
+                console.error('Error sending warning:', e);
+                showToast('Failed to send warning', 'error');
+            }
         }
 
         // Close sidebar on outside click (mobile)

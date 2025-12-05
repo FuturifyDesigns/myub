@@ -101,6 +101,7 @@
         .notif-icon.friend { background: #22c55e; }
         .notif-icon.message { background: #3b82f6; }
         .notif-icon.group { background: #8b5cf6; }
+        .notif-icon.warning { background: #f97316; color: white; }
         .notif-icon svg { width: 18px; height: 18px; color: white; }
         .notif-content { flex: 1; min-width: 0; }
         .notif-content h5 { font-size: 14px; font-weight: 600; color: var(--gray-800); margin-bottom: 2px; }
@@ -460,6 +461,61 @@
         let currentDate = new Date();
         let editingEventId = null;
 
+        // ========== VALIDATION MODULE ==========
+        const badWords = ['fuck', 'shit', 'ass', 'bitch', 'damn', 'crap', 'piss', 'dick', 'cock', 'pussy', 'asshole', 'bastard', 'slut', 'whore', 'nigger', 'nigga', 'fag', 'faggot', 'retard', 'cunt', 'twat', 'wanker', 'bollocks', 'arse', 'motherfucker', 'fucker'];
+        
+        function containsBadWords(text) {
+            if (!text) return false;
+            const lower = text.toLowerCase();
+            return badWords.some(word => new RegExp('\\b' + word + '\\b', 'i').test(lower));
+        }
+        
+        function validateTitle(title, fieldName = 'Title', maxLength = 100) {
+            if (!title || !title.trim()) return { valid: false, error: fieldName + ' is required' };
+            if (title.trim().length < 2) return { valid: false, error: fieldName + ' must be at least 2 characters' };
+            if (title.trim().length > maxLength) return { valid: false, error: fieldName + ' must be less than ' + maxLength + ' characters' };
+            if (containsBadWords(title)) return { valid: false, error: fieldName + ' contains inappropriate language' };
+            return { valid: true };
+        }
+        
+        function validateDateRange(startDate, endDate) {
+            if (!startDate) return { valid: false, error: 'Start date/time is required' };
+            const start = new Date(startDate);
+            if (isNaN(start.getTime())) return { valid: false, error: 'Invalid start date format' };
+            if (endDate) {
+                const end = new Date(endDate);
+                if (isNaN(end.getTime())) return { valid: false, error: 'Invalid end date format' };
+                if (end <= start) return { valid: false, error: 'End time must be after start time' };
+            }
+            return { valid: true };
+        }
+        
+        function validateTextContent(text, fieldName = 'Content', maxLength = 1000) {
+            if (text && text.trim().length > maxLength) return { valid: false, error: fieldName + ' must be less than ' + maxLength + ' characters' };
+            if (text && containsBadWords(text)) return { valid: false, error: fieldName + ' contains inappropriate language' };
+            return { valid: true };
+        }
+        
+        // Helper to format date for local storage (avoid timezone issues)
+        function formatLocalDateTime(date) {
+            const d = new Date(date);
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            const hours = String(d.getHours()).padStart(2, '0');
+            const mins = String(d.getMinutes()).padStart(2, '0');
+            return `${year}-${month}-${day}T${hours}:${mins}`;
+        }
+        
+        // Helper to get local date string for comparison
+        function getLocalDateString(dateStr) {
+            const d = new Date(dateStr);
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
         async function init() {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) { window.location.href = 'index.html'; return; }
@@ -520,8 +576,8 @@
             for (let i = 0; i < 42; i++) {
                 const isOther = curr.getMonth() !== month;
                 const isToday = curr.toDateString() === today.toDateString();
-                const dateStr = curr.toISOString().split('T')[0];
-                const dayEvents = schedules.filter(s => new Date(s.start_time).toISOString().split('T')[0] === dateStr);
+                const dateStr = `${curr.getFullYear()}-${String(curr.getMonth() + 1).padStart(2, '0')}-${String(curr.getDate()).padStart(2, '0')}`;
+                const dayEvents = schedules.filter(s => getLocalDateString(s.start_time) === dateStr);
                 html += `<div class="calendar-cell ${isOther ? 'other-month' : ''} ${isToday ? 'today' : ''}" onclick="openEventModal('${dateStr}')">
                     <div class="day-number">${curr.getDate()}</div>
                     <div class="calendar-events">${dayEvents.slice(0, 3).map(e => `<div class="calendar-event ${e.event_type}" onclick="event.stopPropagation();openEventModal(null,'${e.id}')">${escapeHtml(e.title)}</div>`).join('')}${dayEvents.length > 3 ? `<div class="more-events">+${dayEvents.length - 3} more</div>` : ''}</div></div>`;
@@ -545,8 +601,8 @@
             bodyHtml += '</div>';
             for (let d = 0; d < 7; d++) {
                 const day = new Date(weekStart); day.setDate(day.getDate() + d);
-                const dateStr = day.toISOString().split('T')[0];
-                const dayEvents = schedules.filter(s => new Date(s.start_time).toISOString().split('T')[0] === dateStr);
+                const dateStr = `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, '0')}-${String(day.getDate()).padStart(2, '0')}`;
+                const dayEvents = schedules.filter(s => getLocalDateString(s.start_time) === dateStr);
                 bodyHtml += '<div class="week-day-column">';
                 for (let h = 0; h < 24; h++) bodyHtml += `<div class="week-hour-slot" onclick="openEventModal('${dateStr}T${String(h).padStart(2,'0')}:00')"></div>`;
                 dayEvents.forEach(e => {
@@ -648,17 +704,40 @@
         function closeEventModal() { document.getElementById('eventModal').classList.remove('show'); editingEventId = null; }
 
         async function saveEvent() {
-            const title = document.getElementById('eventTitle').value.trim(), startTime = document.getElementById('startTime').value;
-            if (!title) { showToast('Please enter an event title', 'error'); return; }
-            if (!startTime) { showToast('Please select a start time', 'error'); return; }
+            const title = document.getElementById('eventTitle').value.trim();
+            const startTime = document.getElementById('startTime').value;
+            const endTime = document.getElementById('endTime').value;
+            const location = document.getElementById('eventLocation').value.trim();
+            const description = document.getElementById('eventDescription').value.trim();
+            
+            // Validate title
+            const titleValidation = validateTitle(title, 'Event title');
+            if (!titleValidation.valid) { showToast(titleValidation.error, 'error'); return; }
+            
+            // Validate dates
+            const dateValidation = validateDateRange(startTime, endTime);
+            if (!dateValidation.valid) { showToast(dateValidation.error, 'error'); return; }
+            
+            // Validate location
+            if (location) {
+                const locValidation = validateTextContent(location, 'Location', 200);
+                if (!locValidation.valid) { showToast(locValidation.error, 'error'); return; }
+            }
+            
+            // Validate description
+            if (description) {
+                const descValidation = validateTextContent(description, 'Description', 1000);
+                if (!descValidation.valid) { showToast(descValidation.error, 'error'); return; }
+            }
+            
             const eventData = { 
                 user_id: currentUser.id, 
                 title, 
                 event_type: document.getElementById('eventType').value, 
                 start_time: new Date(startTime).toISOString(), 
-                end_time: document.getElementById('endTime').value ? new Date(document.getElementById('endTime').value).toISOString() : null, 
-                location: document.getElementById('eventLocation').value.trim() || null, 
-                description: document.getElementById('eventDescription').value.trim() || null, 
+                end_time: endTime ? new Date(endTime).toISOString() : null, 
+                location: location || null, 
+                description: description || null, 
                 reminder_before: parseInt(document.getElementById('eventReminder').value) || 30
             };
             let error;
@@ -694,7 +773,7 @@
             badge.textContent = unread; badge.style.display = unread > 0 ? 'flex' : 'none';
             if (notifications.length === 0) { list.innerHTML = '<div class="notif-dropdown-empty">No notifications</div>'; return; }
             list.innerHTML = notifications.slice(0, 10).map(n => {
-                const type = n.type || '', iconClass = type.includes('friend') ? 'friend' : type.includes('message') ? 'message' : 'group';
+                const type = n.type || '', iconClass = type.includes('friend') ? 'friend' : type.includes('message') ? 'message' : type.includes('warning') ? 'warning' : 'group';
                 const iconSvg = iconClass === 'friend' ? '<path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>' : iconClass === 'message' ? '<path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>' : '<path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>';
                 return `<div class="notif-dropdown-item ${n.is_read ? '' : 'unread'}" onclick="handleNotifClick('${n.id}','${type}')"><div class="notif-icon ${iconClass}"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">${iconSvg}</svg></div><div class="notif-content"><h5>${escapeHtml(n.title || 'Notification')}</h5><p>${escapeHtml(n.body || '')}</p><div class="time">${formatTimeAgo(n.created_at)}</div></div></div>`;
             }).join('');
@@ -721,7 +800,7 @@
             const allNotifs = data || [], list = document.getElementById('allNotifList');
             if (allNotifs.length === 0) { list.innerHTML = '<div style="padding:40px;text-align:center;color:#94a3b8;">No notifications</div>'; return; }
             list.innerHTML = allNotifs.map(n => {
-                const type = n.type || '', iconClass = type.includes('friend') ? 'friend' : type.includes('message') ? 'message' : 'group';
+                const type = n.type || '', iconClass = type.includes('friend') ? 'friend' : type.includes('message') ? 'message' : type.includes('warning') ? 'warning' : 'group';
                 const bgColor = iconClass === 'friend' ? '#22c55e' : iconClass === 'message' ? '#3b82f6' : '#8b5cf6';
                 const iconSvg = iconClass === 'friend' ? '<path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>' : iconClass === 'message' ? '<path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>' : '<path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>';
                 return `<div style="display:flex;gap:12px;padding:14px 20px;border-bottom:1px solid #f1f5f9;cursor:pointer;background:${n.is_read ? 'white' : '#f0f9ff'};" onclick="handleNotifClickModal('${n.id}','${type}')"><div style="width:40px;height:40px;border-radius:50%;background:${bgColor};display:flex;align-items:center;justify-content:center;"><svg width="18" height="18" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24">${iconSvg}</svg></div><div style="flex:1;"><h4 style="font-size:14px;font-weight:600;color:#1e293b;margin-bottom:2px;">${escapeHtml(n.title || 'Notification')}</h4><p style="font-size:13px;color:#64748b;margin-bottom:4px;">${escapeHtml(n.body || '')}</p><div style="font-size:12px;color:#94a3b8;">${formatTimeAgo(n.created_at)}</div></div></div>`;

@@ -123,10 +123,10 @@
         .notif-actions .decline { background: var(--gray-200); color: var(--gray-600); }
         
         /* Groups Container */
-        .groups-container { display: flex; flex: 1; overflow: hidden; position: relative; }
+        .groups-container { display: flex; flex: 1; overflow: hidden; }
         
         /* Groups Panel */
-        .groups-panel { width: 360px; background: var(--white); border-right: 1px solid var(--gray-200); display: flex; flex-direction: column; flex-shrink: 0; height: 100%; }
+        .groups-panel { width: 360px; background: var(--white); border-right: 1px solid var(--gray-200); display: flex; flex-direction: column; flex-shrink: 0; }
         .groups-header { padding: 20px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: space-between; }
         .groups-header h2 { font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 700; color: var(--gray-800); }
         .create-btn { width: 36px; height: 36px; border: none; background: var(--navy); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
@@ -143,7 +143,7 @@
         .search-input { width: 100%; padding: 10px 14px 10px 40px; border: 2px solid var(--gray-200); border-radius: 10px; font-family: 'Outfit', sans-serif; font-size: 14px; background: var(--gray-50) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%2394a3b8' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'/%3E%3C/svg%3E") no-repeat 12px center; background-size: 18px; }
         .search-input:focus { outline: none; border-color: var(--navy); background-color: var(--white); }
         .groups-limit { padding: 8px 16px; background: var(--gray-50); font-size: 12px; color: var(--gray-500); text-align: center; border-bottom: 1px solid var(--gray-200); }
-        .groups-list { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        .groups-list { flex: 1; overflow-y: auto; }
         .group-item { display: flex; align-items: center; gap: 12px; padding: 14px 20px; cursor: pointer; transition: all 0.15s; border-bottom: 1px solid var(--gray-100); }
         .group-item:hover { background: var(--gray-50); }
         .group-item.active { background: var(--blue-light); }
@@ -164,22 +164,23 @@
         .groups-empty h3 { font-size: 16px; font-weight: 600; color: var(--gray-600); margin-bottom: 8px; }
         
         /* Chat Panel */
-        .chat-panel { flex: 1; display: flex; flex-direction: column; background: var(--gray-100); min-width: 0; position: relative; }
-        .chat-header { padding: 12px 20px; background: var(--white); border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 10; }
-        .chat-header-back { display: none; width: 36px; height: 36px; border: none; background: var(--gray-100); border-radius: 8px; cursor: pointer; align-items: center; justify-content: center; }
+        .chat-panel { flex: 1; display: flex; flex-direction: column; background: var(--gray-100); min-width: 0; }
+        .chat-header { padding: 12px 20px; background: var(--white); border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: 12px; }
+        .chat-header-back { display: none; width: 36px; height: 36px; border: none; background: var(--gray-100); border-radius: 8px; cursor: pointer; align-items: center; justify-content: center; flex-shrink: 0; }
         .chat-header-back svg { width: 20px; height: 20px; color: var(--gray-600); }
-        .chat-group-info { flex: 1; display: flex; align-items: center; gap: 12px; cursor: pointer; }
-        .chat-avatar { width: 44px; height: 44px; border-radius: 10px; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); display: flex; align-items: center; justify-content: center; color: var(--white); font-family: 'Sora', sans-serif; font-weight: 700; font-size: 14px; overflow: hidden; }
+        .chat-group-info { flex: 1; display: flex; align-items: center; gap: 12px; cursor: pointer; min-width: 0; overflow: hidden; }
+        .chat-avatar { width: 44px; height: 44px; border-radius: 10px; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); display: flex; align-items: center; justify-content: center; color: var(--white); font-family: 'Sora', sans-serif; font-weight: 700; font-size: 14px; overflow: hidden; flex-shrink: 0; }
         .chat-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .chat-group-details h3 { font-size: 16px; font-weight: 600; color: var(--gray-800); }
+        .chat-group-details { min-width: 0; overflow: hidden; }
+        .chat-group-details h3 { font-size: 16px; font-weight: 600; color: var(--gray-800); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .chat-group-status { font-size: 12px; color: var(--gray-500); }
-        .chat-header-actions { display: flex; gap: 8px; position: relative; }
-        .chat-action-btn { width: 36px; height: 36px; border: none; background: var(--gray-100); border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .chat-header-actions { display: flex; gap: 8px; position: relative; flex-shrink: 0; }
+        .chat-action-btn { width: 36px; height: 36px; border: none; background: var(--gray-100); border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
         .chat-action-btn:hover { background: var(--gray-200); }
         .chat-action-btn svg { width: 18px; height: 18px; color: var(--gray-600); }
         
         /* Chat Messages */
-        .chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 4px; -webkit-overflow-scrolling: touch; }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 4px; }
         .chat-date-divider { text-align: center; margin: 16px 0; }
         .chat-date-divider span { background: var(--gray-200); color: var(--gray-600); font-size: 12px; font-weight: 500; padding: 4px 12px; border-radius: 12px; }
         .message-row { display: flex; align-items: flex-end; gap: 8px; margin-bottom: 4px; max-width: 75%; }
@@ -197,7 +198,7 @@
         .message-time { font-size: 11px; opacity: 0.7; }
         
         /* Chat Input */
-        .chat-input-area { padding: 16px 20px; background: var(--white); border-top: 1px solid var(--gray-200); display: flex; align-items: flex-end; gap: 12px; position: sticky; bottom: 0; z-index: 10; }
+        .chat-input-area { padding: 16px 20px; background: var(--white); border-top: 1px solid var(--gray-200); display: flex; align-items: flex-end; gap: 12px; }
         .emoji-btn { width: 44px; height: 44px; border: none; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; transition: all 0.2s; border: 2px solid var(--gray-200); }
         .emoji-btn:hover { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-color: #fbbf24; transform: scale(1.05); }
         .emoji-btn svg { width: 22px; height: 22px; color: var(--gray-600); }
@@ -460,17 +461,11 @@
         @media (max-width: 900px) {
             .groups-panel { width: 100%; position: absolute; left: 0; top: 0; bottom: 0; z-index: 10; }
             .groups-panel.hidden { display: none; }
-            .chat-panel { position: absolute; left: 0; top: 0; right: 0; bottom: 0; display: none; z-index: 20; }
+            .chat-panel { position: absolute; left: 0; top: 0; right: 0; bottom: 0; display: none; }
             .chat-panel.show { display: flex; }
             .chat-header-back { display: flex; }
             .selection-bar-actions { gap: 6px; }
             .selection-bar-actions button { padding: 8px 12px; font-size: 12px; }
-            /* Mobile-specific chat header fixes */
-            .chat-header { padding: 12px 16px; }
-            .chat-header-actions { display: flex !important; }
-            .chat-action-btn { width: 36px; height: 36px; }
-            .chat-group-details h3 { font-size: 16px; }
-            .chat-group-status { font-size: 12px; }
         }
         @media (max-width: 768px) {
             .sidebar { transform: translateX(-100%); }
@@ -479,6 +474,9 @@
             .main-content { margin-left: 0; }
             .topbar { display: flex; }
             .menu-toggle { display: block; }
+            .groups-header { display: none; }
+            .groups-panel { top: 56px; }
+            .chat-panel { top: 56px; }
             .notification-dropdown { position: fixed; top: 70px; left: 10px; right: 10px; width: auto; border-radius: 16px; max-height: calc(100vh - 90px); z-index: 2000; }
             .form-row { grid-template-columns: 1fr; }
             .crop-layout { flex-direction: column; }
@@ -490,10 +488,6 @@
             .selection-bar-actions { flex-wrap: wrap; }
             .selection-bar-actions button { padding: 6px 10px; font-size: 11px; }
             .selection-bar-actions button svg { width: 14px; height: 14px; }
-            /* Mobile chat panel fixes */
-            .chat-panel { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--gray-100); }
-            .chat-messages { padding-bottom: 80px; } /* Add padding for input area */
-            .chat-input-area { position: fixed; bottom: 0; left: 0; right: 0; background: var(--white); border-top: 1px solid var(--gray-200); }
         }
         @media (max-width: 480px) {
             .notification-dropdown { top: 60px; left: 5px; right: 5px; max-height: calc(100vh - 70px); }
@@ -512,10 +506,6 @@
             .chat-action-btn svg { width: 16px; height: 16px; }
             .chat-avatar { width: 36px; height: 36px; font-size: 12px; }
             .chat-group-details h3 { font-size: 14px; }
-            /* Mobile chat input fixes */
-            .chat-input-wrapper { margin-right: 0; }
-            .emoji-btn { width: 40px; height: 40px; }
-            .send-btn { width: 44px; height: 44px; }
         }
     </style>
 <body>
@@ -587,6 +577,9 @@
                         <div class="notif-dropdown-footer"><a onclick="openNotificationsModal()" style="cursor:pointer;">View All Notifications</a></div>
                     </div>
                 </div>
+                <button class="create-btn" id="createBtnTopbar" onclick="openCreateModal()" title="Create Group">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
+                </button>
             </div>
         </header>
         
@@ -1133,33 +1126,10 @@
                 document.addEventListener('click', handleOutsideClick);
                 window.addEventListener('beforeunload', function() { updateOnlineStatus(false); });
                 
-                // Fix mobile viewport issues
-                fixMobileViewport();
-                
                 document.getElementById('loadingScreen').style.display = 'none';
             } catch (err) {
                 console.error('Init error:', err);
                 document.getElementById('loadingScreen').style.display = 'none';
-            }
-        }
-        
-        // Fix mobile viewport issues
-        function fixMobileViewport() {
-            if (window.innerWidth <= 768) {
-                // Prevent unwanted scrolling
-                document.body.style.overflow = 'hidden';
-                document.querySelector('.main-content').style.overflow = 'hidden';
-                document.querySelector('.groups-container').style.overflow = 'hidden';
-                
-                // Set proper heights for mobile
-                var vh = window.innerHeight * 0.01;
-                document.documentElement.style.setProperty('--vh', vh + 'px');
-                
-                // Adjust chat panel for mobile
-                var chatPanel = document.querySelector('.chat-panel');
-                if (chatPanel) {
-                    chatPanel.style.height = '100vh';
-                }
             }
         }
         
@@ -1458,11 +1428,6 @@
             }
             container.innerHTML = html;
             container.scrollTop = container.scrollHeight;
-            
-            // Add bottom padding for mobile input area
-            if (window.innerWidth <= 768) {
-                container.style.paddingBottom = '80px';
-            }
         }
         
         function renderNotifications() {
@@ -1586,10 +1551,6 @@
             if (window.innerWidth <= 900) {
                 document.getElementById('groupsPanel').classList.add('hidden');
                 document.getElementById('chatPanel').classList.add('show');
-                // Ensure chat panel is properly positioned on mobile
-                setTimeout(function() {
-                    document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
-                }, 100);
             }
         }
         
@@ -1770,6 +1731,8 @@
             createdCount = myGroups.filter(function(g) { return g.creator_id === currentUser.id; }).length;
             document.getElementById('groupsLimit').textContent = 'You can create up to ' + MAX_GROUPS + ' groups (' + createdCount + '/' + MAX_GROUPS + ' used)';
             document.getElementById('createBtn').disabled = createdCount >= MAX_GROUPS;
+            var topbarBtn = document.getElementById('createBtnTopbar');
+            if (topbarBtn) topbarBtn.disabled = createdCount >= MAX_GROUPS;
         }
         
         async function promoteToAdmin(userId) {
@@ -2549,14 +2512,7 @@
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('show'); }
         function toggleChatMenu(e) { e.stopPropagation(); document.getElementById('chatMenu').classList.toggle('show'); }
         function closeChatMenu() { document.getElementById('chatMenu').classList.remove('show'); }
-        function backToGroups() { 
-            document.getElementById('groupsPanel').classList.remove('hidden'); 
-            document.getElementById('chatPanel').classList.remove('show');
-            // Restore body scrolling on mobile
-            if (window.innerWidth <= 768) {
-                document.body.style.overflow = 'auto';
-            }
-        }
+        function backToGroups() { document.getElementById('groupsPanel').classList.remove('hidden'); document.getElementById('chatPanel').classList.remove('show'); }
         
         function handleOutsideClick(e) {
             if (!e.target.closest('.notification-wrapper')) {

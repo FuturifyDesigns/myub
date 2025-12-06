@@ -1415,13 +1415,13 @@
             closeAnnouncementModal();
             await loadAnnouncements();
             
-            // Send notification to all users
+            // Send notification to all users with the announcement type
             if (!id) {
-                broadcastNotification(title, message);
+                broadcastNotification(title, message, type);
             }
         }
 
-        async function broadcastNotification(title, message) {
+        async function broadcastNotification(title, message, announcementType = 'info') {
             // Get all user IDs
             const { data: users, error: usersError } = await supabase.from('profiles').select('id');
             if (usersError) {
@@ -1434,11 +1434,18 @@
             }
             
             console.log('Broadcasting to', users.length, 'users');
+            
+            // Map announcement type to notification type
+            let notifType = 'announcement';
+            if (announcementType === 'warning') notifType = 'admin_warning';
+            else if (announcementType === 'urgent') notifType = 'admin_urgent';
+            else if (announcementType === 'success') notifType = 'admin_success';
+            else notifType = 'announcement'; // info type
 
             // Create notifications for all users - only include required fields
             const notifs = users.map(u => ({
                 user_id: u.id,
-                type: 'announcement',
+                type: notifType,
                 title: title,
                 body: message.substring(0, 100) + (message.length > 100 ? '...' : '')
             }));

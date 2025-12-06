@@ -1237,6 +1237,129 @@
                 display: none;
             }
         }
+        
+        /* Admin Announcement Popup */
+        .announcement-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            animation: fadeIn 0.3s ease;
+            padding: 20px;
+        }
+        .announcement-popup {
+            background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+            border-radius: 20px;
+            max-width: 480px;
+            width: 100%;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+        }
+        .announcement-header {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .announcement-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
+        }
+        .announcement-icon svg {
+            width: 26px;
+            height: 26px;
+            color: white;
+        }
+        .announcement-header-text {
+            flex: 1;
+        }
+        .announcement-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #f97316;
+            margin-bottom: 4px;
+        }
+        .announcement-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+        }
+        .announcement-body {
+            padding: 24px;
+        }
+        .announcement-message {
+            font-size: 15px;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        .announcement-time {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .announcement-time svg {
+            width: 14px;
+            height: 14px;
+        }
+        .announcement-footer {
+            padding: 16px 24px 24px;
+        }
+        .announcement-btn {
+            width: 100%;
+            padding: 16px 24px;
+            background: white;
+            color: #1a365d;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .announcement-btn:hover {
+            background: #f1f5f9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .announcement-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
     </style>
 </head>
 <body>
@@ -2041,6 +2164,112 @@
                 .limit(10);
             notifications = data || [];
             renderNotifications();
+            
+            // Check for unread announcements and show popup
+            checkAnnouncementPopup();
+        }
+        
+        function checkAnnouncementPopup() {
+            // Check for any unread admin messages (announcement, warning, ban)
+            const adminTypes = ['announcement', 'admin_warning', 'warning', 'ban', 'admin_message'];
+            const unreadAdmin = notifications.filter(n => adminTypes.includes(n.type) && !n.is_read);
+            if (unreadAdmin.length > 0) {
+                showAdminPopup(unreadAdmin[0]);
+            }
+        }
+        
+        function showAdminPopup(notification) {
+            // Don't show if already showing
+            if (document.querySelector('.announcement-overlay')) return;
+            
+            const timeAgo = formatTimeAgo(notification.created_at);
+            const type = notification.type || 'announcement';
+            
+            // Configure based on type
+            let config = {
+                label: '📢 Admin Announcement',
+                iconBg: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+                iconShadow: 'rgba(249, 115, 22, 0.4)',
+                icon: '<path d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>',
+                headerBg: 'linear-gradient(135deg, #1a365d 0%, #2c5282 100%)'
+            };
+            
+            if (type === 'admin_warning' || type === 'warning') {
+                config = {
+                    label: '⚠️ Admin Warning',
+                    iconBg: 'linear-gradient(135deg, #eab308 0%, #ca8a04 100%)',
+                    iconShadow: 'rgba(234, 179, 8, 0.4)',
+                    icon: '<path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>',
+                    headerBg: 'linear-gradient(135deg, #854d0e 0%, #a16207 100%)'
+                };
+            } else if (type === 'ban') {
+                config = {
+                    label: '🚫 Account Suspended',
+                    iconBg: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+                    iconShadow: 'rgba(220, 38, 38, 0.4)',
+                    icon: '<path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>',
+                    headerBg: 'linear-gradient(135deg, #991b1b 0%, #b91c1c 100%)'
+                };
+            }
+            
+            const overlay = document.createElement('div');
+            overlay.className = 'announcement-overlay';
+            overlay.innerHTML = `
+                <div class="announcement-popup" style="background: ${config.headerBg};">
+                    <div class="announcement-header">
+                        <div class="announcement-icon" style="background: ${config.iconBg}; box-shadow: 0 4px 12px ${config.iconShadow};">
+                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                ${config.icon}
+                            </svg>
+                        </div>
+                        <div class="announcement-header-text">
+                            <div class="announcement-label" style="color: ${type === 'ban' ? '#fca5a5' : type.includes('warning') ? '#fde047' : '#f97316'};">${config.label}</div>
+                            <div class="announcement-title">${escapeHtml(notification.title)}</div>
+                        </div>
+                    </div>
+                    <div class="announcement-body">
+                        <div class="announcement-message">${escapeHtml(notification.body || '')}</div>
+                        <div class="announcement-time">
+                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            ${timeAgo}
+                        </div>
+                    </div>
+                    <div class="announcement-footer">
+                        <button class="announcement-btn" onclick="dismissAnnouncement('${notification.id}')">
+                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M5 13l4 4L19 7"/>
+                            </svg>
+                            I Understand
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+            playNotificationSound();
+        }
+        
+        async function dismissAnnouncement(announcementId) {
+            // Mark as read in database
+            await supabase.from('notifications').update({ is_read: true }).eq('id', announcementId);
+            
+            // Update local state
+            const idx = notifications.findIndex(n => n.id === announcementId);
+            if (idx !== -1) notifications[idx].is_read = true;
+            
+            // Remove popup
+            const overlay = document.querySelector('.announcement-overlay');
+            if (overlay) {
+                overlay.style.animation = 'fadeIn 0.3s ease reverse';
+                setTimeout(() => overlay.remove(), 300);
+            }
+            
+            // Refresh notifications
+            renderNotifications();
+            
+            // Check for more unread announcements
+            setTimeout(checkAnnouncementPopup, 500);
         }
 
         function renderNotifications() {

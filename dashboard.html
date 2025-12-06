@@ -2179,11 +2179,18 @@
         }
         
         function showAdminPopup(notification) {
+            console.log('showAdminPopup called with:', notification);
+            console.log('Notification type:', notification.type);
+            
             // Don't show if already showing
-            if (document.querySelector('.announcement-overlay')) return;
+            if (document.querySelector('.announcement-overlay')) {
+                console.log('Popup already showing, skipping');
+                return;
+            }
             
             const timeAgo = formatTimeAgo(notification.created_at);
             const type = notification.type || 'announcement';
+            console.log('Using type:', type);
             
             // Configure based on type - default is info/announcement (orange)
             let config = {
@@ -2415,15 +2422,23 @@
                     table: 'notifications',
                     filter: `user_id=eq.${currentUser.id}`
                 }, (payload) => {
-                    console.log('New notification received:', payload);
+                    console.log('=== NEW NOTIFICATION RECEIVED ===');
+                    console.log('Full payload:', JSON.stringify(payload, null, 2));
+                    console.log('Notification type:', payload.new.type);
+                    
                     notifications.unshift(payload.new);
                     renderNotifications();
                     
                     // Check if it's an admin notification that needs popup
                     const adminTypes = ['announcement', 'admin_warning', 'warning', 'ban', 'admin_message', 'admin_urgent', 'admin_success'];
+                    console.log('Admin types:', adminTypes);
+                    console.log('Is admin type?', adminTypes.includes(payload.new.type));
+                    
                     if (adminTypes.includes(payload.new.type)) {
+                        console.log('Calling showAdminPopup...');
                         showAdminPopup(payload.new);
                     } else {
+                        console.log('Not an admin type, playing sound and toast');
                         playNotificationSound();
                         showToast(payload.new.title || 'New notification', 'success');
                     }
@@ -2456,10 +2471,23 @@
         
         function playNotificationSound() {
             try {
-                const audio = new Audio('data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABhgC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAAYYNAAAAAAAAAAAAAAAAAAAA//tQxAAAAAANIAAAAAExBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tQxBgAAADSAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVU=');
-                audio.volume = 0.15;
-                audio.play().catch(() => {});
-            } catch (e) {}
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 800;
+                oscillator.type = 'sine';
+                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.3);
+            } catch (e) {
+                console.log('Sound error:', e);
+            }
         }
 
         function showFriendOnlineToast(friendName) {

@@ -685,9 +685,14 @@
             supabase.channel('notifications_changes_' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: 'user_id=eq.' + currentUser.id }, p => { 
                 console.log('Notes: New notification received:', p);
                 notifications.unshift(p.new); 
-                renderNotifications(); 
-                playNotificationSound(); 
-                showToast(p.new.title || 'New notification', 'success'); 
+                renderNotifications();
+                const adminTypes = ['announcement', 'admin_warning', 'warning', 'ban', 'admin_message', 'admin_urgent', 'admin_success'];
+                if (adminTypes.includes(p.new.type)) {
+                    showAdminPopup(p.new);
+                } else {
+                    playNotificationSound(); 
+                    showToast(p.new.title || 'New notification', 'success');
+                }
             }).subscribe((status) => console.log('Notes notification subscription:', status));
             supabase.channel('messages_badge_' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: 'receiver_id=eq.' + currentUser.id }, () => loadSidebarBadges()).subscribe();
             supabase.channel('friend_requests_badge_' + currentUser.id).on('postgres_changes', { event: '*', schema: 'public', table: 'friend_requests' }, () => loadSidebarBadges()).subscribe();
@@ -704,7 +709,7 @@
                 }
             }).subscribe();
         }
-        function playNotificationSound() { try { const a = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleT4HJIvS6qN+bziItda6h2Q+SZG7w+W3mYdXUJOuwOq8gX5+Ynt+sPfJn0g='); a.volume = 0.3; a.play().catch(() => {}); } catch (e) {} }
+        function playNotificationSound() { try { const a = new Audio('data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABhgC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAAYYNAAAAAAAAAAAAAAAAAAAA//tQxAAAAAANIAAAAAExBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tQxBgAAADSAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVU='); a.volume = 0.15; a.play().catch(() => {}); } catch (e) {} }
         
         function showFriendOnlineToast(friendName) {
             const existing = document.querySelector('.friend-online-toast');

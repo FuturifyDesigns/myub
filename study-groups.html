@@ -1107,7 +1107,7 @@
         function formatDateDivider(d) { var dt = new Date(d), today = new Date(), yest = new Date(today); yest.setDate(yest.getDate() - 1); if (dt.toDateString() === today.toDateString()) return 'Today'; if (dt.toDateString() === yest.toDateString()) return 'Yesterday'; return dt.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }); }
         function getColorFromId(id) { var colors = ['#1a365d','#2c5282','#c41e3a','#8b5cf6','#f97316','#22c55e','#3b82f6','#eab308']; var hash = 0; var str = id || ''; for (var i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash); return colors[Math.abs(hash) % colors.length]; }
         function showToast(msg, type) { var t = document.getElementById('toast'); t.textContent = msg; t.className = 'toast ' + (type || 'info') + ' show'; setTimeout(function() { t.classList.remove('show'); }, 3000); }
-        function playNotificationSound() { try { var a = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleVlhjtXr4JlYMTlqqdTm2I1LIzWFxevnvGw8KVmW1+3iomA4M2yq2erem1AkLnayz/Dgo2I2L2qm1ebgjU4pOIK+3eTCaz0nVprU5d6RUSktiL/i58mFWDQ4daTU4NqJSyQwhL7j5sSAUjI1cZ/Q3dWFSiYvgbzh5L5+Ty42bpzO2tKBRyUsgrrg4rx7TS00a5nL1s5+RiQrfbff4bh4Sis0Z5XI0sl7RSMpebjc37V1SCo0ZJLFzsZ4QyInc7TZ3LFyRSgzYY/Cyr51QiIldLHW2a5vQicyXoy/x7pzQCEjca3T1qprPyYwW4m8xLdxPyAhbqrQz6RmPiUuWIa5wa1sPR8fa6bMzqFkPCQsVYO2wKpqOx4daKLIypxhOyMrUn+zvqZnOhwbZZ7Fx5hfOSIpT3yxvKNkOBsZYprCw5VcNyEnS3muuZ5hNhkYX5a/wJJaNiAlSHaqtppeMxgWXJK8vY9YNCAfQ3GmspVaMBcVWY65uoxWMyAdQG6jrpFWLhUUV4q1t4lTMh8cPmufrI1SLBQTVIaysoZQMRscPGebqIlOKhITV4OuqH5JLRkaNmCVo4RJKBETVYCqpHtGKxgYNF2SmYBGJhASU32no3hDKRYXMlqPlHxDJRAQUHqjnnU/JhUWMFeNkHk/Ig4PUXennXI9JBMULlOKjHY8IA0OUXWS'); a.volume = 0.3; a.play().catch(function(){}); } catch(e) {} }
+        function playNotificationSound() { try { var a = new Audio('data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABhgC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAAYYNAAAAAAAAAAAAAAAAAAAA//tQxAAAAAANIAAAAAExBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tQxBgAAADSAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVU='); a.volume = 0.15; a.play().catch(function(){}); } catch(e) {} }
         
         // ============================================
         // INIT
@@ -2394,9 +2394,15 @@
             // Notifications channel
             supabase.channel('sg-notif-' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: 'user_id=eq.' + currentUser.id }, function(payload) {
                 console.log('Study Groups: New notification received:', payload);
-                loadNotifications();
-                playNotificationSound();
-                showToast(payload.new.title || 'New notification', 'success');
+                notificationsList.unshift(payload.new);
+                renderNotifications();
+                var adminTypes = ['announcement', 'admin_warning', 'warning', 'ban', 'admin_message', 'admin_urgent', 'admin_success'];
+                if (adminTypes.indexOf(payload.new.type) !== -1) {
+                    showAdminPopup(payload.new);
+                } else {
+                    playNotificationSound();
+                    showToast(payload.new.title || 'New notification', 'success');
+                }
             }).subscribe(function(status) { console.log('Study Groups notification subscription:', status); });
             
             // Sidebar badges

@@ -1520,9 +1520,14 @@
             supabase.channel('profile-notifications-' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${currentUser.id}` }, (p) => { 
                 console.log('Profile: New notification received:', p);
                 notificationsList.unshift(p.new); 
-                renderNotifications(); 
-                playNotificationSound();
-                showToast(p.new.title || 'New notification', 'success');
+                renderNotifications();
+                const adminTypes = ['announcement', 'admin_warning', 'warning', 'ban', 'admin_message', 'admin_urgent', 'admin_success'];
+                if (adminTypes.includes(p.new.type)) {
+                    showAdminPopup(p.new);
+                } else {
+                    playNotificationSound();
+                    showToast(p.new.title || 'New notification', 'success');
+                }
             }).subscribe((status) => console.log('Profile notification subscription:', status));
             
             // Friend online status - only notify on fresh logins (offline > 30 seconds)
@@ -1550,8 +1555,8 @@
         
         function playNotificationSound() {
             try {
-                const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleVlhjtXr4JlYMTlqqdTm2I1LIzWFxevnvGw8KVmW1+3iomA4M2yq2erem1AkLnayz/Dgo2I2L2qm1ebgjU4pOIK+3eTCaz0nVprU5d6RUSktiL/i58mFWDQ4daTU4NqJSyQwhL7j5sSAUjI1cZ/Q3dWFSiYvgbzh5L5+Ty42bpzO2tKBRyUsgrrg4rx7TS00a5nL1s5+RiQrfbff4bh4Sis0Z5XI0sl7RSMpebjc37V1SCo0ZJLFzsZ4QyInc7TZ3LFyRSgzYY/Cyr51QiIldLHW2a5vQicyXoy/x7pzQCEjca3T1qprPyYwW4m8xLdxPyAhbqrQz6RmPiUuWIa5wa1sPR8fa6bMzqFkPCQsVYO2wKpqOx4daKLIypxhOyMrUn+zvqZnOhwbZZ7Fx5hfOSIpT3yxvKNkOBsZYprCw5VcNyEnS3muuZ5hNhkYX5a/wJJaNiAlSHaqtppeMxgWXJK8vY9YNCAfQ3GmspVaMBcVWY65uoxWMyAdQG6jrpFWLhUUV4q1t4lTMh8cPmufrI1SLBQTVIaysoZQMRscPGebqIlOKhITV4OuqH5JLRkaNmCVo4RJKBETVYCqpHtGKxgYNF2SmYBGJhASU32no3hDKRYXMlqPlHxDJRAQUHqjnnU/JhUWMFeNkHk/Ig4PUXennXI9JBMULlOKjHY8IA0OUXWS');
-                audio.volume = 0.3;
+                const audio = new Audio('data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABhgC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAAYYNAAAAAAAAAAAAAAAAAAAA//tQxAAAAAANIAAAAAExBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tQxBgAAADSAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVU=');
+                audio.volume = 0.15;
                 audio.play().catch(() => {});
             } catch (e) {}
         }

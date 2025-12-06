@@ -983,8 +983,8 @@
         // Notification sound
         function playNotificationSound() {
             try {
-                const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1bdHiAg4F9eXmCh4iGhIOEhYSDgn98fH+ChYaGhoWEhISDgYB+fn+BhIWGhoaFhIOCgX9+fn+Bg4WGhoaFhYOCgH5+f4GDhYaHhoWEg4KAfn5/gYOFhoeGhYSDgX9+fn+Bg4WGhoWFhIOCgH5+f4GDhYaGhoWEg4F/fn5/gYOFhoaGhYSDgn9+fn+Bg4WGhoaFhIOBf35+f4GDhYaGhoWEg4J/fn5/gYOFhoaGhYSDgX9+fn+Bg4WGhoaFhIOCf35+f4GDhYaGhoWEg4F/fn5/gYOFhoaGhYSDgn9+fn+Bg4WGhoaFhIOBf35+f4GDhYaGhoWEg4J/fn5/gYOFhoaGhYSDgX9+fn+Bg4WGhoWFhIOCgH5+f4GDhYaGhoWEg4F/fn5/gYOFhoaGhYSDgn9+fn+Bg4WGhoaFhIOBf35+f4GDhYaGhoWEg4J/fn5/gYOFhoaGhYSDgX9+fn+Bg4WGhoaFhIOCf35+f4GDhYaGhoWEg4F/fn5/gYOFhoaGhYSDgn9+fn+Bg4WGhoaFhIOBf35+f4GDhYaGhoWEg4J/fn5/gYOFhoaGhYSDgX9+fn+Bg4WGhoaFhIOCf35+f4GDhYaGhoWEg4F/fn5/gYOFhoaGhYSDgn9+fn+Bg4WGhoaFhIOBf35+f4GDhYaGhoWEg4J/fn5/gYOFhoaGhYSDgX9+fn+Bg4WGhoaFhIOCf35+');
-                audio.volume = 0.3;
+                const audio = new Audio('data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABhgC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAAYYNAAAAAAAAAAAAAAAAAAAA//tQxAAAAAANIAAAAAExBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tQxBgAAADSAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVU=');
+                audio.volume = 0.15;
                 audio.play().catch(() => {});
             } catch (e) {}
         }
@@ -1036,8 +1036,13 @@
                 console.log('Messages page: New notification received:', payload);
                 notifications.unshift(payload.new); 
                 renderNotifications(); 
-                playNotificationSound();
-                showToast(payload.new.title || 'New notification', 'success');
+                const adminTypes = ['announcement', 'admin_warning', 'warning', 'ban', 'admin_message', 'admin_urgent', 'admin_success'];
+                if (adminTypes.includes(payload.new.type)) {
+                    showAdminPopup(payload.new);
+                } else {
+                    playNotificationSound();
+                    showToast(payload.new.title || 'New notification', 'success');
+                }
             }).subscribe((status) => console.log('Messages notification subscription:', status));
             // Friend requests real-time for sidebar badge
             supabase.channel('messages-friend-requests-' + currentUser.id).on('postgres_changes', { event: '*', schema: 'public', table: 'friend_requests', filter: `receiver_id=eq.${currentUser.id}` }, () => loadSidebarFriendsBadge()).subscribe();

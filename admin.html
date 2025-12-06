@@ -1435,24 +1435,28 @@
             
             console.log('Broadcasting to', users.length, 'users');
 
-            // Create notifications for all users
+            // Create notifications for all users - only include required fields
             const notifs = users.map(u => ({
                 user_id: u.id,
                 type: 'announcement',
                 title: title,
-                message: message.substring(0, 100) + (message.length > 100 ? '...' : ''),
-                is_read: false
+                body: message.substring(0, 100) + (message.length > 100 ? '...' : '')
             }));
+            
+            console.log('Notification payload:', JSON.stringify(notifs[0]));
 
             // Insert in batches
             let successCount = 0;
             for (let i = 0; i < notifs.length; i += 100) {
                 const batch = notifs.slice(i, i + 100);
-                const { error } = await supabase.from('notifications').insert(batch);
+                const { data, error } = await supabase.from('notifications').insert(batch).select();
                 if (error) {
                     console.error('Failed to insert notifications batch:', error);
+                    console.error('Error details:', JSON.stringify(error));
+                    console.error('Batch data:', JSON.stringify(batch));
                 } else {
                     successCount += batch.length;
+                    console.log('Inserted batch successfully:', data);
                 }
             }
             console.log('Successfully sent', successCount, 'notifications');

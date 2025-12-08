@@ -773,7 +773,16 @@
             
             supabase.channel('admin-groups')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'study_groups' }, () => {
+                    console.log('Study groups changed, reloading...');
                     loadAnalytics();
+                    loadGroups();
+                })
+                .subscribe();
+            
+            // Also listen for member changes
+            supabase.channel('admin-group-members')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'study_group_members' }, () => {
+                    console.log('Study group members changed, reloading...');
                     loadGroups();
                 })
                 .subscribe();
@@ -793,6 +802,35 @@
             
             supabase.channel('admin-schedules')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'schedule_items' }, () => {
+                    loadAnalytics();
+                })
+                .subscribe();
+            
+            // Realtime for announcements
+            supabase.channel('admin-announcements')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'announcements' }, () => {
+                    console.log('Announcements changed, reloading...');
+                    loadAnnouncements();
+                })
+                .subscribe();
+            
+            // Realtime for notifications (for analytics)
+            supabase.channel('admin-notifications')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'notifications' }, () => {
+                    loadAnalytics();
+                })
+                .subscribe();
+            
+            // Realtime for friendships (for analytics)
+            supabase.channel('admin-friendships')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'friendships' }, () => {
+                    loadAnalytics();
+                })
+                .subscribe();
+            
+            // Realtime for friend requests (for analytics)
+            supabase.channel('admin-friend-requests')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'friend_requests' }, () => {
                     loadAnalytics();
                 })
                 .subscribe();
@@ -1079,10 +1117,24 @@
 
         // Users Management
         async function loadUsers() {
-            const { data } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
-            allUsers = data || [];
-            document.getElementById('userCount').textContent = allUsers.length;
-            renderUsersTable();
+            try {
+                console.log('Loading users...');
+                const { data, error } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
+                if (error) {
+                    console.error('Error loading users:', error);
+                    allUsers = [];
+                } else {
+                    allUsers = data || [];
+                    console.log('Loaded users:', allUsers.length);
+                }
+                document.getElementById('userCount').textContent = allUsers.length;
+                renderUsersTable();
+            } catch (e) {
+                console.error('Error in loadUsers:', e);
+                allUsers = [];
+                document.getElementById('userCount').textContent = '0';
+                renderUsersTable();
+            }
         }
 
         function filterUsers() {
@@ -1265,10 +1317,37 @@
 
         // Study Groups Management
         async function loadGroups() {
-            const { data } = await supabase.from('study_groups').select('*, profiles(full_name), study_group_members(count)').order('created_at', { ascending: false });
-            allGroups = data || [];
-            document.getElementById('groupCount').textContent = allGroups.length;
-            renderGroupsTable();
+            try {
+                console.log('Loading study groups...');
+                // First get all groups
+                const { data: groups, error: groupsError } = await supabase
+                    .from('study_groups')
+                    .select('*, profiles(full_name)')
+                    .order('created_at', { ascending: false });
+                
+                if (groupsError) {
+                    console.error('Error loading groups:', groupsError);
+                    allGroups = [];
+                } else {
+                    // Get member counts for each group
+                    const groupsWithCounts = await Promise.all((groups || []).map(async (g) => {
+                        const { count } = await supabase
+                            .from('study_group_members')
+                            .select('*', { count: 'exact', head: true })
+                            .eq('group_id', g.id);
+                        return { ...g, member_count: count || 0 };
+                    }));
+                    allGroups = groupsWithCounts;
+                    console.log('Loaded groups:', allGroups.length);
+                }
+                document.getElementById('groupCount').textContent = allGroups.length;
+                renderGroupsTable();
+            } catch (e) {
+                console.error('Error in loadGroups:', e);
+                allGroups = [];
+                document.getElementById('groupCount').textContent = '0';
+                renderGroupsTable();
+            }
         }
 
         function filterGroups() {
@@ -1287,13 +1366,13 @@
 
             const tbody = document.getElementById('groupsTableBody');
             if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--gray-500);">No groups found</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--gray-500);">No study groups found</td></tr>';
             } else {
                 tbody.innerHTML = filtered.map(g => `
                     <tr>
                         <td><strong>${escapeHtml(g.name)}</strong></td>
                         <td>${escapeHtml(g.course_code || '-')}</td>
-                        <td>${g.study_group_members?.[0]?.count || 0} members</td>
+                        <td>${g.member_count || 0} members</td>
                         <td>${formatDate(g.created_at)}</td>
                         <td>
                             <button class="btn btn-sm btn-danger" onclick="deleteGroup('${g.id}', '${escapeHtml(g.name)}')">Delete</button>
@@ -1319,9 +1398,22 @@
 
         // Notes Management
         async function loadNotes() {
-            const { data } = await supabase.from('notes').select('*, profiles(full_name)').order('created_at', { ascending: false });
-            allNotes = data || [];
-            renderNotesTable();
+            try {
+                console.log('Loading notes...');
+                const { data, error } = await supabase.from('notes').select('*, profiles(full_name)').order('created_at', { ascending: false });
+                if (error) {
+                    console.error('Error loading notes:', error);
+                    allNotes = [];
+                } else {
+                    allNotes = data || [];
+                    console.log('Loaded notes:', allNotes.length);
+                }
+                renderNotesTable();
+            } catch (e) {
+                console.error('Error in loadNotes:', e);
+                allNotes = [];
+                renderNotesTable();
+            }
         }
 
         function renderNotesTable() {
@@ -1358,9 +1450,22 @@
 
         // Announcements
         async function loadAnnouncements() {
-            const { data } = await supabase.from('announcements').select('*').order('created_at', { ascending: false });
-            announcements = data || [];
-            renderAnnouncements();
+            try {
+                console.log('Loading announcements...');
+                const { data, error } = await supabase.from('announcements').select('*').order('created_at', { ascending: false });
+                if (error) {
+                    console.error('Error loading announcements:', error);
+                    announcements = [];
+                } else {
+                    announcements = data || [];
+                    console.log('Loaded announcements:', announcements.length);
+                }
+                renderAnnouncements();
+            } catch (e) {
+                console.error('Error in loadAnnouncements:', e);
+                announcements = [];
+                renderAnnouncements();
+            }
         }
 
         function renderAnnouncements() {

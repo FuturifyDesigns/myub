@@ -935,12 +935,14 @@
             else if (type === 'group_added' || type === 'group_request_accepted') { config = { icon: '🎉', bgColor: 'linear-gradient(135deg, #16a34a 0%, #22c55e 100%)' }; }
             else if (type === 'group_request_declined') { config = { icon: '😔', bgColor: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)' }; }
             else if (type === 'group_member_joined') { config = { icon: '👋', bgColor: 'linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%)' }; }
+            const bodyText = notification.body || notification.message || '';
+            const displayBody = bodyText.replace(/\s*\[REF:[^\]]+\]/, '').replace(/\s*\[GROUP:[^\]]+\]/, '');
             const popup = document.createElement('div');
             popup.className = 'group-notif-popup';
             popup.style.cssText = `position:fixed;top:20px;right:20px;background:${config.bgColor};color:#fff;padding:16px 20px;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.25);z-index:10000;max-width:350px;animation:slideInRight 0.4s cubic-bezier(0.34,1.56,0.64,1);`;
-            let html = `<div style="display:flex;align-items:flex-start;gap:12px;"><div style="font-size:28px;line-height:1;">${config.icon}</div><div style="flex:1;min-width:0;"><div style="font-weight:600;font-size:15px;margin-bottom:4px;">${escapeHtml(notification.title)}</div><div style="font-size:13px;opacity:0.9;line-height:1.4;">${escapeHtml(notification.body || notification.message || '')}</div>`;
+            let html = `<div style="display:flex;align-items:flex-start;gap:12px;"><div style="font-size:28px;line-height:1;">${config.icon}</div><div style="flex:1;min-width:0;"><div style="font-weight:600;font-size:15px;margin-bottom:4px;">${escapeHtml(notification.title)}</div><div style="font-size:13px;opacity:0.9;line-height:1.4;">${escapeHtml(displayBody)}</div>`;
             if (isJoinRequest) {
-                html += `<div style="display:flex;gap:8px;margin-top:12px;"><button onclick="window.location.href='study-groups.html'" style="flex:1;padding:8px 12px;background:#22c55e;color:#fff;border:none;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">View Request</button><button onclick="this.closest('.group-notif-popup').remove()" style="flex:1;padding:8px 12px;background:rgba(255,255,255,0.2);color:#fff;border:none;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">Dismiss</button></div>`;
+                html += `<div style="display:flex;gap:8px;margin-top:12px;"><button onclick="window.location.href='study-groups.html?notif=${notification.id}'" style="flex:1;padding:8px 12px;background:#22c55e;color:#fff;border:none;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">View Request</button><button onclick="this.closest('.group-notif-popup').remove()" style="flex:1;padding:8px 12px;background:rgba(255,255,255,0.2);color:#fff;border:none;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">Dismiss</button></div>`;
             }
             html += `</div><button onclick="this.parentElement.parentElement.remove()" style="background:rgba(255,255,255,0.2);border:none;color:#fff;width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;">×</button></div>`;
             popup.innerHTML = html;
@@ -991,7 +993,7 @@
             document.getElementById('notificationDropdown').classList.remove('show');
             if (type === 'friend_request' || type === 'friend_accept') switchTab('requests');
             else if (type === 'message') window.location.href = 'messages.html';
-            else if (type.startsWith('group_')) window.location.href = 'study-groups.html';
+            else if (type.startsWith('group_')) window.location.href = 'study-groups.html?notif=' + id;
             else if (type === 'admin_warning' || type === 'announcement') window.location.href = 'dashboard.html';
         }
 

@@ -527,6 +527,77 @@
             .chat-avatar { width: 36px; height: 36px; font-size: 12px; }
             .chat-group-details h3 { font-size: 14px; }
         }
+        
+        /* Join Request Popup */
+        .join-request-popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            animation: fadeIn 0.2s ease;
+        }
+        .join-request-popup {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s ease;
+        }
+        .join-request-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .join-request-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        .join-request-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin: 0;
+        }
+        .join-request-body {
+            padding: 16px 0;
+            border-top: 1px solid var(--gray-200);
+            border-bottom: 1px solid var(--gray-200);
+            margin-bottom: 16px;
+        }
+        .join-request-body p {
+            color: var(--gray-600);
+            font-size: 15px;
+            margin: 0;
+        }
+        .join-request-actions {
+            display: flex;
+            gap: 12px;
+        }
+        .join-request-actions .btn {
+            flex: 1;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
     </style>
 <body>
     <div class="loading" id="loadingScreen"><div class="loading-spinner"></div></div>
@@ -1157,9 +1228,48 @@
                 window.addEventListener('beforeunload', function() { updateOnlineStatus(false); });
                 
                 document.getElementById('loadingScreen').style.display = 'none';
+                
+                // Check URL params for notification to display
+                var urlParams = new URLSearchParams(window.location.search);
+                var notifId = urlParams.get('notif');
+                if (notifId) {
+                    // Clear the URL param
+                    window.history.replaceState({}, '', window.location.pathname);
+                    // Find and handle the notification
+                    setTimeout(function() { handleNotificationFromUrl(notifId); }, 500);
+                }
             } catch (err) {
                 console.error('Init error:', err);
                 document.getElementById('loadingScreen').style.display = 'none';
+            }
+        }
+        
+        async function handleNotificationFromUrl(notifId) {
+            // Load the notification
+            var result = await supabase.from('notifications').select('*').eq('id', notifId).single();
+            if (!result.data) return;
+            
+            var notif = result.data;
+            var type = notif.type;
+            
+            // Extract ref from body
+            var bodyText = notif.body || '';
+            var refMatch = bodyText.match(/\[REF:([^\]]+)\]/);
+            var refId = refMatch ? refMatch[1] : '';
+            
+            // Handle based on type
+            if (type === 'group_join_request' && refId) {
+                showJoinRequestPopup(notif, refId);
+            } else if (type === 'group_added' || type === 'group_request_accepted' || type === 'group_member_joined') {
+                // Extract group ID from body [GROUP:xxx]
+                var groupMatch = bodyText.match(/\[GROUP:([^\]]+)\]/);
+                var groupId = groupMatch ? groupMatch[1] : (refId ? refId.split(':')[0] : null);
+                if (groupId) {
+                    await loadMyGroups();
+                    openGroup(groupId);
+                }
+            } else if (type === 'group_request_declined') {
+                switchTab('discover');
             }
         }
         
@@ -2553,6 +2663,9 @@
         async function handleNotifClick(id, type, refId) {
             try { await supabase.from('notifications').update({ is_read: true }).eq('id', id); } catch(e) {}
             
+            // Find the notification
+            var notif = notifications.find(function(n) { return n.id === id; });
+            
             if (type === 'friend_request' || type === 'friend_accept') window.location.href = 'friends.html';
             else if (type === 'message') window.location.href = 'messages.html' + (refId ? '?conv=' + refId : '');
             else if (type === 'group_added' || type === 'group_request_accepted' || type === 'group_member_joined') {
@@ -2568,7 +2681,10 @@
                 switchTab('discover');
             }
             else if (type === 'group_join_request') {
-                // Stay on page - admin will use Accept/Decline buttons
+                // Show the join request popup with Accept/Decline buttons
+                if (notif && refId) {
+                    showJoinRequestPopup(notif, refId);
+                }
             }
             else if (type === 'admin_warning' || type === 'warning') { /* Stay on current page */ }
             else if (type === 'announcement') { window.location.href = 'dashboard.html'; }
@@ -2576,6 +2692,51 @@
             await loadNotifications();
             renderNotifications();
             toggleNotifications();
+        }
+        
+        function showJoinRequestPopup(notification, refId) {
+            // Remove any existing popup
+            var existing = document.querySelector('.join-request-popup-overlay');
+            if (existing) existing.remove();
+            
+            var parts = refId.split(':');
+            var groupId = parts[0];
+            var userId = parts[1];
+            
+            // Get user info from notification body
+            var bodyText = notification.body || '';
+            var displayBody = bodyText.replace(/\s*\[REF:[^\]]+\]/, '');
+            
+            var overlay = document.createElement('div');
+            overlay.className = 'join-request-popup-overlay';
+            overlay.innerHTML = '<div class="join-request-popup">' +
+                '<div class="join-request-header">' +
+                    '<div class="join-request-icon">👤</div>' +
+                    '<h3>' + escapeHtml(notification.title || 'Join Request') + '</h3>' +
+                '</div>' +
+                '<div class="join-request-body">' +
+                    '<p>' + escapeHtml(displayBody) + '</p>' +
+                '</div>' +
+                '<div class="join-request-actions">' +
+                    '<button class="btn btn-success" onclick="handleJoinRequestFromPopup(\'' + refId + '\',\'' + notification.id + '\',true)">Accept</button>' +
+                    '<button class="btn btn-outline" style="color:var(--red);border-color:var(--red);" onclick="handleJoinRequestFromPopup(\'' + refId + '\',\'' + notification.id + '\',false)">Decline</button>' +
+                '</div>' +
+            '</div>';
+            
+            overlay.onclick = function(e) {
+                if (e.target === overlay) overlay.remove();
+            };
+            
+            document.body.appendChild(overlay);
+        }
+        
+        async function handleJoinRequestFromPopup(refId, notifId, accept) {
+            // Remove popup
+            var popup = document.querySelector('.join-request-popup-overlay');
+            if (popup) popup.remove();
+            
+            // Call existing handler
+            await handleJoinRequest(refId, notifId, accept);
         }
         
         async function markAllNotificationsRead() {

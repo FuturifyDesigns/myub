@@ -2204,17 +2204,15 @@
             try {
                 OnlineStatus.stopHeartbeat();
 
-                const { error } = await supabase
-                    .from('profiles')
-                    .delete()
-                    .eq('id', currentUser.id);
+                // Call the database function to delete user and all data
+                const { error } = await supabase.rpc('delete_user_account');
 
                 if (error) throw error;
 
                 await supabase.auth.signOut();
                 window.location.href = 'index.html';
             } catch (err) {
-                showToast(err.message, 'error');
+                showToast(err.message || 'Failed to delete account', 'error');
                 confirmBtn.disabled = false;
                 confirmBtn.textContent = 'Delete My Account';
             }

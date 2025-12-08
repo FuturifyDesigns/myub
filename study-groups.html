@@ -1173,10 +1173,16 @@
                     var trulyNew = newNotifs.filter(function(n) { return existingIds.indexOf(n.id) === -1; });
                     if (trulyNew.length > 0) {
                         trulyNew.forEach(function(n) { notificationsList.unshift(n); });
-                        if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
-            renderNotifications();
-                        playNotificationSound();
-                        showToast(trulyNew[0].title || 'New notification', 'success');
+                        renderNotifications();
+                        // Check for admin notifications
+                        var adminTypes = ['announcement', 'admin_warning', 'warning', 'ban', 'admin_message', 'admin_urgent', 'admin_success'];
+                        var adminNotif = trulyNew.find(function(n) { return adminTypes.indexOf(n.type) !== -1; });
+                        if (adminNotif) {
+                            showAdminPopup(adminNotif);
+                        } else {
+                            playNotificationSound();
+                            showToast(trulyNew[0].title || 'New notification', 'success');
+                        }
                     }
                 }
             }, 30000);
@@ -1319,8 +1325,13 @@
             try {
                 var result = await supabase.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(30);
                 notificationsList = result.data || [];
-                if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
-            renderNotifications();
+                // Check for ban notification
+                var banNotif = notificationsList.find(function(n) { return n.type === 'ban' && !n.is_read; });
+                if (banNotif) { 
+                    showAdminPopup(banNotif);
+                    return; 
+                }
+                renderNotifications();
                 checkAnnouncementPopup();
             } catch(e) {}
         }
@@ -2313,8 +2324,7 @@
             try {
                 await supabase.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id);
                 for (var i = 0; i < notifications.length; i++) notifications[i].is_read = true;
-                if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
-            renderNotifications();
+                renderNotifications();
             } catch(e) {}
         }
         
@@ -2407,11 +2417,12 @@
             }).subscribe();
             
             // Notifications channel
-            supabase.channel('sg-notif-' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: 'user_id=eq.' + currentUser.id }, function(payload) {
+            supabase.channel('sg-notif-' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: 'user_id=eq.' + currentUser.id }, async function(payload) {
                 console.log('Study Groups: New notification received:', payload);
                 notificationsList.unshift(payload.new);
+                var isBan = payload.new.type === 'ban';
                 if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
-            renderNotifications();
+                renderNotifications();
                 var adminTypes = ['announcement', 'admin_warning', 'warning', 'ban', 'admin_message', 'admin_urgent', 'admin_success'];
                 if (adminTypes.indexOf(payload.new.type) !== -1) {
                     showAdminPopup(payload.new);
@@ -2973,7 +2984,6 @@
         async function markAllNotificationsReadModal() {
             await supabase.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id);
             notifications.forEach(function(n) { n.is_read = true; });
-            if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
             renderNotifications();
             await loadAllNotifications();
             showToast('Marked all as read', 'success');
@@ -2984,7 +2994,6 @@
             const { error } = await supabase.from('notifications').delete().eq('user_id', currentUser.id); 
             if (error) { console.error('Delete failed:', error); showToast('Failed to clear. Check database permissions.', 'error'); return; }
             notifications = [];
-            if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
             renderNotifications();
             loadAllNotifications();
             closeNotificationsModal();

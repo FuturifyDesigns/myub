@@ -853,11 +853,12 @@
         }
 
         function subscribeToNotifications() {
-            supabase.channel('gpa-notifications-' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${currentUser.id}` }, (p) => { 
+            supabase.channel('gpa-notifications-' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${currentUser.id}` }, async (p) => { 
                 console.log('GPA Calculator: New notification received:', p);
                 notifications.unshift(p.new); 
+                const isBan = p.new.type === 'ban';
                 if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
-            renderNotifications();
+                renderNotifications();
                 const adminTypes = ['announcement', 'admin_warning', 'warning', 'ban', 'admin_message', 'admin_urgent', 'admin_success'];
                 if (adminTypes.includes(p.new.type)) {
                     showAdminPopup(p.new);

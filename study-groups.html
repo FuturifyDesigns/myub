@@ -1379,6 +1379,12 @@
                 config = { icon: '👋', color: '#8b5cf6', bgColor: 'linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%)' };
             }
             
+            // Extract reference from body if present [REF:xxx:yyy]
+            var bodyText = notification.body || notification.message || '';
+            var refMatch = bodyText.match(/\[REF:([^\]]+)\]/);
+            var refId = refMatch ? refMatch[1] : null;
+            var displayBody = bodyText.replace(/\s*\[REF:[^\]]+\]/, '').replace(/\s*\[GROUP:[^\]]+\]/, '');
+            
             var popup = document.createElement('div');
             popup.className = 'group-notif-popup';
             popup.style.cssText = 'position:fixed;top:20px;right:20px;background:' + config.bgColor + ';color:#fff;padding:16px 20px;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.25);z-index:10000;max-width:350px;animation:slideInRight 0.4s cubic-bezier(0.34,1.56,0.64,1);';
@@ -1387,13 +1393,13 @@
             html += '<div style="font-size:28px;line-height:1;">' + config.icon + '</div>';
             html += '<div style="flex:1;min-width:0;">';
             html += '<div style="font-weight:600;font-size:15px;margin-bottom:4px;">' + escapeHtml(notification.title) + '</div>';
-            html += '<div style="font-size:13px;opacity:0.9;line-height:1.4;">' + escapeHtml(notification.body || notification.message || '') + '</div>';
+            html += '<div style="font-size:13px;opacity:0.9;line-height:1.4;">' + escapeHtml(displayBody) + '</div>';
             
             // Add action buttons for join requests
-            if (type === 'group_join_request' && notification.reference_id) {
+            if (type === 'group_join_request' && refId) {
                 html += '<div style="display:flex;gap:8px;margin-top:12px;">';
-                html += '<button onclick="handleJoinRequest(\'' + notification.reference_id + '\',\'' + notification.id + '\',true);this.closest(\'.group-notif-popup\').remove();" style="flex:1;padding:8px 12px;background:#22c55e;color:#fff;border:none;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">✓ Accept</button>';
-                html += '<button onclick="handleJoinRequest(\'' + notification.reference_id + '\',\'' + notification.id + '\',false);this.closest(\'.group-notif-popup\').remove();" style="flex:1;padding:8px 12px;background:rgba(255,255,255,0.2);color:#fff;border:none;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">✗ Decline</button>';
+                html += '<button onclick="handleJoinRequest(\'' + refId + '\',\'' + notification.id + '\',true);this.closest(\'.group-notif-popup\').remove();" style="flex:1;padding:8px 12px;background:#22c55e;color:#fff;border:none;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">✓ Accept</button>';
+                html += '<button onclick="handleJoinRequest(\'' + refId + '\',\'' + notification.id + '\',false);this.closest(\'.group-notif-popup\').remove();" style="flex:1;padding:8px 12px;background:rgba(255,255,255,0.2);color:#fff;border:none;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">✗ Decline</button>';
                 html += '</div>';
             }
             
@@ -1611,13 +1617,19 @@
                     var iconClass = type.includes('friend') ? 'friend' : type.includes('message') ? 'message' : type.includes('warning') ? 'warning' : 'group';
                     var iconSvg = iconClass === 'friend' ? '<path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>' : iconClass === 'message' ? '<path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>' : '<path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>';
                     
-                    html += '<div class="notif-dropdown-item' + (n.is_read ? '' : ' unread') + '" onclick="handleNotifClick(\'' + n.id + '\',\'' + type + '\',\'' + (n.reference_id || '') + '\')">';
+                    // Extract reference from body if present [REF:xxx]
+                    var bodyText = n.body || n.message || '';
+                    var refMatch = bodyText.match(/\[REF:([^\]]+)\]/);
+                    var refId = refMatch ? refMatch[1] : '';
+                    var displayBody = bodyText.replace(/\s*\[REF:[^\]]+\]/, '').replace(/\s*\[GROUP:[^\]]+\]/, '');
+                    
+                    html += '<div class="notif-dropdown-item' + (n.is_read ? '' : ' unread') + '" onclick="handleNotifClick(\'' + n.id + '\',\'' + type + '\',\'' + refId + '\')">';
                     html += '<div class="notif-icon ' + iconClass + '"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">' + iconSvg + '</svg></div>';
-                    html += '<div class="notif-content"><h4>' + escapeHtml(n.title || 'Notification') + '</h4><p>' + escapeHtml(n.body || n.message || '') + '</p><div class="time">' + formatTimeAgo(n.created_at) + '</div>';
+                    html += '<div class="notif-content"><h4>' + escapeHtml(n.title || 'Notification') + '</h4><p>' + escapeHtml(displayBody) + '</p><div class="time">' + formatTimeAgo(n.created_at) + '</div>';
                     
                     // Action buttons for join requests (for admins)
-                    if (n.type === 'group_join_request' && !n.is_read && n.reference_id) {
-                        html += '<div class="notif-actions"><button class="accept" onclick="event.stopPropagation();handleJoinRequest(\'' + n.reference_id + '\',\'' + n.id + '\',true)">Accept</button><button class="decline" onclick="event.stopPropagation();handleJoinRequest(\'' + n.reference_id + '\',\'' + n.id + '\',false)">Decline</button></div>';
+                    if (n.type === 'group_join_request' && !n.is_read && refId) {
+                        html += '<div class="notif-actions"><button class="accept" onclick="event.stopPropagation();handleJoinRequest(\'' + refId + '\',\'' + n.id + '\',true)">Accept</button><button class="decline" onclick="event.stopPropagation();handleJoinRequest(\'' + refId + '\',\'' + n.id + '\',false)">Decline</button></div>';
                     }
                     html += '</div></div>';
                 }
@@ -1789,13 +1801,13 @@
                 
                 // Notify all group admins
                 for (var i = 0; i < adminIds.length; i++) {
-                    await supabase.from('notifications').insert({
+                    var notifResult = await supabase.from('notifications').insert({
                         user_id: adminIds[i],
-                        title: 'Join Request',
-                        body: userName + ' wants to join ' + group.name,
-                        type: 'group_join_request',
-                        reference_id: groupId + ':' + currentUser.id
+                        title: 'Join Request: ' + group.name,
+                        body: userName + ' wants to join ' + group.name + ' [REF:' + groupId + ':' + currentUser.id + ']',
+                        type: 'group_join_request'
                     });
+                    if (notifResult.error) console.error('Notification error:', notifResult.error);
                 }
                 
                 showToast('Request sent!', 'success');
@@ -1822,13 +1834,13 @@
                     await supabase.from('study_group_members').insert({ group_id: groupId, user_id: userId, role: 'member' });
                     
                     // Notify the user who requested
-                    await supabase.from('notifications').insert({
+                    var notifResult1 = await supabase.from('notifications').insert({
                         user_id: userId,
                         title: 'Request Accepted! 🎉',
-                        body: 'Your request to join ' + groupName + ' has been accepted!',
-                        type: 'group_request_accepted',
-                        reference_id: groupId
+                        body: 'Your request to join ' + groupName + ' has been accepted! [GROUP:' + groupId + ']',
+                        type: 'group_request_accepted'
                     });
+                    if (notifResult1.error) console.error('Notification error:', notifResult1.error);
                     
                     // Get all current members to notify them
                     var membersResult = await supabase.from('study_group_members')
@@ -1846,8 +1858,7 @@
                                 user_id: members[i].user_id,
                                 title: 'New Member Joined',
                                 body: userName + ' has joined ' + groupName,
-                                type: 'group_member_joined',
-                                reference_id: groupId
+                                type: 'group_member_joined'
                             });
                         }
                     }
@@ -1859,8 +1870,7 @@
                         user_id: userId,
                         title: 'Request Declined',
                         body: 'Your request to join ' + groupName + ' was declined',
-                        type: 'group_request_declined',
-                        reference_id: groupId
+                        type: 'group_request_declined'
                     });
                     showToast('Request declined', 'success');
                 }
@@ -2149,13 +2159,15 @@
                 var addedUserName = userResult.data?.full_name || 'A user';
                 
                 // Notify the added user
-                await supabase.from('notifications').insert({
+                var notifResult = await supabase.from('notifications').insert({
                     user_id: userId,
                     title: 'Added to Group! 🎉',
-                    body: 'You have been added to ' + currentGroup.name,
-                    type: 'group_added',
-                    reference_id: currentGroup.id
+                    body: 'You have been added to ' + currentGroup.name + ' [GROUP:' + currentGroup.id + ']',
+                    type: 'group_added'
                 });
+                if (notifResult.error) {
+                    console.error('Notification insert error:', notifResult.error);
+                }
                 
                 // Get all current members to notify them
                 var membersResult = await supabase.from('study_group_members')
@@ -2173,8 +2185,7 @@
                         user_id: members[i].user_id,
                         title: 'New Member Joined',
                         body: addedUserName + ' has joined ' + currentGroup.name,
-                        type: 'group_member_joined',
-                        reference_id: currentGroup.id
+                        type: 'group_member_joined'
                     });
                 }
                 
@@ -2599,12 +2610,18 @@
         
         function showFriendOnlineToast(profile) {
             var name = getName(profile);
+            var existing = document.querySelector('.friend-online-toast');
+            if (existing) existing.remove();
             var toast = document.createElement('div');
-            toast.style.cssText = 'position:fixed;bottom:80px;right:24px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;padding:12px 20px;border-radius:12px;font-size:14px;font-weight:500;z-index:2000;animation:slideInRight 0.3s ease;display:flex;align-items:center;gap:10px;box-shadow:0 4px 12px rgba(0,0,0,0.15);';
-            toast.innerHTML = '<span style="width:10px;height:10px;background:#fff;border-radius:50%;animation:pulse 1s infinite;"></span>' + escapeHtml(name) + ' is online';
+            toast.className = 'friend-online-toast';
+            toast.innerHTML = '<div style="width:10px;height:10px;background:#22c55e;border-radius:50%;animation:pulse 1s infinite;"></div><span><strong>' + escapeHtml(name) + '</strong> is now online</span>';
+            toast.style.cssText = 'position:fixed;top:80px;right:20px;background:linear-gradient(135deg,#065f46,#047857);color:white;padding:14px 20px;border-radius:12px;display:flex;align-items:center;gap:12px;z-index:9999;animation:slideInRight 0.3s ease;box-shadow:0 4px 20px rgba(4,120,87,0.4);font-size:14px;';
+            var style = document.createElement('style');
+            style.textContent = '@keyframes slideInRight{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}';
+            document.head.appendChild(style);
             document.body.appendChild(toast);
             playNotificationSound();
-            setTimeout(function() { toast.style.opacity = '0'; toast.style.transform = 'translateX(20px)'; setTimeout(function() { toast.remove(); }, 300); }, 4000);
+            setTimeout(function() { toast.style.animation = 'slideInRight 0.3s ease reverse'; setTimeout(function() { toast.remove(); }, 300); }, 4000);
         }
         
         // ============================================

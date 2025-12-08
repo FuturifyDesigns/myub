@@ -896,7 +896,7 @@
             const popup = document.createElement('div');
             popup.className = 'group-notif-popup';
             popup.style.cssText = `position:fixed;top:20px;right:20px;background:${config.bgColor};color:#fff;padding:16px 20px;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.25);z-index:10000;max-width:350px;animation:slideInRight 0.4s cubic-bezier(0.34,1.56,0.64,1);`;
-            let html = `<div style="display:flex;align-items:flex-start;gap:12px;"><div style="font-size:28px;line-height:1;">${config.icon}</div><div style="flex:1;min-width:0;"><div style="font-weight:600;font-size:15px;margin-bottom:4px;">${escapeHtml(notification.title)}</div><div style="font-size:13px;opacity:0.9;line-height:1.4;">${escapeHtml(notification.message || notification.body || '')}</div>`;
+            let html = `<div style="display:flex;align-items:flex-start;gap:12px;"><div style="font-size:28px;line-height:1;">${config.icon}</div><div style="flex:1;min-width:0;"><div style="font-weight:600;font-size:15px;margin-bottom:4px;">${escapeHtml(notification.title)}</div><div style="font-size:13px;opacity:0.9;line-height:1.4;">${escapeHtml(notification.body || notification.message || '')}</div>`;
             if (type === 'group_join_request' && notification.reference_id) {
                 html += `<div style="display:flex;gap:8px;margin-top:12px;"><button onclick="window.location.href='study-groups.html'" style="flex:1;padding:8px 12px;background:#22c55e;color:#fff;border:none;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">View Request</button><button onclick="this.closest('.group-notif-popup').remove()" style="flex:1;padding:8px 12px;background:rgba(255,255,255,0.2);color:#fff;border:none;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">Dismiss</button></div>`;
             }
@@ -995,7 +995,20 @@
 
         function playNotificationSound() { try { const ctx = new (window.AudioContext || window.webkitAudioContext)(); const osc = ctx.createOscillator(); const gain = ctx.createGain(); osc.connect(gain); gain.connect(ctx.destination); osc.frequency.value = 800; osc.type = 'sine'; gain.gain.setValueAtTime(0.1, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3); osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.3); } catch(e) {} }
 
-        function showFriendOnlineToast(name) { const t = document.getElementById('friendOnlineToast'); document.getElementById('friendOnlineName').textContent = `${name} is now online`; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 4000); }
+        function showFriendOnlineToast(name) { 
+            const existing = document.querySelector('.friend-online-toast');
+            if (existing) existing.remove();
+            const toast = document.createElement('div');
+            toast.className = 'friend-online-toast';
+            toast.innerHTML = `<div style="width:10px;height:10px;background:#22c55e;border-radius:50%;animation:pulse 1s infinite;"></div><span><strong>${name}</strong> is now online</span>`;
+            toast.style.cssText = 'position:fixed;top:80px;right:20px;background:linear-gradient(135deg,#065f46,#047857);color:white;padding:14px 20px;border-radius:12px;display:flex;align-items:center;gap:12px;z-index:9999;animation:slideInRight 0.3s ease;box-shadow:0 4px 20px rgba(4,120,87,0.4);font-size:14px;';
+            const style = document.createElement('style');
+            style.textContent = '@keyframes slideInRight{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}';
+            document.head.appendChild(style);
+            document.body.appendChild(toast);
+            playNotificationSound();
+            setTimeout(() => { toast.style.animation = 'slideInRight 0.3s ease reverse'; setTimeout(() => toast.remove(), 300); }, 4000);
+        }
         function toggleNotifications(e) { e.stopPropagation(); document.getElementById('notificationDropdown').classList.toggle('show'); }
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
         function toggleDarkMode() { document.body.classList.toggle('dark-mode'); localStorage.setItem('darkMode', document.body.classList.contains('dark-mode')); }

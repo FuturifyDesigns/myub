@@ -1177,14 +1177,24 @@
             e.preventDefault();
             const email = document.getElementById('loginEmail').value;
             if (!email) { showAlert('Enter your email first'); return; }
+            
+            // Show loading state
+            const forgotLink = document.querySelector('.forgot');
+            const originalText = forgotLink.textContent;
+            forgotLink.textContent = 'Sending...';
+            forgotLink.style.pointerEvents = 'none';
+            
             try {
                 const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                    redirectTo: window.location.origin + '/reset-password.html'
+                    redirectTo: window.location.origin + '/myub/reset-password.html'
                 });
                 if (error) throw error;
-                showAlert('Reset link sent to your email!', 'success');
+                showAlert('Password reset link sent to your email! Check your inbox.', 'success');
             } catch (err) {
                 showAlert(err.message);
+            } finally {
+                forgotLink.textContent = originalText;
+                forgotLink.style.pointerEvents = 'auto';
             }
         }
 

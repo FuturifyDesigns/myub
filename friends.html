@@ -915,39 +915,9 @@
             else if (type === 'admin_success') { config = { label: '✅ Good News!', iconBg: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)', iconShadow: 'rgba(34, 197, 94, 0.4)', icon: '<path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>', headerBg: 'linear-gradient(135deg, #166534 0%, #15803d 100%)', labelColor: '#86efac' }; }
             const overlay = document.createElement('div');
             overlay.className = 'announcement-overlay';
-            overlay.innerHTML = `<div class="announcement-popup" style="background: ${config.headerBg};"><div class="announcement-header"><div class="announcement-icon" style="background: ${config.iconBg}; box-shadow: 0 4px 12px ${config.iconShadow};"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">${config.icon}</svg></div><div class="announcement-header-text"><div class="announcement-label" style="color: ${config.labelColor};">${config.label}</div><div class="announcement-title">${escapeHtml(notification.title)}</div></div></div><div class="announcement-body"><div class="announcement-message">${escapeHtml(notificatiodisplayBody)}</div><div class="announcement-time"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>${timeAgo}</div></div><div class="announcement-footer"><button class="announcement-btn" onclick="dismissAnnouncement('${notification.id}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>I Understand</button></div></div>`;
+            overlay.innerHTML = `<div class="announcement-popup" style="background: ${config.headerBg};"><div class="announcement-header"><div class="announcement-icon" style="background: ${config.iconBg}; box-shadow: 0 4px 12px ${config.iconShadow};"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">${config.icon}</svg></div><div class="announcement-header-text"><div class="announcement-label" style="color: ${config.labelColor};">${config.label}</div><div class="announcement-title">${escapeHtml(notification.title)}</div></div></div><div class="announcement-body"><div class="announcement-message">${escapeHtml(notification.body || '')}</div><div class="announcement-time"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>${timeAgo}</div></div><div class="announcement-footer"><button class="announcement-btn" onclick="dismissAnnouncement('${notification.id}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>I Understand</button></div></div>`;
             document.body.appendChild(overlay);
             playNotificationSound();
-        }
-        
-        function showGroupNotificationPopup(notification) {
-            const existing = document.querySelector('.group-notif-popup');
-            if (existing) existing.remove();
-            const type = notification.type;
-            const title = notification.title || '';
-            let config = { icon: '👥', bgColor: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)' };
-            const isJoinRequest = title.includes('Join Request');
-            const isAccepted = title.includes('Accepted') || title.includes('Added to Group');
-            const isDeclined = title.includes('Declined');
-            const isMemberJoined = title.includes('New Member');
-            
-            if (isJoinRequest) { config = { icon: '🔔', bgColor: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)' }; }
-            else if (type === 'group_added' || type === 'group_request_accepted') { config = { icon: '🎉', bgColor: 'linear-gradient(135deg, #16a34a 0%, #22c55e 100%)' }; }
-            else if (type === 'group_request_declined') { config = { icon: '😔', bgColor: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)' }; }
-            else if (type === 'group_member_joined') { config = { icon: '👋', bgColor: 'linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%)' }; }
-            const bodyText = notification.body || notification.message || '';
-            const displayBody = bodyText.replace(/\s*\[REF:[^\]]+\]/, '').replace(/\s*\[GROUP:[^\]]+\]/, '');
-            const popup = document.createElement('div');
-            popup.className = 'group-notif-popup';
-            popup.style.cssText = `position:fixed;top:20px;right:20px;background:${config.bgColor};color:#fff;padding:16px 20px;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.25);z-index:10000;max-width:350px;animation:slideInRight 0.4s cubic-bezier(0.34,1.56,0.64,1);`;
-            let html = `<div style="display:flex;align-items:flex-start;gap:12px;"><div style="font-size:28px;line-height:1;">${config.icon}</div><div style="flex:1;min-width:0;"><div style="font-weight:600;font-size:15px;margin-bottom:4px;">${escapeHtml(notification.title)}</div><div style="font-size:13px;opacity:0.9;line-height:1.4;">${escapeHtml(displayBody)}</div>`;
-            if (isJoinRequest) {
-                html += `<div style="display:flex;gap:8px;margin-top:12px;"><button onclick="window.location.href='study-groups.html?notif=${notification.id}'" style="flex:1;padding:8px 12px;background:#22c55e;color:#fff;border:none;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">View Request</button><button onclick="this.closest('.group-notif-popup').remove()" style="flex:1;padding:8px 12px;background:rgba(255,255,255,0.2);color:#fff;border:none;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">Dismiss</button></div>`;
-            }
-            html += `</div><button onclick="this.parentElement.parentElement.remove()" style="background:rgba(255,255,255,0.2);border:none;color:#fff;width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;">×</button></div>`;
-            popup.innerHTML = html;
-            document.body.appendChild(popup);
-            if (!isJoinRequest) { setTimeout(() => { if (popup.parentElement) { popup.style.animation = 'slideInRight 0.3s ease reverse'; setTimeout(() => popup.remove(), 300); } }, 8000); }
         }
         
         async function dismissAnnouncement(announcementId) {
@@ -981,8 +951,7 @@
                 const type = n.type || '';
                 const iconClass = type.includes('friend') ? 'friend' : type.includes('message') ? 'message' : type.includes('warning') ? 'warning' : 'group';
                 const iconSvg = iconClass === 'friend' ? '<path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>' : iconClass === 'message' ? '<path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>' : '<path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>';
-                const displayBody = (n.body||'').replace(/\s*\[REF:[^\]]+\]/, '').replace(/\s*\[GROUP:[^\]]+\]/, '');
-                return `<div class="notif-dropdown-item ${n.is_read ? '' : 'unread'}" onclick="handleNotifClick('${n.id}','${type}')"><div class="notif-icon ${iconClass}"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">${iconSvg}</svg></div><div class="notif-content"><h4>${escapeHtml(n.title || 'Notification')}</h4><p>${escapeHtml(displayBody)}</p><div class="time">${formatTimeAgo(n.created_at)}</div></div></div>`;
+                return `<div class="notif-dropdown-item ${n.is_read ? '' : 'unread'}" onclick="handleNotifClick('${n.id}','${type}')"><div class="notif-icon ${iconClass}"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">${iconSvg}</svg></div><div class="notif-content"><h4>${escapeHtml(n.title || 'Notification')}</h4><p>${escapeHtml(n.body||'')}</p><div class="time">${formatTimeAgo(n.created_at)}</div></div></div>`;
             }).join('');
         }
 
@@ -993,7 +962,7 @@
             document.getElementById('notificationDropdown').classList.remove('show');
             if (type === 'friend_request' || type === 'friend_accept') switchTab('requests');
             else if (type === 'message') window.location.href = 'messages.html';
-            else if (type.startsWith('group_')) window.location.href = 'study-groups.html?notif=' + id;
+            else if (type === 'study_group') window.location.href = 'study-groups.html';
             else if (type === 'admin_warning' || type === 'announcement') window.location.href = 'dashboard.html';
         }
 
@@ -1034,23 +1003,13 @@
             supabase.channel('friend-requests-out').on('postgres_changes', { event: '*', schema: 'public', table: 'friend_requests', filter: `sender_id=eq.${currentUser.id}` }, () => { loadRequests(); renderDiscoverUsers(); }).subscribe();
             // Listen for friendship changes
             supabase.channel('friendships').on('postgres_changes', { event: '*', schema: 'public', table: 'friendships' }, () => { loadFriends(); loadRequests(); }).subscribe();
-            supabase.channel('notifications-friends-' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${currentUser.id}` }, async (p) => { 
+            supabase.channel('notifications-friends-' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${currentUser.id}` }, (p) => { 
                 console.log('Friends page: New notification received:', p);
-                // Check for ban - immediate logout
-                const isBan = p.new.type === 'ban';
-                if (isBan) {
-                    showAdminPopup(p.new);
-                    return;
-                }
                 notifications.unshift(p.new); 
                 renderNotifications(); 
-                const adminTypes = ['announcement', 'admin_warning', 'warning', 'admin_message', 'admin_urgent', 'admin_success'];
-                const groupNotifTypes = ['group_join_request', 'group_added', 'group_request_accepted', 'group_request_declined', 'group_member_joined'];
+                const adminTypes = ['announcement', 'admin_warning', 'warning', 'ban', 'admin_message', 'admin_urgent', 'admin_success'];
                 if (adminTypes.includes(p.new.type)) {
                     showAdminPopup(p.new);
-                } else if (p.new.type === 'group') {
-                    showGroupNotificationPopup(p.new);
-                    playNotificationSound();
                 } else {
                     playNotificationSound();
                     showToast(p.new.title || 'New notification', 'success');
@@ -1059,21 +1018,20 @@
             supabase.channel('online-status-friends-' + currentUser.id).on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, (p) => {
                 // Update friends list
                 const idx = friends.findIndex(f => f.id === p.new.id);
-                if (idx !== -1 && p.old && p.new) { 
-                    const wasOff = p.old.is_online === false;
-                    const isNowOnline = p.new.is_online === true;
-                    const oldLastSeen = p.old.last_seen ? new Date(p.old.last_seen) : null;
+                if (idx !== -1) { 
+                    const wasOff = !friends[idx].is_online;
+                    const lastSeen = friends[idx].last_seen ? new Date(friends[idx].last_seen) : null;
                     const now = new Date();
-                    const offlineDuration = oldLastSeen ? (now - oldLastSeen) / 1000 : 999;
+                    const offlineDuration = lastSeen ? (now - lastSeen) / 1000 : 999;
                     
                     friends[idx].is_online = p.new.is_online; 
                     friends[idx].last_seen = p.new.last_seen; 
                     renderFriends(); 
                     updateStats(); 
                     
-                    // Only show notification if they were truly offline for more than 60 seconds
-                    if (wasOff && isNowOnline && offlineDuration > 60) {
-                        showFriendOnlineToast(friends[idx].full_name || friends[idx].first_name || 'A friend');
+                    // Only show notification if they were offline for more than 30 seconds
+                    if (wasOff && p.new.is_online && offlineDuration > 30) {
+                        showFriendOnlineToast(friends[idx].full_name || friends[idx].first_name);
                     }
                 }
                 // Update discover list
@@ -1534,7 +1492,7 @@
                 const type = n.type || '';
                 const iconClass = type.includes('friend') ? 'friend' : type.includes('message') ? 'message' : type.includes('warning') ? 'warning' : 'group';
                 const iconSvg = iconClass === 'friend' ? '<path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>' : iconClass === 'message' ? '<path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>' : '<path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>';
-                return `<div class="notif-dropdown-item ${n.is_read ? '' : 'unread'}" onclick="handleNotifClickModal('${n.id}','${type}')"><div class="notif-icon ${iconClass}"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">${iconSvg}</svg></div><div class="notif-content"><h4>${escapeHtml(n.title || 'Notification')}</h4><p>${escapeHtml(displayBody)}</p><div class="time">${formatTimeAgo(n.created_at)}</div></div></div>`;
+                return `<div class="notif-dropdown-item ${n.is_read ? '' : 'unread'}" onclick="handleNotifClickModal('${n.id}','${type}')"><div class="notif-icon ${iconClass}"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">${iconSvg}</svg></div><div class="notif-content"><h4>${escapeHtml(n.title || 'Notification')}</h4><p>${escapeHtml(n.body || '')}</p><div class="time">${formatTimeAgo(n.created_at)}</div></div></div>`;
             }).join('');
         }
         async function handleNotifClickModal(id, type) { await supabase.from('notifications').update({ is_read: true }).eq('id', id); closeNotificationsModal(); if (type === 'friend_request' || type === 'friend_accept') switchTab('requests'); else if (type === 'message') window.location.href = 'messages.html'; else if (type === 'study_group') window.location.href = 'study-groups.html'; else if (type === 'admin_warning' || type === 'announcement') window.location.href = 'dashboard.html'; }

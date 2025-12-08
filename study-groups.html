@@ -527,77 +527,6 @@
             .chat-avatar { width: 36px; height: 36px; font-size: 12px; }
             .chat-group-details h3 { font-size: 14px; }
         }
-        
-        /* Join Request Popup */
-        .join-request-popup-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-            animation: fadeIn 0.2s ease;
-        }
-        .join-request-popup {
-            background: white;
-            border-radius: 16px;
-            padding: 24px;
-            max-width: 400px;
-            width: 90%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            animation: slideUp 0.3s ease;
-        }
-        .join-request-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-        .join-request-icon {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-        .join-request-header h3 {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--gray-800);
-            margin: 0;
-        }
-        .join-request-body {
-            padding: 16px 0;
-            border-top: 1px solid var(--gray-200);
-            border-bottom: 1px solid var(--gray-200);
-            margin-bottom: 16px;
-        }
-        .join-request-body p {
-            color: var(--gray-600);
-            font-size: 15px;
-            margin: 0;
-        }
-        .join-request-actions {
-            display: flex;
-            gap: 12px;
-        }
-        .join-request-actions .btn {
-            flex: 1;
-            padding: 12px 20px;
-            font-size: 14px;
-            font-weight: 600;
-        }
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
     </style>
 <body>
     <div class="loading" id="loadingScreen"><div class="loading-spinner"></div></div>
@@ -1149,6 +1078,7 @@
         var confirmCallback = null;
         var selectedProfileUser = null;
         var reportTargetId = null;
+        var friendLastSeen = {};
         var selectedMembers = [];
         var searchTimeout = null;
         var groupCropper = null;
@@ -1227,71 +1157,25 @@
                 window.addEventListener('beforeunload', function() { updateOnlineStatus(false); });
                 
                 document.getElementById('loadingScreen').style.display = 'none';
-                
-                // Check URL params for notification to display
-                var urlParams = new URLSearchParams(window.location.search);
-                var notifId = urlParams.get('notif');
-                if (notifId) {
-                    // Clear the URL param
-                    window.history.replaceState({}, '', window.location.pathname);
-                    // Find and handle the notification
-                    setTimeout(function() { handleNotificationFromUrl(notifId); }, 500);
-                }
             } catch (err) {
                 console.error('Init error:', err);
                 document.getElementById('loadingScreen').style.display = 'none';
             }
         }
         
-        async function handleNotificationFromUrl(notifId) {
-            // Load the notification
-            var result = await supabase.from('notifications').select('*').eq('id', notifId).single();
-            if (!result.data) return;
-            
-            var notif = result.data;
-            var type = notif.type;
-            
-            // Extract ref from body
-            var bodyText = notif.body || '';
-            var refMatch = bodyText.match(/\[REF:([^\]]+)\]/);
-            var refId = refMatch ? refMatch[1] : '';
-            
-            // Handle based on type
-            if (type === 'group_join_request' && refId) {
-                showJoinRequestPopup(notif, refId);
-            } else if (type === 'group_added' || type === 'group_request_accepted' || type === 'group_member_joined') {
-                // Extract group ID from body [GROUP:xxx]
-                var groupMatch = bodyText.match(/\[GROUP:([^\]]+)\]/);
-                var groupId = groupMatch ? groupMatch[1] : (refId ? refId.split(':')[0] : null);
-                if (groupId) {
-                    await loadMyGroups();
-                    openGroup(groupId);
-                }
-            } else if (type === 'group_request_declined') {
-                switchTab('discover');
-            }
-        }
-        
         function startNotificationPolling() {
             setInterval(async function() {
-                var lastNotifId = notifications.length > 0 ? notifications[0].id : null;
+                var lastNotifId = notificationsList.length > 0 ? notificationsList[0].id : null;
                 var result = await supabase.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(5);
                 var newNotifs = result.data;
                 if (newNotifs && newNotifs.length > 0 && (!lastNotifId || newNotifs[0].id !== lastNotifId)) {
-                    var existingIds = notifications.map(function(n) { return n.id; });
+                    var existingIds = notificationsList.map(function(n) { return n.id; });
                     var trulyNew = newNotifs.filter(function(n) { return existingIds.indexOf(n.id) === -1; });
                     if (trulyNew.length > 0) {
-                        trulyNew.forEach(function(n) { notifications.unshift(n); });
+                        trulyNew.forEach(function(n) { notificationsList.unshift(n); });
                         renderNotifications();
-                        // Check for admin notifications
-                        var adminTypes = ['announcement', 'admin_warning', 'warning', 'ban', 'admin_message', 'admin_urgent', 'admin_success'];
-                        var adminNotif = trulyNew.find(function(n) { return adminTypes.indexOf(n.type) !== -1; });
-                        if (adminNotif) {
-                            showAdminPopup(adminNotif);
-                        } else {
-                            playNotificationSound();
-                            showToast(trulyNew[0].title || 'New notification', 'success');
-                        }
+                        playNotificationSound();
+                        showToast(trulyNew[0].title || 'New notification', 'success');
                     }
                 }
             }, 30000);
@@ -1433,13 +1317,7 @@
         async function loadNotifications() {
             try {
                 var result = await supabase.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(30);
-                notifications = result.data || [];
-                // Check for ban notification
-                var banNotif = notifications.find(function(n) { return n.type === 'ban' && !n.is_read; });
-                if (banNotif) { 
-                    showAdminPopup(banNotif);
-                    return; 
-                }
+                notificationsList = result.data || [];
                 renderNotifications();
                 checkAnnouncementPopup();
             } catch(e) {}
@@ -1447,7 +1325,7 @@
         
         function checkAnnouncementPopup() {
             var adminTypes = ['announcement', 'admin_warning', 'warning', 'ban', 'admin_message', 'admin_urgent', 'admin_success'];
-            var unreadAdmin = notifications.filter(function(n) { return adminTypes.indexOf(n.type) !== -1 && !n.is_read; });
+            var unreadAdmin = notificationsList.filter(function(n) { return adminTypes.indexOf(n.type) !== -1 && !n.is_read; });
             if (unreadAdmin.length > 0) showAdminPopup(unreadAdmin[0]);
         }
         
@@ -1466,83 +1344,12 @@
             playNotificationSound();
         }
         
-        function showGroupNotificationPopup(notification) {
-            // Remove any existing group notification popup
-            var existing = document.querySelector('.group-notif-popup');
-            if (existing) existing.remove();
-            
-            var type = notification.type;
-            var title = notification.title || '';
-            var config = {
-                icon: '👥',
-                color: '#3b82f6',
-                bgColor: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)'
-            };
-            
-            // Detect notification category by title since type is just 'group'
-            var isJoinRequest = title.includes('Join Request');
-            var isAccepted = title.includes('Accepted') || title.includes('Added to Group');
-            var isDeclined = title.includes('Declined');
-            var isMemberJoined = title.includes('New Member');
-            
-            if (isJoinRequest) {
-                config = { icon: '🔔', color: '#f59e0b', bgColor: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)' };
-            } else if (isAccepted) {
-                config = { icon: '🎉', color: '#22c55e', bgColor: 'linear-gradient(135deg, #16a34a 0%, #22c55e 100%)' };
-            } else if (isDeclined) {
-                config = { icon: '😔', color: '#ef4444', bgColor: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)' };
-            } else if (isMemberJoined) {
-                config = { icon: '👋', color: '#8b5cf6', bgColor: 'linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%)' };
-            }
-            
-            // Extract reference from body if present [REF:xxx:yyy]
-            var bodyText = notification.body || notification.message || '';
-            var refMatch = bodyText.match(/\[REF:([^\]]+)\]/);
-            var refId = refMatch ? refMatch[1] : null;
-            var displayBody = bodyText.replace(/\s*\[REF:[^\]]+\]/, '').replace(/\s*\[GROUP:[^\]]+\]/, '');
-            
-            var popup = document.createElement('div');
-            popup.className = 'group-notif-popup';
-            popup.style.cssText = 'position:fixed;top:20px;right:20px;background:' + config.bgColor + ';color:#fff;padding:16px 20px;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.25);z-index:10000;max-width:350px;animation:slideInRight 0.4s cubic-bezier(0.34,1.56,0.64,1);';
-            
-            var html = '<div style="display:flex;align-items:flex-start;gap:12px;">';
-            html += '<div style="font-size:28px;line-height:1;">' + config.icon + '</div>';
-            html += '<div style="flex:1;min-width:0;">';
-            html += '<div style="font-weight:600;font-size:15px;margin-bottom:4px;">' + escapeHtml(notification.title) + '</div>';
-            html += '<div style="font-size:13px;opacity:0.9;line-height:1.4;">' + escapeHtml(displayBody) + '</div>';
-            
-            // Add action buttons for join requests
-            if (isJoinRequest && refId) {
-                html += '<div style="display:flex;gap:8px;margin-top:12px;">';
-                html += '<button onclick="handleJoinRequest(\'' + refId + '\',\'' + notification.id + '\',true);this.closest(\'.group-notif-popup\').remove();" style="flex:1;padding:8px 12px;background:#22c55e;color:#fff;border:none;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">✓ Accept</button>';
-                html += '<button onclick="handleJoinRequest(\'' + refId + '\',\'' + notification.id + '\',false);this.closest(\'.group-notif-popup\').remove();" style="flex:1;padding:8px 12px;background:rgba(255,255,255,0.2);color:#fff;border:none;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">✗ Decline</button>';
-                html += '</div>';
-            }
-            
-            html += '</div>';
-            html += '<button onclick="this.parentElement.parentElement.remove()" style="background:rgba(255,255,255,0.2);border:none;color:#fff;width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;">×</button>';
-            html += '</div>';
-            
-            popup.innerHTML = html;
-            document.body.appendChild(popup);
-            
-            // Auto-dismiss after 10 seconds (unless it's a join request which needs action)
-            if (!isJoinRequest) {
-                setTimeout(function() {
-                    if (popup.parentElement) {
-                        popup.style.animation = 'slideInRight 0.3s ease reverse';
-                        setTimeout(function() { popup.remove(); }, 300);
-                    }
-                }, 8000);
-            }
-        }
-        
         async function dismissAnnouncement(announcementId) {
-            const notification = notifications.find(n => n.id === announcementId);
+            const notification = (typeof notificationsList !== 'undefined' ? notificationsList : notifications).find(n => n.id === announcementId);
             const isBan = notification && notification.type === 'ban';
             await supabase.from('notifications').update({ is_read: true }).eq('id', announcementId);
-            var idx = notifications.findIndex(function(n) { return n.id === announcementId; });
-            if (idx !== -1) notifications[idx].is_read = true;
+            var idx = notificationsList.findIndex(function(n) { return n.id === announcementId; });
+            if (idx !== -1) notificationsList[idx].is_read = true;
             var overlay = document.querySelector('.announcement-overlay');
             if (overlay) { overlay.style.animation = 'fadeIn 0.3s ease reverse'; setTimeout(function() { overlay.remove(); }, 300); }
             if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
@@ -1653,7 +1460,6 @@
                 if (tab === 'my' && g.onlineCount > 0) html += '<div class="group-online">' + g.onlineCount + ' online</div>';
                 if (tab === 'discover' && !g.isPrivate) html += '<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();joinGroup(\'' + g.id + '\')">Join</button>';
                 if (tab === 'discover' && g.isPrivate && !g.hasPendingRequest) html += '<button class="btn btn-outline btn-sm" onclick="event.stopPropagation();askToJoin(\'' + g.id + '\')">Ask to Join</button>';
-                if (tab === 'discover' && g.isPrivate && g.hasPendingRequest) html += '<button class="btn btn-outline btn-sm" style="color:var(--red);border-color:var(--red);" onclick="event.stopPropagation();cancelJoinRequest(\'' + g.id + '\')">Cancel</button>';
                 html += '</div></div>';
             }
             container.innerHTML = html;
@@ -1734,22 +1540,13 @@
                     var iconClass = type.includes('friend') ? 'friend' : type.includes('message') ? 'message' : type.includes('warning') ? 'warning' : 'group';
                     var iconSvg = iconClass === 'friend' ? '<path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>' : iconClass === 'message' ? '<path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>' : '<path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>';
                     
-                    // Extract reference from body if present [REF:xxx]
-                    var bodyText = n.body || n.message || '';
-                    var refMatch = bodyText.match(/\[REF:([^\]]+)\]/);
-                    var refId = refMatch ? refMatch[1] : '';
-                    var displayBody = bodyText.replace(/\s*\[REF:[^\]]+\]/, '').replace(/\s*\[GROUP:[^\]]+\]/, '');
-                    
-                    // Detect join request by title
-                    var isJoinRequest = (n.title || '').includes('Join Request');
-                    
-                    html += '<div class="notif-dropdown-item' + (n.is_read ? '' : ' unread') + '" onclick="handleNotifClick(\'' + n.id + '\',\'' + type + '\',\'' + refId + '\')">';
+                    html += '<div class="notif-dropdown-item' + (n.is_read ? '' : ' unread') + '" onclick="handleNotifClick(\'' + n.id + '\',\'' + type + '\',\'' + (n.reference_id || '') + '\')">';
                     html += '<div class="notif-icon ' + iconClass + '"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">' + iconSvg + '</svg></div>';
-                    html += '<div class="notif-content"><h4>' + escapeHtml(n.title || 'Notification') + '</h4><p>' + escapeHtml(displayBody) + '</p><div class="time">' + formatTimeAgo(n.created_at) + '</div>';
+                    html += '<div class="notif-content"><h4>' + escapeHtml(n.title || 'Notification') + '</h4><p>' + escapeHtml(n.body || n.message || '') + '</p><div class="time">' + formatTimeAgo(n.created_at) + '</div>';
                     
                     // Action buttons for join requests (for admins)
-                    if (isJoinRequest && !n.is_read && refId) {
-                        html += '<div class="notif-actions"><button class="accept" onclick="event.stopPropagation();handleJoinRequest(\'' + refId + '\',\'' + n.id + '\',true)">Accept</button><button class="decline" onclick="event.stopPropagation();handleJoinRequest(\'' + refId + '\',\'' + n.id + '\',false)">Decline</button></div>';
+                    if (n.type === 'group_join_request' && !n.is_read && n.reference_id) {
+                        html += '<div class="notif-actions"><button class="accept" onclick="event.stopPropagation();handleJoinRequest(\'' + n.reference_id + '\',\'' + n.id + '\',true)">Accept</button><button class="decline" onclick="event.stopPropagation();handleJoinRequest(\'' + n.reference_id + '\',\'' + n.id + '\',false)">Decline</button></div>';
                     }
                     html += '</div></div>';
                 }
@@ -1861,34 +1658,8 @@
                     return;
                 }
                 
-                // Get group info and current members BEFORE joining
-                var groupResult = await supabase.from('study_groups').select('name').eq('id', groupId).single();
-                var groupName = groupResult.data?.name || 'the group';
-                
-                var membersResult = await supabase.from('study_group_members')
-                    .select('user_id')
-                    .eq('group_id', groupId)
-                    .neq('role', 'banned');
-                var existingMembers = membersResult.data || [];
-                
-                // Get joiner's name
-                var profileResult = await supabase.from('profiles').select('full_name').eq('id', currentUser.id).single();
-                var joinerName = profileResult.data?.full_name || 'Someone';
-                
                 var result = await supabase.from('study_group_members').insert({ group_id: groupId, user_id: currentUser.id, role: 'member' });
                 if (result.error) { showToast(result.error.code === '23505' ? 'Already a member' : 'Failed to join', 'error'); return; }
-                
-                // Notify all existing members about new member
-                for (var i = 0; i < existingMembers.length; i++) {
-                    await supabase.from('notifications').insert({
-                        user_id: existingMembers[i].user_id,
-                        title: 'New Member Joined',
-                        body: joinerName + ' has joined ' + groupName,
-                        type: 'group_member_joined',
-                        is_read: false
-                    });
-                }
-                
                 showToast('Joined!', 'success');
                 await loadMyGroups();
                 switchTab('my');
@@ -1911,25 +1682,6 @@
                     return;
                 }
                 
-                // Check if there's already a pending request
-                var pendingCheck = await supabase.from('group_join_requests')
-                    .select('status')
-                    .eq('group_id', groupId)
-                    .eq('user_id', currentUser.id)
-                    .eq('status', 'pending')
-                    .maybeSingle();
-                
-                if (pendingCheck.data) {
-                    showToast('Request already pending', 'error');
-                    return;
-                }
-                
-                // Delete any old requests (declined, cancelled, or accepted - user may have left and wants to rejoin)
-                await supabase.from('group_join_requests')
-                    .delete()
-                    .eq('group_id', groupId)
-                    .eq('user_id', currentUser.id);
-                
                 // Get group info for notification
                 var groupResult = await supabase.from('study_groups').select('name, creator_id').eq('id', groupId).single();
                 var group = groupResult.data;
@@ -1942,61 +1694,27 @@
                 });
                 
                 if (result.error) {
-                    console.error('Insert error:', result.error);
-                    showToast('Failed to send request', 'error');
+                    if (result.error.code === '23505') showToast('Request already sent', 'error');
+                    else showToast('Failed to send request', 'error');
                     return;
                 }
                 
                 // Get user's name for notification
-                var profileResult = await supabase.from('profiles').select('full_name').eq('id', currentUser.id).single();
-                var userName = profileResult.data?.full_name || 'Someone';
+                var profileResult = await supabase.from('profiles').select('first_name, last_name').eq('id', currentUser.id).single();
+                var userName = getName(profileResult.data);
                 
-                // Get ALL admins of the group (not just creator)
-                var adminsResult = await supabase.from('study_group_members')
-                    .select('user_id')
-                    .eq('group_id', groupId)
-                    .eq('role', 'admin');
-                
-                var adminIds = (adminsResult.data || []).map(function(a) { return a.user_id; });
-                
-                // Also include creator if not already in admins list
-                if (!adminIds.includes(group.creator_id)) {
-                    adminIds.push(group.creator_id);
-                }
-                
-                // Notify all group admins
-                for (var i = 0; i < adminIds.length; i++) {
-                    console.log('Sending notification to admin:', adminIds[i]);
-                    var notifResult = await supabase.from('notifications').insert({
-                        user_id: adminIds[i],
-                        title: 'Join Request: ' + group.name,
-                        body: userName + ' wants to join ' + group.name + ' [REF:' + groupId + ':' + currentUser.id + ']',
-                        type: 'group_join_request',
-                        is_read: false
-                    });
-                    if (notifResult.error) {
-                        console.error('Notification error for user ' + adminIds[i] + ':', notifResult.error);
-                    } else {
-                        console.log('Notification sent successfully to:', adminIds[i]);
-                    }
-                }
+                // Notify group admin
+                await supabase.from('notifications').insert({
+                    user_id: group.creator_id,
+                    title: 'Join Request',
+                    message: userName + ' wants to join ' + group.name,
+                    type: 'study_group',
+                    reference_id: groupId + ':' + currentUser.id
+                });
                 
                 showToast('Request sent!', 'success');
                 await loadDiscoverGroups();
             } catch(e) { showToast('Failed to send request', 'error'); console.error(e); }
-        }
-        
-        async function cancelJoinRequest(groupId) {
-            try {
-                await supabase.from('group_join_requests')
-                    .update({ status: 'cancelled' })
-                    .eq('group_id', groupId)
-                    .eq('user_id', currentUser.id)
-                    .eq('status', 'pending');
-                
-                showToast('Request cancelled', 'success');
-                await loadDiscoverGroups();
-            } catch(e) { showToast('Failed to cancel', 'error'); }
         }
         
         async function handleJoinRequest(refId, notifId, accept) {
@@ -2005,96 +1723,32 @@
                 var groupId = parts[0];
                 var userId = parts[1];
                 
-                // Check if the request was cancelled by the user
-                var requestCheck = await supabase.from('group_join_requests')
-                    .select('status')
-                    .eq('group_id', groupId)
-                    .eq('user_id', userId)
-                    .maybeSingle();
-                
-                if (!requestCheck.data || requestCheck.data.status === 'cancelled') {
-                    showToast('User cancelled their request', 'error');
-                    // DELETE the notification since request no longer exists
-                    await supabase.from('notifications').delete().eq('id', notifId);
-                    notifications = notifications.filter(function(n) { return n.id !== notifId; });
-                    renderNotifications();
-                    return;
-                }
-                
-                if (requestCheck.data.status !== 'pending') {
-                    showToast('Request already handled', 'error');
-                    await supabase.from('notifications').delete().eq('id', notifId);
-                    notifications = notifications.filter(function(n) { return n.id !== notifId; });
-                    renderNotifications();
-                    return;
-                }
-                
-                // Get group name
-                var groupResult = await supabase.from('study_groups').select('name').eq('id', groupId).single();
-                var groupName = groupResult.data?.name || 'the group';
-                
-                // Get requester's name
-                var userResult = await supabase.from('profiles').select('full_name').eq('id', userId).single();
-                var userName = userResult.data?.full_name || 'A user';
-                
                 if (accept) {
                     // Add user to group
                     await supabase.from('study_group_members').insert({ group_id: groupId, user_id: userId, role: 'member' });
                     
-                    // Notify the user who requested
+                    // Get group name
+                    var groupResult = await supabase.from('study_groups').select('name').eq('id', groupId).single();
+                    
+                    // Notify the user
                     await supabase.from('notifications').insert({
                         user_id: userId,
-                        title: 'Request Accepted! 🎉',
-                        body: 'Your request to join ' + groupName + ' has been accepted! [GROUP:' + groupId + ']',
-                        type: 'group_request_accepted',
-                        is_read: false
+                        title: 'Request Accepted',
+                        message: 'You can now join ' + groupResult.data.name,
+                        type: 'study_group',
+                        reference_id: groupId
                     });
-                    
-                    // Get all current members to notify them
-                    var membersResult = await supabase.from('study_group_members')
-                        .select('user_id')
-                        .eq('group_id', groupId)
-                        .neq('user_id', userId)
-                        .neq('role', 'banned');
-                    
-                    var members = membersResult.data || [];
-                    
-                    // Notify all existing members about the new member
-                    for (var i = 0; i < members.length; i++) {
-                        if (members[i].user_id !== currentUser.id) {
-                            await supabase.from('notifications').insert({
-                                user_id: members[i].user_id,
-                                title: 'New Member Joined',
-                                body: userName + ' has joined ' + groupName,
-                                type: 'group_member_joined',
-                                is_read: false
-                            });
-                        }
-                    }
-                    
                     showToast('User added to group', 'success');
                 } else {
-                    // Notify the user their request was declined
-                    await supabase.from('notifications').insert({
-                        user_id: userId,
-                        title: 'Request Declined',
-                        body: 'Your request to join ' + groupName + ' was declined',
-                        type: 'group_request_declined',
-                        is_read: false
-                    });
                     showToast('Request declined', 'success');
                 }
                 
                 // Update request status
                 await supabase.from('group_join_requests').update({ status: accept ? 'accepted' : 'declined' }).eq('group_id', groupId).eq('user_id', userId);
                 
-                // DELETE the notification so it doesn't show again
-                await supabase.from('notifications').delete().eq('id', notifId);
-                
-                // Remove from local notifications array immediately
-                notifications = notifications.filter(function(n) { return n.id !== notifId; });
-                renderNotifications();
-                
+                // Mark notification as read
+                await supabase.from('notifications').update({ is_read: true }).eq('id', notifId);
+                await loadNotifications();
                 if (currentGroup && currentGroup.id === groupId) await loadGroupMembers();
             } catch(e) { showToast('Failed', 'error'); console.error(e); }
         }
@@ -2367,47 +2021,6 @@
                     console.error('Add member error:', result.error);
                     return; 
                 }
-                
-                // Get the added user's name
-                var userResult = await supabase.from('profiles').select('full_name').eq('id', userId).single();
-                var addedUserName = userResult.data?.full_name || 'A user';
-                
-                // Notify the added user
-                console.log('Sending notification to added user:', userId);
-                var notifResult = await supabase.from('notifications').insert({
-                    user_id: userId,
-                    title: 'Added to Group! 🎉',
-                    body: 'You have been added to ' + currentGroup.name + ' [GROUP:' + currentGroup.id + ']',
-                    type: 'group_added',
-                    is_read: false
-                });
-                if (notifResult.error) {
-                    console.error('Notification insert error:', notifResult.error);
-                } else {
-                    console.log('Notification sent successfully to added user');
-                }
-                
-                // Get all current members to notify them
-                var membersResult = await supabase.from('study_group_members')
-                    .select('user_id')
-                    .eq('group_id', currentGroup.id)
-                    .neq('user_id', userId)
-                    .neq('user_id', currentUser.id)
-                    .neq('role', 'banned');
-                
-                var members = membersResult.data || [];
-                
-                // Notify all existing members about the new member
-                for (var i = 0; i < members.length; i++) {
-                    await supabase.from('notifications').insert({
-                        user_id: members[i].user_id,
-                        title: 'New Member Joined',
-                        body: addedUserName + ' has joined ' + currentGroup.name,
-                        type: 'group_member_joined',
-                        is_read: false
-                    });
-                }
-                
                 showToast('Member added!', 'success');
                 
                 // Reload and update all displays
@@ -2493,26 +2106,12 @@
                 
                 var group = insertResult.data;
                 
-                // Get creator's name for notifications
-                var creatorResult = await supabase.from('profiles').select('full_name').eq('id', currentUser.id).single();
-                var creatorName = creatorResult.data?.full_name || 'Someone';
-                
                 // Add creator as admin
                 await supabase.from('study_group_members').insert({ group_id: group.id, user_id: currentUser.id, role: 'admin' });
                 
-                // Add selected members and notify them
+                // Add selected members
                 for (var i = 0; i < selectedMembers.length; i++) {
-                    var member = selectedMembers[i];
-                    await supabase.from('study_group_members').insert({ group_id: group.id, user_id: member.id, role: 'member' });
-                    
-                    // Notify the added member
-                    await supabase.from('notifications').insert({
-                        user_id: member.id,
-                        title: 'Added to Group',
-                        body: creatorName + ' added you to ' + name + ' [GROUP:' + group.id + ']',
-                        type: 'group_added',
-                        is_read: false
-                    });
+                    await supabase.from('study_group_members').insert({ group_id: group.id, user_id: selectedMembers[i].id, role: 'member' });
                 }
                 
                 closeCreateModal();
@@ -2700,80 +2299,12 @@
         async function handleNotifClick(id, type, refId) {
             try { await supabase.from('notifications').update({ is_read: true }).eq('id', id); } catch(e) {}
             
-            // Find the notification
-            var notif = notifications.find(function(n) { return n.id === id; });
-            
             if (type === 'friend_request' || type === 'friend_accept') window.location.href = 'friends.html';
             else if (type === 'message') window.location.href = 'messages.html' + (refId ? '?conv=' + refId : '');
-            else if (type === 'group_added' || type === 'group_request_accepted' || type === 'group_member_joined') {
-                // Navigate to the group - extract group ID from refId or body
-                var groupId = refId ? refId.split(':')[0] : null;
-                if (groupId) {
-                    await loadMyGroups();
-                    openGroup(groupId);
-                }
-            }
-            else if (type === 'group_request_declined') {
-                // Go to discover tab
-                switchTab('discover');
-            }
-            else if (type === 'group_join_request') {
-                // Show the join request popup with Accept/Decline buttons
-                if (notif && refId) {
-                    showJoinRequestPopup(notif, refId);
-                }
-            }
-            else if (type === 'admin_warning' || type === 'warning') { /* Stay on current page */ }
+            else if (type === 'study_group' || type === 'group_message' || type === 'group_request_accepted') { if (refId) { await loadMyGroups(); openGroup(refId.split(':')[0]); } }
+            else if (type === 'admin_warning') { /* Stay on current page */ }
             else if (type === 'announcement') { window.location.href = 'dashboard.html'; }
-            
-            await loadNotifications();
-            renderNotifications();
             toggleNotifications();
-        }
-        
-        function showJoinRequestPopup(notification, refId) {
-            // Remove any existing popup
-            var existing = document.querySelector('.join-request-popup-overlay');
-            if (existing) existing.remove();
-            
-            var parts = refId.split(':');
-            var groupId = parts[0];
-            var userId = parts[1];
-            
-            // Get user info from notification body
-            var bodyText = notification.body || '';
-            var displayBody = bodyText.replace(/\s*\[REF:[^\]]+\]/, '');
-            
-            var overlay = document.createElement('div');
-            overlay.className = 'join-request-popup-overlay';
-            overlay.innerHTML = '<div class="join-request-popup">' +
-                '<div class="join-request-header">' +
-                    '<div class="join-request-icon">👤</div>' +
-                    '<h3>' + escapeHtml(notification.title || 'Join Request') + '</h3>' +
-                '</div>' +
-                '<div class="join-request-body">' +
-                    '<p>' + escapeHtml(displayBody) + '</p>' +
-                '</div>' +
-                '<div class="join-request-actions">' +
-                    '<button class="btn btn-success" onclick="handleJoinRequestFromPopup(\'' + refId + '\',\'' + notification.id + '\',true)">Accept</button>' +
-                    '<button class="btn btn-outline" style="color:var(--red);border-color:var(--red);" onclick="handleJoinRequestFromPopup(\'' + refId + '\',\'' + notification.id + '\',false)">Decline</button>' +
-                '</div>' +
-            '</div>';
-            
-            overlay.onclick = function(e) {
-                if (e.target === overlay) overlay.remove();
-            };
-            
-            document.body.appendChild(overlay);
-        }
-        
-        async function handleJoinRequestFromPopup(refId, notifId, accept) {
-            // Remove popup
-            var popup = document.querySelector('.join-request-popup-overlay');
-            if (popup) popup.remove();
-            
-            // Call existing handler
-            await handleJoinRequest(refId, notifId, accept);
         }
         
         async function markAllNotificationsRead() {
@@ -2859,18 +2390,7 @@
             
             // Online status channel - update when any profile's online status changes
             supabase.channel('sg-online').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, function(payload) {
-                // Check friend online toast with proper duration check
-                if (payload.old && payload.new && payload.old.is_online === false && payload.new.is_online === true) {
-                    var friendIds = friends.map(function(f) { return f.id; });
-                    if (friendIds.indexOf(payload.new.id) !== -1) {
-                        var oldLastSeen = payload.old.last_seen ? new Date(payload.old.last_seen) : null;
-                        var now = new Date();
-                        var offlineDuration = oldLastSeen ? (now - oldLastSeen) / 1000 : 999;
-                        if (offlineDuration > 60) {
-                            showFriendOnlineToast(payload.new);
-                        }
-                    }
-                }
+                if (payload.new.is_online) checkFriendOnline(payload.new);
                 if (currentGroup) {
                     loadGroupMembers().then(function() { 
                         updateMembersDisplay(); 
@@ -2884,21 +2404,13 @@
             }).subscribe();
             
             // Notifications channel
-            supabase.channel('sg-notif-' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: 'user_id=eq.' + currentUser.id }, async function(payload) {
+            supabase.channel('sg-notif-' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: 'user_id=eq.' + currentUser.id }, function(payload) {
                 console.log('Study Groups: New notification received:', payload);
-                notifications.unshift(payload.new);
-                var isBan = payload.new.type === 'ban';
-                if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
+                notificationsList.unshift(payload.new);
                 renderNotifications();
-                
                 var adminTypes = ['announcement', 'admin_warning', 'warning', 'ban', 'admin_message', 'admin_urgent', 'admin_success'];
-                
                 if (adminTypes.indexOf(payload.new.type) !== -1) {
                     showAdminPopup(payload.new);
-                } else if (payload.new.type === 'group') {
-                    // Show special popup for group notifications
-                    showGroupNotificationPopup(payload.new);
-                    playNotificationSound();
                 } else {
                     playNotificationSound();
                     showToast(payload.new.title || 'New notification', 'success');
@@ -2907,28 +2419,26 @@
             
             // Sidebar badges
             supabase.channel('sg-msg-badge-' + currentUser.id).on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: 'receiver_id=eq.' + currentUser.id }, function() { loadSidebarBadges(); }).subscribe();
-            
-            // Join request status updates (for users who sent requests)
-            supabase.channel('sg-join-requests-' + currentUser.id).on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'group_join_requests', filter: 'user_id=eq.' + currentUser.id }, function(payload) {
-                console.log('Join request updated:', payload);
-                loadDiscoverGroups(); // Refresh to update pending status
-            }).subscribe();
+        }
+        
+        function checkFriendOnline(profile) {
+            var friendIds = friends.map(function(f) { return f.id; });
+            if (friendIds.indexOf(profile.id) !== -1 && profile.is_online) {
+                var lastSeen = friendLastSeen[profile.id];
+                var now = Date.now();
+                if (!lastSeen || now - lastSeen > 30000) showFriendOnlineToast(profile);
+                friendLastSeen[profile.id] = now;
+            }
         }
         
         function showFriendOnlineToast(profile) {
             var name = getName(profile);
-            var existing = document.querySelector('.friend-online-toast');
-            if (existing) existing.remove();
             var toast = document.createElement('div');
-            toast.className = 'friend-online-toast';
-            toast.innerHTML = '<div style="width:10px;height:10px;background:#22c55e;border-radius:50%;animation:pulse 1s infinite;"></div><span><strong>' + escapeHtml(name) + '</strong> is now online</span>';
-            toast.style.cssText = 'position:fixed;top:80px;right:20px;background:linear-gradient(135deg,#065f46,#047857);color:white;padding:14px 20px;border-radius:12px;display:flex;align-items:center;gap:12px;z-index:9999;animation:slideInRight 0.3s ease;box-shadow:0 4px 20px rgba(4,120,87,0.4);font-size:14px;';
-            var style = document.createElement('style');
-            style.textContent = '@keyframes slideInRight{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}';
-            document.head.appendChild(style);
+            toast.style.cssText = 'position:fixed;bottom:80px;right:24px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;padding:12px 20px;border-radius:12px;font-size:14px;font-weight:500;z-index:2000;animation:slideInRight 0.3s ease;display:flex;align-items:center;gap:10px;box-shadow:0 4px 12px rgba(0,0,0,0.15);';
+            toast.innerHTML = '<span style="width:10px;height:10px;background:#fff;border-radius:50%;animation:pulse 1s infinite;"></span>' + escapeHtml(name) + ' is online';
             document.body.appendChild(toast);
             playNotificationSound();
-            setTimeout(function() { toast.style.animation = 'slideInRight 0.3s ease reverse'; setTimeout(function() { toast.remove(); }, 300); }, 4000);
+            setTimeout(function() { toast.style.opacity = '0'; toast.style.transform = 'translateX(20px)'; setTimeout(function() { toast.remove(); }, 300); }, 4000);
         }
         
         // ============================================

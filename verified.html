@@ -209,6 +209,51 @@
             }
         }
     </style>
+    <!-- Primary Meta Tags -->
+    <meta name="title" content="Email Verified - MyUB | University of Botswana">
+    <meta name="description" content="Your email has been verified. Welcome to MyUB!">
+    <meta name="keywords" content="MyUB, University of Botswana, UB, student portal, GPA calculator, study groups, student companion, Botswana education, UB students">
+    <meta name="author" content="Futurify Designs">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.myub.online/">
+    <meta property="og:title" content="Email Verified - MyUB | University of Botswana">
+    <meta property="og:description" content="Your email has been verified. Welcome to MyUB!">
+    <meta property="og:image" content="https://www.myub.online/icons/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="1200">
+    <meta property="og:site_name" content="MyUB">
+    <meta property="og:locale" content="en_US">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://www.myub.online/">
+    <meta name="twitter:title" content="Email Verified - MyUB | University of Botswana">
+    <meta name="twitter:description" content="Your email has been verified. Welcome to MyUB!">
+    <meta name="twitter:image" content="https://www.myub.online/icons/og-image.jpg">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+    <link rel="mask-icon" href="icons/favicon-32x32.png" color="#1a365d">
+    <meta name="msapplication-TileColor" content="#1a365d">
+    <meta name="msapplication-TileImage" content="icons/icon-144x144.png">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1a365d">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MyUB">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://www.myub.online/">
+
 </head>
 <body>
     <div class="card">
@@ -244,5 +289,17 @@
             © 2025 Futurify Designs
         </div>
     </div>
+
+    <!-- PWA Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('ServiceWorker registered:', reg.scope))
+                    .catch(err => console.log('ServiceWorker registration failed:', err));
+            });
+        }
+    </script>
+
 </body>
 </html>

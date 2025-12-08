@@ -1061,7 +1061,8 @@
                 }
                 
                 // Check for unban notification (user was recently unbanned)
-                const { data: unbanNotif } = await supabase.from('notifications')
+                console.log('Checking for unban notification...');
+                const { data: unbanNotif, error: unbanError } = await supabase.from('notifications')
                     .select('*')
                     .eq('user_id', data.user.id)
                     .eq('type', 'unban')
@@ -1069,7 +1070,10 @@
                     .order('created_at', { ascending: false })
                     .limit(1);
                 
+                console.log('Unban notification check:', unbanNotif, unbanError);
+                
                 if (unbanNotif && unbanNotif.length > 0) {
+                    console.log('Found unban notification, setting flag');
                     // Mark as read
                     await supabase.from('notifications').update({ is_read: true }).eq('id', unbanNotif[0].id);
                     // Store flag to show welcome back popup on dashboard

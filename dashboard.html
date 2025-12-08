@@ -1812,7 +1812,9 @@
             subscribeToNotifications();
             
             // Check for unban welcome popup
+            console.log('Checking localStorage for unban flag:', localStorage.getItem('myub_show_unban_welcome'));
             if (localStorage.getItem('myub_show_unban_welcome') === 'true') {
+                console.log('Showing unban welcome popup');
                 localStorage.removeItem('myub_show_unban_welcome');
                 showUnbanWelcomePopup();
             }

@@ -579,10 +579,16 @@
             const loadingScreen = document.getElementById('loadingScreen');
             if (loadingScreen) loadingScreen.style.display = 'none';
             
-            // Render calendar and upcoming - ensure DOM is ready
-            updateDateDisplay();
-            renderMonthView();
-            renderUpcoming();
+            // Force calendar and upcoming events to render after DOM is fully ready
+            setTimeout(() => {
+                updateDateDisplay();
+                // Make sure month view is visible
+                const monthContent = document.querySelector('.month-view-content');
+                if (monthContent) monthContent.style.display = 'block';
+                renderMonthView();
+                renderUpcoming();
+                console.log('Schedule: Calendar rendered with', schedules.length, 'events');
+            }, 100);
         }
         
         function startNotificationPolling() {
@@ -594,10 +600,16 @@
                     const trulyNew = newNotifs.filter(n => !existingIds.includes(n.id));
                     if (trulyNew.length > 0) {
                         trulyNew.forEach(n => notifications.unshift(n));
-                        if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
-            renderNotifications();
-                        playNotificationSound();
-                        showToast(trulyNew[0].title || 'New notification', 'success');
+                        renderNotifications();
+                        // Check for admin notifications
+                        const adminTypes = ['announcement', 'admin_warning', 'warning', 'ban', 'admin_message', 'admin_urgent', 'admin_success'];
+                        const adminNotif = trulyNew.find(n => adminTypes.includes(n.type));
+                        if (adminNotif) {
+                            showAdminPopup(adminNotif);
+                        } else {
+                            playNotificationSound();
+                            showToast(trulyNew[0].title || 'New notification', 'success');
+                        }
                     }
                 }
             }, 30000);
@@ -840,7 +852,13 @@
 
         async function loadNotifications() {
             const { data } = await supabase.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(20);
-            notifications = data || []; if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
+            notifications = data || [];
+            // Check for ban notification
+            const banNotif = notifications.find(n => n.type === 'ban' && !n.is_read);
+            if (banNotif) { 
+                showAdminPopup(banNotif);
+                return; 
+            }
             renderNotifications();
             checkAnnouncementPopup();
         }
@@ -901,7 +919,7 @@
 
         async function markAllRead() {
             await supabase.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id);
-            notifications.forEach(n => n.is_read = true); if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
+            notifications.forEach(n => n.is_read = true);
             renderNotifications();
         }
 

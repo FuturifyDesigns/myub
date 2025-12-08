@@ -1275,14 +1275,14 @@
         
         function startNotificationPolling() {
             setInterval(async function() {
-                var lastNotifId = notificationsList.length > 0 ? notificationsList[0].id : null;
+                var lastNotifId = notifications.length > 0 ? notifications[0].id : null;
                 var result = await supabase.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(5);
                 var newNotifs = result.data;
                 if (newNotifs && newNotifs.length > 0 && (!lastNotifId || newNotifs[0].id !== lastNotifId)) {
-                    var existingIds = notificationsList.map(function(n) { return n.id; });
+                    var existingIds = notifications.map(function(n) { return n.id; });
                     var trulyNew = newNotifs.filter(function(n) { return existingIds.indexOf(n.id) === -1; });
                     if (trulyNew.length > 0) {
-                        trulyNew.forEach(function(n) { notificationsList.unshift(n); });
+                        trulyNew.forEach(function(n) { notifications.unshift(n); });
                         renderNotifications();
                         // Check for admin notifications
                         var adminTypes = ['announcement', 'admin_warning', 'warning', 'ban', 'admin_message', 'admin_urgent', 'admin_success'];
@@ -1434,9 +1434,9 @@
         async function loadNotifications() {
             try {
                 var result = await supabase.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(30);
-                notificationsList = result.data || [];
+                notifications = result.data || [];
                 // Check for ban notification
-                var banNotif = notificationsList.find(function(n) { return n.type === 'ban' && !n.is_read; });
+                var banNotif = notifications.find(function(n) { return n.type === 'ban' && !n.is_read; });
                 if (banNotif) { 
                     showAdminPopup(banNotif);
                     return; 
@@ -1448,7 +1448,7 @@
         
         function checkAnnouncementPopup() {
             var adminTypes = ['announcement', 'admin_warning', 'warning', 'ban', 'admin_message', 'admin_urgent', 'admin_success'];
-            var unreadAdmin = notificationsList.filter(function(n) { return adminTypes.indexOf(n.type) !== -1 && !n.is_read; });
+            var unreadAdmin = notifications.filter(function(n) { return adminTypes.indexOf(n.type) !== -1 && !n.is_read; });
             if (unreadAdmin.length > 0) showAdminPopup(unreadAdmin[0]);
         }
         
@@ -1539,11 +1539,11 @@
         }
         
         async function dismissAnnouncement(announcementId) {
-            const notification = (typeof notificationsList !== 'undefined' ? notificationsList : notifications).find(n => n.id === announcementId);
+            const notification = notifications.find(n => n.id === announcementId);
             const isBan = notification && notification.type === 'ban';
             await supabase.from('notifications').update({ is_read: true }).eq('id', announcementId);
-            var idx = notificationsList.findIndex(function(n) { return n.id === announcementId; });
-            if (idx !== -1) notificationsList[idx].is_read = true;
+            var idx = notifications.findIndex(function(n) { return n.id === announcementId; });
+            if (idx !== -1) notifications[idx].is_read = true;
             var overlay = document.querySelector('.announcement-overlay');
             if (overlay) { overlay.style.animation = 'fadeIn 0.3s ease reverse'; setTimeout(function() { overlay.remove(); }, 300); }
             if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
@@ -2005,6 +2005,30 @@
                 var parts = refId.split(':');
                 var groupId = parts[0];
                 var userId = parts[1];
+                
+                // Check if the request was cancelled by the user
+                var requestCheck = await supabase.from('group_join_requests')
+                    .select('status')
+                    .eq('group_id', groupId)
+                    .eq('user_id', userId)
+                    .maybeSingle();
+                
+                if (!requestCheck.data || requestCheck.data.status === 'cancelled') {
+                    showToast('User cancelled their request', 'error');
+                    // DELETE the notification since request no longer exists
+                    await supabase.from('notifications').delete().eq('id', notifId);
+                    notifications = notifications.filter(function(n) { return n.id !== notifId; });
+                    renderNotifications();
+                    return;
+                }
+                
+                if (requestCheck.data.status !== 'pending') {
+                    showToast('Request already handled', 'error');
+                    await supabase.from('notifications').delete().eq('id', notifId);
+                    notifications = notifications.filter(function(n) { return n.id !== notifId; });
+                    renderNotifications();
+                    return;
+                }
                 
                 // Get group name
                 var groupResult = await supabase.from('study_groups').select('name').eq('id', groupId).single();

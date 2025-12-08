@@ -1003,11 +1003,17 @@
             supabase.channel('friend-requests-out').on('postgres_changes', { event: '*', schema: 'public', table: 'friend_requests', filter: `sender_id=eq.${currentUser.id}` }, () => { loadRequests(); renderDiscoverUsers(); }).subscribe();
             // Listen for friendship changes
             supabase.channel('friendships').on('postgres_changes', { event: '*', schema: 'public', table: 'friendships' }, () => { loadFriends(); loadRequests(); }).subscribe();
-            supabase.channel('notifications-friends-' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${currentUser.id}` }, (p) => { 
+            supabase.channel('notifications-friends-' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${currentUser.id}` }, async (p) => { 
                 console.log('Friends page: New notification received:', p);
+                // Check for ban - immediate logout
+                const isBan = p.new.type === 'ban';
+                if (isBan) {
+                    showAdminPopup(p.new);
+                    return;
+                }
                 notifications.unshift(p.new); 
                 renderNotifications(); 
-                const adminTypes = ['announcement', 'admin_warning', 'warning', 'ban', 'admin_message', 'admin_urgent', 'admin_success'];
+                const adminTypes = ['announcement', 'admin_warning', 'warning', 'admin_message', 'admin_urgent', 'admin_success'];
                 if (adminTypes.includes(p.new.type)) {
                     showAdminPopup(p.new);
                 } else {

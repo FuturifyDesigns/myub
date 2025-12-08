@@ -1412,7 +1412,6 @@
         async function loadNotifications() {
             const { data } = await supabase.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(10);
             notificationsList = data || [];
-            if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
             renderNotifications();
             checkAnnouncementPopup();
         }
@@ -1472,7 +1471,6 @@
         async function handleNotifClick(id, type) {
             await supabase.from('notifications').update({ is_read: true }).eq('id', id);
             const n = notificationsList.find(x => x.id === id); if (n) n.is_read = true;
-            if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
             renderNotifications();
             document.getElementById('notificationDropdown').classList.remove('show');
             if (type.includes('friend')) window.location.href = 'friends.html';
@@ -1483,7 +1481,6 @@
         async function markAllNotificationsRead() {
             await supabase.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id);
             notificationsList.forEach(n => n.is_read = true);
-            if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
             renderNotifications();
         }
 
@@ -1682,10 +1679,16 @@
                     const trulyNew = newNotifs.filter(n => !existingIds.includes(n.id));
                     if (trulyNew.length > 0) {
                         trulyNew.forEach(n => notificationsList.unshift(n));
-                        if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
-            renderNotifications();
-                        playNotificationSound();
-                        showToast(trulyNew[0].title || 'New notification', 'success');
+                        renderNotifications();
+                        // Check for admin notifications
+                        const adminTypes = ['announcement', 'admin_warning', 'warning', 'ban', 'admin_message', 'admin_urgent', 'admin_success'];
+                        const adminNotif = trulyNew.find(n => adminTypes.includes(n.type));
+                        if (adminNotif) {
+                            showAdminPopup(adminNotif);
+                        } else {
+                            playNotificationSound();
+                            showToast(trulyNew[0].title || 'New notification', 'success');
+                        }
                     }
                 }
             }, 30000);

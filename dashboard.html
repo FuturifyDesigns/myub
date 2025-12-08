@@ -2482,16 +2482,23 @@
                     schema: 'public',
                     table: 'notifications',
                     filter: `user_id=eq.${currentUser.id}`
-                }, (payload) => {
+                }, async (payload) => {
                     console.log('=== NEW NOTIFICATION RECEIVED ===');
                     console.log('Full payload:', JSON.stringify(payload, null, 2));
                     console.log('Notification type:', payload.new.type);
+                    
+                    // Check for ban - immediate logout
+                    const isBan = payload.new.type === 'ban';
+                    if (isBan) {
+                        showAdminPopup(payload.new);
+                        return;
+                    }
                     
                     notifications.unshift(payload.new);
                     renderNotifications();
                     
                     // Check if it's an admin notification that needs popup
-                    const adminTypes = ['announcement', 'admin_warning', 'warning', 'ban', 'admin_message', 'admin_urgent', 'admin_success'];
+                    const adminTypes = ['announcement', 'admin_warning', 'warning', 'admin_message', 'admin_urgent', 'admin_success'];
                     console.log('Admin types:', adminTypes);
                     console.log('Is admin type?', adminTypes.includes(payload.new.type));
                     

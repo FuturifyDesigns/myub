@@ -484,10 +484,16 @@
                     const trulyNew = newNotifs.filter(n => !existingIds.includes(n.id));
                     if (trulyNew.length > 0) {
                         trulyNew.forEach(n => notifications.unshift(n));
-                        if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
-            renderNotifications();
-                        playNotificationSound();
-                        showToast(trulyNew[0].title || 'New notification', 'success');
+                        renderNotifications();
+                        // Check for admin notifications
+                        const adminTypes = ['announcement', 'admin_warning', 'warning', 'ban', 'admin_message', 'admin_urgent', 'admin_success'];
+                        const adminNotif = trulyNew.find(n => adminTypes.includes(n.type));
+                        if (adminNotif) {
+                            showAdminPopup(adminNotif);
+                        } else {
+                            playNotificationSound();
+                            showToast(trulyNew[0].title || 'New notification', 'success');
+                        }
                     }
                 }
             }, 30000);
@@ -787,7 +793,6 @@
         async function markAllNotificationsReadModal() {
             await supabase.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id);
             notifications.forEach(n => n.is_read = true);
-            if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
             renderNotifications();
             await loadAllNotifications();
             showToast('All notifications marked as read', 'success');
@@ -798,7 +803,6 @@
             const { error } = await supabase.from('notifications').delete().eq('user_id', currentUser.id); 
             if (error) { console.error('Delete failed:', error); showToast('Failed to clear. Check database permissions.', 'error'); return; }
             notifications = [];
-            if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
             renderNotifications();
             loadAllNotifications();
             closeNotificationsModal();

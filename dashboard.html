@@ -1767,6 +1767,15 @@
 
             currentUser = session.user;
             
+            // Check if user is banned
+            const { data: profile } = await supabase.from('profiles').select('is_banned').eq('id', currentUser.id).single();
+            if (profile && profile.is_banned) {
+                await supabase.auth.signOut();
+                alert('Your account has been suspended. Please contact an administrator.');
+                window.location.href = 'index.html';
+                return;
+            }
+            
             // Initialize connection manager (checks server capacity)
             if (window.MyUBUtils) {
                 const canConnect = await MyUBUtils.ConnectionManager.init(supabase, currentUser.id);
@@ -2270,6 +2279,10 @@
         }
         
         async function dismissAnnouncement(announcementId) {
+            // Find the notification
+            const notification = notifications.find(n => n.id === announcementId);
+            const isBan = notification && notification.type === 'ban';
+            
             // Mark as read in database
             await supabase.from('notifications').update({ is_read: true }).eq('id', announcementId);
             
@@ -2282,6 +2295,13 @@
             if (overlay) {
                 overlay.style.animation = 'fadeIn 0.3s ease reverse';
                 setTimeout(() => overlay.remove(), 300);
+            }
+            
+            // If it's a ban notification, log the user out
+            if (isBan) {
+                await supabase.auth.signOut();
+                window.location.href = 'index.html';
+                return;
             }
             
             // Refresh notifications

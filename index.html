@@ -1049,6 +1049,14 @@
                     return;
                 }
                 
+                // Check if user is banned
+                const { data: profile } = await supabase.from('profiles').select('is_banned').eq('id', data.user.id).single();
+                if (profile && profile.is_banned) {
+                    await supabase.auth.signOut();
+                    showAlert('Your account has been suspended. Please contact an administrator.', 'error');
+                    return;
+                }
+                
                 showAlert('Success! Redirecting...', 'success');
                 setTimeout(() => window.location.href = 'dashboard.html', 1000);
             } catch (err) {

@@ -1118,6 +1118,15 @@
                 var session = sessionResult.data.session;
                 if (!session) { window.location.href = 'index.html'; return; }
                 currentUser = session.user;
+            
+            // Check if user is banned
+            const { data: banProfile } = await supabase.from('profiles').select('is_banned').eq('id', currentUser.id).single();
+            if (banProfile && banProfile.is_banned) {
+                await supabase.auth.signOut();
+                alert('Your account has been suspended. Please contact an administrator.');
+                window.location.href = 'index.html';
+                return;
+            }
                 
                 // Initialize connection manager
                 if (window.MyUBUtils) {
@@ -1164,7 +1173,8 @@
                     var trulyNew = newNotifs.filter(function(n) { return existingIds.indexOf(n.id) === -1; });
                     if (trulyNew.length > 0) {
                         trulyNew.forEach(function(n) { notificationsList.unshift(n); });
-                        renderNotifications();
+                        if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
+            renderNotifications();
                         playNotificationSound();
                         showToast(trulyNew[0].title || 'New notification', 'success');
                     }
@@ -1309,7 +1319,8 @@
             try {
                 var result = await supabase.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(30);
                 notificationsList = result.data || [];
-                renderNotifications();
+                if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
+            renderNotifications();
                 checkAnnouncementPopup();
             } catch(e) {}
         }
@@ -1336,11 +1347,14 @@
         }
         
         async function dismissAnnouncement(announcementId) {
+            const notification = (typeof notificationsList !== 'undefined' ? notificationsList : notifications).find(n => n.id === announcementId);
+            const isBan = notification && notification.type === 'ban';
             await supabase.from('notifications').update({ is_read: true }).eq('id', announcementId);
             var idx = notificationsList.findIndex(function(n) { return n.id === announcementId; });
             if (idx !== -1) notificationsList[idx].is_read = true;
             var overlay = document.querySelector('.announcement-overlay');
             if (overlay) { overlay.style.animation = 'fadeIn 0.3s ease reverse'; setTimeout(function() { overlay.remove(); }, 300); }
+            if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
             renderNotifications();
             setTimeout(checkAnnouncementPopup, 500);
         }
@@ -2299,7 +2313,8 @@
             try {
                 await supabase.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id);
                 for (var i = 0; i < notifications.length; i++) notifications[i].is_read = true;
-                renderNotifications();
+                if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
+            renderNotifications();
             } catch(e) {}
         }
         
@@ -2395,7 +2410,8 @@
             supabase.channel('sg-notif-' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: 'user_id=eq.' + currentUser.id }, function(payload) {
                 console.log('Study Groups: New notification received:', payload);
                 notificationsList.unshift(payload.new);
-                renderNotifications();
+                if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
+            renderNotifications();
                 var adminTypes = ['announcement', 'admin_warning', 'warning', 'ban', 'admin_message', 'admin_urgent', 'admin_success'];
                 if (adminTypes.indexOf(payload.new.type) !== -1) {
                     showAdminPopup(payload.new);
@@ -2957,6 +2973,7 @@
         async function markAllNotificationsReadModal() {
             await supabase.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id);
             notifications.forEach(function(n) { n.is_read = true; });
+            if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
             renderNotifications();
             await loadAllNotifications();
             showToast('Marked all as read', 'success');
@@ -2967,6 +2984,7 @@
             const { error } = await supabase.from('notifications').delete().eq('user_id', currentUser.id); 
             if (error) { console.error('Delete failed:', error); showToast('Failed to clear. Check database permissions.', 'error'); return; }
             notifications = [];
+            if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
             renderNotifications();
             loadAllNotifications();
             closeNotificationsModal();

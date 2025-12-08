@@ -743,6 +743,7 @@
         async function loadNotifications() {
             const { data } = await supabase.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(10);
             notifications = data || [];
+            if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
             renderNotifications();
             checkAnnouncementPopup();
         }
@@ -769,11 +770,14 @@
         }
         
         async function dismissAnnouncement(announcementId) {
+            const notification = (typeof notificationsList !== 'undefined' ? notificationsList : notifications).find(n => n.id === announcementId);
+            const isBan = notification && notification.type === 'ban';
             await supabase.from('notifications').update({ is_read: true }).eq('id', announcementId);
             const idx = notifications.findIndex(n => n.id === announcementId);
             if (idx !== -1) notifications[idx].is_read = true;
             const overlay = document.querySelector('.announcement-overlay');
             if (overlay) { overlay.style.animation = 'fadeIn 0.3s ease reverse'; setTimeout(() => overlay.remove(), 300); }
+            if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
             renderNotifications();
             setTimeout(checkAnnouncementPopup, 500);
         }
@@ -799,6 +803,7 @@
         async function handleNotifClick(id, type) {
             await supabase.from('notifications').update({ is_read: true }).eq('id', id);
             const n = notifications.find(x => x.id === id); if (n) n.is_read = true;
+            if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
             renderNotifications();
             document.getElementById('notificationDropdown').classList.remove('show');
             if (type.includes('friend')) window.location.href = 'friends.html';
@@ -809,6 +814,7 @@
         async function markAllNotificationsRead() {
             await supabase.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id);
             notifications.forEach(n => n.is_read = true);
+            if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
             renderNotifications();
         }
 
@@ -850,7 +856,8 @@
             supabase.channel('gpa-notifications-' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${currentUser.id}` }, (p) => { 
                 console.log('GPA Calculator: New notification received:', p);
                 notifications.unshift(p.new); 
-                renderNotifications();
+                if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
+            renderNotifications();
                 const adminTypes = ['announcement', 'admin_warning', 'warning', 'ban', 'admin_message', 'admin_urgent', 'admin_success'];
                 if (adminTypes.includes(p.new.type)) {
                     showAdminPopup(p.new);
@@ -930,6 +937,15 @@
             if (!session) { window.location.href = 'index.html'; return; }
             currentUser = session.user;
             
+            // Check if user is banned
+            const { data: banProfile } = await supabase.from('profiles').select('is_banned').eq('id', currentUser.id).single();
+            if (banProfile && banProfile.is_banned) {
+                await supabase.auth.signOut();
+                alert('Your account has been suspended. Please contact an administrator.');
+                window.location.href = 'index.html';
+                return;
+            }
+            
             // Initialize connection manager
             if (window.MyUBUtils) {
                 const canConnect = await MyUBUtils.ConnectionManager.init(supabase, currentUser.id);
@@ -976,7 +992,8 @@
                     const trulyNew = newNotifs.filter(n => !existingIds.includes(n.id));
                     if (trulyNew.length > 0) {
                         trulyNew.forEach(n => notifications.unshift(n));
-                        renderNotifications();
+                        if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
+            renderNotifications();
                         playNotificationSound();
                         showToast(trulyNew[0].title || 'New notification', 'success');
                     }

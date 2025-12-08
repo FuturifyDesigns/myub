@@ -526,6 +526,15 @@
             if (!session) { window.location.href = 'index.html'; return; }
             currentUser = session.user;
             
+            // Check if user is banned
+            const { data: profile } = await supabase.from('profiles').select('is_banned').eq('id', currentUser.id).single();
+            if (profile && profile.is_banned) {
+                await supabase.auth.signOut();
+                alert('Your account has been suspended. Please contact an administrator.');
+                window.location.href = 'index.html';
+                return;
+            }
+            
             // Initialize connection manager (checks server capacity)
             if (window.MyUBUtils) {
                 const canConnect = await MyUBUtils.ConnectionManager.init(supabase, currentUser.id);
@@ -931,11 +940,21 @@
         }
         
         async function dismissAnnouncement(announcementId) {
+            const notification = notifications.find(n => n.id === announcementId);
+            const isBan = notification && notification.type === 'ban';
+            
             await supabase.from('notifications').update({ is_read: true }).eq('id', announcementId);
             const idx = notifications.findIndex(n => n.id === announcementId);
             if (idx !== -1) notifications[idx].is_read = true;
             const overlay = document.querySelector('.announcement-overlay');
             if (overlay) { overlay.style.animation = 'fadeIn 0.3s ease reverse'; setTimeout(() => overlay.remove(), 300); }
+            
+            if (isBan) {
+                await supabase.auth.signOut();
+                window.location.href = 'index.html';
+                return;
+            }
+            
             renderNotifications();
             setTimeout(checkAnnouncementPopup, 500);
         }

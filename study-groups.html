@@ -2494,12 +2494,26 @@
                 
                 var group = insertResult.data;
                 
+                // Get creator's name for notifications
+                var creatorResult = await supabase.from('profiles').select('full_name').eq('id', currentUser.id).single();
+                var creatorName = creatorResult.data?.full_name || 'Someone';
+                
                 // Add creator as admin
                 await supabase.from('study_group_members').insert({ group_id: group.id, user_id: currentUser.id, role: 'admin' });
                 
-                // Add selected members
+                // Add selected members and notify them
                 for (var i = 0; i < selectedMembers.length; i++) {
-                    await supabase.from('study_group_members').insert({ group_id: group.id, user_id: selectedMembers[i].id, role: 'member' });
+                    var member = selectedMembers[i];
+                    await supabase.from('study_group_members').insert({ group_id: group.id, user_id: member.id, role: 'member' });
+                    
+                    // Notify the added member
+                    await supabase.from('notifications').insert({
+                        user_id: member.id,
+                        title: 'Added to Group',
+                        body: creatorName + ' added you to ' + name + ' [GROUP:' + group.id + ']',
+                        type: 'group_added',
+                        is_read: false
+                    });
                 }
                 
                 closeCreateModal();

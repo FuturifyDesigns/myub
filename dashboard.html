@@ -1360,12 +1360,320 @@
             from { opacity: 0; transform: scale(0.9) translateY(20px); }
             to { opacity: 1; transform: scale(1) translateY(0); }
         }
+        /* Welcome Modal for First-Time Users */
+        .welcome-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10001;
+            animation: fadeIn 0.3s ease;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .welcome-modal {
+            background: linear-gradient(135deg, #1a365d 0%, #1e3a5f 50%, #234876 100%);
+            border-radius: 24px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .welcome-modal-header {
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .welcome-modal-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 3s infinite;
+        }
+        .welcome-modal-logo {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        .welcome-modal-header h1 {
+            color: white;
+            font-size: 28px;
+            font-weight: 800;
+            margin: 0;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        .welcome-modal-header p {
+            color: rgba(255,255,255,0.9);
+            margin: 8px 0 0;
+            font-size: 14px;
+            position: relative;
+        }
+        .welcome-modal-body {
+            padding: 30px;
+            color: white;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .welcome-intro {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .welcome-intro h2 {
+            font-size: 20px;
+            margin: 0 0 10px;
+            color: #fbbf24;
+        }
+        .welcome-intro p {
+            color: rgba(255,255,255,0.8);
+            line-height: 1.6;
+            margin: 0;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .feature-item {
+            background: rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            transition: all 0.3s ease;
+        }
+        .feature-item:hover {
+            background: rgba(255,255,255,0.12);
+            transform: translateY(-2px);
+        }
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .feature-icon.blue { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+        .feature-icon.green { background: linear-gradient(135deg, #22c55e, #16a34a); }
+        .feature-icon.purple { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+        .feature-icon.orange { background: linear-gradient(135deg, #f97316, #ea580c); }
+        .feature-icon.pink { background: linear-gradient(135deg, #ec4899, #db2777); }
+        .feature-icon.cyan { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+        .feature-text h4 {
+            margin: 0 0 4px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .feature-text p {
+            margin: 0;
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.4;
+        }
+        .welcome-contact {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .welcome-contact h4 {
+            margin: 0 0 10px;
+            font-size: 14px;
+            color: #fbbf24;
+        }
+        .welcome-contact p {
+            margin: 0 0 12px;
+            font-size: 13px;
+            color: rgba(255,255,255,0.7);
+        }
+        .contact-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .contact-link {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: white;
+            text-decoration: none;
+            font-size: 13px;
+            padding: 8px 14px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .contact-link:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        .contact-link svg {
+            width: 16px;
+            height: 16px;
+        }
+        .welcome-modal-footer {
+            padding: 20px 30px;
+            background: rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        .welcome-start-btn {
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4);
+        }
+        .welcome-start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(249, 115, 22, 0.5);
+        }
+        @media (max-width: 600px) {
+            .welcome-modal {
+                max-height: 95vh;
+                margin: 10px;
+            }
+            .welcome-modal-header {
+                padding: 20px;
+            }
+            .welcome-modal-header h1 {
+                font-size: 22px;
+            }
+            .welcome-modal-body {
+                padding: 20px;
+            }
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+            .contact-links {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 0.8; }
+        }
     </style>
 </head>
 <body>
     <!-- Loading State -->
     <div class="loading" id="loadingScreen">
         <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Welcome Modal for First-Time Users -->
+    <div class="welcome-modal-overlay" id="welcomeModal" style="display: none;">
+        <div class="welcome-modal">
+            <div class="welcome-modal-header">
+                <div class="welcome-modal-logo">🎓</div>
+                <h1>Welcome to MyUB!</h1>
+                <p>Your Complete University of Botswana Student Companion</p>
+            </div>
+            <div class="welcome-modal-body">
+                <div class="welcome-intro">
+                    <h2>👋 Hello, Future Graduate!</h2>
+                    <p>MyUB is designed to make your university life easier and more organized. Here's everything you can do:</p>
+                </div>
+                
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <div class="feature-icon blue">📊</div>
+                        <div class="feature-text">
+                            <h4>GPA Calculator</h4>
+                            <p>Track your grades with UB's official grading system and predict exam scores</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon green">📅</div>
+                        <div class="feature-text">
+                            <h4>Schedule Planner</h4>
+                            <p>Organize your classes, assignments, and deadlines in one place</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon purple">👥</div>
+                        <div class="feature-text">
+                            <h4>Study Groups</h4>
+                            <p>Create or join study groups with real-time chat and collaboration</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon orange">💬</div>
+                        <div class="feature-text">
+                            <h4>Direct Messages</h4>
+                            <p>Connect with friends and classmates through instant messaging</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon pink">🤝</div>
+                        <div class="feature-text">
+                            <h4>Friends System</h4>
+                            <p>Add friends, see who's online, and build your campus network</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon cyan">📝</div>
+                        <div class="feature-text">
+                            <h4>Notes & Profile</h4>
+                            <p>Keep personal notes and customize your student profile</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="welcome-contact">
+                    <h4>🐛 Found a Bug? Have Suggestions?</h4>
+                    <p>We're constantly improving MyUB. Your feedback helps us make it better for everyone!</p>
+                    <div class="contact-links">
+                        <a href="mailto:futurifydesigns@gmail.com" class="contact-link">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                <polyline points="22,6 12,13 2,6"/>
+                            </svg>
+                            futurifydesigns@gmail.com
+                        </a>
+                        <a href="https://wa.me/26777783823" target="_blank" class="contact-link">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                            </svg>
+                            +267 77 783 823
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="welcome-modal-footer">
+                <button class="welcome-start-btn" onclick="dismissWelcomeModal()">
+                    🚀 Let's Get Started!
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- Sidebar Overlay (Mobile) -->
@@ -1818,6 +2126,9 @@
                 localStorage.removeItem('myub_show_unban_welcome');
                 showUnbanWelcomePopup();
             }
+            
+            // Check for first-time user welcome modal
+            checkFirstTimeUser();
             
             // Poll for notifications every 30 seconds as fallback
             setInterval(async () => {
@@ -2767,6 +3078,42 @@
             loadAllNotifications();
             closeNotificationsModal();
             showToast('All notifications cleared', 'success');
+        }
+
+        // =============================================
+        // FIRST-TIME USER WELCOME MODAL
+        // =============================================
+        function checkFirstTimeUser() {
+            // Check if user has seen the welcome modal
+            const hasSeenWelcome = localStorage.getItem('myub_welcome_seen_' + currentUser.id);
+            
+            if (!hasSeenWelcome) {
+                // Show welcome modal after a short delay for smooth experience
+                setTimeout(() => {
+                    showWelcomeModal();
+                }, 500);
+            }
+        }
+        
+        function showWelcomeModal() {
+            const modal = document.getElementById('welcomeModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        
+        function dismissWelcomeModal() {
+            const modal = document.getElementById('welcomeModal');
+            if (modal) {
+                modal.style.animation = 'fadeIn 0.3s ease reverse';
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                    document.body.style.overflow = '';
+                    // Mark as seen for this user
+                    localStorage.setItem('myub_welcome_seen_' + currentUser.id, 'true');
+                }, 300);
+            }
         }
 
         // Initialize

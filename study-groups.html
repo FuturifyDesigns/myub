@@ -1363,19 +1363,26 @@
             if (existing) existing.remove();
             
             var type = notification.type;
+            var title = notification.title || '';
             var config = {
                 icon: '👥',
                 color: '#3b82f6',
                 bgColor: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)'
             };
             
-            if (type === 'group_join_request') {
+            // Detect notification category by title since type is just 'group'
+            var isJoinRequest = title.includes('Join Request');
+            var isAccepted = title.includes('Accepted') || title.includes('Added to Group');
+            var isDeclined = title.includes('Declined');
+            var isMemberJoined = title.includes('New Member');
+            
+            if (isJoinRequest) {
                 config = { icon: '🔔', color: '#f59e0b', bgColor: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)' };
-            } else if (type === 'group_added' || type === 'group_request_accepted') {
+            } else if (isAccepted) {
                 config = { icon: '🎉', color: '#22c55e', bgColor: 'linear-gradient(135deg, #16a34a 0%, #22c55e 100%)' };
-            } else if (type === 'group_request_declined') {
+            } else if (isDeclined) {
                 config = { icon: '😔', color: '#ef4444', bgColor: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)' };
-            } else if (type === 'group_member_joined') {
+            } else if (isMemberJoined) {
                 config = { icon: '👋', color: '#8b5cf6', bgColor: 'linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%)' };
             }
             
@@ -1396,7 +1403,7 @@
             html += '<div style="font-size:13px;opacity:0.9;line-height:1.4;">' + escapeHtml(displayBody) + '</div>';
             
             // Add action buttons for join requests
-            if (type === 'group_join_request' && refId) {
+            if (isJoinRequest && refId) {
                 html += '<div style="display:flex;gap:8px;margin-top:12px;">';
                 html += '<button onclick="handleJoinRequest(\'' + refId + '\',\'' + notification.id + '\',true);this.closest(\'.group-notif-popup\').remove();" style="flex:1;padding:8px 12px;background:#22c55e;color:#fff;border:none;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">✓ Accept</button>';
                 html += '<button onclick="handleJoinRequest(\'' + refId + '\',\'' + notification.id + '\',false);this.closest(\'.group-notif-popup\').remove();" style="flex:1;padding:8px 12px;background:rgba(255,255,255,0.2);color:#fff;border:none;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">✗ Decline</button>';
@@ -1411,7 +1418,7 @@
             document.body.appendChild(popup);
             
             // Auto-dismiss after 10 seconds (unless it's a join request which needs action)
-            if (type !== 'group_join_request') {
+            if (!isJoinRequest) {
                 setTimeout(function() {
                     if (popup.parentElement) {
                         popup.style.animation = 'slideInRight 0.3s ease reverse';
@@ -1537,6 +1544,7 @@
                 if (tab === 'my' && g.onlineCount > 0) html += '<div class="group-online">' + g.onlineCount + ' online</div>';
                 if (tab === 'discover' && !g.isPrivate) html += '<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();joinGroup(\'' + g.id + '\')">Join</button>';
                 if (tab === 'discover' && g.isPrivate && !g.hasPendingRequest) html += '<button class="btn btn-outline btn-sm" onclick="event.stopPropagation();askToJoin(\'' + g.id + '\')">Ask to Join</button>';
+                if (tab === 'discover' && g.isPrivate && g.hasPendingRequest) html += '<button class="btn btn-outline btn-sm" style="color:var(--red);border-color:var(--red);" onclick="event.stopPropagation();cancelJoinRequest(\'' + g.id + '\')">Cancel</button>';
                 html += '</div></div>';
             }
             container.innerHTML = html;
@@ -1623,12 +1631,15 @@
                     var refId = refMatch ? refMatch[1] : '';
                     var displayBody = bodyText.replace(/\s*\[REF:[^\]]+\]/, '').replace(/\s*\[GROUP:[^\]]+\]/, '');
                     
+                    // Detect join request by title
+                    var isJoinRequest = (n.title || '').includes('Join Request');
+                    
                     html += '<div class="notif-dropdown-item' + (n.is_read ? '' : ' unread') + '" onclick="handleNotifClick(\'' + n.id + '\',\'' + type + '\',\'' + refId + '\')">';
                     html += '<div class="notif-icon ' + iconClass + '"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">' + iconSvg + '</svg></div>';
                     html += '<div class="notif-content"><h4>' + escapeHtml(n.title || 'Notification') + '</h4><p>' + escapeHtml(displayBody) + '</p><div class="time">' + formatTimeAgo(n.created_at) + '</div>';
                     
                     // Action buttons for join requests (for admins)
-                    if (n.type === 'group_join_request' && !n.is_read && refId) {
+                    if (isJoinRequest && !n.is_read && refId) {
                         html += '<div class="notif-actions"><button class="accept" onclick="event.stopPropagation();handleJoinRequest(\'' + refId + '\',\'' + n.id + '\',true)">Accept</button><button class="decline" onclick="event.stopPropagation();handleJoinRequest(\'' + refId + '\',\'' + n.id + '\',false)">Decline</button></div>';
                     }
                     html += '</div></div>';
@@ -1741,8 +1752,34 @@
                     return;
                 }
                 
+                // Get group info and current members BEFORE joining
+                var groupResult = await supabase.from('study_groups').select('name').eq('id', groupId).single();
+                var groupName = groupResult.data?.name || 'the group';
+                
+                var membersResult = await supabase.from('study_group_members')
+                    .select('user_id')
+                    .eq('group_id', groupId)
+                    .neq('role', 'banned');
+                var existingMembers = membersResult.data || [];
+                
+                // Get joiner's name
+                var profileResult = await supabase.from('profiles').select('full_name').eq('id', currentUser.id).single();
+                var joinerName = profileResult.data?.full_name || 'Someone';
+                
                 var result = await supabase.from('study_group_members').insert({ group_id: groupId, user_id: currentUser.id, role: 'member' });
                 if (result.error) { showToast(result.error.code === '23505' ? 'Already a member' : 'Failed to join', 'error'); return; }
+                
+                // Notify all existing members about new member
+                for (var i = 0; i < existingMembers.length; i++) {
+                    await supabase.from('notifications').insert({
+                        user_id: existingMembers[i].user_id,
+                        title: 'New Member Joined',
+                        body: joinerName + ' has joined ' + groupName,
+                        type: 'group_member_joined',
+                        is_read: false
+                    });
+                }
+                
                 showToast('Joined!', 'success');
                 await loadMyGroups();
                 switchTab('my');
@@ -1765,6 +1802,13 @@
                     return;
                 }
                 
+                // Delete any old declined/cancelled requests first
+                await supabase.from('group_join_requests')
+                    .delete()
+                    .eq('group_id', groupId)
+                    .eq('user_id', currentUser.id)
+                    .in('status', ['declined', 'cancelled']);
+                
                 // Get group info for notification
                 var groupResult = await supabase.from('study_groups').select('name, creator_id').eq('id', groupId).single();
                 var group = groupResult.data;
@@ -1777,7 +1821,7 @@
                 });
                 
                 if (result.error) {
-                    if (result.error.code === '23505') showToast('Request already sent', 'error');
+                    if (result.error.code === '23505') showToast('Request already pending', 'error');
                     else showToast('Failed to send request', 'error');
                     return;
                 }
@@ -1811,9 +1855,6 @@
                     });
                     if (notifResult.error) {
                         console.error('Notification error for user ' + adminIds[i] + ':', notifResult.error);
-                        console.error('Error message:', notifResult.error.message);
-                        console.error('Error code:', notifResult.error.code);
-                        console.error('Error details:', notifResult.error.details);
                     } else {
                         console.log('Notification sent successfully to:', adminIds[i]);
                     }
@@ -1822,6 +1863,19 @@
                 showToast('Request sent!', 'success');
                 await loadDiscoverGroups();
             } catch(e) { showToast('Failed to send request', 'error'); console.error(e); }
+        }
+        
+        async function cancelJoinRequest(groupId) {
+            try {
+                await supabase.from('group_join_requests')
+                    .update({ status: 'cancelled' })
+                    .eq('group_id', groupId)
+                    .eq('user_id', currentUser.id)
+                    .eq('status', 'pending');
+                
+                showToast('Request cancelled', 'success');
+                await loadDiscoverGroups();
+            } catch(e) { showToast('Failed to cancel', 'error'); }
         }
         
         async function handleJoinRequest(refId, notifId, accept) {
@@ -1843,14 +1897,13 @@
                     await supabase.from('study_group_members').insert({ group_id: groupId, user_id: userId, role: 'member' });
                     
                     // Notify the user who requested
-                    var notifResult1 = await supabase.from('notifications').insert({
+                    await supabase.from('notifications').insert({
                         user_id: userId,
                         title: 'Request Accepted! 🎉',
                         body: 'Your request to join ' + groupName + ' has been accepted! [GROUP:' + groupId + ']',
                         type: 'group_request_accepted',
                         is_read: false
                     });
-                    if (notifResult1.error) console.error('Notification error:', notifResult1.error);
                     
                     // Get all current members to notify them
                     var membersResult = await supabase.from('study_group_members')
@@ -1863,7 +1916,7 @@
                     
                     // Notify all existing members about the new member
                     for (var i = 0; i < members.length; i++) {
-                        if (members[i].user_id !== currentUser.id) { // Don't notify the admin who accepted
+                        if (members[i].user_id !== currentUser.id) {
                             await supabase.from('notifications').insert({
                                 user_id: members[i].user_id,
                                 title: 'New Member Joined',
@@ -1890,9 +1943,13 @@
                 // Update request status
                 await supabase.from('group_join_requests').update({ status: accept ? 'accepted' : 'declined' }).eq('group_id', groupId).eq('user_id', userId);
                 
-                // Mark notification as read
-                await supabase.from('notifications').update({ is_read: true }).eq('id', notifId);
-                await loadNotifications();
+                // DELETE the notification so it doesn't show again
+                await supabase.from('notifications').delete().eq('id', notifId);
+                
+                // Remove from local notifications array immediately
+                notifications = notifications.filter(function(n) { return n.id !== notifId; });
+                renderNotifications();
+                
                 if (currentGroup && currentGroup.id === groupId) await loadGroupMembers();
             } catch(e) { showToast('Failed', 'error'); console.error(e); }
         }
@@ -2181,8 +2238,6 @@
                 });
                 if (notifResult.error) {
                     console.error('Notification insert error:', notifResult.error);
-                    console.error('Error message:', notifResult.error.message);
-                    console.error('Error code:', notifResult.error.code);
                 } else {
                     console.log('Notification sent successfully to added user');
                 }
@@ -2488,9 +2543,26 @@
             
             if (type === 'friend_request' || type === 'friend_accept') window.location.href = 'friends.html';
             else if (type === 'message') window.location.href = 'messages.html' + (refId ? '?conv=' + refId : '');
-            else if (type === 'study_group' || type === 'group_message' || type === 'group_request_accepted') { if (refId) { await loadMyGroups(); openGroup(refId.split(':')[0]); } }
-            else if (type === 'admin_warning') { /* Stay on current page */ }
+            else if (type === 'group_added' || type === 'group_request_accepted' || type === 'group_member_joined') {
+                // Navigate to the group - extract group ID from refId or body
+                var groupId = refId ? refId.split(':')[0] : null;
+                if (groupId) {
+                    await loadMyGroups();
+                    openGroup(groupId);
+                }
+            }
+            else if (type === 'group_request_declined') {
+                // Go to discover tab
+                switchTab('discover');
+            }
+            else if (type === 'group_join_request') {
+                // Stay on page - admin will use Accept/Decline buttons
+            }
+            else if (type === 'admin_warning' || type === 'warning') { /* Stay on current page */ }
             else if (type === 'announcement') { window.location.href = 'dashboard.html'; }
+            
+            await loadNotifications();
+            renderNotifications();
             toggleNotifications();
         }
         
@@ -2599,11 +2671,10 @@
                 renderNotifications();
                 
                 var adminTypes = ['announcement', 'admin_warning', 'warning', 'ban', 'admin_message', 'admin_urgent', 'admin_success'];
-                var groupNotifTypes = ['group_join_request', 'group_added', 'group_request_accepted', 'group_request_declined', 'group_member_joined'];
                 
                 if (adminTypes.indexOf(payload.new.type) !== -1) {
                     showAdminPopup(payload.new);
-                } else if (groupNotifTypes.indexOf(payload.new.type) !== -1) {
+                } else if (payload.new.type === 'group') {
                     // Show special popup for group notifications
                     showGroupNotificationPopup(payload.new);
                     playNotificationSound();
@@ -2615,6 +2686,12 @@
             
             // Sidebar badges
             supabase.channel('sg-msg-badge-' + currentUser.id).on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: 'receiver_id=eq.' + currentUser.id }, function() { loadSidebarBadges(); }).subscribe();
+            
+            // Join request status updates (for users who sent requests)
+            supabase.channel('sg-join-requests-' + currentUser.id).on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'group_join_requests', filter: 'user_id=eq.' + currentUser.id }, function(payload) {
+                console.log('Join request updated:', payload);
+                loadDiscoverGroups(); // Refresh to update pending status
+            }).subscribe();
         }
         
         function checkFriendOnline(profile) {

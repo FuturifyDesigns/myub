@@ -2325,19 +2325,25 @@
             if (existing) existing.remove();
             
             const type = notification.type;
+            const title = notification.title || '';
             let config = {
                 icon: '👥',
                 color: '#3b82f6',
                 bgColor: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)'
             };
             
-            if (type === 'group_join_request') {
+            const isJoinRequest = title.includes('Join Request');
+            const isAccepted = title.includes('Accepted') || title.includes('Added to Group');
+            const isDeclined = title.includes('Declined');
+            const isMemberJoined = title.includes('New Member');
+            
+            if (isJoinRequest) {
                 config = { icon: '🔔', color: '#f59e0b', bgColor: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)' };
-            } else if (type === 'group_added' || type === 'group_request_accepted') {
+            } else if (isAccepted) {
                 config = { icon: '🎉', color: '#22c55e', bgColor: 'linear-gradient(135deg, #16a34a 0%, #22c55e 100%)' };
-            } else if (type === 'group_request_declined') {
+            } else if (isDeclined) {
                 config = { icon: '😔', color: '#ef4444', bgColor: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)' };
-            } else if (type === 'group_member_joined') {
+            } else if (isMemberJoined) {
                 config = { icon: '👋', color: '#8b5cf6', bgColor: 'linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%)' };
             }
             
@@ -2349,10 +2355,10 @@
             html += `<div style="font-size:28px;line-height:1;">${config.icon}</div>`;
             html += '<div style="flex:1;min-width:0;">';
             html += `<div style="font-weight:600;font-size:15px;margin-bottom:4px;">${escapeHtml(notification.title)}</div>`;
-            html += `<div style="font-size:13px;opacity:0.9;line-height:1.4;">${escapeHtml(notification.message || notification.body || '')}</div>`;
+            html += `<div style="font-size:13px;opacity:0.9;line-height:1.4;">${escapeHtml(notification.body || notification.message || '')}</div>`;
             
             // Add action buttons for join requests (redirect to study groups page)
-            if (type === 'group_join_request' && notification.reference_id) {
+            if (isJoinRequest) {
                 html += '<div style="display:flex;gap:8px;margin-top:12px;">';
                 html += `<button onclick="window.location.href='study-groups.html'" style="flex:1;padding:8px 12px;background:#22c55e;color:#fff;border:none;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">View Request</button>`;
                 html += `<button onclick="this.closest('.group-notif-popup').remove()" style="flex:1;padding:8px 12px;background:rgba(255,255,255,0.2);color:#fff;border:none;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">Dismiss</button>`;
@@ -2367,7 +2373,7 @@
             document.body.appendChild(popup);
             
             // Auto-dismiss after 8 seconds (unless it's a join request)
-            if (type !== 'group_join_request') {
+            if (!isJoinRequest) {
                 setTimeout(() => {
                     if (popup.parentElement) {
                         popup.style.animation = 'slideInRight 0.3s ease reverse';
@@ -2437,9 +2443,14 @@
                     : iconClass === 'warning'
                     ? '<path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>'
                     : '<path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>';
+                
+                // Clean body text by removing [REF:] and [GROUP:] tags
+                const bodyText = n.body || '';
+                const displayBody = bodyText.replace(/\s*\[REF:[^\]]+\]/, '').replace(/\s*\[GROUP:[^\]]+\]/, '');
+                
                 return `<div class="notif-dropdown-item ${n.is_read ? '' : 'unread'}" onclick="handleNotifClick('${n.id}','${type}')">
                     <div class="notif-icon ${iconClass}"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">${iconSvg}</svg></div>
-                    <div class="notif-content"><h4>${escapeHtml(n.title || 'Notification')}</h4><p>${escapeHtml(n.body || '')}</p><div class="time">${formatTimeAgo(n.created_at)}</div></div>
+                    <div class="notif-content"><h4>${escapeHtml(n.title || 'Notification')}</h4><p>${escapeHtml(displayBody)}</p><div class="time">${formatTimeAgo(n.created_at)}</div></div>
                 </div>`;
             }).join('');
         }
@@ -2452,7 +2463,7 @@
             document.getElementById('notificationDropdown').classList.remove('show');
             if (type === 'friend_request' || type === 'friend_accept') window.location.href = 'friends.html';
             else if (type === 'message') window.location.href = 'messages.html';
-            else if (type === 'study_group') window.location.href = 'study-groups.html';
+            else if (type.startsWith('group_')) window.location.href = 'study-groups.html';
             else if (type === 'admin_warning' || type === 'announcement') { /* Stay on dashboard, it's displayed here */ }
         }
 
@@ -2562,7 +2573,7 @@
                     if (adminTypes.includes(payload.new.type)) {
                         console.log('Calling showAdminPopup...');
                         showAdminPopup(payload.new);
-                    } else if (groupNotifTypes.includes(payload.new.type)) {
+                    } else if (payload.new.type === 'group') {
                         showGroupNotificationPopup(payload.new);
                         playNotificationSound();
                     } else {

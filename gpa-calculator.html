@@ -430,6 +430,55 @@
         .announcement-btn svg { width: 18px; height: 18px; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes popIn { from { opacity: 0; transform: scale(0.9) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        
+        /* ========== SEMESTER ANALYSIS ========== */
+        .semester-analysis { background: var(--white); border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+        .semester-analysis-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .semester-analysis-header svg { width: 24px; height: 24px; color: var(--navy); }
+        .semester-analysis-header h3 { font-size: 16px; font-weight: 700; color: var(--gray-800); }
+        .analysis-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px; }
+        .analysis-card { background: var(--gray-50); border-radius: 12px; padding: 14px; position: relative; overflow: hidden; }
+        .analysis-card.best { background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); border: 1px solid #86efac; }
+        .analysis-card.worst { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 1px solid #fcd34d; }
+        .analysis-card.improved { background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border: 1px solid #93c5fd; }
+        .analysis-card.declined { background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); border: 1px solid #fca5a5; }
+        .analysis-card-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; font-size: 18px; }
+        .analysis-card.best .analysis-card-icon { background: #22c55e; color: white; }
+        .analysis-card.worst .analysis-card-icon { background: #eab308; color: white; }
+        .analysis-card.improved .analysis-card-icon { background: #3b82f6; color: white; }
+        .analysis-card.declined .analysis-card-icon { background: #ef4444; color: white; }
+        .analysis-card-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gray-500); margin-bottom: 4px; }
+        .analysis-card.best .analysis-card-label { color: #166534; }
+        .analysis-card.worst .analysis-card-label { color: #854d0e; }
+        .analysis-card.improved .analysis-card-label { color: #1e40af; }
+        .analysis-card.declined .analysis-card-label { color: #b91c1c; }
+        .analysis-card-semester { font-size: 14px; font-weight: 700; color: var(--gray-800); margin-bottom: 2px; }
+        .analysis-card-gpa { font-size: 20px; font-weight: 800; }
+        .analysis-card.best .analysis-card-gpa { color: #16a34a; }
+        .analysis-card.worst .analysis-card-gpa { color: #ca8a04; }
+        .analysis-card.improved .analysis-card-gpa { color: #2563eb; }
+        .analysis-card.declined .analysis-card-gpa { color: #dc2626; }
+        .analysis-card-change { font-size: 12px; font-weight: 600; margin-top: 4px; }
+        .analysis-insights { background: var(--gray-50); border-radius: 12px; padding: 14px; }
+        .analysis-insights-title { font-size: 13px; font-weight: 700; color: var(--gray-700); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .analysis-insights-title svg { width: 16px; height: 16px; color: var(--purple); }
+        .insight-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--gray-200); }
+        .insight-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .insight-icon { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 10px; }
+        .insight-icon.up { background: #dcfce7; color: #16a34a; }
+        .insight-icon.down { background: #fee2e2; color: #dc2626; }
+        .insight-icon.neutral { background: #e0e7ff; color: #4f46e5; }
+        .insight-icon.star { background: #fef3c7; color: #d97706; }
+        .insight-text { font-size: 13px; color: var(--gray-600); line-height: 1.4; }
+        .insight-text strong { color: var(--gray-800); }
+        .analysis-empty { text-align: center; padding: 24px; color: var(--gray-400); }
+        .analysis-empty svg { width: 40px; height: 40px; margin-bottom: 10px; opacity: 0.5; }
+        .analysis-empty p { font-size: 13px; }
+        @media (max-width: 600px) {
+            .analysis-grid { grid-template-columns: 1fr; }
+            .analysis-card { padding: 12px; }
+            .analysis-card-gpa { font-size: 18px; }
+        }
     </style>
 </head>
 <body>
@@ -540,6 +589,26 @@
                     <div class="summary-card credits"><div class="summary-label">Total Credits</div><div class="summary-value" id="totalCredits">0</div><div class="summary-sub">credits earned</div></div>
                     <div class="summary-card courses"><div class="summary-label">Courses</div><div class="summary-value" id="totalCourses">0</div><div class="summary-sub">completed</div></div>
                     <div class="summary-card class"><div class="summary-label">Classification</div><div class="summary-value"><span class="class-badge none" id="classification">N/A</span></div><div class="summary-sub" id="classificationSub">Add courses to see</div></div>
+                </div>
+
+                <!-- Semester Analysis Section -->
+                <div class="semester-analysis" id="semesterAnalysis" style="display: none;">
+                    <div class="semester-analysis-header">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                        <h3>Semester Analysis</h3>
+                    </div>
+                    <div class="analysis-grid" id="analysisGrid">
+                        <!-- Populated by JS -->
+                    </div>
+                    <div class="analysis-insights" id="analysisInsights">
+                        <div class="analysis-insights-title">
+                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                            Key Insights
+                        </div>
+                        <div id="insightsList">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
                 </div>
 
                 <div class="card">
@@ -763,39 +832,9 @@
             else if (type === 'admin_success') { config = { label: '✅ Good News!', iconBg: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)', iconShadow: 'rgba(34, 197, 94, 0.4)', icon: '<path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>', headerBg: 'linear-gradient(135deg, #166534 0%, #15803d 100%)', labelColor: '#86efac' }; }
             const overlay = document.createElement('div');
             overlay.className = 'announcement-overlay';
-            overlay.innerHTML = `<div class="announcement-popup" style="background: ${config.headerBg};"><div class="announcement-header"><div class="announcement-icon" style="background: ${config.iconBg}; box-shadow: 0 4px 12px ${config.iconShadow};"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">${config.icon}</svg></div><div class="announcement-header-text"><div class="announcement-label" style="color: ${config.labelColor};">${config.label}</div><div class="announcement-title">${escapeHtml(notification.title)}</div></div></div><div class="announcement-body"><div class="announcement-message">${escapeHtml(notificatiodisplayBody)}</div><div class="announcement-time"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>${timeAgo}</div></div><div class="announcement-footer"><button class="announcement-btn" onclick="dismissAnnouncement('${notification.id}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>I Understand</button></div></div>`;
+            overlay.innerHTML = `<div class="announcement-popup" style="background: ${config.headerBg};"><div class="announcement-header"><div class="announcement-icon" style="background: ${config.iconBg}; box-shadow: 0 4px 12px ${config.iconShadow};"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">${config.icon}</svg></div><div class="announcement-header-text"><div class="announcement-label" style="color: ${config.labelColor};">${config.label}</div><div class="announcement-title">${escapeHtml(notification.title)}</div></div></div><div class="announcement-body"><div class="announcement-message">${escapeHtml(notification.body || '')}</div><div class="announcement-time"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>${timeAgo}</div></div><div class="announcement-footer"><button class="announcement-btn" onclick="dismissAnnouncement('${notification.id}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>I Understand</button></div></div>`;
             document.body.appendChild(overlay);
             playNotificationSound();
-        }
-        
-        function showGroupNotificationPopup(notification) {
-            const existing = document.querySelector('.group-notif-popup');
-            if (existing) existing.remove();
-            const type = notification.type;
-            const title = notification.title || '';
-            let config = { icon: '👥', bgColor: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)' };
-            const isJoinRequest = title.includes('Join Request');
-            const isAccepted = title.includes('Accepted') || title.includes('Added to Group');
-            const isDeclined = title.includes('Declined');
-            const isMemberJoined = title.includes('New Member');
-            
-            if (isJoinRequest) { config = { icon: '🔔', bgColor: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)' }; }
-            else if (type === 'group_added' || type === 'group_request_accepted') { config = { icon: '🎉', bgColor: 'linear-gradient(135deg, #16a34a 0%, #22c55e 100%)' }; }
-            else if (type === 'group_request_declined') { config = { icon: '😔', bgColor: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)' }; }
-            else if (type === 'group_member_joined') { config = { icon: '👋', bgColor: 'linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%)' }; }
-            const bodyText = notification.body || notification.message || '';
-            const displayBody = bodyText.replace(/\s*\[REF:[^\]]+\]/, '').replace(/\s*\[GROUP:[^\]]+\]/, '');
-            const popup = document.createElement('div');
-            popup.className = 'group-notif-popup';
-            popup.style.cssText = `position:fixed;top:20px;right:20px;background:${config.bgColor};color:#fff;padding:16px 20px;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.25);z-index:10000;max-width:350px;animation:slideInRight 0.4s cubic-bezier(0.34,1.56,0.64,1);`;
-            let html = `<div style="display:flex;align-items:flex-start;gap:12px;"><div style="font-size:28px;line-height:1;">${config.icon}</div><div style="flex:1;min-width:0;"><div style="font-weight:600;font-size:15px;margin-bottom:4px;">${escapeHtml(notification.title)}</div><div style="font-size:13px;opacity:0.9;line-height:1.4;">${escapeHtml(displayBody)}</div>`;
-            if (isJoinRequest) {
-                html += `<div style="display:flex;gap:8px;margin-top:12px;"><button onclick="window.location.href='study-groups.html?notif=${notification.id}'" style="flex:1;padding:8px 12px;background:#22c55e;color:#fff;border:none;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">View Request</button><button onclick="this.closest('.group-notif-popup').remove()" style="flex:1;padding:8px 12px;background:rgba(255,255,255,0.2);color:#fff;border:none;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">Dismiss</button></div>`;
-            }
-            html += `</div><button onclick="this.parentElement.parentElement.remove()" style="background:rgba(255,255,255,0.2);border:none;color:#fff;width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;">×</button></div>`;
-            popup.innerHTML = html;
-            document.body.appendChild(popup);
-            if (!isJoinRequest) { setTimeout(() => { if (popup.parentElement) { popup.style.animation = 'slideInRight 0.3s ease reverse'; setTimeout(() => popup.remove(), 300); } }, 8000); }
         }
         
         async function dismissAnnouncement(announcementId) {
@@ -825,8 +864,7 @@
                 const type = n.type || '';
                 const iconClass = type.includes('friend') ? 'friend' : type.includes('message') ? 'message' : type.includes('warning') ? 'warning' : 'group';
                 const iconSvg = iconClass === 'friend' ? '<path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>' : iconClass === 'message' ? '<path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>' : '<path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>';
-                const displayBody = (n.body||'').replace(/\s*\[REF:[^\]]+\]/, '').replace(/\s*\[GROUP:[^\]]+\]/, '');
-                return `<div class="notif-dropdown-item ${n.is_read ? '' : 'unread'}" onclick="handleNotifClick('${n.id}','${type}')"><div class="notif-icon ${iconClass}"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">${iconSvg}</svg></div><div class="notif-content"><h4>${escapeHtml(n.title || 'Notification')}</h4><p>${escapeHtml(displayBody)}</p><div class="time">${formatTimeAgo(n.created_at)}</div></div></div>`;
+                return `<div class="notif-dropdown-item ${n.is_read ? '' : 'unread'}" onclick="handleNotifClick('${n.id}','${type}')"><div class="notif-icon ${iconClass}"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">${iconSvg}</svg></div><div class="notif-content"><h4>${escapeHtml(n.title || 'Notification')}</h4><p>${escapeHtml(n.body||'')}</p><div class="time">${formatTimeAgo(n.created_at)}</div></div></div>`;
             }).join('');
         }
 
@@ -837,7 +875,7 @@
             document.getElementById('notificationDropdown').classList.remove('show');
             if (type.includes('friend')) window.location.href = 'friends.html';
             else if (type.includes('message')) window.location.href = 'messages.html';
-            else if (type.includes('group')) window.location.href = 'study-groups.html?notif=' + id;
+            else if (type.includes('group')) window.location.href = 'study-groups.html';
         }
 
         async function markAllNotificationsRead() {
@@ -881,40 +919,33 @@
         }
 
         function subscribeToNotifications() {
-            supabase.channel('gpa-notifications-' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${currentUser.id}` }, async (p) => { 
+            supabase.channel('gpa-notifications-' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${currentUser.id}` }, (p) => { 
                 console.log('GPA Calculator: New notification received:', p);
                 notifications.unshift(p.new); 
-                const isBan = p.new.type === 'ban';
-                if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
                 renderNotifications();
                 const adminTypes = ['announcement', 'admin_warning', 'warning', 'ban', 'admin_message', 'admin_urgent', 'admin_success'];
-                const groupNotifTypes = ['group_join_request', 'group_added', 'group_request_accepted', 'group_request_declined', 'group_member_joined'];
                 if (adminTypes.includes(p.new.type)) {
                     showAdminPopup(p.new);
-                } else if (p.new.type === 'group') {
-                    showGroupNotificationPopup(p.new);
-                    playNotificationSound();
                 } else {
                     playNotificationSound();
                     showToast(p.new.title || 'New notification', 'success');
                 }
             }).subscribe((status) => console.log('GPA notification subscription:', status));
             
-            // Friend online status - only notify on fresh logins (offline > 60 seconds)
+            // Friend online status - only notify on fresh logins (offline > 30 seconds)
             supabase.channel('gpa-online-status-' + currentUser.id).on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, (p) => {
                 const friend = friends.find(f => f.id === p.new.id);
-                if (friend && p.old && p.new) {
-                    const wasOffline = p.old.is_online === false;
-                    const isNowOnline = p.new.is_online === true;
-                    const oldLastSeen = p.old.last_seen ? new Date(p.old.last_seen) : null;
+                if (friend) {
+                    const wasOffline = !friend.is_online;
+                    const lastSeen = friend.last_seen ? new Date(friend.last_seen) : null;
                     const now = new Date();
-                    const offlineDuration = oldLastSeen ? (now - oldLastSeen) / 1000 : 999;
+                    const offlineDuration = lastSeen ? (now - lastSeen) / 1000 : 999;
                     
                     friend.is_online = p.new.is_online;
                     friend.last_seen = p.new.last_seen;
                     
-                    if (wasOffline && isNowOnline && offlineDuration > 60) {
-                        showFriendOnlineToast(friend.full_name || friend.first_name || 'A friend');
+                    if (wasOffline && p.new.is_online && offlineDuration > 30) {
+                        showFriendOnlineToast(friend.full_name || friend.first_name);
                     }
                 }
             }).subscribe();
@@ -1027,15 +1058,8 @@
                     if (trulyNew.length > 0) {
                         trulyNew.forEach(n => notifications.unshift(n));
                         renderNotifications();
-                        // Check for admin notifications
-                        const adminTypes = ['announcement', 'admin_warning', 'warning', 'ban', 'admin_message', 'admin_urgent', 'admin_success'];
-                        const adminNotif = trulyNew.find(n => adminTypes.includes(n.type));
-                        if (adminNotif) {
-                            showAdminPopup(adminNotif);
-                        } else {
-                            playNotificationSound();
-                            showToast(trulyNew[0].title || 'New notification', 'success');
-                        }
+                        playNotificationSound();
+                        showToast(trulyNew[0].title || 'New notification', 'success');
                     }
                 }
             }, 30000);
@@ -1323,7 +1347,215 @@
             const classEl = document.getElementById('classification'); 
             classEl.textContent = classification.name; 
             classEl.className = `class-badge ${classification.badge}`; 
-            document.getElementById('classificationSub').textContent = courses.length === 0 ? 'Add courses to see' : gpa < 2.0 && gpa > 0 ? 'Below pass threshold' : `GPA ${gpa.toFixed(1)}`; 
+            document.getElementById('classificationSub').textContent = courses.length === 0 ? 'Add courses to see' : gpa < 2.0 && gpa > 0 ? 'Below pass threshold' : `GPA ${gpa.toFixed(1)}`;
+            updateSemesterAnalysis();
+        }
+        
+        // =============================================
+        // SEMESTER ANALYSIS
+        // =============================================
+        function updateSemesterAnalysis() {
+            const analysisSection = document.getElementById('semesterAnalysis');
+            const analysisGrid = document.getElementById('analysisGrid');
+            const insightsList = document.getElementById('insightsList');
+            
+            // Get all semesters with courses and calculate GPAs
+            const semesterKeys = Object.keys(semesters).filter(k => semesters[k].courses.length > 0);
+            
+            // Need at least 1 semester with courses to show analysis
+            if (semesterKeys.length === 0) {
+                analysisSection.style.display = 'none';
+                return;
+            }
+            
+            analysisSection.style.display = 'block';
+            
+            // Sort semesters chronologically
+            semesterKeys.sort((a, b) => {
+                const [yearA, semA] = [semesters[a].year, semesters[a].semester];
+                const [yearB, semB] = [semesters[b].year, semesters[b].semester];
+                const yearNumA = parseInt(yearA.replace('Year ', ''));
+                const yearNumB = parseInt(yearB.replace('Year ', ''));
+                if (yearNumA !== yearNumB) return yearNumA - yearNumB;
+                const semOrder = { 'Semester 1': 1, 'Semester 2': 2, 'Winter': 3 };
+                return (semOrder[semA] || 4) - (semOrder[semB] || 4);
+            });
+            
+            // Calculate GPA for each semester
+            const semesterData = semesterKeys.map(key => {
+                const sem = semesters[key];
+                const gpa = calculateGPA(sem.courses);
+                const credits = sem.courses.reduce((sum, c) => sum + (c.credits || 0), 0);
+                const courseCount = sem.courses.length;
+                return { key, gpa, credits, courseCount, ...sem };
+            });
+            
+            // Find best and worst
+            const best = semesterData.reduce((max, s) => s.gpa > max.gpa ? s : max, semesterData[0]);
+            const worst = semesterData.reduce((min, s) => s.gpa < min.gpa ? s : min, semesterData[0]);
+            
+            // Find most improved and biggest drop (if we have at least 2 semesters)
+            let mostImproved = null;
+            let biggestDrop = null;
+            let maxImprovement = 0;
+            let maxDrop = 0;
+            
+            for (let i = 1; i < semesterData.length; i++) {
+                const change = semesterData[i].gpa - semesterData[i - 1].gpa;
+                if (change > maxImprovement) {
+                    maxImprovement = change;
+                    mostImproved = { current: semesterData[i], previous: semesterData[i - 1], change };
+                }
+                if (change < maxDrop) {
+                    maxDrop = change;
+                    biggestDrop = { current: semesterData[i], previous: semesterData[i - 1], change };
+                }
+            }
+            
+            // Build analysis cards
+            let gridHTML = '';
+            
+            // Best Semester
+            gridHTML += `
+                <div class="analysis-card best">
+                    <div class="analysis-card-icon">🏆</div>
+                    <div class="analysis-card-label">Best Semester</div>
+                    <div class="analysis-card-semester">${best.year} - ${best.semester}</div>
+                    <div class="analysis-card-gpa">${best.gpa.toFixed(2)} GPA</div>
+                    <div class="analysis-card-change">${best.courseCount} courses • ${best.credits} credits</div>
+                </div>
+            `;
+            
+            // Worst Semester (only show if different from best)
+            if (semesterData.length > 1 && worst.key !== best.key) {
+                gridHTML += `
+                    <div class="analysis-card worst">
+                        <div class="analysis-card-icon">📉</div>
+                        <div class="analysis-card-label">Needs Improvement</div>
+                        <div class="analysis-card-semester">${worst.year} - ${worst.semester}</div>
+                        <div class="analysis-card-gpa">${worst.gpa.toFixed(2)} GPA</div>
+                        <div class="analysis-card-change">${worst.courseCount} courses • ${worst.credits} credits</div>
+                    </div>
+                `;
+            }
+            
+            // Most Improved (only show if significant improvement)
+            if (mostImproved && maxImprovement >= 0.1) {
+                gridHTML += `
+                    <div class="analysis-card improved">
+                        <div class="analysis-card-icon">📈</div>
+                        <div class="analysis-card-label">Most Improved</div>
+                        <div class="analysis-card-semester">${mostImproved.current.year} - ${mostImproved.current.semester}</div>
+                        <div class="analysis-card-gpa">+${maxImprovement.toFixed(2)}</div>
+                        <div class="analysis-card-change">From ${mostImproved.previous.gpa.toFixed(2)} → ${mostImproved.current.gpa.toFixed(2)}</div>
+                    </div>
+                `;
+            }
+            
+            // Biggest Drop (only show if significant drop)
+            if (biggestDrop && maxDrop <= -0.1) {
+                gridHTML += `
+                    <div class="analysis-card declined">
+                        <div class="analysis-card-icon">⚠️</div>
+                        <div class="analysis-card-label">Biggest Drop</div>
+                        <div class="analysis-card-semester">${biggestDrop.current.year} - ${biggestDrop.current.semester}</div>
+                        <div class="analysis-card-gpa">${maxDrop.toFixed(2)}</div>
+                        <div class="analysis-card-change">From ${biggestDrop.previous.gpa.toFixed(2)} → ${biggestDrop.current.gpa.toFixed(2)}</div>
+                    </div>
+                `;
+            }
+            
+            analysisGrid.innerHTML = gridHTML;
+            
+            // Build insights
+            let insightsHTML = '';
+            
+            // Calculate overall trend
+            if (semesterData.length >= 2) {
+                const firstGPA = semesterData[0].gpa;
+                const lastGPA = semesterData[semesterData.length - 1].gpa;
+                const overallChange = lastGPA - firstGPA;
+                
+                if (overallChange > 0.2) {
+                    insightsHTML += `
+                        <div class="insight-item">
+                            <div class="insight-icon up">↑</div>
+                            <div class="insight-text"><strong>Strong upward trend!</strong> Your GPA has improved by ${overallChange.toFixed(2)} points since you started.</div>
+                        </div>
+                    `;
+                } else if (overallChange < -0.2) {
+                    insightsHTML += `
+                        <div class="insight-item">
+                            <div class="insight-icon down">↓</div>
+                            <div class="insight-text"><strong>Downward trend detected.</strong> Your GPA has dropped by ${Math.abs(overallChange).toFixed(2)} points. Consider reviewing your study habits.</div>
+                        </div>
+                    `;
+                } else {
+                    insightsHTML += `
+                        <div class="insight-item">
+                            <div class="insight-icon neutral">→</div>
+                            <div class="insight-text"><strong>Consistent performance.</strong> Your GPA has remained relatively stable throughout your semesters.</div>
+                        </div>
+                    `;
+                }
+            }
+            
+            // Best grade insight
+            const avgGPA = semesterData.reduce((sum, s) => sum + s.gpa, 0) / semesterData.length;
+            if (avgGPA >= 4.0) {
+                insightsHTML += `
+                    <div class="insight-item">
+                        <div class="insight-icon star">★</div>
+                        <div class="insight-text"><strong>Outstanding!</strong> Your average semester GPA of ${avgGPA.toFixed(2)} puts you on track for honors.</div>
+                    </div>
+                `;
+            } else if (avgGPA >= 3.0) {
+                insightsHTML += `
+                    <div class="insight-item">
+                        <div class="insight-icon star">★</div>
+                        <div class="insight-text"><strong>Good work!</strong> Your average semester GPA of ${avgGPA.toFixed(2)} shows solid academic performance.</div>
+                    </div>
+                `;
+            } else if (avgGPA < 2.0) {
+                insightsHTML += `
+                    <div class="insight-item">
+                        <div class="insight-icon down">!</div>
+                        <div class="insight-text"><strong>Action needed.</strong> Your average GPA of ${avgGPA.toFixed(2)} is below the 2.0 passing threshold. Consider academic support.</div>
+                    </div>
+                `;
+            }
+            
+            // GPA difference insight
+            if (semesterData.length > 1) {
+                const gpaDiff = best.gpa - worst.gpa;
+                if (gpaDiff > 1.0) {
+                    insightsHTML += `
+                        <div class="insight-item">
+                            <div class="insight-icon neutral">📊</div>
+                            <div class="insight-text"><strong>High variance (${gpaDiff.toFixed(2)} GPA difference).</strong> Your performance varies significantly between semesters. Try to identify what worked in your best semester.</div>
+                        </div>
+                    `;
+                } else if (gpaDiff < 0.3) {
+                    insightsHTML += `
+                        <div class="insight-item">
+                            <div class="insight-icon neutral">📊</div>
+                            <div class="insight-text"><strong>Very consistent!</strong> Only ${gpaDiff.toFixed(2)} GPA difference between your best and worst semesters.</div>
+                        </div>
+                    `;
+                }
+            }
+            
+            // Credits insight
+            const totalCredits = semesterData.reduce((sum, s) => sum + s.credits, 0);
+            const totalCourses = semesterData.reduce((sum, s) => sum + s.courseCount, 0);
+            insightsHTML += `
+                <div class="insight-item">
+                    <div class="insight-icon neutral">📚</div>
+                    <div class="insight-text">You've completed <strong>${totalCourses} courses</strong> across <strong>${semesterData.length} semester${semesterData.length > 1 ? 's' : ''}</strong>, earning <strong>${totalCredits} credits</strong>.</div>
+                </div>
+            `;
+            
+            insightsList.innerHTML = insightsHTML;
         }
 
         // =============================================
@@ -1744,7 +1976,7 @@
                 const type = n.type || '';
                 const iconClass = type.includes('friend') ? 'friend' : type.includes('message') ? 'message' : type.includes('warning') ? 'warning' : 'group';
                 const iconSvg = iconClass === 'friend' ? '<path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>' : iconClass === 'message' ? '<path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>' : '<path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>';
-                return `<div class="notif-dropdown-item ${n.is_read ? '' : 'unread'}" onclick="handleNotifClickModal('${n.id}','${type}')"><div class="notif-icon ${iconClass}"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">${iconSvg}</svg></div><div class="notif-content"><h4>${escapeHtml(n.title || 'Notification')}</h4><p>${escapeHtml(displayBody)}</p><div class="time">${formatTimeAgo(n.created_at)}</div></div></div>`;
+                return `<div class="notif-dropdown-item ${n.is_read ? '' : 'unread'}" onclick="handleNotifClickModal('${n.id}','${type}')"><div class="notif-icon ${iconClass}"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">${iconSvg}</svg></div><div class="notif-content"><h4>${escapeHtml(n.title || 'Notification')}</h4><p>${escapeHtml(n.body || '')}</p><div class="time">${formatTimeAgo(n.created_at)}</div></div></div>`;
             }).join('');
         }
         async function handleNotifClickModal(id, type) { await supabase.from('notifications').update({ is_read: true }).eq('id', id); closeNotificationsModal(); if (type.includes('friend')) window.location.href = 'friends.html'; else if (type.includes('message')) window.location.href = 'messages.html'; else if (type.includes('group')) window.location.href = 'study-groups.html'; }

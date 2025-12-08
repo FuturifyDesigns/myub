@@ -741,7 +741,7 @@
                         </div>
                         <div class="form-footer">
                             <label class="remember">
-                                <input type="checkbox">
+                                <input type="checkbox" id="rememberMe">
                                 Remember me
                             </label>
                             <a href="#" class="forgot" onclick="forgotPassword(event)">Forgot password?</a>
@@ -1026,6 +1026,7 @@
             
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
             
             try {
                 const { data, error } = await supabase.auth.signInWithPassword({
@@ -1058,6 +1059,15 @@
                     await supabase.auth.signOut();
                     showAlert('Your account has been suspended. Please contact an administrator.', 'error');
                     return;
+                }
+                
+                // Handle Remember Me - store email for convenience
+                if (rememberMe) {
+                    localStorage.setItem('myub_remembered_email', email);
+                    localStorage.setItem('myub_remember_me', 'true');
+                } else {
+                    localStorage.removeItem('myub_remembered_email');
+                    localStorage.removeItem('myub_remember_me');
                 }
                 
                 // Check for unban notification (user was recently unbanned)
@@ -1186,7 +1196,7 @@
             
             try {
                 const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                    redirectTo: window.location.origin + '/myub/reset-password.html'
+                    redirectTo: 'https://futurifydesigns.github.io/myub/reset-password.html'
                 });
                 if (error) throw error;
                 showAlert('Password reset link sent to your email! Check your inbox.', 'success');
@@ -1217,10 +1227,22 @@
                 window.location.href = 'dashboard.html';
             }
         }
+        
+        // Load remembered email if exists
+        function loadRememberedEmail() {
+            const rememberedEmail = localStorage.getItem('myub_remembered_email');
+            const rememberMe = localStorage.getItem('myub_remember_me');
+            
+            if (rememberedEmail && rememberMe === 'true') {
+                document.getElementById('loginEmail').value = rememberedEmail;
+                document.getElementById('rememberMe').checked = true;
+            }
+        }
 
         // Init
         handleAuthCallback();
         checkSession();
+        loadRememberedEmail();
     </script>
 </body>
 </html>

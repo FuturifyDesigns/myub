@@ -1387,7 +1387,7 @@
             html += '<div style="font-size:28px;line-height:1;">' + config.icon + '</div>';
             html += '<div style="flex:1;min-width:0;">';
             html += '<div style="font-weight:600;font-size:15px;margin-bottom:4px;">' + escapeHtml(notification.title) + '</div>';
-            html += '<div style="font-size:13px;opacity:0.9;line-height:1.4;">' + escapeHtml(notification.message || notification.body || '') + '</div>';
+            html += '<div style="font-size:13px;opacity:0.9;line-height:1.4;">' + escapeHtml(notification.body || notification.message || '') + '</div>';
             
             // Add action buttons for join requests
             if (type === 'group_join_request' && notification.reference_id) {
@@ -1792,7 +1792,7 @@
                     await supabase.from('notifications').insert({
                         user_id: adminIds[i],
                         title: 'Join Request',
-                        message: userName + ' wants to join ' + group.name,
+                        body: userName + ' wants to join ' + group.name,
                         type: 'group_join_request',
                         reference_id: groupId + ':' + currentUser.id
                     });
@@ -1825,7 +1825,7 @@
                     await supabase.from('notifications').insert({
                         user_id: userId,
                         title: 'Request Accepted! 🎉',
-                        message: 'Your request to join ' + groupName + ' has been accepted!',
+                        body: 'Your request to join ' + groupName + ' has been accepted!',
                         type: 'group_request_accepted',
                         reference_id: groupId
                     });
@@ -1845,7 +1845,7 @@
                             await supabase.from('notifications').insert({
                                 user_id: members[i].user_id,
                                 title: 'New Member Joined',
-                                message: userName + ' has joined ' + groupName,
+                                body: userName + ' has joined ' + groupName,
                                 type: 'group_member_joined',
                                 reference_id: groupId
                             });
@@ -1858,7 +1858,7 @@
                     await supabase.from('notifications').insert({
                         user_id: userId,
                         title: 'Request Declined',
-                        message: 'Your request to join ' + groupName + ' was declined',
+                        body: 'Your request to join ' + groupName + ' was declined',
                         type: 'group_request_declined',
                         reference_id: groupId
                     });
@@ -2152,7 +2152,7 @@
                 await supabase.from('notifications').insert({
                     user_id: userId,
                     title: 'Added to Group! 🎉',
-                    message: 'You have been added to ' + currentGroup.name,
+                    body: 'You have been added to ' + currentGroup.name,
                     type: 'group_added',
                     reference_id: currentGroup.id
                 });
@@ -2172,7 +2172,7 @@
                     await supabase.from('notifications').insert({
                         user_id: members[i].user_id,
                         title: 'New Member Joined',
-                        message: addedUserName + ' has joined ' + currentGroup.name,
+                        body: addedUserName + ' has joined ' + currentGroup.name,
                         type: 'group_member_joined',
                         reference_id: currentGroup.id
                     });

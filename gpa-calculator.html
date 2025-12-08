@@ -900,20 +900,21 @@
                 }
             }).subscribe((status) => console.log('GPA notification subscription:', status));
             
-            // Friend online status - only notify on fresh logins (offline > 30 seconds)
+            // Friend online status - only notify on fresh logins (offline > 60 seconds)
             supabase.channel('gpa-online-status-' + currentUser.id).on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, (p) => {
                 const friend = friends.find(f => f.id === p.new.id);
-                if (friend) {
-                    const wasOffline = !friend.is_online;
-                    const lastSeen = friend.last_seen ? new Date(friend.last_seen) : null;
+                if (friend && p.old && p.new) {
+                    const wasOffline = p.old.is_online === false;
+                    const isNowOnline = p.new.is_online === true;
+                    const oldLastSeen = p.old.last_seen ? new Date(p.old.last_seen) : null;
                     const now = new Date();
-                    const offlineDuration = lastSeen ? (now - lastSeen) / 1000 : 999;
+                    const offlineDuration = oldLastSeen ? (now - oldLastSeen) / 1000 : 999;
                     
                     friend.is_online = p.new.is_online;
                     friend.last_seen = p.new.last_seen;
                     
-                    if (wasOffline && p.new.is_online && offlineDuration > 30) {
-                        showFriendOnlineToast(friend.full_name || friend.first_name);
+                    if (wasOffline && isNowOnline && offlineDuration > 60) {
+                        showFriendOnlineToast(friend.full_name || friend.first_name || 'A friend');
                     }
                 }
             }).subscribe();

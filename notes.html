@@ -753,14 +753,21 @@
             supabase.channel('messages_badge_' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: 'receiver_id=eq.' + currentUser.id }, () => loadSidebarBadges()).subscribe();
             supabase.channel('friend_requests_badge_' + currentUser.id).on('postgres_changes', { event: '*', schema: 'public', table: 'friend_requests' }, () => loadSidebarBadges()).subscribe();
             
-            // Friend online status - show toast when friends come online
+            // Friend online status - show toast when friends come online (only after 60s offline)
             supabase.channel('friends_online_status_' + currentUser.id).on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, async (p) => {
-                if (p.new.is_online && !p.old?.is_online) {
-                    // Check if this person is a friend
-                    const { data: friendship } = await supabase.from('friendships').select('*').or(`user_id.eq.${currentUser.id},friend_id.eq.${currentUser.id}`).or(`user_id.eq.${p.new.id},friend_id.eq.${p.new.id}`).maybeSingle();
-                    if (friendship) {
-                        const name = p.new.full_name || p.new.first_name || 'A friend';
-                        showFriendOnlineToast(name);
+                if (p.old && p.new && p.old.is_online === false && p.new.is_online === true) {
+                    // Check offline duration
+                    const oldLastSeen = p.old.last_seen ? new Date(p.old.last_seen) : null;
+                    const now = new Date();
+                    const offlineDuration = oldLastSeen ? (now - oldLastSeen) / 1000 : 999;
+                    
+                    if (offlineDuration > 60) {
+                        // Check if this person is a friend
+                        const { data: friendship } = await supabase.from('friendships').select('*').or(`and(user_id.eq.${currentUser.id},friend_id.eq.${p.new.id}),and(user_id.eq.${p.new.id},friend_id.eq.${currentUser.id})`).maybeSingle();
+                        if (friendship) {
+                            const name = p.new.full_name || p.new.first_name || 'A friend';
+                            showFriendOnlineToast(name);
+                        }
                     }
                 }
             }).subscribe();

@@ -1059,20 +1059,21 @@
             supabase.channel('online-status-friends-' + currentUser.id).on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, (p) => {
                 // Update friends list
                 const idx = friends.findIndex(f => f.id === p.new.id);
-                if (idx !== -1) { 
-                    const wasOff = !friends[idx].is_online;
-                    const lastSeen = friends[idx].last_seen ? new Date(friends[idx].last_seen) : null;
+                if (idx !== -1 && p.old && p.new) { 
+                    const wasOff = p.old.is_online === false;
+                    const isNowOnline = p.new.is_online === true;
+                    const oldLastSeen = p.old.last_seen ? new Date(p.old.last_seen) : null;
                     const now = new Date();
-                    const offlineDuration = lastSeen ? (now - lastSeen) / 1000 : 999;
+                    const offlineDuration = oldLastSeen ? (now - oldLastSeen) / 1000 : 999;
                     
                     friends[idx].is_online = p.new.is_online; 
                     friends[idx].last_seen = p.new.last_seen; 
                     renderFriends(); 
                     updateStats(); 
                     
-                    // Only show notification if they were offline for more than 30 seconds
-                    if (wasOff && p.new.is_online && offlineDuration > 30) {
-                        showFriendOnlineToast(friends[idx].full_name || friends[idx].first_name);
+                    // Only show notification if they were truly offline for more than 60 seconds
+                    if (wasOff && isNowOnline && offlineDuration > 60) {
+                        showFriendOnlineToast(friends[idx].full_name || friends[idx].first_name || 'A friend');
                     }
                 }
                 // Update discover list

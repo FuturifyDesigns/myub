@@ -996,9 +996,16 @@
             supabase.channel('schedule_messages_' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `receiver_id=eq.${currentUser.id}` }, () => loadSidebarBadges()).subscribe();
             supabase.channel('schedule_friends_' + currentUser.id).on('postgres_changes', { event: '*', schema: 'public', table: 'friendships' }, () => loadSidebarBadges()).subscribe();
             supabase.channel('friends_online_status_' + currentUser.id).on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, async p => {
-                if (p.new.is_online && !p.old?.is_online) {
-                    const { data: f } = await supabase.from('friendships').select('*').or(`user_id.eq.${currentUser.id},friend_id.eq.${currentUser.id}`).or(`user_id.eq.${p.new.id},friend_id.eq.${p.new.id}`).maybeSingle();
-                    if (f) showFriendOnlineToast(p.new.full_name || p.new.first_name || 'A friend');
+                if (p.old && p.new && p.old.is_online === false && p.new.is_online === true) {
+                    // Check offline duration
+                    const oldLastSeen = p.old.last_seen ? new Date(p.old.last_seen) : null;
+                    const now = new Date();
+                    const offlineDuration = oldLastSeen ? (now - oldLastSeen) / 1000 : 999;
+                    
+                    if (offlineDuration > 60) {
+                        const { data: f } = await supabase.from('friendships').select('*').or(`and(user_id.eq.${currentUser.id},friend_id.eq.${p.new.id}),and(user_id.eq.${p.new.id},friend_id.eq.${currentUser.id})`).maybeSingle();
+                        if (f) showFriendOnlineToast(p.new.full_name || p.new.first_name || 'A friend');
+                    }
                 }
             }).subscribe();
         }

@@ -1149,7 +1149,6 @@
         var confirmCallback = null;
         var selectedProfileUser = null;
         var reportTargetId = null;
-        var friendLastSeen = {};
         var selectedMembers = [];
         var searchTimeout = null;
         var groupCropper = null;
@@ -2860,7 +2859,18 @@
             
             // Online status channel - update when any profile's online status changes
             supabase.channel('sg-online').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, function(payload) {
-                if (payload.new.is_online) checkFriendOnline(payload.new);
+                // Check friend online toast with proper duration check
+                if (payload.old && payload.new && payload.old.is_online === false && payload.new.is_online === true) {
+                    var friendIds = friends.map(function(f) { return f.id; });
+                    if (friendIds.indexOf(payload.new.id) !== -1) {
+                        var oldLastSeen = payload.old.last_seen ? new Date(payload.old.last_seen) : null;
+                        var now = new Date();
+                        var offlineDuration = oldLastSeen ? (now - oldLastSeen) / 1000 : 999;
+                        if (offlineDuration > 60) {
+                            showFriendOnlineToast(payload.new);
+                        }
+                    }
+                }
                 if (currentGroup) {
                     loadGroupMembers().then(function() { 
                         updateMembersDisplay(); 
@@ -2903,16 +2913,6 @@
                 console.log('Join request updated:', payload);
                 loadDiscoverGroups(); // Refresh to update pending status
             }).subscribe();
-        }
-        
-        function checkFriendOnline(profile) {
-            var friendIds = friends.map(function(f) { return f.id; });
-            if (friendIds.indexOf(profile.id) !== -1 && profile.is_online) {
-                var lastSeen = friendLastSeen[profile.id];
-                var now = Date.now();
-                if (!lastSeen || now - lastSeen > 30000) showFriendOnlineToast(profile);
-                friendLastSeen[profile.id] = now;
-            }
         }
         
         function showFriendOnlineToast(profile) {

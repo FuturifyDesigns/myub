@@ -1074,19 +1074,20 @@
             supabase.channel('online-status-messages').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, (payload) => {
                 if (currentChatUser && currentChatUser.id === payload.new.id) { currentChatUser.is_online = payload.new.is_online; currentChatUser.last_seen = payload.new.last_seen; const statusEl = document.getElementById('chatUserStatus'); statusEl.textContent = payload.new.is_online ? 'Online' : `Last seen ${formatTimeAgo(payload.new.last_seen)}`; statusEl.className = 'chat-user-status' + (payload.new.is_online ? '' : ' offline'); }
                 const conv = conversations.find(c => c.oderId === payload.new.id); if (conv && conv.user) { conv.user.is_online = payload.new.is_online; conv.user.last_seen = payload.new.last_seen; renderConversations(); }
-                // Friend online toast - only on fresh logins (offline > 30 seconds)
+                // Friend online toast - only on fresh logins (offline > 60 seconds)
                 const friend = friends.find(f => f.id === payload.new.id);
-                if (friend) {
-                    const wasOffline = !friend.is_online;
-                    const lastSeen = friend.last_seen ? new Date(friend.last_seen) : null;
+                if (friend && payload.old && payload.new) {
+                    const wasOffline = payload.old.is_online === false;
+                    const isNowOnline = payload.new.is_online === true;
+                    const oldLastSeen = payload.old.last_seen ? new Date(payload.old.last_seen) : null;
                     const now = new Date();
-                    const offlineDuration = lastSeen ? (now - lastSeen) / 1000 : 999;
+                    const offlineDuration = oldLastSeen ? (now - oldLastSeen) / 1000 : 999;
                     
                     friend.is_online = payload.new.is_online;
                     friend.last_seen = payload.new.last_seen;
                     
-                    if (wasOffline && payload.new.is_online && offlineDuration > 30) {
-                        showFriendOnlineToast(friend.full_name || friend.first_name);
+                    if (wasOffline && isNowOnline && offlineDuration > 60) {
+                        showFriendOnlineToast(friend.full_name || friend.first_name || 'A friend');
                     }
                 }
             }).subscribe();

@@ -1802,12 +1802,24 @@
                     return;
                 }
                 
-                // Delete any old declined/cancelled requests first
+                // Check if there's already a pending request
+                var pendingCheck = await supabase.from('group_join_requests')
+                    .select('status')
+                    .eq('group_id', groupId)
+                    .eq('user_id', currentUser.id)
+                    .eq('status', 'pending')
+                    .maybeSingle();
+                
+                if (pendingCheck.data) {
+                    showToast('Request already pending', 'error');
+                    return;
+                }
+                
+                // Delete any old requests (declined, cancelled, or accepted - user may have left and wants to rejoin)
                 await supabase.from('group_join_requests')
                     .delete()
                     .eq('group_id', groupId)
-                    .eq('user_id', currentUser.id)
-                    .in('status', ['declined', 'cancelled']);
+                    .eq('user_id', currentUser.id);
                 
                 // Get group info for notification
                 var groupResult = await supabase.from('study_groups').select('name, creator_id').eq('id', groupId).single();
@@ -1821,8 +1833,8 @@
                 });
                 
                 if (result.error) {
-                    if (result.error.code === '23505') showToast('Request already pending', 'error');
-                    else showToast('Failed to send request', 'error');
+                    console.error('Insert error:', result.error);
+                    showToast('Failed to send request', 'error');
                     return;
                 }
                 

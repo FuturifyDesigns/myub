@@ -1222,12 +1222,15 @@
             
             const { error } = await supabase.from('profiles').update({ is_banned: ban }).eq('id', userId);
             if (error) {
+                console.error('Failed to update ban status:', error);
                 showToast('Failed to update user status', 'error');
                 return;
             }
             
-            // If banning, send a ban notification
+            console.log('Ban status updated:', userId, ban);
+            
             if (ban) {
+                // Send ban notification
                 const { error: notifError } = await supabase.from('notifications').insert({
                     user_id: userId,
                     type: 'ban',
@@ -1237,10 +1240,27 @@
                 if (notifError) {
                     console.error('Failed to send ban notification:', notifError);
                 }
+            } else {
+                // Send unban notification
+                const { error: notifError } = await supabase.from('notifications').insert({
+                    user_id: userId,
+                    type: 'unban',
+                    title: 'Account Restored',
+                    body: 'Good news! Your account has been restored. You can now access MyUB again. Welcome back!'
+                });
+                if (notifError) {
+                    console.error('Failed to send unban notification:', notifError);
+                }
+            }
+            
+            // Update local data immediately for instant UI update
+            const userIdx = allUsers.findIndex(u => u.id === userId);
+            if (userIdx !== -1) {
+                allUsers[userIdx].is_banned = ban;
             }
             
             showToast(ban ? 'User banned' : 'User unbanned', 'success');
-            await loadUsers();
+            renderUsersTable(); // Re-render immediately
         }
 
         // Study Groups Management
@@ -1519,21 +1539,9 @@
             });
         }
 
-        // Sidebar badges
+        // Sidebar badges - not needed for admin panel
         async function loadSidebarBadges() {
-            try {
-                // Unread messages
-                const { count: msgCount } = await supabase.from('messages').select('*', { count: 'exact', head: true }).eq('receiver_id', currentUser.id).eq('is_read', false);
-                const msgBadge = document.getElementById('sidebarMsgBadge');
-                if (msgCount > 0) { msgBadge.textContent = msgCount; msgBadge.style.display = 'inline'; }
-                else { msgBadge.style.display = 'none'; }
-
-                // Friend requests
-                const { count: friendCount } = await supabase.from('friendships').select('*', { count: 'exact', head: true }).eq('friend_id', currentUser.id).eq('status', 'pending');
-                const friendBadge = document.getElementById('sidebarFriendsBadge');
-                if (friendCount > 0) { friendBadge.textContent = friendCount; friendBadge.style.display = 'inline'; }
-                else { friendBadge.style.display = 'none'; }
-            } catch (e) { console.error('Badge error:', e); }
+            // Admin panel has simplified sidebar, no badges needed
         }
 
         // Utilities

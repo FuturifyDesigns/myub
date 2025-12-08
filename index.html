@@ -1050,11 +1050,30 @@
                 }
                 
                 // Check if user is banned
-                const { data: profile } = await supabase.from('profiles').select('is_banned').eq('id', data.user.id).single();
-                if (profile && profile.is_banned) {
+                const { data: profile, error: profileError } = await supabase.from('profiles').select('is_banned').eq('id', data.user.id).single();
+                console.log('Profile check:', profile, profileError);
+                
+                if (profile && profile.is_banned === true) {
+                    console.log('User is banned, signing out');
                     await supabase.auth.signOut();
                     showAlert('Your account has been suspended. Please contact an administrator.', 'error');
                     return;
+                }
+                
+                // Check for unban notification (user was recently unbanned)
+                const { data: unbanNotif } = await supabase.from('notifications')
+                    .select('*')
+                    .eq('user_id', data.user.id)
+                    .eq('type', 'unban')
+                    .eq('is_read', false)
+                    .order('created_at', { ascending: false })
+                    .limit(1);
+                
+                if (unbanNotif && unbanNotif.length > 0) {
+                    // Mark as read
+                    await supabase.from('notifications').update({ is_read: true }).eq('id', unbanNotif[0].id);
+                    // Store flag to show welcome back popup on dashboard
+                    localStorage.setItem('myub_show_unban_welcome', 'true');
                 }
                 
                 showAlert('Success! Redirecting...', 'success');

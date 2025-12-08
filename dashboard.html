@@ -1811,6 +1811,12 @@
             // Setup real-time subscriptions
             subscribeToNotifications();
             
+            // Check for unban welcome popup
+            if (localStorage.getItem('myub_show_unban_welcome') === 'true') {
+                localStorage.removeItem('myub_show_unban_welcome');
+                showUnbanWelcomePopup();
+            }
+            
             // Poll for notifications every 30 seconds as fallback
             setInterval(async () => {
                 const lastNotifId = notifications.length > 0 ? notifications[0].id : null;
@@ -1843,6 +1849,39 @@
             // Hide loading, show content
             document.getElementById('loadingScreen').style.display = 'none';
             document.getElementById('mainContent').style.display = 'block';
+        }
+        
+        function showUnbanWelcomePopup() {
+            const overlay = document.createElement('div');
+            overlay.className = 'announcement-overlay';
+            overlay.innerHTML = `
+                <div class="announcement-popup" style="background: linear-gradient(135deg, #166534 0%, #15803d 100%);">
+                    <div class="announcement-header">
+                        <div class="announcement-icon" style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);">
+                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div class="announcement-header-text">
+                            <div class="announcement-label" style="color: #86efac;">🎉 Welcome Back!</div>
+                            <div class="announcement-title">Account Restored</div>
+                        </div>
+                    </div>
+                    <div class="announcement-body">
+                        <div class="announcement-message">Good news! Your account has been restored by an administrator. You now have full access to MyUB again. We're glad to have you back!</div>
+                    </div>
+                    <div class="announcement-footer">
+                        <button class="announcement-btn" onclick="this.closest('.announcement-overlay').remove()">
+                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Continue to Dashboard
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+            playNotificationSound();
         }
         
         // Debounced badge update to prevent excessive API calls

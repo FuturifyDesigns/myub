@@ -197,6 +197,28 @@
         .message-meta { display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin-top: 4px; }
         .message-time { font-size: 11px; opacity: 0.7; }
         
+        /* Reply styles */
+        .reply-preview { background: var(--gray-100); border-left: 3px solid var(--navy); padding: 8px 12px; margin-bottom: 6px; border-radius: 0 8px 8px 0; cursor: pointer; }
+        .message-row.sent .reply-preview { background: rgba(255,255,255,0.15); border-left-color: rgba(255,255,255,0.5); }
+        .reply-preview-name { font-size: 11px; font-weight: 600; color: var(--navy); margin-bottom: 2px; }
+        .message-row.sent .reply-preview-name { color: rgba(255,255,255,0.9); }
+        .reply-preview-text { font-size: 12px; color: var(--gray-600); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
+        .message-row.sent .reply-preview-text { color: rgba(255,255,255,0.7); }
+        .reply-bar { display: none; background: var(--white); border-top: 1px solid var(--gray-200); padding: 10px 16px; align-items: center; gap: 12px; }
+        .reply-bar.show { display: flex; }
+        .reply-bar-content { flex: 1; min-width: 0; }
+        .reply-bar-name { font-size: 12px; font-weight: 600; color: var(--navy); }
+        .reply-bar-text { font-size: 13px; color: var(--gray-600); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .reply-bar-close { width: 32px; height: 32px; border: none; background: var(--gray-100); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .reply-bar-close:hover { background: var(--gray-200); }
+        .reply-bar-close svg { width: 16px; height: 16px; color: var(--gray-500); }
+        .message-actions { display: none; position: absolute; top: -36px; right: 0; background: var(--white); border-radius: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.15); padding: 4px; gap: 2px; z-index: 10; }
+        .message-row:not(.sent) .message-actions { right: auto; left: 0; }
+        .message-bubble:hover .message-actions { display: flex; }
+        .message-action-btn { width: 28px; height: 28px; border: none; background: transparent; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+        .message-action-btn:hover { background: var(--gray-100); }
+        .message-action-btn svg { width: 14px; height: 14px; color: var(--gray-600); }
+        
         /* Chat Input */
         .chat-input-area { padding: 16px 20px; background: var(--white); border-top: 1px solid var(--gray-200); display: flex; align-items: flex-end; gap: 12px; }
         .emoji-btn { width: 44px; height: 44px; border: none; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; transition: all 0.2s; border: 2px solid var(--gray-200); }
@@ -724,6 +746,7 @@
                     </div>
                 </div>
                 <div class="chat-messages" id="chatMessages" style="display:none;"></div>
+                <div class="reply-bar" id="replyBar"><div class="reply-bar-content"><div class="reply-bar-name" id="replyBarName">Replying to User</div><div class="reply-bar-text" id="replyBarText">Message preview...</div></div><button class="reply-bar-close" onclick="cancelReply()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button></div>
                 <div class="chat-input-area" id="chatInputArea" style="display:none;">
                     <button class="emoji-btn" onclick="toggleEmojiPicker()">
                         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -1115,6 +1138,7 @@
         var currentGroup = null;
         var currentMembers = [];
         var groupMessages = [];
+        var replyToMessage = null;
         var notifications = [];
         var friends = [];
         var blockedUsers = [];
@@ -1540,6 +1564,17 @@
                     continue;
                 }
                 
+                // Check if this message is a reply
+                var replyHtml = '';
+                if (msg.reply_to_id) {
+                    var repliedMsg = groupMessages.find(function(m) { return m.id === msg.reply_to_id; });
+                    if (repliedMsg) {
+                        var repliedSender = repliedMsg.profiles || {};
+                        var repliedName = repliedMsg.sender_id === currentUser.id ? 'You' : getName(repliedSender);
+                        replyHtml = '<div class="reply-preview" onclick="scrollToMessage(\'' + msg.reply_to_id + '\')"><div class="reply-preview-name">' + escapeHtml(repliedName) + '</div><div class="reply-preview-text">' + escapeHtml(truncateText(repliedMsg.content, 50)) + '</div></div>';
+                    }
+                }
+                
                 html += '<div class="message-row' + (isSent ? ' sent' : '') + '" data-msg-id="' + msg.id + '" oncontextmenu="showMessageContextMenu(event, \'' + msg.id + '\', ' + isSent + ')">';
                 
                 // Selection checkbox
@@ -1550,6 +1585,8 @@
                     html += '<div class="message-avatar" onclick="openProfileModal(\'' + msg.sender_id + '\')" style="background:' + getColorFromId(msg.sender_id) + ';">' + avatarContent + '</div>';
                 }
                 html += '<div class="message-bubble" onclick="if(isSelectionMode) toggleMessageSelect(\'' + msg.id + '\')">';
+                html += '<div class="message-actions"><button class="message-action-btn" onclick="event.stopPropagation(); setReply(\'' + msg.id + '\')" title="Reply"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg></button></div>';
+                html += replyHtml;
                 if (!isSent) html += '<div class="message-sender">' + escapeHtml(name) + '</div>';
                 html += '<div class="message-text" id="msg-text-' + msg.id + '">' + escapeHtml(filterBadWords(msg.content)) + '</div>';
                 html += '<div class="message-meta"><span class="message-time">' + time + '</span></div></div></div>';
@@ -1804,8 +1841,10 @@
             if (!content || !currentGroup) return;
             
             var tempContent = content;
+            var tempReplyId = replyToMessage ? replyToMessage.id : null;
             input.value = '';
             input.style.height = 'auto';
+            cancelReply();
             
             // Optimistic update - show message immediately
             var tempMsg = {
@@ -1813,6 +1852,7 @@
                 group_id: currentGroup.id,
                 sender_id: currentUser.id,
                 content: tempContent,
+                reply_to_id: tempReplyId,
                 created_at: new Date().toISOString(),
                 profiles: {
                     id: currentUser.id,
@@ -1826,11 +1866,14 @@
             renderMessages();
             
             try {
-                var result = await supabase.from('study_group_messages').insert({ 
+                var insertData = { 
                     group_id: currentGroup.id, 
                     sender_id: currentUser.id, 
                     content: tempContent 
-                }).select('*, profiles:sender_id(id, first_name, last_name, full_name, avatar_url)').single();
+                };
+                if (tempReplyId) insertData.reply_to_id = tempReplyId;
+                
+                var result = await supabase.from('study_group_messages').insert(insertData).select('*, profiles:sender_id(id, first_name, last_name, full_name, avatar_url)').single();
                 
                 if (result.error) { 
                     // Remove temp message on error
@@ -1855,6 +1898,43 @@
         function handleKeydown(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
         function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; }
         function isGroupAdmin() { var m = currentMembers.find(function(m) { return m.user_id === currentUser.id; }); return m && m.role === 'admin'; }
+        
+        // Reply functions
+        function setReply(msgId) {
+            var msg = groupMessages.find(function(m) { return m.id === msgId; });
+            if (!msg) return;
+            replyToMessage = msg;
+            var sender = msg.profiles || {};
+            var name = msg.sender_id === currentUser.id ? 'You' : getName(sender);
+            document.getElementById('replyBarName').textContent = name;
+            document.getElementById('replyBarText').textContent = truncateText(msg.content, 60);
+            document.getElementById('replyBar').classList.add('show');
+            document.getElementById('messageInput').focus();
+        }
+        
+        function cancelReply() {
+            replyToMessage = null;
+            document.getElementById('replyBar').classList.remove('show');
+        }
+        
+        function scrollToMessage(msgId) {
+            var msgEl = document.querySelector('[data-msg-id="' + msgId + '"]');
+            if (msgEl) {
+                msgEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                var bubble = msgEl.querySelector('.message-bubble');
+                bubble.style.background = '#dbeafe';
+                setTimeout(function() {
+                    if (msgEl.classList.contains('sent')) bubble.style.background = '#1a365d';
+                    else bubble.style.background = '#ffffff';
+                }, 1500);
+            }
+        }
+        
+        function truncateText(text, maxLen) {
+            if (!text) return '';
+            return text.length > maxLen ? text.substring(0, maxLen) + '...' : text;
+        }
+        
         function updateCreatedCount() {
             createdCount = myGroups.filter(function(g) { return g.creator_id === currentUser.id; }).length;
             document.getElementById('groupsLimit').textContent = 'You can create up to ' + MAX_GROUPS + ' groups (' + createdCount + '/' + MAX_GROUPS + ' used)';

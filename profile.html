@@ -819,6 +819,28 @@
 
         .sidebar-overlay.show { display: block; }
 
+        /* Other User Profile Grid */
+        .other-profile-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+        .other-profile-item {
+            padding: 16px;
+            background: var(--gray-50);
+            border-radius: 10px;
+        }
+        .other-profile-label {
+            color: var(--gray-500);
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+        .other-profile-value {
+            font-weight: 600;
+            color: var(--gray-900);
+            word-break: break-word;
+        }
+
         /* ========== RESPONSIVE ========== */
         @media (max-width: 768px) {
             .sidebar { transform: translateX(-100%); }
@@ -826,6 +848,10 @@
             .main-content { margin-left: 0; min-height: auto; }
             .menu-toggle { display: block; }
             .profile-page { padding: 16px; padding-top: 16px; }
+
+            .other-profile-grid {
+                grid-template-columns: 1fr;
+            }
 
             .profile-header-content {
                 flex-direction: column;
@@ -932,6 +958,9 @@
         body.dark-mode .sidebar { background: #0a0f1a; }
         body.dark-mode .topbar { background: var(--gray-200); border-bottom-color: var(--gray-300); }
         body.dark-mode .card { background: var(--gray-200); }
+        body.dark-mode .other-profile-item { background: var(--gray-300); }
+        body.dark-mode .other-profile-label { color: var(--gray-500); }
+        body.dark-mode .other-profile-value { color: var(--white); }
 
         body.dark-mode .form-group input,
         body.dark-mode .form-group select,
@@ -970,51 +999,6 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes popIn { from { opacity: 0; transform: scale(0.9) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
     </style>
-    <!-- Primary Meta Tags -->
-    <meta name="title" content="Profile - MyUB | University of Botswana">
-    <meta name="description" content="Manage your MyUB profile. Update your information and customize your student profile.">
-    <meta name="keywords" content="MyUB, University of Botswana, UB, student portal, GPA calculator, study groups, student companion, Botswana education, UB students">
-    <meta name="author" content="Futurify Designs">
-    <meta name="robots" content="index, follow">
-    <meta name="language" content="English">
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://www.myub.online/">
-    <meta property="og:title" content="Profile - MyUB | University of Botswana">
-    <meta property="og:description" content="Manage your MyUB profile. Update your information and customize your student profile.">
-    <meta property="og:image" content="https://www.myub.online/icons/og-image.jpg">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="1200">
-    <meta property="og:site_name" content="MyUB">
-    <meta property="og:locale" content="en_US">
-    
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="https://www.myub.online/">
-    <meta name="twitter:title" content="Profile - MyUB | University of Botswana">
-    <meta name="twitter:description" content="Manage your MyUB profile. Update your information and customize your student profile.">
-    <meta name="twitter:image" content="https://www.myub.online/icons/og-image.jpg">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
-    <link rel="mask-icon" href="icons/favicon-32x32.png" color="#1a365d">
-    <meta name="msapplication-TileColor" content="#1a365d">
-    <meta name="msapplication-TileImage" content="icons/icon-144x144.png">
-    
-    <!-- PWA -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#1a365d">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="MyUB">
-    
-    <!-- Canonical URL -->
-    <link rel="canonical" href="https://www.myub.online/">
-
 </head>
 <body>
     <div class="loading" id="loadingState">
@@ -1801,31 +1785,31 @@
                                 <p class="card-subtitle">Profile information</p>
                             </div>
                         </div>
-                        <div style="padding:20px;">
-                            <div style="display:grid;grid-template-columns:repeat(2, 1fr);gap:16px;">
-                                <div style="padding:16px;background:var(--gray-50);border-radius:10px;">
-                                    <div style="color:var(--gray-500);font-size:13px;margin-bottom:6px;">First Name</div>
-                                    <div style="font-weight:600;color:var(--gray-900);">${escapeHtml(user.first_name || 'Not specified')}</div>
+                        <div style="padding:20px;overflow-x:hidden;">
+                            <div class="other-profile-grid">
+                                <div class="other-profile-item">
+                                    <div class="other-profile-label">First Name</div>
+                                    <div class="other-profile-value">${escapeHtml(user.first_name || 'Not specified')}</div>
                                 </div>
-                                <div style="padding:16px;background:var(--gray-50);border-radius:10px;">
-                                    <div style="color:var(--gray-500);font-size:13px;margin-bottom:6px;">Last Name</div>
-                                    <div style="font-weight:600;color:var(--gray-900);">${escapeHtml(user.last_name || 'Not specified')}</div>
+                                <div class="other-profile-item">
+                                    <div class="other-profile-label">Last Name</div>
+                                    <div class="other-profile-value">${escapeHtml(user.last_name || 'Not specified')}</div>
                                 </div>
-                                <div style="padding:16px;background:var(--gray-50);border-radius:10px;">
-                                    <div style="color:var(--gray-500);font-size:13px;margin-bottom:6px;">Email</div>
-                                    <div style="font-weight:600;color:var(--gray-900);">${escapeHtml(user.email || 'Not specified')}</div>
+                                <div class="other-profile-item">
+                                    <div class="other-profile-label">Email</div>
+                                    <div class="other-profile-value" style="font-size:13px;">${escapeHtml(user.email || 'Not specified')}</div>
                                 </div>
-                                <div style="padding:16px;background:var(--gray-50);border-radius:10px;">
-                                    <div style="color:var(--gray-500);font-size:13px;margin-bottom:6px;">Student ID</div>
-                                    <div style="font-weight:600;color:var(--gray-900);">${escapeHtml(user.student_id || 'Not specified')}</div>
+                                <div class="other-profile-item">
+                                    <div class="other-profile-label">Student ID</div>
+                                    <div class="other-profile-value">${escapeHtml(user.student_id || 'Not specified')}</div>
                                 </div>
-                                <div style="padding:16px;background:var(--gray-50);border-radius:10px;">
-                                    <div style="color:var(--gray-500);font-size:13px;margin-bottom:6px;">Program</div>
-                                    <div style="font-weight:600;color:var(--gray-900);">${escapeHtml(user.program_name || 'Not specified')}</div>
+                                <div class="other-profile-item">
+                                    <div class="other-profile-label">Program</div>
+                                    <div class="other-profile-value">${escapeHtml(user.program_name || 'Not specified')}</div>
                                 </div>
-                                <div style="padding:16px;background:var(--gray-50);border-radius:10px;">
-                                    <div style="color:var(--gray-500);font-size:13px;margin-bottom:6px;">Year of Study</div>
-                                    <div style="font-weight:600;color:var(--gray-900);">${user.year_of_study ? 'Year ' + user.year_of_study : 'Not specified'}</div>
+                                <div class="other-profile-item">
+                                    <div class="other-profile-label">Year of Study</div>
+                                    <div class="other-profile-value">${user.year_of_study ? 'Year ' + user.year_of_study : 'Not specified'}</div>
                                 </div>
                             </div>
                             ${user.bio ? `
@@ -2204,15 +2188,17 @@
             try {
                 OnlineStatus.stopHeartbeat();
 
-                // Call the database function to delete user and all data
-                const { error } = await supabase.rpc('delete_user_account');
+                const { error } = await supabase
+                    .from('profiles')
+                    .delete()
+                    .eq('id', currentUser.id);
 
                 if (error) throw error;
 
                 await supabase.auth.signOut();
                 window.location.href = 'index.html';
             } catch (err) {
-                showToast(err.message || 'Failed to delete account', 'error');
+                showToast(err.message, 'error');
                 confirmBtn.disabled = false;
                 confirmBtn.textContent = 'Delete My Account';
             }
@@ -2293,17 +2279,5 @@
 
         init();
     </script>
-
-    <!-- PWA Service Worker Registration -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('ServiceWorker registered:', reg.scope))
-                    .catch(err => console.log('ServiceWorker registration failed:', err));
-            });
-        }
-    </script>
-
 </body>
 </html>

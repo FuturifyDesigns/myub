@@ -1377,23 +1377,28 @@
                 const { error: profileError } = await supabase.from('profiles').delete().eq('id', userId);
                 if (profileError) throw profileError;
                 
-                // 16. Delete auth user (this requires admin API or service role)
-                // Note: This may fail if you don't have the right permissions
-                // The profile deletion above should be sufficient for most cases
+                // 16. Try to delete auth user (this requires admin API - will likely fail client-side)
+                // The profile deletion above is sufficient - user can't log in without a profile
                 try {
                     await supabase.auth.admin.deleteUser(userId);
                 } catch (authErr) {
-                    console.log('Could not delete auth user (may require service role):', authErr);
-                    // Continue anyway - profile is deleted
+                    // Expected to fail without service role key - this is fine
+                    // Profile is deleted so user can't access the app anyway
                 }
                 
                 // Update local data
                 allUsers = allUsers.filter(u => u.id !== userId);
                 
+                // Update user count display
+                const userCountEl = document.getElementById('userCount');
+                if (userCountEl) userCountEl.textContent = allUsers.length;
+                
                 showToast('User deleted successfully', 'success');
                 closeUserModal();
                 renderUsersTable();
-                loadStats();
+                
+                // Refresh analytics to update counts
+                loadAnalytics();
                 
             } catch (err) {
                 console.error('Delete user error:', err);

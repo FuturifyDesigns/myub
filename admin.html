@@ -1249,6 +1249,13 @@
             if (!user) return;
             
             currentViewedUser = user; // Track for delete functionality
+            
+            // Reset delete button state
+            const deleteBtn = document.getElementById('deleteUserBtn');
+            if (deleteBtn) {
+                deleteBtn.disabled = false;
+                deleteBtn.textContent = 'Delete User';
+            }
 
             // Get additional stats
             const { count: notesCount } = await supabase.from('notes').select('*', { count: 'exact', head: true }).eq('user_id', userId);

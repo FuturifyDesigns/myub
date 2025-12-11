@@ -1373,23 +1373,20 @@
                 // 14. Delete study group messages
                 await supabase.from('study_group_messages').delete().eq('sender_id', userId);
                 
-                // 15. Delete profile
-                const { error: profileError } = await supabase.from('profiles').delete().eq('id', userId);
-                if (profileError) throw profileError;
+                // 15. Call the database function to delete the user completely
+                const { error: deleteError } = await supabase.rpc('admin_delete_user', { target_user_id: userId });
                 
-                // 16. Try to delete auth user (this requires admin API - will likely fail client-side)
-                // The profile deletion above is sufficient - user can't log in without a profile
-                try {
-                    await supabase.auth.admin.deleteUser(userId);
-                } catch (authErr) {
-                    // Expected to fail without service role key - this is fine
-                    // Profile is deleted so user can't access the app anyway
+                if (deleteError) {
+                    console.error('RPC delete failed:', deleteError);
+                    // Fallback: Just delete the profile directly
+                    const { error: profileError } = await supabase.from('profiles').delete().eq('id', userId);
+                    if (profileError) throw profileError;
                 }
                 
                 // Update local data
                 allUsers = allUsers.filter(u => u.id !== userId);
                 
-                // Update user count display
+                // Update all count displays
                 const userCountEl = document.getElementById('userCount');
                 if (userCountEl) userCountEl.textContent = allUsers.length;
                 
@@ -1397,7 +1394,7 @@
                 closeUserModal();
                 renderUsersTable();
                 
-                // Refresh analytics to update counts
+                // Refresh analytics to update all counts
                 loadAnalytics();
                 
             } catch (err) {

@@ -963,6 +963,17 @@
                 return value.length === 0;
             }
         }
+        
+        // Check if student ID already exists in database
+        async function checkStudentIdExists(studentId) {
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('id')
+                .eq('student_id', studentId)
+                .maybeSingle();
+            
+            return data !== null;
+        }
 
         function checkStrength(pw) {
             const fill = document.getElementById('strengthFill');
@@ -1177,16 +1188,28 @@
                 return;
             }
             
+            // Check if student ID already exists
+            const studentIdValue = studentIdInput.value;
+            setLoading('signupBtn', true);
+            
+            const studentIdExists = await checkStudentIdExists(studentIdValue);
+            if (studentIdExists) {
+                setLoading('signupBtn', false);
+                showAlert('This Student ID is already registered. Please sign in or use a different Student ID.');
+                studentIdInput.classList.add('error');
+                document.getElementById('studentIdError').textContent = 'Student ID already in use.';
+                document.getElementById('studentIdError').classList.add('show');
+                return;
+            }
+            
             const pw = document.getElementById('signupPassword').value;
             const confirm = document.getElementById('confirmPassword').value;
             
-            if (pw !== confirm) { showAlert('Passwords do not match'); return; }
-            if (pw.length < 8) { showAlert('Password must be at least 8 characters'); return; }
-            if (!/[A-Z]/.test(pw)) { showAlert('Password must contain at least one uppercase letter'); return; }
-            if (!/[a-z]/.test(pw)) { showAlert('Password must contain at least one lowercase letter'); return; }
-            if (!/[0-9]/.test(pw)) { showAlert('Password must contain at least one number'); return; }
-            
-            setLoading('signupBtn', true);
+            if (pw !== confirm) { setLoading('signupBtn', false); showAlert('Passwords do not match'); return; }
+            if (pw.length < 8) { setLoading('signupBtn', false); showAlert('Password must be at least 8 characters'); return; }
+            if (!/[A-Z]/.test(pw)) { setLoading('signupBtn', false); showAlert('Password must contain at least one uppercase letter'); return; }
+            if (!/[a-z]/.test(pw)) { setLoading('signupBtn', false); showAlert('Password must contain at least one lowercase letter'); return; }
+            if (!/[0-9]/.test(pw)) { setLoading('signupBtn', false); showAlert('Password must contain at least one number'); return; }
             
             const email = document.getElementById('signupEmail').value;
             

@@ -685,6 +685,7 @@
             <div class="modal-body" id="userModalBody">
             </div>
             <div class="modal-footer">
+                <button class="btn btn-danger" id="deleteUserBtn" onclick="confirmDeleteUser()">Delete User</button>
                 <button class="btn btn-outline" onclick="closeUserModal()">Close</button>
             </div>
         </div>
@@ -741,6 +742,7 @@
         let allNotes = [];
         let announcements = [];
         let currentPage = 1;
+        let currentViewedUser = null; // Track user being viewed in modal
         const USERS_PER_PAGE = 10;
 
         // Initialize
@@ -1245,6 +1247,8 @@
         async function viewUser(userId) {
             const user = allUsers.find(u => u.id === userId);
             if (!user) return;
+            
+            currentViewedUser = user; // Track for delete functionality
 
             // Get additional stats
             const { count: notesCount } = await supabase.from('notes').select('*', { count: 'exact', head: true }).eq('user_id', userId);
@@ -1299,6 +1303,106 @@
 
         function closeUserModal() {
             document.getElementById('userModal').classList.remove('show');
+            currentViewedUser = null;
+        }
+        
+        function confirmDeleteUser() {
+            if (!currentViewedUser) return;
+            
+            const userName = currentViewedUser.full_name || currentViewedUser.email || 'this user';
+            if (!confirm(`⚠️ DELETE USER ⚠️\n\nAre you sure you want to permanently delete "${userName}"?\n\nThis will remove:\n• Their profile\n• All their messages\n• All their notes\n• All their courses\n• Group memberships\n• Friend connections\n• All other data\n\nThis action CANNOT be undone!`)) return;
+            
+            // Double confirmation for safety
+            const confirmText = prompt(`Type "DELETE ${currentViewedUser.student_id || 'USER'}" to confirm:`);
+            if (confirmText !== `DELETE ${currentViewedUser.student_id || 'USER'}`) {
+                showToast('Deletion cancelled - confirmation text did not match', 'error');
+                return;
+            }
+            
+            deleteUser(currentViewedUser.id);
+        }
+        
+        async function deleteUser(userId) {
+            const deleteBtn = document.getElementById('deleteUserBtn');
+            if (deleteBtn) {
+                deleteBtn.disabled = true;
+                deleteBtn.textContent = 'Deleting...';
+            }
+            
+            try {
+                // Delete in order to respect foreign key constraints
+                // 1. Delete active connections
+                await supabase.from('active_connections').delete().eq('user_id', userId);
+                
+                // 2. Delete admin actions by this user
+                await supabase.from('admin_actions').delete().eq('admin_id', userId);
+                
+                // 3. Delete blocked users (both directions)
+                await supabase.from('blocked_users').delete().or(`blocker_id.eq.${userId},blocked_id.eq.${userId}`);
+                
+                // 4. Delete courses
+                await supabase.from('courses').delete().eq('user_id', userId);
+                
+                // 5. Delete deleted conversations
+                await supabase.from('deleted_conversations').delete().eq('user_id', userId);
+                
+                // 6. Delete friend requests (both directions)
+                await supabase.from('friend_requests').delete().or(`sender_id.eq.${userId},receiver_id.eq.${userId}`);
+                
+                // 7. Delete friendships (both directions)
+                await supabase.from('friendships').delete().or(`user_id.eq.${userId},friend_id.eq.${userId}`);
+                
+                // 8. Delete group join requests
+                await supabase.from('group_join_requests').delete().eq('user_id', userId);
+                
+                // 9. Delete messages (both sent and received)
+                await supabase.from('messages').delete().or(`sender_id.eq.${userId},receiver_id.eq.${userId}`);
+                
+                // 10. Delete notes
+                await supabase.from('notes').delete().eq('user_id', userId);
+                
+                // 11. Delete notifications
+                await supabase.from('notifications').delete().eq('user_id', userId);
+                
+                // 12. Delete schedules
+                await supabase.from('schedules').delete().eq('user_id', userId);
+                
+                // 13. Delete study group members
+                await supabase.from('study_group_members').delete().eq('user_id', userId);
+                
+                // 14. Delete study group messages
+                await supabase.from('study_group_messages').delete().eq('sender_id', userId);
+                
+                // 15. Delete profile
+                const { error: profileError } = await supabase.from('profiles').delete().eq('id', userId);
+                if (profileError) throw profileError;
+                
+                // 16. Delete auth user (this requires admin API or service role)
+                // Note: This may fail if you don't have the right permissions
+                // The profile deletion above should be sufficient for most cases
+                try {
+                    await supabase.auth.admin.deleteUser(userId);
+                } catch (authErr) {
+                    console.log('Could not delete auth user (may require service role):', authErr);
+                    // Continue anyway - profile is deleted
+                }
+                
+                // Update local data
+                allUsers = allUsers.filter(u => u.id !== userId);
+                
+                showToast('User deleted successfully', 'success');
+                closeUserModal();
+                renderUsersTable();
+                loadStats();
+                
+            } catch (err) {
+                console.error('Delete user error:', err);
+                showToast('Failed to delete user: ' + err.message, 'error');
+                if (deleteBtn) {
+                    deleteBtn.disabled = false;
+                    deleteBtn.textContent = 'Delete User';
+                }
+            }
         }
 
         async function toggleBan(userId, ban) {

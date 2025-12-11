@@ -35,6 +35,15 @@
                 console.log('MyUB: Initializing connection manager...');
 
                 try {
+                    // Clean up stale connections (no heartbeat in 2+ minutes)
+                    var twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000).toISOString();
+                    await supabase
+                        .from('active_connections')
+                        .delete()
+                        .lt('last_heartbeat', twoMinutesAgo);
+                    
+                    console.log('MyUB: Cleaned up stale connections');
+
                     // Check current capacity
                     var countResult = await supabase
                         .from('active_connections')

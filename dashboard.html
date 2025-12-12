@@ -2859,7 +2859,9 @@
 
             list.innerHTML = notifications.map(n => {
                 const type = n.type || '';
-                const iconClass = type.includes('friend') ? 'friend' : type.includes('message') ? 'message' : type.includes('warning') ? 'warning' : 'group';
+                const refId = n.reference_id || '';
+                const isGroupNotif = refId.startsWith('group:');
+                const iconClass = type.includes('friend') ? 'friend' : (isGroupNotif ? 'group' : (type.includes('message') ? 'message' : type.includes('warning') ? 'warning' : 'group'));
                 const iconSvg = iconClass === 'friend' 
                     ? '<path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>' 
                     : iconClass === 'message' 
@@ -2867,20 +2869,27 @@
                     : iconClass === 'warning'
                     ? '<path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>'
                     : '<path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>';
-                return `<div class="notif-dropdown-item ${n.is_read ? '' : 'unread'}" onclick="handleNotifClick('${n.id}','${type}')">
+                return `<div class="notif-dropdown-item ${n.is_read ? '' : 'unread'}" onclick="handleNotifClick('${n.id}','${type}','${refId}')">
                     <div class="notif-icon ${iconClass}"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">${iconSvg}</svg></div>
                     <div class="notif-content"><h4>${escapeHtml(n.title || 'Notification')}</h4><p>${escapeHtml(n.body || '')}</p><div class="time">${formatTimeAgo(n.created_at)}</div></div>
                 </div>`;
             }).join('');
         }
 
-        async function handleNotifClick(id, type) {
+        async function handleNotifClick(id, type, refId) {
             await supabase.from('notifications').update({ is_read: true }).eq('id', id);
             const n = notifications.find(x => x.id === id);
             if (n) n.is_read = true;
             renderNotifications();
             document.getElementById('notificationDropdown').classList.remove('show');
-            if (type === 'friend_request' || type === 'friend_accept') window.location.href = 'friends.html';
+            
+            // Check if this is a group notification
+            if (refId && refId.startsWith('group:')) {
+                window.location.href = 'study-groups.html?id=' + refId.replace('group:', '');
+                return;
+            }
+            
+            if (type === 'friend_request' || type === 'friend_accept' || type === 'friend_accepted') window.location.href = 'friends.html';
             else if (type === 'message') window.location.href = 'messages.html';
             else if (type === 'study_group') window.location.href = 'study-groups.html';
             else if (type === 'admin_warning' || type === 'announcement') { /* Stay on dashboard, it's displayed here */ }

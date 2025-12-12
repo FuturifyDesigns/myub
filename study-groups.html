@@ -460,13 +460,13 @@
 <style>
         /* Member Selection (WhatsApp style) */
         .member-selection { margin-bottom: 20px; }
-        .selected-members { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px; background: var(--gray-50); border-radius: 10px; min-height: 60px; margin-bottom: 12px; }
-        .selected-member { display: flex; align-items: center; gap: 6px; background: var(--navy); color: var(--white); padding: 6px 10px 6px 6px; border-radius: 20px; font-size: 13px; }
+        .selected-members { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px; background: var(--gray-50); border-radius: 10px; min-height: 60px; margin-bottom: 12px; align-items: flex-start; align-content: flex-start; }
+        .selected-member { display: inline-flex; align-items: center; gap: 6px; background: var(--navy); color: var(--white); padding: 6px 8px 6px 6px; border-radius: 20px; font-size: 13px; cursor: default; }
         .selected-member-avatar { width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; overflow: hidden; }
         .selected-member-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .selected-member-remove { background: none; border: none; color: rgba(255,255,255,0.7); cursor: pointer; padding: 2px; display: flex; }
-        .selected-member-remove:hover { color: white; }
-        .selected-member-remove svg { width: 14px; height: 14px; }
+        .selected-member-remove { background: none; border: none; color: rgba(255,255,255,0.7); cursor: pointer; padding: 4px; display: flex; align-items: center; justify-content: center; margin-left: 2px; border-radius: 50%; transition: all 0.2s; }
+        .selected-member-remove:hover { color: white; background: rgba(255,255,255,0.2); }
+        .selected-member-remove svg { width: 14px; height: 14px; pointer-events: none; }
         .selected-placeholder { color: var(--gray-400); font-size: 13px; display: flex; align-items: center; }
         .user-search-results { max-height: 200px; overflow-y: auto; border: 2px solid var(--gray-200); border-radius: 10px; }
         .user-search-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; cursor: pointer; transition: background 0.2s; border-bottom: 1px solid var(--gray-100); }
@@ -776,9 +776,6 @@
                         </div>
                     </div>
                     <div class="chat-header-actions">
-                        <button class="chat-action-btn call-btn" onclick="startGroupCall()" title="Voice Call">
-                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-                        </button>
                         <button class="chat-action-btn" onclick="enterSelectionMode()" title="Select Messages">
                             <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
                         </button>
@@ -1957,6 +1954,34 @@
                     groupMessages = groupMessages.filter(function(m) { return m.id !== tempMsg.id; });
                     groupMessages.push(result.data);
                     renderMessages();
+                    
+                    // Send notifications to all other group members
+                    var senderName = currentUser.user_metadata?.full_name || 'Someone';
+                    var otherMembers = currentMembers.filter(function(m) { 
+                        return m.user_id !== currentUser.id && m.role !== 'banned'; 
+                    });
+                    
+                    console.log('Sending notifications to', otherMembers.length, 'members');
+                    
+                    if (otherMembers.length > 0) {
+                        var notificationData = otherMembers.map(function(m) {
+                            return {
+                                user_id: m.user_id,
+                                type: 'study_group',
+                                title: currentGroup.name,
+                                body: senderName + ': ' + truncateText(tempContent, 50),
+                                data: JSON.stringify({ group_id: currentGroup.id })
+                            };
+                        });
+                        
+                        // Insert notifications in batch
+                        var notifResult = await supabase.from('notifications').insert(notificationData);
+                        if (notifResult.error) {
+                            console.error('Failed to send notifications:', notifResult.error);
+                        } else {
+                            console.log('Notifications sent successfully to', otherMembers.length, 'members');
+                        }
+                    }
                 }
             } catch(e) { 
                 groupMessages = groupMessages.filter(function(m) { return m.id !== tempMsg.id; });
@@ -2156,7 +2181,7 @@
                 var m = selectedMembers[i];
                 var initials = getInitials(m.name);
                 var avatarContent = hasValidAvatar(m.avatar_url) ? '<img src="' + escapeHtml(m.avatar_url) + '">' : initials;
-                html += '<div class="selected-member"><div class="selected-member-avatar" style="background:' + getColorFromId(m.id) + ';">' + avatarContent + '</div><span>' + escapeHtml(m.name.split(' ')[0]) + '</span><button class="selected-member-remove" onclick="removeSelectedMember(\'' + m.id + '\')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button></div>';
+                html += '<div class="selected-member"><div class="selected-member-avatar" style="background:' + getColorFromId(m.id) + ';">' + avatarContent + '</div><span>' + escapeHtml(m.name.split(' ')[0]) + '</span><button type="button" class="selected-member-remove" onclick="event.stopPropagation(); removeSelectedMember(\'' + m.id + '\'); return false;"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button></div>';
             }
             container.innerHTML = html;
         }
@@ -2258,7 +2283,25 @@
             croppedImageBlob = null;
         }
         
-        function closeCreateModal() { document.getElementById('createModal').classList.remove('show'); croppedImageBlob = null; selectedMembers = []; }
+        function closeCreateModal() { 
+            document.getElementById('createModal').classList.remove('show'); 
+            // Reset all form fields
+            document.getElementById('groupNameInput').value = '';
+            document.getElementById('groupDescInput').value = '';
+            document.getElementById('groupCourseInput').value = '';
+            document.getElementById('groupPrivacyInput').value = 'public';
+            document.getElementById('nameCount').textContent = '0';
+            document.getElementById('descCount').textContent = '0';
+            document.getElementById('nameError').textContent = '';
+            document.getElementById('memberSearchInput').value = '';
+            document.getElementById('userSearchResults').style.display = 'none';
+            document.getElementById('groupImagePreview').style.display = 'none';
+            document.getElementById('groupImagePreview').src = '';
+            // Clear selected members
+            croppedImageBlob = null; 
+            selectedMembers = []; 
+            renderSelectedMembers();
+        }
         
         function validateGroupName() {
             var name = document.getElementById('groupNameInput').value;

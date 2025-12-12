@@ -1858,7 +1858,7 @@
                     user_id: group.creator_id,
                     title: 'Join Request',
                     message: userName + ' wants to join ' + group.name,
-                    type: 'study_group',
+                    type: 'group',
                     reference_id: groupId + ':' + currentUser.id
                 });
                 
@@ -1885,7 +1885,7 @@
                         user_id: userId,
                         title: 'Request Accepted',
                         message: 'You can now join ' + groupResult.data.name,
-                        type: 'study_group',
+                        type: 'group',
                         reference_id: groupId
                     });
                     showToast('User added to group', 'success');
@@ -1967,7 +1967,7 @@
                         var notificationData = otherMembers.map(function(m) {
                             return {
                                 user_id: m.user_id,
-                                type: 'study_group',
+                                type: 'group',
                                 title: currentGroup.name,
                                 body: senderName + ': ' + truncateText(tempContent, 50),
                                 data: JSON.stringify({ group_id: currentGroup.id })
@@ -2247,7 +2247,7 @@
                 var adderName = currentUser.user_metadata?.full_name || 'Someone';
                 var notifResult = await supabase.from('notifications').insert({
                     user_id: userId,
-                    type: 'study_group',
+                    type: 'group',
                     title: 'Added to Study Group',
                     body: adderName + ' added you to "' + currentGroup.name + '"',
                     data: JSON.stringify({ group_id: currentGroup.id })
@@ -2383,7 +2383,7 @@
                     // Prepare notification for this member
                     memberNotifications.push({
                         user_id: selectedMembers[i].id,
-                        type: 'study_group',
+                        type: 'group',
                         title: 'Added to Study Group',
                         body: creatorName + ' added you to "' + name + '"',
                         data: JSON.stringify({ group_id: group.id })
@@ -2587,7 +2587,7 @@
             
             if (type === 'friend_request' || type === 'friend_accept') window.location.href = 'friends.html';
             else if (type === 'message') window.location.href = 'messages.html' + (refId ? '?conv=' + refId : '');
-            else if (type === 'study_group' || type === 'group_message' || type === 'group_request_accepted') { if (refId) { await loadMyGroups(); openGroup(refId.split(':')[0]); } }
+            else if (type === 'group' || type === 'group_message' || type === 'group_request_accepted') { if (refId) { await loadMyGroups(); openGroup(refId.split(':')[0]); } }
             else if (type === 'admin_warning') { /* Stay on current page */ }
             else if (type === 'announcement') { window.location.href = 'dashboard.html'; }
             toggleNotifications();
@@ -3270,7 +3270,7 @@
             closeNotificationsModal();
             if (type.includes('friend')) window.location.href = 'friends.html';
             else if (type === 'message') window.location.href = 'messages.html';
-            else if (type === 'study_group') { /* Already on study groups */ await loadMyGroups(); }
+            else if (type === 'group') { /* Already on study groups */ await loadMyGroups(); }
             else if (type === 'announcement' || type === 'admin_warning') window.location.href = 'dashboard.html';
         }
         

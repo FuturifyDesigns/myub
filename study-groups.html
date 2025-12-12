@@ -2168,10 +2168,9 @@
         
         function renderSelectedMembers() {
             var container = document.getElementById('selectedMembers');
-            var placeholder = document.getElementById('selectedPlaceholder');
+            if (!container) return;
             
             if (selectedMembers.length === 0) {
-                placeholder.style.display = 'flex';
                 container.innerHTML = '<span class="selected-placeholder" id="selectedPlaceholder">Search and select users to add</span>';
                 return;
             }
@@ -2285,18 +2284,31 @@
         
         function closeCreateModal() { 
             document.getElementById('createModal').classList.remove('show'); 
-            // Reset all form fields
-            document.getElementById('groupNameInput').value = '';
-            document.getElementById('groupDescInput').value = '';
-            document.getElementById('groupCourseInput').value = '';
-            document.getElementById('groupPrivacyInput').value = 'public';
-            document.getElementById('nameCount').textContent = '0';
-            document.getElementById('descCount').textContent = '0';
-            document.getElementById('nameError').textContent = '';
-            document.getElementById('memberSearchInput').value = '';
-            document.getElementById('userSearchResults').style.display = 'none';
-            document.getElementById('groupImagePreview').style.display = 'none';
-            document.getElementById('groupImagePreview').src = '';
+            // Reset all form fields safely
+            var nameInput = document.getElementById('groupNameInput');
+            var descInput = document.getElementById('groupDescInput');
+            var courseInput = document.getElementById('groupCourseInput');
+            var privacyInput = document.getElementById('groupPrivacyInput');
+            var nameCount = document.getElementById('nameCount');
+            var descCount = document.getElementById('descCount');
+            var nameError = document.getElementById('nameError');
+            var memberSearch = document.getElementById('memberSearchInput');
+            var searchResults = document.getElementById('userSearchResults');
+            var imagePreview = document.getElementById('groupImagePreview');
+            
+            if (nameInput) nameInput.value = '';
+            if (descInput) descInput.value = '';
+            if (courseInput) courseInput.value = '';
+            if (privacyInput) privacyInput.value = 'public';
+            if (nameCount) nameCount.textContent = '0';
+            if (descCount) descCount.textContent = '0';
+            if (nameError) nameError.textContent = '';
+            if (memberSearch) memberSearch.value = '';
+            if (searchResults) searchResults.style.display = 'none';
+            if (imagePreview) {
+                imagePreview.style.display = 'none';
+                imagePreview.src = '';
+            }
             // Clear selected members
             croppedImageBlob = null; 
             selectedMembers = []; 
@@ -3225,80 +3237,21 @@
         }
         
         // ============================================
-        // GROUP VOICE CALL FUNCTIONS
+        // GROUP VOICE CALL FUNCTIONS (DISABLED)
         // ============================================
         
         function initGroupCallPeerJS() {
-            var peerId = 'myub_' + currentUser.id.replace(/-/g, '_');
-            peer = new Peer(peerId, {
-                debug: 0,
-                config: {
-                    iceServers: [
-                        { urls: 'stun:stun.l.google.com:19302' },
-                        { urls: 'stun:stun1.l.google.com:19302' }
-                    ]
-                }
-            });
-            
-            peer.on('open', function(id) {
-                console.log('PeerJS connected:', id);
-            });
-            
-            peer.on('call', function(call) {
-                handleIncomingGroupPeerCall(call);
-            });
-            
-            peer.on('error', function(err) {
-                console.error('PeerJS error:', err);
-            });
-            
-            peer.on('disconnected', function() {
-                peer.reconnect();
-            });
+            // Group calls disabled - PeerJS handled by myub-calls.js for 1-on-1 calls only
+            console.log('Group call PeerJS disabled - using unified call handler');
         }
         
         function subscribeToGroupCallSignals() {
-            // Subscribe to group call signals for all user's groups
-            var groupIds = myGroups.map(function(g) { return g.id; });
-            if (groupIds.length === 0) return;
-            
-            supabase.channel('group_calls_' + currentUser.id)
-                .on('postgres_changes', {
-                    event: 'INSERT',
-                    schema: 'public',
-                    table: 'group_call_signals'
-                }, async function(payload) {
-                    var signal = payload.new;
-                    if (signal.user_id === currentUser.id) return;
-                    if (groupIds.indexOf(signal.group_id) === -1) return;
-                    
-                    if (signal.signal_type === 'call_started' && !isInGroupCall) {
-                        var group = myGroups.find(function(g) { return g.id === signal.group_id; });
-                        if (group) {
-                            var profileResult = await supabase.from('profiles').select('full_name').eq('id', signal.user_id).single();
-                            incomingGroupCallData = {
-                                groupId: signal.group_id,
-                                groupName: group.name,
-                                initiatorId: signal.user_id,
-                                initiatorName: profileResult.data ? profileResult.data.full_name : 'Someone'
-                            };
-                            showIncomingGroupCallToast(incomingGroupCallData);
-                        }
-                    } else if (signal.signal_type === 'user_joined' && isInGroupCall && currentGroup && signal.group_id === currentGroup.id) {
-                        connectToGroupPeer(signal.user_id);
-                    }
-                })
-                .subscribe();
+            // Group calls disabled - function kept as no-op for compatibility
+            console.log('Group call signals disabled');
         }
         
         function showIncomingGroupCallToast(data) {
-            document.getElementById('toastGroupName').textContent = data.groupName;
-            document.getElementById('toastCallInitiator').textContent = data.initiatorName + ' started a call';
-            document.getElementById('incomingGroupCallToast').classList.add('show');
-            
-            setTimeout(function() {
-                document.getElementById('incomingGroupCallToast').classList.remove('show');
-            }, 30000);
+            // Group calls disabled
         }
         
         function ignoreGroupCall() {

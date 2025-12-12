@@ -2243,6 +2243,19 @@
                 }
                 showToast('Member added!', 'success');
                 
+                // Send notification to the added member
+                var adderName = currentUser.user_metadata?.full_name || 'Someone';
+                var notifResult = await supabase.from('notifications').insert({
+                    user_id: userId,
+                    type: 'study_group',
+                    title: 'Added to Study Group',
+                    body: adderName + ' added you to "' + currentGroup.name + '"',
+                    data: JSON.stringify({ group_id: currentGroup.id })
+                });
+                if (notifResult.error) {
+                    console.error('Failed to send add member notification:', notifResult.error);
+                }
+                
                 // Reload and update all displays
                 await loadGroupMembers();
                 renderMembersList();
@@ -2360,9 +2373,31 @@
                 // Add creator as admin
                 await supabase.from('study_group_members').insert({ group_id: group.id, user_id: currentUser.id, role: 'admin' });
                 
-                // Add selected members
+                // Add selected members and send notifications
+                var creatorName = currentUser.user_metadata?.full_name || 'Someone';
+                var memberNotifications = [];
+                
                 for (var i = 0; i < selectedMembers.length; i++) {
                     await supabase.from('study_group_members').insert({ group_id: group.id, user_id: selectedMembers[i].id, role: 'member' });
+                    
+                    // Prepare notification for this member
+                    memberNotifications.push({
+                        user_id: selectedMembers[i].id,
+                        type: 'study_group',
+                        title: 'Added to Study Group',
+                        body: creatorName + ' added you to "' + name + '"',
+                        data: JSON.stringify({ group_id: group.id })
+                    });
+                }
+                
+                // Send all notifications
+                if (memberNotifications.length > 0) {
+                    var notifResult = await supabase.from('notifications').insert(memberNotifications);
+                    if (notifResult.error) {
+                        console.error('Failed to send group invite notifications:', notifResult.error);
+                    } else {
+                        console.log('Sent notifications to', memberNotifications.length, 'new members');
+                    }
                 }
                 
                 closeCreateModal();
@@ -2677,19 +2712,41 @@
             if (friendIds.indexOf(profile.id) !== -1 && profile.is_online) {
                 var lastSeen = friendLastSeen[profile.id];
                 var now = Date.now();
-                if (!lastSeen || now - lastSeen > 30000) showFriendOnlineToast(profile);
+                if (!lastSeen || now - lastSeen > 30000) {
+                    var friendName = profile.full_name || profile.first_name || 'Friend';
+                    showFriendOnlineToast(friendName);
+                }
                 friendLastSeen[profile.id] = now;
             }
         }
         
-        function showFriendOnlineToast(profile) {
-            var name = getName(profile);
+        function showFriendOnlineToast(friendName) {
+            // Remove any existing toast first
+            var existing = document.querySelector('.friend-online-toast');
+            if (existing) existing.remove();
+            
+            // Create toast matching dashboard design
             var toast = document.createElement('div');
-            toast.style.cssText = 'position:fixed;bottom:80px;right:24px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;padding:12px 20px;border-radius:12px;font-size:14px;font-weight:500;z-index:2000;animation:slideInRight 0.3s ease;display:flex;align-items:center;gap:10px;box-shadow:0 4px 12px rgba(0,0,0,0.15);';
-            toast.innerHTML = '<span style="width:10px;height:10px;background:#fff;border-radius:50%;animation:pulse 1s infinite;"></span>' + escapeHtml(name) + ' is online';
+            toast.className = 'friend-online-toast';
+            toast.innerHTML = '<div style="width:10px;height:10px;background:#22c55e;border-radius:50%;animation:pulse 1s infinite;"></div><span><strong>' + escapeHtml(friendName) + '</strong> is now online</span>';
+            toast.style.cssText = 'position:fixed;top:80px;right:20px;background:linear-gradient(135deg,#065f46,#047857);color:white;padding:14px 20px;border-radius:12px;display:flex;align-items:center;gap:12px;z-index:9999;animation:slideInRight 0.3s ease;box-shadow:0 4px 20px rgba(4,120,87,0.4);font-size:14px;';
+            
+            // Add keyframes if not already present
+            if (!document.getElementById('friendOnlineStyles')) {
+                var style = document.createElement('style');
+                style.id = 'friendOnlineStyles';
+                style.textContent = '@keyframes slideInRight{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}';
+                document.head.appendChild(style);
+            }
+            
             document.body.appendChild(toast);
             playNotificationSound();
-            setTimeout(function() { toast.style.opacity = '0'; toast.style.transform = 'translateX(20px)'; setTimeout(function() { toast.remove(); }, 300); }, 4000);
+            
+            // Animate out after 4 seconds
+            setTimeout(function() { 
+                toast.style.animation = 'slideInRight 0.3s ease reverse'; 
+                setTimeout(function() { toast.remove(); }, 300); 
+            }, 4000);
         }
         
         // ============================================

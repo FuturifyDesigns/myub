@@ -10,6 +10,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+    <script src="myub-calls.js"></script>
     <script src="myub-utils.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -178,6 +180,54 @@
         .chat-action-btn { width: 36px; height: 36px; border: none; background: var(--gray-100); border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
         .chat-action-btn:hover { background: var(--gray-200); }
         .chat-action-btn svg { width: 18px; height: 18px; color: var(--gray-600); }
+        .chat-action-btn.call-btn { background: var(--green); }
+        .chat-action-btn.call-btn:hover { background: #16a34a; }
+        .chat-action-btn.call-btn svg { color: var(--white); }
+        
+        /* Group Call Modal Styles */
+        .call-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 2000; opacity: 0; visibility: hidden; transition: all 0.3s; }
+        .call-modal-overlay.show { opacity: 1; visibility: visible; }
+        .call-modal { background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy) 100%); border-radius: 24px; width: 100%; max-width: 480px; padding: 32px; text-align: center; transform: scale(0.9); transition: transform 0.3s; }
+        .call-modal-overlay.show .call-modal { transform: scale(1); }
+        .call-group-name { font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 700; color: var(--white); margin-bottom: 8px; }
+        .call-status { font-size: 15px; color: rgba(255,255,255,0.7); margin-bottom: 24px; }
+        .call-status.connected { color: var(--green); }
+        .call-timer { font-family: 'Sora', sans-serif; font-size: 18px; color: var(--white); margin-bottom: 24px; display: none; }
+        .call-timer.show { display: block; }
+        .call-participants { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; margin-bottom: 24px; }
+        .call-participant { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .call-participant-avatar { width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, var(--navy-light) 0%, var(--blue) 100%); display: flex; align-items: center; justify-content: center; font-family: 'Sora', sans-serif; font-size: 24px; font-weight: 700; color: var(--white); position: relative; overflow: hidden; box-shadow: 0 0 0 3px rgba(255,255,255,0.2); }
+        .call-participant-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .call-participant-avatar.speaking { box-shadow: 0 0 0 3px var(--green); }
+        .call-participant-name { font-size: 13px; color: rgba(255,255,255,0.8); max-width: 80px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .call-actions { display: flex; justify-content: center; gap: 20px; }
+        .call-action-btn { width: 64px; height: 64px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .call-action-btn svg { width: 28px; height: 28px; }
+        .call-action-btn.end { background: var(--red); }
+        .call-action-btn.end:hover { background: #dc2626; transform: scale(1.1); }
+        .call-action-btn.end svg { color: var(--white); }
+        .call-action-btn.mute { background: rgba(255,255,255,0.2); }
+        .call-action-btn.mute:hover { background: rgba(255,255,255,0.3); }
+        .call-action-btn.mute svg { color: var(--white); }
+        .call-action-btn.mute.active { background: var(--red); }
+        
+        /* Incoming Call Toast */
+        .incoming-call-toast { position: fixed; top: 20px; right: 20px; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); border-radius: 16px; padding: 20px; display: none; align-items: center; gap: 16px; z-index: 3000; box-shadow: 0 10px 40px rgba(0,0,0,0.3); animation: slideInRight 0.3s ease; max-width: 360px; }
+        .incoming-call-toast.show { display: flex; }
+        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .incoming-call-info { flex: 1; min-width: 0; }
+        .incoming-call-group { font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 700; color: var(--white); margin-bottom: 4px; }
+        .incoming-call-type { font-size: 13px; color: rgba(255,255,255,0.7); display: flex; align-items: center; gap: 6px; }
+        .incoming-call-type svg { width: 14px; height: 14px; }
+        .incoming-call-actions { display: flex; gap: 10px; }
+        .incoming-call-btn { width: 44px; height: 44px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .incoming-call-btn svg { width: 20px; height: 20px; }
+        .incoming-call-btn.accept { background: var(--green); }
+        .incoming-call-btn.accept:hover { background: #16a34a; transform: scale(1.1); }
+        .incoming-call-btn.accept svg { color: var(--white); }
+        .incoming-call-btn.decline { background: var(--red); }
+        .incoming-call-btn.decline:hover { background: #dc2626; transform: scale(1.1); }
+        .incoming-call-btn.decline svg { color: var(--white); }
         
         /* Chat Messages */
         .chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 4px; }
@@ -726,6 +776,9 @@
                         </div>
                     </div>
                     <div class="chat-header-actions">
+                        <button class="chat-action-btn call-btn" onclick="startGroupCall()" title="Voice Call">
+                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                        </button>
                         <button class="chat-action-btn" onclick="enterSelectionMode()" title="Select Messages">
                             <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
                         </button>
@@ -1162,6 +1215,18 @@
         var messageReportTarget = null;
         
         // ============================================
+        // GROUP VOICE CALL STATE
+        // ============================================
+        var peer = null;
+        var groupCallPeers = {}; // Map of peerId -> MediaConnection
+        var localStream = null;
+        var isInGroupCall = false;
+        var isMuted = false;
+        var callTimer = null;
+        var callSeconds = 0;
+        var incomingGroupCallData = null;
+        
+        // ============================================
         // HELPERS
         // ============================================
         function hasValidAvatar(url) { return url && url !== 'null' && url !== 'undefined' && url.length > 10; }
@@ -1217,6 +1282,12 @@
                 
                 updateCreatedCount();
                 subscribeToRealtime(); // Setup real-time subscriptions
+                initGroupCallPeerJS(); // Initialize PeerJS for group calls
+                subscribeToGroupCallSignals(); // Listen for group call notifications
+                // Initialize unified call handler for 1-on-1 call notifications
+                if (window.MyUBCalls) {
+                    MyUBCalls.init(supabase);
+                }
                 setupEmojiPicker();
                 startHeartbeat();
                 startNotificationPolling(); // Poll for notifications as fallback
@@ -3111,6 +3182,315 @@
         }
         
         // ============================================
+        // GROUP VOICE CALL FUNCTIONS
+        // ============================================
+        
+        function initGroupCallPeerJS() {
+            var peerId = 'myub_' + currentUser.id.replace(/-/g, '_');
+            peer = new Peer(peerId, {
+                debug: 0,
+                config: {
+                    iceServers: [
+                        { urls: 'stun:stun.l.google.com:19302' },
+                        { urls: 'stun:stun1.l.google.com:19302' }
+                    ]
+                }
+            });
+            
+            peer.on('open', function(id) {
+                console.log('PeerJS connected:', id);
+            });
+            
+            peer.on('call', function(call) {
+                handleIncomingGroupPeerCall(call);
+            });
+            
+            peer.on('error', function(err) {
+                console.error('PeerJS error:', err);
+            });
+            
+            peer.on('disconnected', function() {
+                peer.reconnect();
+            });
+        }
+        
+        function subscribeToGroupCallSignals() {
+            // Subscribe to group call signals for all user's groups
+            var groupIds = myGroups.map(function(g) { return g.id; });
+            if (groupIds.length === 0) return;
+            
+            supabase.channel('group_calls_' + currentUser.id)
+                .on('postgres_changes', {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'group_call_signals'
+                }, async function(payload) {
+                    var signal = payload.new;
+                    if (signal.user_id === currentUser.id) return;
+                    if (groupIds.indexOf(signal.group_id) === -1) return;
+                    
+                    if (signal.signal_type === 'call_started' && !isInGroupCall) {
+                        var group = myGroups.find(function(g) { return g.id === signal.group_id; });
+                        if (group) {
+                            var profileResult = await supabase.from('profiles').select('full_name').eq('id', signal.user_id).single();
+                            incomingGroupCallData = {
+                                groupId: signal.group_id,
+                                groupName: group.name,
+                                initiatorId: signal.user_id,
+                                initiatorName: profileResult.data ? profileResult.data.full_name : 'Someone'
+                            };
+                            showIncomingGroupCallToast(incomingGroupCallData);
+                        }
+                    } else if (signal.signal_type === 'user_joined' && isInGroupCall && currentGroup && signal.group_id === currentGroup.id) {
+                        connectToGroupPeer(signal.user_id);
+                    }
+                })
+                .subscribe();
+        }
+        
+        function showIncomingGroupCallToast(data) {
+            document.getElementById('toastGroupName').textContent = data.groupName;
+            document.getElementById('toastCallInitiator').textContent = data.initiatorName + ' started a call';
+            document.getElementById('incomingGroupCallToast').classList.add('show');
+            
+            setTimeout(function() {
+                document.getElementById('incomingGroupCallToast').classList.remove('show');
+            }, 30000);
+        }
+        
+        function ignoreGroupCall() {
+            document.getElementById('incomingGroupCallToast').classList.remove('show');
+            incomingGroupCallData = null;
+        }
+        
+        async function joinGroupCallFromToast() {
+            document.getElementById('incomingGroupCallToast').classList.remove('show');
+            if (incomingGroupCallData) {
+                if (!currentGroup || currentGroup.id !== incomingGroupCallData.groupId) {
+                    await openGroup(incomingGroupCallData.groupId);
+                }
+                await joinGroupCall();
+            }
+        }
+        
+        async function startGroupCall() {
+            if (!currentGroup) return;
+            
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                isInGroupCall = true;
+                isMuted = false;
+                
+                await supabase.from('group_call_signals').insert({
+                    group_id: currentGroup.id,
+                    user_id: currentUser.id,
+                    signal_type: 'call_started'
+                });
+                
+                showGroupCallModal();
+                addParticipantToUI(currentUser.id, getName({ full_name: currentUser.user_metadata?.full_name }), currentUser.user_metadata?.avatar_url, true);
+                startCallTimer();
+                
+            } catch (err) {
+                console.error('Error starting call:', err);
+                if (err.name === 'NotAllowedError') {
+                    showToast('Please allow microphone access', 'error');
+                } else {
+                    showToast('Failed to start call', 'error');
+                }
+            }
+        }
+        
+        async function joinGroupCall() {
+            if (!currentGroup || isInGroupCall) return;
+            
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                isInGroupCall = true;
+                isMuted = false;
+                
+                await supabase.from('group_call_signals').insert({
+                    group_id: currentGroup.id,
+                    user_id: currentUser.id,
+                    signal_type: 'user_joined'
+                });
+                
+                showGroupCallModal();
+                addParticipantToUI(currentUser.id, getName({ full_name: currentUser.user_metadata?.full_name }), currentUser.user_metadata?.avatar_url, true);
+                startCallTimer();
+                
+            } catch (err) {
+                console.error('Error joining call:', err);
+                showToast('Failed to join call', 'error');
+            }
+        }
+        
+        function connectToGroupPeer(userId) {
+            if (groupCallPeers[userId]) return;
+            
+            var targetPeerId = 'myub_' + userId.replace(/-/g, '_');
+            var call = peer.call(targetPeerId, localStream);
+            
+            if (call) {
+                groupCallPeers[userId] = call;
+                
+                call.on('stream', async function(remoteStream) {
+                    playRemoteAudio(userId, remoteStream);
+                    var profileResult = await supabase.from('profiles').select('full_name, avatar_url').eq('id', userId).single();
+                    if (profileResult.data) {
+                        addParticipantToUI(userId, profileResult.data.full_name, profileResult.data.avatar_url, false);
+                    }
+                });
+                
+                call.on('close', function() {
+                    removeParticipantFromUI(userId);
+                    delete groupCallPeers[userId];
+                });
+            }
+        }
+        
+        function handleIncomingGroupPeerCall(call) {
+            if (!isInGroupCall || !localStream) return;
+            
+            call.answer(localStream);
+            var callerId = call.peer.replace('myub_', '').replace(/_/g, '-');
+            groupCallPeers[callerId] = call;
+            
+            call.on('stream', async function(remoteStream) {
+                playRemoteAudio(callerId, remoteStream);
+                var profileResult = await supabase.from('profiles').select('full_name, avatar_url').eq('id', callerId).single();
+                if (profileResult.data) {
+                    addParticipantToUI(callerId, profileResult.data.full_name, profileResult.data.avatar_url, false);
+                }
+            });
+            
+            call.on('close', function() {
+                removeParticipantFromUI(callerId);
+                delete groupCallPeers[callerId];
+            });
+        }
+        
+        function playRemoteAudio(peerId, stream) {
+            var existingAudio = document.getElementById('audio_' + peerId);
+            if (existingAudio) existingAudio.remove();
+            
+            var audio = document.createElement('audio');
+            audio.id = 'audio_' + peerId;
+            audio.srcObject = stream;
+            audio.autoplay = true;
+            document.body.appendChild(audio);
+        }
+        
+        function showGroupCallModal() {
+            document.getElementById('callGroupName').textContent = currentGroup ? currentGroup.name : 'Study Group';
+            document.getElementById('callStatus').textContent = 'In call';
+            document.getElementById('callStatus').classList.add('connected');
+            document.getElementById('callParticipants').innerHTML = '';
+            document.getElementById('groupCallModal').classList.add('show');
+            updateMuteUI();
+        }
+        
+        function addParticipantToUI(userId, name, avatarUrl, isYou) {
+            var existing = document.getElementById('participant_' + userId);
+            if (existing) return;
+            
+            var initials = getInitials(name);
+            var avatarHtml = avatarUrl ? '<img src="' + avatarUrl + '" alt="">' : initials;
+            
+            var html = '<div class="call-participant" id="participant_' + userId + '">' +
+                '<div class="call-participant-avatar">' + avatarHtml + '</div>' +
+                '<div class="call-participant-name">' + escapeHtml(name || 'User') + (isYou ? ' (You)' : '') + '</div>' +
+                '</div>';
+            
+            document.getElementById('callParticipants').insertAdjacentHTML('beforeend', html);
+        }
+        
+        function removeParticipantFromUI(userId) {
+            var el = document.getElementById('participant_' + userId);
+            if (el) el.remove();
+        }
+        
+        async function endGroupCall() {
+            if (currentGroup) {
+                await supabase.from('group_call_signals').insert({
+                    group_id: currentGroup.id,
+                    user_id: currentUser.id,
+                    signal_type: 'user_left'
+                });
+            }
+            
+            cleanupGroupCall();
+            document.getElementById('groupCallModal').classList.remove('show');
+            showToast('Left the call', 'info');
+        }
+        
+        function cleanupGroupCall() {
+            if (localStream) {
+                localStream.getTracks().forEach(function(track) { track.stop(); });
+                localStream = null;
+            }
+            
+            Object.keys(groupCallPeers).forEach(function(peerId) {
+                if (groupCallPeers[peerId]) {
+                    groupCallPeers[peerId].close();
+                }
+                var audio = document.getElementById('audio_' + peerId);
+                if (audio) audio.remove();
+            });
+            groupCallPeers = {};
+            
+            stopCallTimer();
+            isInGroupCall = false;
+            incomingGroupCallData = null;
+        }
+        
+        function toggleMute() {
+            if (!localStream) return;
+            
+            isMuted = !isMuted;
+            localStream.getAudioTracks().forEach(function(track) {
+                track.enabled = !isMuted;
+            });
+            updateMuteUI();
+        }
+        
+        function updateMuteUI() {
+            var muteBtn = document.getElementById('muteBtn');
+            var muteIcon = document.getElementById('muteIcon');
+            var muteIconOff = document.getElementById('muteIconOff');
+            
+            if (muteBtn) muteBtn.classList.toggle('active', isMuted);
+            if (muteIcon) muteIcon.style.display = isMuted ? 'none' : 'block';
+            if (muteIconOff) muteIconOff.style.display = isMuted ? 'block' : 'none';
+        }
+        
+        function startCallTimer() {
+            callSeconds = 0;
+            document.getElementById('callTimer').classList.add('show');
+            updateCallTimerDisplay();
+            
+            callTimer = setInterval(function() {
+                callSeconds++;
+                updateCallTimerDisplay();
+            }, 1000);
+        }
+        
+        function stopCallTimer() {
+            if (callTimer) {
+                clearInterval(callTimer);
+                callTimer = null;
+            }
+            callSeconds = 0;
+        }
+        
+        function updateCallTimerDisplay() {
+            var minutes = Math.floor(callSeconds / 60);
+            var seconds = callSeconds % 60;
+            document.getElementById('callTimer').textContent = 
+                String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+        }
+        
+        // ============================================
         // START APP
         // ============================================
         init();
@@ -3126,6 +3506,46 @@
             });
         }
     </script>
+
+    <!-- Group Voice Call Modal -->
+    <div class="call-modal-overlay" id="groupCallModal">
+        <div class="call-modal">
+            <div class="call-group-name" id="callGroupName">Study Group</div>
+            <div class="call-status" id="callStatus">Starting call...</div>
+            <div class="call-timer" id="callTimer">00:00</div>
+            <div class="call-participants" id="callParticipants">
+                <!-- Participants will be added dynamically -->
+            </div>
+            <div class="call-actions">
+                <button class="call-action-btn mute" id="muteBtn" onclick="toggleMute()" title="Mute">
+                    <svg id="muteIcon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+                    <svg id="muteIconOff" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:none;"><path d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/><path d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/></svg>
+                </button>
+                <button class="call-action-btn end" id="endCallBtn" onclick="endGroupCall()" title="End Call">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 8l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M5 3a2 2 0 00-2 2v1c0 8.284 6.716 15 15 15h1a2 2 0 002-2v-3.28a1 1 0 00-.684-.948l-4.493-1.498a1 1 0 00-1.21.502l-1.13 2.257a11.042 11.042 0 01-5.516-5.517l2.257-1.128a1 1 0 00.502-1.21L9.228 3.683A1 1 0 008.279 3H5z"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Incoming Group Call Toast -->
+    <div class="incoming-call-toast" id="incomingGroupCallToast">
+        <div class="incoming-call-info">
+            <div class="incoming-call-group" id="toastGroupName">Study Group</div>
+            <div class="incoming-call-type">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                <span id="toastCallInitiator">Someone started a call</span>
+            </div>
+        </div>
+        <div class="incoming-call-actions">
+            <button class="incoming-call-btn decline" onclick="ignoreGroupCall()" title="Ignore">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+            <button class="incoming-call-btn accept" onclick="joinGroupCallFromToast()" title="Join">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+            </button>
+        </div>
+    </div>
 
 </body>
 </html>

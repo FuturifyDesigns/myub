@@ -8,6 +8,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+    <script src="myub-calls.js"></script>
     <script src="myub-utils.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -1006,6 +1008,11 @@
 
         document.addEventListener('click', e => { if (!e.target.closest('.notification-wrapper')) document.getElementById('notificationDropdown').classList.remove('show'); });
         init();
+        
+        // Initialize call notifications
+        if (window.MyUBCalls) {
+            MyUBCalls.init(supabase);
+        }
     </script>
 
     <!-- PWA Service Worker Registration -->

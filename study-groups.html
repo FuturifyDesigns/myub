@@ -1454,15 +1454,15 @@
         async function loadNotifications() {
             try {
                 var result = await supabase.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(30);
-                notificationsList = result.data || [];
+                notifications = result.data || [];
                 renderNotifications();
                 checkAnnouncementPopup();
-            } catch(e) {}
+            } catch(e) { console.error('loadNotifications error:', e); }
         }
         
         function checkAnnouncementPopup() {
             var adminTypes = ['announcement', 'admin_warning', 'warning', 'ban', 'admin_message', 'admin_urgent', 'admin_success'];
-            var unreadAdmin = notificationsList.filter(function(n) { return adminTypes.indexOf(n.type) !== -1 && !n.is_read; });
+            var unreadAdmin = notifications.filter(function(n) { return adminTypes.indexOf(n.type) !== -1 && !n.is_read; });
             if (unreadAdmin.length > 0) showAdminPopup(unreadAdmin[0]);
         }
         
@@ -1482,11 +1482,11 @@
         }
         
         async function dismissAnnouncement(announcementId) {
-            const notification = (typeof notificationsList !== 'undefined' ? notificationsList : notifications).find(n => n.id === announcementId);
+            const notification = notifications.find(n => n.id === announcementId);
             const isBan = notification && notification.type === 'ban';
             await supabase.from('notifications').update({ is_read: true }).eq('id', announcementId);
-            var idx = notificationsList.findIndex(function(n) { return n.id === announcementId; });
-            if (idx !== -1) notificationsList[idx].is_read = true;
+            var idx = notifications.findIndex(function(n) { return n.id === announcementId; });
+            if (idx !== -1) notifications[idx].is_read = true;
             var overlay = document.querySelector('.announcement-overlay');
             if (overlay) { overlay.style.animation = 'fadeIn 0.3s ease reverse'; setTimeout(function() { overlay.remove(); }, 300); }
             if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
@@ -2692,7 +2692,7 @@
             // Notifications channel
             supabase.channel('sg-notif-' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: 'user_id=eq.' + currentUser.id }, function(payload) {
                 console.log('Study Groups: New notification received:', payload);
-                notificationsList.unshift(payload.new);
+                notifications.unshift(payload.new);
                 renderNotifications();
                 var adminTypes = ['announcement', 'admin_warning', 'warning', 'ban', 'admin_message', 'admin_urgent', 'admin_success'];
                 if (adminTypes.indexOf(payload.new.type) !== -1) {

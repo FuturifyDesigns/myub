@@ -31,6 +31,23 @@
             --green: #38a169;
         }
 
+        /* Global input cursor fix */
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="number"],
+        input[type="tel"],
+        input[type="search"],
+        textarea {
+            cursor: text !important;
+            caret-color: var(--navy);
+        }
+
+        input[type="checkbox"],
+        input[type="radio"] {
+            cursor: pointer !important;
+        }
+
         html {
             height: auto;
             min-height: 100%;
@@ -321,7 +338,14 @@
             font-family: 'Outfit', sans-serif;
             font-size: 14px;
             background: var(--white);
+            color: var(--gray-800);
+            cursor: text;
+            caret-color: var(--navy);
             transition: all 0.2s;
+        }
+
+        .form-group select {
+            cursor: pointer;
         }
 
         .form-group input:focus,
@@ -329,6 +353,11 @@
             outline: none;
             border-color: var(--navy);
             box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
+            cursor: text;
+        }
+
+        .form-group select:focus {
+            cursor: pointer;
         }
 
         .form-group input::placeholder { color: var(--gray-400); }
@@ -356,7 +385,10 @@
         }
 
         .pw-wrapper { position: relative; }
-        .pw-wrapper input { padding-right: 40px; }
+        .pw-wrapper input { 
+            padding-right: 40px; 
+            cursor: text !important;
+        }
 
         .pw-toggle {
             position: absolute;
@@ -368,6 +400,12 @@
             cursor: pointer;
             color: var(--gray-400);
             font-size: 16px;
+            z-index: 2;
+            padding: 4px;
+        }
+
+        .pw-toggle:hover {
+            color: var(--gray-600);
         }
 
         .form-footer {

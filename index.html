@@ -905,7 +905,7 @@
         // Supabase
         const SUPABASE_URL = 'https://weuxtwmaqmbhskjpjdyi.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndldXh0d21hcW1iaHNranBqZHlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NTYzMTcsImV4cCI6MjA4MDMzMjMxN30.J-0Nd0MY6-g_ltbBNHwOulqZuQfb8mKIRgx0dAaJ76o';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let pendingEmail = '';
         let resendCooldown = 0;
@@ -966,7 +966,7 @@
         
         // Check if student ID already exists in database
         async function checkStudentIdExists(studentId) {
-            const { data, error } = await supabase
+            const { data, error } = await supabaseClient
                 .from('profiles')
                 .select('id')
                 .eq('student_id', studentId)
@@ -1055,7 +1055,7 @@
             btn.disabled = true;
             
             try {
-                const { error } = await supabase.auth.resend({
+                const { error } = await supabaseClient.auth.resend({
                     type: 'signup',
                     email: pendingEmail
                 });
@@ -1085,7 +1085,7 @@
             const rememberMe = document.getElementById('rememberMe').checked;
             
             try {
-                const { data, error } = await supabase.auth.signInWithPassword({
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
                     email: email,
                     password: password
                 });
@@ -1101,18 +1101,18 @@
                 
                 // Check if email is confirmed
                 if (data.user && !data.user.email_confirmed_at) {
-                    await supabase.auth.signOut();
+                    await supabaseClient.auth.signOut();
                     showAlert('Please verify your email before signing in. Check your inbox.', 'warning');
                     return;
                 }
                 
                 // Check if user is banned
-                const { data: profile, error: profileError } = await supabase.from('profiles').select('is_banned').eq('id', data.user.id).single();
+                const { data: profile, error: profileError } = await supabaseClient.from('profiles').select('is_banned').eq('id', data.user.id).single();
                 console.log('Profile check:', profile, profileError);
                 
                 if (profile && profile.is_banned === true) {
                     console.log('User is banned, signing out');
-                    await supabase.auth.signOut();
+                    await supabaseClient.auth.signOut();
                     showAlert('Your account has been suspended. Please contact an administrator.', 'error');
                     return;
                 }
@@ -1128,7 +1128,7 @@
                 
                 // Check for unban notification (user was recently unbanned)
                 console.log('Checking for unban notification...');
-                const { data: unbanNotif, error: unbanError } = await supabase.from('notifications')
+                const { data: unbanNotif, error: unbanError } = await supabaseClient.from('notifications')
                     .select('*')
                     .eq('user_id', data.user.id)
                     .eq('type', 'unban')
@@ -1141,7 +1141,7 @@
                 if (unbanNotif && unbanNotif.length > 0) {
                     console.log('Found unban notification, setting flag');
                     // Mark as read
-                    await supabase.from('notifications').update({ is_read: true }).eq('id', unbanNotif[0].id);
+                    await supabaseClient.from('notifications').update({ is_read: true }).eq('id', unbanNotif[0].id);
                     // Store flag to show welcome back popup on dashboard
                     localStorage.setItem('myub_show_unban_welcome', 'true');
                 }
@@ -1214,7 +1214,7 @@
             const email = document.getElementById('signupEmail').value;
             
             try {
-                const { data, error } = await supabase.auth.signUp({
+                const { data, error } = await supabaseClient.auth.signUp({
                     email: email,
                     password: pw,
                     options: {
@@ -1263,7 +1263,7 @@
             forgotLink.style.pointerEvents = 'none';
             
             try {
-                const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
                     redirectTo: 'https://www.myub.online/reset-password.html'
                 });
                 if (error) throw error;
@@ -1290,7 +1290,7 @@
 
         // Check if already logged in
         async function checkSession() {
-            const { data: { session } } = await supabase.auth.getSession();
+            const { data: { session } } = await supabaseClient.auth.getSession();
             if (session && session.user.email_confirmed_at) {
                 window.location.href = 'dashboard.html';
             }

@@ -21,6 +21,37 @@
             --blue: #3b82f6; --blue-light: #dbeafe; --yellow: #eab308; --orange: #f97316;
             --purple: #8b5cf6; --purple-light: #ede9fe;
         }
+
+        /* Global input cursor fix */
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="number"],
+        input[type="tel"],
+        input[type="search"],
+        input[type="url"],
+        input[type="date"],
+        input[type="time"],
+        textarea {
+            cursor: text !important;
+            caret-color: #1a365d;
+        }
+
+        input[type="checkbox"],
+        input[type="radio"],
+        input[type="submit"],
+        input[type="button"],
+        button,
+        select {
+            cursor: pointer !important;
+        }
+
+        input:disabled,
+        textarea:disabled,
+        select:disabled,
+        button:disabled {
+            cursor: not-allowed !important;
+        }
         html { height: auto; min-height: 100%; }
         body { font-family: 'Outfit', sans-serif; background: var(--gray-100); min-height: 100%; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
 

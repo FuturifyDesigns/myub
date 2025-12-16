@@ -44,6 +44,37 @@
             --orange: #f97316;
         }
 
+        /* Global input cursor fix */
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="number"],
+        input[type="tel"],
+        input[type="search"],
+        input[type="url"],
+        input[type="date"],
+        input[type="time"],
+        textarea {
+            cursor: text !important;
+            caret-color: #1a365d;
+        }
+
+        input[type="checkbox"],
+        input[type="radio"],
+        input[type="submit"],
+        input[type="button"],
+        button,
+        select {
+            cursor: pointer !important;
+        }
+
+        input:disabled,
+        textarea:disabled,
+        select:disabled,
+        button:disabled {
+            cursor: not-allowed !important;
+        }
+
         html {
             height: auto;
             min-height: 100%;
@@ -1829,12 +1860,12 @@
                     <h4>🐛 Found a Bug? Have Suggestions?</h4>
                     <p>We're constantly improving MyUB. Your feedback helps us make it better for everyone!</p>
                     <div class="contact-links">
-                        <a href="mailto:support@myub.online" class="contact-link">
+                        <a href="mailto:futurifydesigns@gmail.com" class="contact-link">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
                                 <polyline points="22,6 12,13 2,6"/>
                             </svg>
-                            support@myub.online
+                            futurifydesigns@gmail.com
                         </a>
                         <a href="https://wa.me/26777783823" target="_blank" class="contact-link">
                             <svg viewBox="0 0 24 24" fill="currentColor">
@@ -3315,11 +3346,4 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('ServiceWorker registered:', reg.scope))
-                    .catch(err => console.log('ServiceWorker registration failed:', err));
-            });
-        }
-    </script>
-</body>
-</html>
+                navigator.serviceWorker.registe

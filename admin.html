@@ -32,6 +32,37 @@
             --orange: #f97316;
             --cyan: #06b6d4;
         }
+
+        /* Global input cursor fix */
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="number"],
+        input[type="tel"],
+        input[type="search"],
+        input[type="url"],
+        input[type="date"],
+        input[type="time"],
+        textarea {
+            cursor: text !important;
+            caret-color: #1a365d;
+        }
+
+        input[type="checkbox"],
+        input[type="radio"],
+        input[type="submit"],
+        input[type="button"],
+        button,
+        select {
+            cursor: pointer !important;
+        }
+
+        input:disabled,
+        textarea:disabled,
+        select:disabled,
+        button:disabled {
+            cursor: not-allowed !important;
+        }
         html { height: auto; min-height: 100%; }
         body { font-family: 'Outfit', sans-serif; background: var(--gray-100); min-height: 100%; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
 
@@ -731,7 +762,7 @@
     <script>
         const SUPABASE_URL = 'https://weuxtwmaqmbhskjpjdyi.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndldXh0d21hcW1iaHNranBqZHlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NTYzMTcsImV4cCI6MjA4MDMzMjMxN30.J-0Nd0MY6-g_ltbBNHwOulqZuQfb8mKIRgx0dAaJ76o';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         // ADMIN USER ID - Only this user can access admin panel
         const ADMIN_USER_ID = '80d10c97-c596-4739-aaa3-6dc2132e6304'; // Replace with your actual user ID
@@ -747,7 +778,7 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', async () => {
-            const { data: { user } } = await supabase.auth.getUser();
+            const { data: { user } } = await supabaseClient.auth.getUser();
             if (!user) { window.location.href = 'index.html'; return; }
             
             // Check admin access
@@ -777,7 +808,7 @@
 
         // Real-time subscriptions for new reports
         function setupRealtimeSubscriptions() {
-            supabase.channel('admin-reports')
+            supabaseClient.channel('admin-reports')
                 .on('postgres_changes', {
                     event: 'INSERT',
                     schema: 'public',
@@ -798,14 +829,14 @@
                 .subscribe();
             
             // Real-time updates for analytics
-            supabase.channel('admin-profiles')
+            supabaseClient.channel('admin-profiles')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => {
                     loadAnalytics();
                     loadUsers();
                 })
                 .subscribe();
             
-            supabase.channel('admin-groups')
+            supabaseClient.channel('admin-groups')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'study_groups' }, () => {
                     console.log('Study groups changed, reloading...');
                     loadAnalytics();
@@ -814,34 +845,34 @@
                 .subscribe();
             
             // Also listen for member changes
-            supabase.channel('admin-group-members')
+            supabaseClient.channel('admin-group-members')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'study_group_members' }, () => {
                     console.log('Study group members changed, reloading...');
                     loadGroups();
                 })
                 .subscribe();
             
-            supabase.channel('admin-notes')
+            supabaseClient.channel('admin-notes')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'notes' }, () => {
                     loadAnalytics();
                     loadNotes();
                 })
                 .subscribe();
             
-            supabase.channel('admin-messages')
+            supabaseClient.channel('admin-messages')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, () => {
                     loadAnalytics();
                 })
                 .subscribe();
             
-            supabase.channel('admin-schedules')
+            supabaseClient.channel('admin-schedules')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'schedule_items' }, () => {
                     loadAnalytics();
                 })
                 .subscribe();
             
             // Realtime for announcements
-            supabase.channel('admin-announcements')
+            supabaseClient.channel('admin-announcements')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'announcements' }, () => {
                     console.log('Announcements changed, reloading...');
                     loadAnnouncements();
@@ -849,21 +880,21 @@
                 .subscribe();
             
             // Realtime for notifications (for analytics)
-            supabase.channel('admin-notifications')
+            supabaseClient.channel('admin-notifications')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'notifications' }, () => {
                     loadAnalytics();
                 })
                 .subscribe();
             
             // Realtime for friendships (for analytics)
-            supabase.channel('admin-friendships')
+            supabaseClient.channel('admin-friendships')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'friendships' }, () => {
                     loadAnalytics();
                 })
                 .subscribe();
             
             // Realtime for friend requests (for analytics)
-            supabase.channel('admin-friend-requests')
+            supabaseClient.channel('admin-friend-requests')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'friend_requests' }, () => {
                     loadAnalytics();
                 })
@@ -873,7 +904,7 @@
         // Update reports badge
         async function updateReportsBadge() {
             try {
-                const { count } = await supabase.from('user_reports')
+                const { count } = await supabaseClient.from('user_reports')
                     .select('*', { count: 'exact', head: true })
                     .eq('status', 'pending');
                 
@@ -901,37 +932,37 @@
         async function loadAnalytics() {
             try {
                 // Total users
-                const { count: usersCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
+                const { count: usersCount } = await supabaseClient.from('profiles').select('*', { count: 'exact', head: true });
                 document.getElementById('totalUsers').textContent = usersCount || 0;
 
                 // New users this week
                 const weekAgo = new Date();
                 weekAgo.setDate(weekAgo.getDate() - 7);
-                const { count: newUsers } = await supabase.from('profiles').select('*', { count: 'exact', head: true }).gte('created_at', weekAgo.toISOString());
+                const { count: newUsers } = await supabaseClient.from('profiles').select('*', { count: 'exact', head: true }).gte('created_at', weekAgo.toISOString());
                 document.getElementById('newUsersWeek').textContent = newUsers || 0;
 
                 // Total messages (try both tables)
                 let msgCount = 0;
                 try {
-                    const { count: dmCount } = await supabase.from('messages').select('*', { count: 'exact', head: true });
+                    const { count: dmCount } = await supabaseClient.from('messages').select('*', { count: 'exact', head: true });
                     msgCount += dmCount || 0;
                 } catch(e) {}
                 try {
-                    const { count: groupMsgCount } = await supabase.from('study_group_messages').select('*', { count: 'exact', head: true });
+                    const { count: groupMsgCount } = await supabaseClient.from('study_group_messages').select('*', { count: 'exact', head: true });
                     msgCount += groupMsgCount || 0;
                 } catch(e) {}
                 document.getElementById('totalMessages').textContent = msgCount;
 
                 // Study groups
-                const { count: groupsCount } = await supabase.from('study_groups').select('*', { count: 'exact', head: true });
+                const { count: groupsCount } = await supabaseClient.from('study_groups').select('*', { count: 'exact', head: true });
                 document.getElementById('totalGroups').textContent = groupsCount || 0;
 
                 // Notes
-                const { count: notesCount } = await supabase.from('notes').select('*', { count: 'exact', head: true });
+                const { count: notesCount } = await supabaseClient.from('notes').select('*', { count: 'exact', head: true });
                 document.getElementById('totalNotes').textContent = notesCount || 0;
 
                 // Schedules
-                const { count: schedulesCount } = await supabase.from('schedules').select('*', { count: 'exact', head: true });
+                const { count: schedulesCount } = await supabaseClient.from('schedules').select('*', { count: 'exact', head: true });
                 document.getElementById('totalSchedules').textContent = schedulesCount || 0;
 
                 // Recent activity
@@ -946,7 +977,7 @@
             const activities = [];
 
             // Recent users
-            const { data: recentUsers } = await supabase.from('profiles').select('*').order('created_at', { ascending: false }).limit(5);
+            const { data: recentUsers } = await supabaseClient.from('profiles').select('*').order('created_at', { ascending: false }).limit(5);
             if (recentUsers) {
                 recentUsers.forEach(u => {
                     activities.push({
@@ -958,7 +989,7 @@
             }
 
             // Recent groups
-            const { data: recentGroups } = await supabase.from('study_groups').select('*, profiles(full_name)').order('created_at', { ascending: false }).limit(5);
+            const { data: recentGroups } = await supabaseClient.from('study_groups').select('*, profiles(full_name)').order('created_at', { ascending: false }).limit(5);
             if (recentGroups) {
                 recentGroups.forEach(g => {
                     activities.push({
@@ -996,7 +1027,7 @@
         
         async function loadReports() {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('user_reports')
                     .select(`
                         *,
@@ -1086,7 +1117,7 @@
         
         async function updateReportStatus(reportId, status) {
             try {
-                const { error } = await supabase
+                const { error } = await supabaseClient
                     .from('user_reports')
                     .update({ status, reviewed_at: new Date().toISOString() })
                     .eq('id', reportId);
@@ -1153,7 +1184,7 @@
         async function loadUsers() {
             try {
                 console.log('Loading users...');
-                const { data, error } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
+                const { data, error } = await supabaseClient.from('profiles').select('*').order('created_at', { ascending: false });
                 if (error) {
                     console.error('Error loading users:', error);
                     allUsers = [];
@@ -1258,8 +1289,8 @@
             }
 
             // Get additional stats
-            const { count: notesCount } = await supabase.from('notes').select('*', { count: 'exact', head: true }).eq('user_id', userId);
-            const { count: groupsCount } = await supabase.from('study_group_members').select('*', { count: 'exact', head: true }).eq('user_id', userId);
+            const { count: notesCount } = await supabaseClient.from('notes').select('*', { count: 'exact', head: true }).eq('user_id', userId);
+            const { count: groupsCount } = await supabaseClient.from('study_group_members').select('*', { count: 'exact', head: true }).eq('user_id', userId);
 
             const modal = document.getElementById('userModal');
             document.getElementById('userModalBody').innerHTML = `
@@ -1339,54 +1370,54 @@
             try {
                 // Delete in order to respect foreign key constraints
                 // 1. Delete active connections
-                await supabase.from('active_connections').delete().eq('user_id', userId);
+                await supabaseClient.from('active_connections').delete().eq('user_id', userId);
                 
                 // 2. Delete admin actions by this user
-                await supabase.from('admin_actions').delete().eq('admin_id', userId);
+                await supabaseClient.from('admin_actions').delete().eq('admin_id', userId);
                 
                 // 3. Delete blocked users (both directions)
-                await supabase.from('blocked_users').delete().or(`blocker_id.eq.${userId},blocked_id.eq.${userId}`);
+                await supabaseClient.from('blocked_users').delete().or(`blocker_id.eq.${userId},blocked_id.eq.${userId}`);
                 
                 // 4. Delete courses
-                await supabase.from('courses').delete().eq('user_id', userId);
+                await supabaseClient.from('courses').delete().eq('user_id', userId);
                 
                 // 5. Delete deleted conversations
-                await supabase.from('deleted_conversations').delete().eq('user_id', userId);
+                await supabaseClient.from('deleted_conversations').delete().eq('user_id', userId);
                 
                 // 6. Delete friend requests (both directions)
-                await supabase.from('friend_requests').delete().or(`sender_id.eq.${userId},receiver_id.eq.${userId}`);
+                await supabaseClient.from('friend_requests').delete().or(`sender_id.eq.${userId},receiver_id.eq.${userId}`);
                 
                 // 7. Delete friendships (both directions)
-                await supabase.from('friendships').delete().or(`user_id.eq.${userId},friend_id.eq.${userId}`);
+                await supabaseClient.from('friendships').delete().or(`user_id.eq.${userId},friend_id.eq.${userId}`);
                 
                 // 8. Delete group join requests
-                await supabase.from('group_join_requests').delete().eq('user_id', userId);
+                await supabaseClient.from('group_join_requests').delete().eq('user_id', userId);
                 
                 // 9. Delete messages (both sent and received)
-                await supabase.from('messages').delete().or(`sender_id.eq.${userId},receiver_id.eq.${userId}`);
+                await supabaseClient.from('messages').delete().or(`sender_id.eq.${userId},receiver_id.eq.${userId}`);
                 
                 // 10. Delete notes
-                await supabase.from('notes').delete().eq('user_id', userId);
+                await supabaseClient.from('notes').delete().eq('user_id', userId);
                 
                 // 11. Delete notifications
-                await supabase.from('notifications').delete().eq('user_id', userId);
+                await supabaseClient.from('notifications').delete().eq('user_id', userId);
                 
                 // 12. Delete schedules
-                await supabase.from('schedules').delete().eq('user_id', userId);
+                await supabaseClient.from('schedules').delete().eq('user_id', userId);
                 
                 // 13. Delete study group members
-                await supabase.from('study_group_members').delete().eq('user_id', userId);
+                await supabaseClient.from('study_group_members').delete().eq('user_id', userId);
                 
                 // 14. Delete study group messages
-                await supabase.from('study_group_messages').delete().eq('sender_id', userId);
+                await supabaseClient.from('study_group_messages').delete().eq('sender_id', userId);
                 
                 // 15. Call the database function to delete the user completely
-                const { error: deleteError } = await supabase.rpc('admin_delete_user', { p_user_id: userId });
+                const { error: deleteError } = await supabaseClient.rpc('admin_delete_user', { p_user_id: userId });
                 
                 if (deleteError) {
                     console.error('RPC delete failed:', deleteError);
                     // Fallback: Just delete the profile directly
-                    const { error: profileError } = await supabase.from('profiles').delete().eq('id', userId);
+                    const { error: profileError } = await supabaseClient.from('profiles').delete().eq('id', userId);
                     if (profileError) throw profileError;
                 }
                 
@@ -1417,7 +1448,7 @@
         async function toggleBan(userId, ban) {
             if (!confirm(ban ? 'Ban this user? They will not be able to access MyUB.' : 'Unban this user?')) return;
             
-            const { error } = await supabase.from('profiles').update({ is_banned: ban }).eq('id', userId);
+            const { error } = await supabaseClient.from('profiles').update({ is_banned: ban }).eq('id', userId);
             if (error) {
                 console.error('Failed to update ban status:', error);
                 showToast('Failed to update user status', 'error');
@@ -1428,7 +1459,7 @@
             
             if (ban) {
                 // Send ban notification
-                const { error: notifError } = await supabase.from('notifications').insert({
+                const { error: notifError } = await supabaseClient.from('notifications').insert({
                     user_id: userId,
                     type: 'ban',
                     title: 'Account Suspended',
@@ -1439,7 +1470,7 @@
                 }
             } else {
                 // Send unban notification
-                const { error: notifError } = await supabase.from('notifications').insert({
+                const { error: notifError } = await supabaseClient.from('notifications').insert({
                     user_id: userId,
                     type: 'unban',
                     title: 'Account Restored',
@@ -1466,7 +1497,7 @@
                 console.log('Loading study groups...');
                 
                 // Simple direct query - let's see what happens
-                const { data: groups, error: groupsError } = await supabase
+                const { data: groups, error: groupsError } = await supabaseClient
                     .from('study_groups')
                     .select('*')
                     .order('created_at', { ascending: false });
@@ -1485,7 +1516,7 @@
                         // Get member counts for each group
                         const groupsWithCounts = await Promise.all(groups.map(async (g) => {
                             try {
-                                const { count } = await supabase
+                                const { count } = await supabaseClient
                                     .from('study_group_members')
                                     .select('*', { count: 'exact', head: true })
                                     .eq('group_id', g.id);
@@ -1493,7 +1524,7 @@
                                 // Try to get creator name
                                 let creatorName = 'Unknown';
                                 if (g.creator_id) {
-                                    const { data: profile } = await supabase
+                                    const { data: profile } = await supabaseClient
                                         .from('profiles')
                                         .select('full_name')
                                         .eq('id', g.creator_id)
@@ -1556,7 +1587,7 @@
         async function deleteGroup(groupId, groupName) {
             if (!confirm(`Delete study group "${groupName}"? This cannot be undone.`)) return;
             
-            const { error } = await supabase.from('study_groups').delete().eq('id', groupId);
+            const { error } = await supabaseClient.from('study_groups').delete().eq('id', groupId);
             if (error) {
                 showToast('Failed to delete group', 'error');
                 return;
@@ -1571,7 +1602,7 @@
         async function loadNotes() {
             try {
                 console.log('Loading notes...');
-                const { data, error } = await supabase.from('notes').select('*, profiles(full_name)').order('created_at', { ascending: false });
+                const { data, error } = await supabaseClient.from('notes').select('*, profiles(full_name)').order('created_at', { ascending: false });
                 if (error) {
                     console.error('Error loading notes:', error);
                     allNotes = [];
@@ -1608,7 +1639,7 @@
         async function deleteNote(noteId) {
             if (!confirm('Delete this note? This cannot be undone.')) return;
             
-            const { error } = await supabase.from('notes').delete().eq('id', noteId);
+            const { error } = await supabaseClient.from('notes').delete().eq('id', noteId);
             if (error) {
                 showToast('Failed to delete note', 'error');
                 return;
@@ -1623,7 +1654,7 @@
         async function loadAnnouncements() {
             try {
                 console.log('Loading announcements...');
-                const { data, error } = await supabase.from('announcements').select('*').order('created_at', { ascending: false });
+                const { data, error } = await supabaseClient.from('announcements').select('*').order('created_at', { ascending: false });
                 if (error) {
                     console.error('Error loading announcements:', error);
                     announcements = [];
@@ -1702,9 +1733,9 @@
 
             let error;
             if (id) {
-                error = (await supabase.from('announcements').update(data).eq('id', id)).error;
+                error = (await supabaseClient.from('announcements').update(data).eq('id', id)).error;
             } else {
-                error = (await supabase.from('announcements').insert(data)).error;
+                error = (await supabaseClient.from('announcements').insert(data)).error;
             }
 
             if (error) {
@@ -1725,7 +1756,7 @@
 
         async function broadcastNotification(title, message, announcementType = 'info') {
             // Get all user IDs
-            const { data: users, error: usersError } = await supabase.from('profiles').select('id');
+            const { data: users, error: usersError } = await supabaseClient.from('profiles').select('id');
             if (usersError) {
                 console.error('Failed to get users:', usersError);
                 return;
@@ -1758,7 +1789,7 @@
             let successCount = 0;
             for (let i = 0; i < notifs.length; i += 100) {
                 const batch = notifs.slice(i, i + 100);
-                const { data, error } = await supabase.from('notifications').insert(batch).select();
+                const { data, error } = await supabaseClient.from('notifications').insert(batch).select();
                 if (error) {
                     console.error('Failed to insert notifications batch:', error);
                     console.error('Error details:', JSON.stringify(error));
@@ -1772,7 +1803,7 @@
         }
 
         async function toggleAnnouncement(id, active) {
-            const { error } = await supabase.from('announcements').update({ is_active: active }).eq('id', id);
+            const { error } = await supabaseClient.from('announcements').update({ is_active: active }).eq('id', id);
             if (error) {
                 showToast('Failed to update announcement', 'error');
                 return;
@@ -1784,7 +1815,7 @@
         async function deleteAnnouncement(id) {
             if (!confirm('Delete this announcement?')) return;
             
-            const { error } = await supabase.from('announcements').delete().eq('id', id);
+            const { error } = await supabaseClient.from('announcements').delete().eq('id', id);
             if (error) {
                 showToast('Failed to delete announcement', 'error');
                 return;
@@ -1891,7 +1922,7 @@
             
             try {
                 // Create a notification for the user
-                const { error } = await supabase.from('notifications').insert({
+                const { error } = await supabaseClient.from('notifications').insert({
                     user_id: warningTargetUserId,
                     type: 'admin_warning',
                     title: '⚠️ Admin Warning: ' + warningType.charAt(0).toUpperCase() + warningType.slice(1),

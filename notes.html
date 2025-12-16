@@ -14,7 +14,69 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         :root { --navy: #1a365d; --navy-light: #2c5282; --navy-dark: #0f2744; --red: #c41e3a; --white: #ffffff; --gray-50: #f8fafc; --gray-100: #f1f5f9; --gray-200: #e2e8f0; --gray-300: #cbd5e1; --gray-400: #94a3b8; --gray-500: #64748b; --gray-600: #475569; --gray-700: #334155; --gray-800: #1e293b; --green: #22c55e; --blue: #3b82f6; --orange: #f97316; --yellow: #eab308; --purple: #8b5cf6; --pink: #ec4899; }
+
+        /* Global input cursor fix */
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="number"],
+        input[type="tel"],
+        input[type="search"],
+        input[type="url"],
+        input[type="date"],
+        input[type="time"],
+        textarea {
+            cursor: text !important;
+            caret-color: #1a365d;
+        }
+
+        input[type="checkbox"],
+        input[type="radio"],
+        input[type="submit"],
+        input[type="button"],
+        button,
+        select {
+            cursor: pointer !important;
+        }
+
+        input:disabled,
+        textarea:disabled,
+        select:disabled,
+        button:disabled {
+            cursor: not-allowed !important;
+        }
         html { height: auto; min-height: 100%; }
+
+        /* Global input cursor fix */
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="number"],
+        input[type="tel"],
+        input[type="search"],
+        input[type="url"],
+        input[type="date"],
+        input[type="time"],
+        textarea {
+            cursor: text !important;
+            caret-color: #1a365d;
+        }
+
+        input[type="checkbox"],
+        input[type="radio"],
+        input[type="submit"],
+        input[type="button"],
+        button,
+        select {
+            cursor: pointer !important;
+        }
+
+        input:disabled,
+        textarea:disabled,
+        select:disabled,
+        button:disabled {
+            cursor: not-allowed !important;
+        }
         body { font-family: 'Outfit', sans-serif; background: var(--gray-100); min-height: 100%; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
         .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 260px; background: var(--navy-dark); padding: 20px 0; z-index: 100; transition: transform 0.3s ease; overflow-y: auto; }
         .sidebar-header { padding: 0 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }

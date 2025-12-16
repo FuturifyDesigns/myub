@@ -700,12 +700,12 @@
             
             // Initialize connection manager
             if (window.MyUBUtils) {
-                const canConnect = await MyUBUtils.ConnectionManager.init(supabase, currentUser.id);
+                const canConnect = await MyUBUtils.ConnectionManager.init(supabaseClient, currentUser.id);
                 if (!canConnect) {
                     document.getElementById('loadingScreen').style.display = 'none';
                     return;
                 }
-                MyUBUtils.SubscriptionManager.init(supabase, currentUser.id);
+                MyUBUtils.SubscriptionManager.init(supabaseClient, currentUser.id);
                 MyUBUtils.SubscriptionManager.subscribe({
                     messages: () => loadSidebarBadges(),
                     notifications: () => loadNotifications(),
@@ -1155,7 +1155,7 @@
             const filter = document.getElementById('discoverFilter').value;
             
             try {
-                let query = supabase
+                let query = supabaseClient
                     .from('profiles')
                     .select('id, first_name, last_name, full_name, avatar_url, program_name, is_online, last_seen, created_at')
                     .neq('id', currentUser.id)
@@ -1272,14 +1272,14 @@
         // =============================================
         async function loadBlockedUsers() {
             // Users I blocked
-            const { data: blocked } = await supabase
+            const { data: blocked } = await supabaseClient
                 .from('blocked_users')
                 .select('blocked_id, created_at, blocked:profiles!blocked_users_blocked_id_fkey(id, first_name, last_name, full_name, avatar_url)')
                 .eq('blocker_id', currentUser.id);
             blockedUsers = blocked || [];
 
             // Users who blocked me
-            const { data: blockedBy } = await supabase
+            const { data: blockedBy } = await supabaseClient
                 .from('blocked_users')
                 .select('blocker_id')
                 .eq('blocked_id', currentUser.id);
@@ -1390,7 +1390,7 @@
         // =============================================
         async function openProfileModal(userId) {
             // Fetch full user profile
-            const { data: user } = await supabase
+            const { data: user } = await supabaseClient
                 .from('profiles')
                 .select('id, first_name, last_name, full_name, program_name, year_of_study, bio, avatar_url, is_online, last_seen, created_at')
                 .eq('id', userId)
@@ -1555,7 +1555,7 @@
         
         // Initialize call notifications
         if (window.MyUBCalls) {
-            MyUBCalls.init(supabase);
+            MyUBCalls.init(supabaseClient);
         }
     </script>
 

@@ -2263,14 +2263,14 @@
             
             // Initialize connection manager (checks server capacity)
             if (window.MyUBUtils) {
-                const canConnect = await MyUBUtils.ConnectionManager.init(supabase, currentUser.id);
+                const canConnect = await MyUBUtils.ConnectionManager.init(supabaseClient, currentUser.id);
                 if (!canConnect) {
                     document.getElementById('loadingScreen').style.display = 'none';
                     return; // User is in queue, don't load the page
                 }
                 
                 // Initialize subscription manager with consolidated subscriptions
-                MyUBUtils.SubscriptionManager.init(supabase, currentUser.id);
+                MyUBUtils.SubscriptionManager.init(supabaseClient, currentUser.id);
                 MyUBUtils.SubscriptionManager.subscribe({
                     messages: () => debouncedBadgeUpdate(),
                     notifications: () => { loadNotifications(); debouncedBadgeUpdate(); },
@@ -2310,7 +2310,7 @@
             // Poll for notifications every 30 seconds as fallback
             setInterval(async () => {
                 const lastNotifId = notifications.length > 0 ? notifications[0].id : null;
-                const { data: newNotifs } = await supabase
+                const { data: newNotifs } = await supabaseClient
                     .from('notifications')
                     .select('*')
                     .eq('user_id', currentUser.id)
@@ -2385,9 +2385,9 @@
             // Use cache if available
             let data;
             if (window.MyUBUtils) {
-                data = await MyUBUtils.CacheManager.getProfile(supabase, currentUser.id);
+                data = await MyUBUtils.CacheManager.getProfile(supabaseClient, currentUser.id);
             } else {
-                const result = await supabase
+                const result = await supabaseClient
                     .from('profiles')
                     .select('*')
                     .eq('id', currentUser.id)
@@ -2510,7 +2510,7 @@
 
         async function loadDashboardData() {
             // Load courses count
-            const { count: coursesCount } = await supabase
+            const { count: coursesCount } = await supabaseClient
                 .from('courses')
                 .select('*', { count: 'exact', head: true })
                 .eq('user_id', currentUser.id);
@@ -2518,7 +2518,7 @@
             document.getElementById('coursesCount').textContent = coursesCount || 0;
 
             // Calculate credits
-            const { data: courses } = await supabase
+            const { data: courses } = await supabaseClient
                 .from('courses')
                 .select('credits, grade')
                 .eq('user_id', currentUser.id);
@@ -2548,7 +2548,7 @@
             }
 
             // Load study groups count
-            const { count: groupsCount } = await supabase
+            const { count: groupsCount } = await supabaseClient
                 .from('study_group_members')
                 .select('*', { count: 'exact', head: true })
                 .eq('user_id', currentUser.id);
@@ -2557,7 +2557,7 @@
 
             // Load pending tasks
             try {
-                const { count: tasksCount, error: tasksError } = await supabase
+                const { count: tasksCount, error: tasksError } = await supabaseClient
                     .from('schedules')
                     .select('*', { count: 'exact', head: true })
                     .eq('user_id', currentUser.id)
@@ -2577,7 +2577,7 @@
             await loadUpcomingSchedule();
 
             // Load unread messages
-            const { count: unreadCount } = await supabase
+            const { count: unreadCount } = await supabaseClient
                 .from('messages')
                 .select('*', { count: 'exact', head: true })
                 .eq('receiver_id', currentUser.id)
@@ -2598,7 +2598,7 @@
 
         async function loadUpcomingSchedule() {
             try {
-                const { data: schedules, error } = await supabase
+                const { data: schedules, error } = await supabaseClient
                     .from('schedules')
                     .select('*')
                     .eq('user_id', currentUser.id)
@@ -2694,7 +2694,7 @@
         let notifications = [];
 
         async function loadNotifications() {
-            const { data } = await supabase
+            const { data } = await supabaseClient
                 .from('notifications')
                 .select('*')
                 .eq('user_id', currentUser.id)
@@ -2940,7 +2940,7 @@
 
         async function loadSidebarBadges() {
             // Load unread messages count
-            const { data: msgs, count: msgCount } = await supabase
+            const { data: msgs, count: msgCount } = await supabaseClient
                 .from('messages')
                 .select('id', { count: 'exact' })
                 .eq('receiver_id', currentUser.id)
@@ -2950,7 +2950,7 @@
             updateSidebarBadge('sidebarMsgBadge', unreadMessages);
             
             // Load pending friend requests count
-            const { data: reqs, count: reqCount } = await supabase
+            const { data: reqs, count: reqCount } = await supabaseClient
                 .from('friend_requests')
                 .select('id', { count: 'exact' })
                 .eq('receiver_id', currentUser.id)
@@ -3307,7 +3307,7 @@
         
         // Initialize call notifications across all pages
         if (window.MyUBCalls) {
-            MyUBCalls.init(supabase);
+            MyUBCalls.init(supabaseClient);
         }
     </script>
 

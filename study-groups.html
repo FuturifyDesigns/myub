@@ -1261,12 +1261,12 @@
                 
                 // Initialize connection manager
                 if (window.MyUBUtils) {
-                    var canConnect = await MyUBUtils.ConnectionManager.init(supabase, currentUser.id);
+                    var canConnect = await MyUBUtils.ConnectionManager.init(supabaseClient, currentUser.id);
                     if (!canConnect) {
                         document.getElementById('loadingScreen').style.display = 'none';
                         return;
                     }
-                    MyUBUtils.SubscriptionManager.init(supabase, currentUser.id);
+                    MyUBUtils.SubscriptionManager.init(supabaseClient, currentUser.id);
                     MyUBUtils.SubscriptionManager.subscribe({
                         messages: function() { loadSidebarBadges(); },
                         notifications: function() { loadNotifications(); },
@@ -1283,7 +1283,7 @@
                 subscribeToGroupCallSignals(); // Listen for group call notifications
                 // Initialize unified call handler for 1-on-1 call notifications
                 if (window.MyUBCalls) {
-                    MyUBCalls.init(supabase);
+                    MyUBCalls.init(supabaseClient);
                 }
                 setupEmojiPicker();
                 startHeartbeat();
@@ -1399,7 +1399,7 @@
         
         async function loadGroupMembers() {
             try {
-                var result = await supabase
+                var result = await supabaseClient
                     .from('study_group_members')
                     .select('*, profiles:user_id(id, first_name, last_name, full_name, avatar_url, is_online, last_seen)')
                     .eq('group_id', currentGroup.id);
@@ -1429,7 +1429,7 @@
         
         async function loadGroupMessages() {
             try {
-                var result = await supabase
+                var result = await supabaseClient
                     .from('study_group_messages')
                     .select('*, profiles:sender_id(id, first_name, last_name, full_name, avatar_url)')
                     .eq('group_id', currentGroup.id)
@@ -1508,7 +1508,7 @@
                 friendIds = friendIds.filter(function(id, i, arr) { return arr.indexOf(id) === i; });
                 
                 if (friendIds.length > 0) {
-                    var profilesResult = await supabase
+                    var profilesResult = await supabaseClient
                         .from('profiles')
                         .select('id, first_name, last_name, full_name, program_name, avatar_url, is_online, last_seen')
                         .in('id', friendIds);
@@ -1531,7 +1531,7 @@
         
         async function loadSidebarBadges() {
             try {
-                var msgResult = await supabase
+                var msgResult = await supabaseClient
                     .from('messages')
                     .select('id', { count: 'exact', head: true })
                     .eq('receiver_id', currentUser.id)
@@ -1542,7 +1542,7 @@
             } catch(e) { console.error('msg badge error:', e); }
             
             try {
-                var frResult = await supabase
+                var frResult = await supabaseClient
                     .from('friend_requests')
                     .select('id', { count: 'exact', head: true })
                     .eq('receiver_id', currentUser.id)
@@ -2114,7 +2114,7 @@
             searchTimeout = setTimeout(async function() {
                 try {
                     // Use same query format as friends.html which works
-                    var result = await supabase
+                    var result = await supabaseClient
                         .from('profiles')
                         .select('id, first_name, last_name, full_name, program_name, avatar_url, is_online')
                         .or('full_name.ilike.%' + query + '%,first_name.ilike.%' + query + '%,last_name.ilike.%' + query + '%')
@@ -2203,7 +2203,7 @@
                     var excludeIds = memberIds.concat(bannedIds);
                     
                     // Use same query format as friends.html
-                    var result = await supabase
+                    var result = await supabaseClient
                         .from('profiles')
                         .select('id, first_name, last_name, full_name, program_name, avatar_url, is_online')
                         .or('full_name.ilike.%' + query + '%,first_name.ilike.%' + query + '%,last_name.ilike.%' + query + '%')
@@ -2646,7 +2646,7 @@
                     var exists = groupMessages.some(function(m) { return m.id === payload.new.id; });
                     if (!exists) {
                         // Fetch the full message with profile data
-                        var result = await supabase
+                        var result = await supabaseClient
                             .from('study_group_messages')
                             .select('*, profiles:sender_id(id, first_name, last_name, full_name, avatar_url)')
                             .eq('id', payload.new.id)

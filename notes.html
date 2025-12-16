@@ -499,12 +499,12 @@
                 
                 // Initialize connection manager
                 if (window.MyUBUtils) {
-                    const canConnect = await MyUBUtils.ConnectionManager.init(supabase, currentUser.id);
+                    const canConnect = await MyUBUtils.ConnectionManager.init(supabaseClient, currentUser.id);
                     if (!canConnect) {
                         document.getElementById('loadingScreen').style.display = 'none';
                         return;
                     }
-                    MyUBUtils.SubscriptionManager.init(supabase, currentUser.id);
+                    MyUBUtils.SubscriptionManager.init(supabaseClient, currentUser.id);
                     MyUBUtils.SubscriptionManager.subscribe({
                         messages: () => loadSidebarBadges(),
                         notifications: () => loadNotifications(),
@@ -857,7 +857,7 @@
             init();
             // Initialize call notifications
             if (window.MyUBCalls) {
-                MyUBCalls.init(supabase);
+                MyUBCalls.init(supabaseClient);
             }
         });
         window.addEventListener('beforeunload', () => updateOnlineStatus(false));

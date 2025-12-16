@@ -966,7 +966,7 @@
         
         // Check if student ID already exists in database
         async function checkStudentIdExists(studentId) {
-            const { data, error } = await supabase
+            const { data, error } = await supabaseClient
                 .from('profiles')
                 .select('id')
                 .eq('student_id', studentId)

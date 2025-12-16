@@ -616,13 +616,13 @@
             
             // Initialize connection manager (checks server capacity)
             if (window.MyUBUtils) {
-                const canConnect = await MyUBUtils.ConnectionManager.init(supabase, currentUser.id);
+                const canConnect = await MyUBUtils.ConnectionManager.init(supabaseClient, currentUser.id);
                 if (!canConnect) {
                     document.getElementById('loadingScreen').style.display = 'none';
                     return; // User in queue
                 }
                 // Use consolidated subscriptions
-                MyUBUtils.SubscriptionManager.init(supabase, currentUser.id);
+                MyUBUtils.SubscriptionManager.init(supabaseClient, currentUser.id);
                 MyUBUtils.SubscriptionManager.subscribe({
                     messages: () => { loadConversations(); loadSidebarFriendsBadge(); },
                     notifications: () => loadNotifications(),
@@ -1294,7 +1294,7 @@
                 container.innerHTML = '<div class="search-loading">Searching...</div>';
 
                 try {
-                    const { data: users, error } = await supabase
+                    const { data: users, error } = await supabaseClient
                         .from('profiles')
                         .select('id, first_name, last_name, full_name, avatar_url, program_name, is_online, last_seen')
                         .or(`full_name.ilike.%${query}%,first_name.ilike.%${query}%,last_name.ilike.%${query}%,program_name.ilike.%${query}%`)
@@ -1348,7 +1348,7 @@
             // Refresh friend data to ensure sync
             await Promise.all([loadFriends(), loadFriendRequests()]);
             
-            const { data: user, error } = await supabase
+            const { data: user, error } = await supabaseClient
                 .from('profiles')
                 .select('id, first_name, last_name, full_name, avatar_url, program_name, year_of_study, bio, is_online, last_seen, created_at')
                 .eq('id', userId)

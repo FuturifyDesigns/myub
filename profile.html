@@ -1639,12 +1639,12 @@
 
             // Initialize connection manager
             if (window.MyUBUtils) {
-                const canConnect = await MyUBUtils.ConnectionManager.init(supabase, currentUser.id);
+                const canConnect = await MyUBUtils.ConnectionManager.init(supabaseClient, currentUser.id);
                 if (!canConnect) {
                     document.getElementById('loadingState').style.display = 'none';
                     return;
                 }
-                MyUBUtils.SubscriptionManager.init(supabase, currentUser.id);
+                MyUBUtils.SubscriptionManager.init(supabaseClient, currentUser.id);
                 MyUBUtils.SubscriptionManager.subscribe({
                     messages: () => loadSidebarBadges(),
                     notifications: () => loadNotifications(),
@@ -1656,7 +1656,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             viewingUserId = urlParams.get('user');
 
-            const { data: profile } = await supabase
+            const { data: profile } = await supabaseClient
                 .from('profiles')
                 .select('is_banned, ban_reason')
                 .eq('id', currentUser.id)
@@ -1721,7 +1721,7 @@
 
         // Load another user's profile (view only)
         async function loadOtherProfile(userId) {
-            const { data: user, error } = await supabase
+            const { data: user, error } = await supabaseClient
                 .from('profiles')
                 .select('*')
                 .eq('id', userId)
@@ -1862,7 +1862,7 @@
         // PROFILE
         // =============================================
         async function loadProfile() {
-            const { data } = await supabase
+            const { data } = await supabaseClient
                 .from('profiles')
                 .select('*')
                 .eq('id', currentUser.id)
@@ -2061,7 +2061,7 @@
 
         async function removeAvatar() {
             try {
-                const { error } = await supabase
+                const { error } = await supabaseClient
                     .from('profiles')
                     .update({ avatar_url: null, updated_at: new Date().toISOString() })
                     .eq('id', currentUser.id);
@@ -2148,7 +2148,7 @@
 
                 const { data: urlData } = supabaseClient.storage.from('avatars').getPublicUrl(fileName);
 
-                const { error: updateError } = await supabase
+                const { error: updateError } = await supabaseClient
                     .from('profiles')
                     .update({ avatar_url: urlData.publicUrl, updated_at: new Date().toISOString() })
                     .eq('id', currentUser.id);
@@ -2193,7 +2193,7 @@
             try {
                 OnlineStatus.stopHeartbeat();
 
-                const { error } = await supabase
+                const { error } = await supabaseClient
                     .from('profiles')
                     .delete()
                     .eq('id', currentUser.id);
@@ -2288,7 +2288,7 @@
         
         // Initialize call notifications
         if (window.MyUBCalls) {
-            MyUBCalls.init(supabase);
+            MyUBCalls.init(supabaseClient);
         }
     </script>
 </body>

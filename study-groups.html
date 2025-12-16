@@ -1172,7 +1172,7 @@
         // ============================================
         var SUPABASE_URL = 'https://weuxtwmaqmbhskjpjdyi.supabase.co';
         var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndldXh0d21hcW1iaHNranBqZHlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NTYzMTcsImV4cCI6MjA4MDMzMjMxN30.J-0Nd0MY6-g_ltbBNHwOulqZuQfb8mKIRgx0dAaJ76o';
-        var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         var BAD_WORDS = ['fuck','shit','ass','bitch','damn','crap','bastard','dick','pussy','cock','cunt','whore','slut','fag','nigger','nigga','retard'];
         var BAD_WORD_REGEX = new RegExp('\\b(' + BAD_WORDS.join('|') + ')\\b', 'gi');
@@ -1245,15 +1245,15 @@
         // ============================================
         async function init() {
             try {
-                var sessionResult = await supabase.auth.getSession();
+                var sessionResult = await supabaseClient.auth.getSession();
                 var session = sessionResult.data.session;
                 if (!session) { window.location.href = 'index.html'; return; }
                 currentUser = session.user;
             
             // Check if user is banned
-            const { data: banProfile } = await supabase.from('profiles').select('is_banned').eq('id', currentUser.id).single();
+            const { data: banProfile } = await supabaseClient.from('profiles').select('is_banned').eq('id', currentUser.id).single();
             if (banProfile && banProfile.is_banned) {
-                await supabase.auth.signOut();
+                await supabaseClient.auth.signOut();
                 alert('Your account has been suspended. Please contact an administrator.');
                 window.location.href = 'index.html';
                 return;
@@ -1303,7 +1303,7 @@
         function startNotificationPolling() {
             setInterval(async function() {
                 var lastNotifId = notifications.length > 0 ? notifications[0].id : null;
-                var result = await supabase.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(5);
+                var result = await supabaseClient.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(5);
                 var newNotifs = result.data;
                 if (newNotifs && newNotifs.length > 0 && (!lastNotifId || newNotifs[0].id !== lastNotifId)) {
                     var existingIds = notifications.map(function(n) { return n.id; });
@@ -1319,7 +1319,7 @@
         }
         
         async function updateOnlineStatus(online) {
-            try { await supabase.from('profiles').update({ is_online: online, last_seen: new Date().toISOString() }).eq('id', currentUser.id); } catch(e) {}
+            try { await supabaseClient.from('profiles').update({ is_online: online, last_seen: new Date().toISOString() }).eq('id', currentUser.id); } catch(e) {}
         }
         
         function startHeartbeat() { setInterval(function() { updateOnlineStatus(true); }, 30000); }
@@ -1329,7 +1329,7 @@
         // ============================================
         async function loadMyGroups() {
             try {
-                var result = await supabase.from('study_group_members').select('group_id, role, study_groups(*)').eq('user_id', currentUser.id).neq('role', 'banned');
+                var result = await supabaseClient.from('study_group_members').select('group_id, role, study_groups(*)').eq('user_id', currentUser.id).neq('role', 'banned');
                 if (result.data) {
                     myGroups = result.data.map(function(m) {
                         if (!m.study_groups) return null;
@@ -1340,9 +1340,9 @@
                     
                     for (var i = 0; i < myGroups.length; i++) {
                         var g = myGroups[i];
-                        var msgResult = await supabase.from('study_group_messages').select('content, created_at, profiles:sender_id(first_name)').eq('group_id', g.id).eq('is_deleted', false).order('created_at', { ascending: false }).limit(1).maybeSingle();
+                        var msgResult = await supabaseClient.from('study_group_messages').select('content, created_at, profiles:sender_id(first_name)').eq('group_id', g.id).eq('is_deleted', false).order('created_at', { ascending: false }).limit(1).maybeSingle();
                         g.lastMessage = msgResult.data;
-                        var membersResult = await supabase.from('study_group_members').select('user_id, profiles:user_id(is_online)').eq('group_id', g.id).neq('role', 'banned');
+                        var membersResult = await supabaseClient.from('study_group_members').select('user_id, profiles:user_id(is_online)').eq('group_id', g.id).neq('role', 'banned');
                         g.membersCount = (membersResult.data || []).length;
                         g.onlineCount = (membersResult.data || []).filter(function(m) { return m.profiles && m.profiles.is_online; }).length;
                     }
@@ -1364,31 +1364,31 @@
                 discoverGroups = [];
                 
                 // Get IDs of groups user is a member of (including banned)
-                var myMemberResult = await supabase.from('study_group_members').select('group_id').eq('user_id', currentUser.id);
+                var myMemberResult = await supabaseClient.from('study_group_members').select('group_id').eq('user_id', currentUser.id);
                 var myIds = (myMemberResult.data || []).map(function(m) { return m.group_id; });
                 
                 // Load public groups
-                var result = await supabase.from('study_groups').select('*').eq('is_private', false).order('created_at', { ascending: false }).limit(50);
+                var result = await supabaseClient.from('study_groups').select('*').eq('is_private', false).order('created_at', { ascending: false }).limit(50);
                 var publicGroups = (result.data || []).filter(function(g) { return myIds.indexOf(g.id) === -1; });
                 
                 for (var i = 0; i < publicGroups.length; i++) {
-                    var countResult = await supabase.from('study_group_members').select('*', { count: 'exact', head: true }).eq('group_id', publicGroups[i].id).neq('role', 'banned');
+                    var countResult = await supabaseClient.from('study_group_members').select('*', { count: 'exact', head: true }).eq('group_id', publicGroups[i].id).neq('role', 'banned');
                     publicGroups[i].membersCount = countResult.count || 0;
                     discoverGroups.push(publicGroups[i]);
                 }
                 
                 // Also load private groups to show "Ask to Join"
-                var privateResult = await supabase.from('study_groups').select('*').eq('is_private', true).order('created_at', { ascending: false }).limit(50);
+                var privateResult = await supabaseClient.from('study_groups').select('*').eq('is_private', true).order('created_at', { ascending: false }).limit(50);
                 var privateGroups = (privateResult.data || []).filter(function(g) { return myIds.indexOf(g.id) === -1; });
                 
                 for (var i = 0; i < privateGroups.length; i++) {
                     var pg = privateGroups[i];
-                    var countResult = await supabase.from('study_group_members').select('*', { count: 'exact', head: true }).eq('group_id', pg.id).neq('role', 'banned');
+                    var countResult = await supabaseClient.from('study_group_members').select('*', { count: 'exact', head: true }).eq('group_id', pg.id).neq('role', 'banned');
                     pg.membersCount = countResult.count || 0;
                     pg.isPrivate = true;
                     
                     // Check if user has pending request
-                    var reqResult = await supabase.from('group_join_requests').select('status').eq('group_id', pg.id).eq('user_id', currentUser.id).eq('status', 'pending').maybeSingle();
+                    var reqResult = await supabaseClient.from('group_join_requests').select('status').eq('group_id', pg.id).eq('user_id', currentUser.id).eq('status', 'pending').maybeSingle();
                     pg.hasPendingRequest = !!reqResult.data;
                     discoverGroups.push(pg);
                 }
@@ -1453,7 +1453,7 @@
         
         async function loadNotifications() {
             try {
-                var result = await supabase.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(30);
+                var result = await supabaseClient.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(30);
                 notifications = result.data || [];
                 renderNotifications();
                 checkAnnouncementPopup();
@@ -1484,12 +1484,12 @@
         async function dismissAnnouncement(announcementId) {
             const notification = notifications.find(n => n.id === announcementId);
             const isBan = notification && notification.type === 'ban';
-            await supabase.from('notifications').update({ is_read: true }).eq('id', announcementId);
+            await supabaseClient.from('notifications').update({ is_read: true }).eq('id', announcementId);
             var idx = notifications.findIndex(function(n) { return n.id === announcementId; });
             if (idx !== -1) notifications[idx].is_read = true;
             var overlay = document.querySelector('.announcement-overlay');
             if (overlay) { overlay.style.animation = 'fadeIn 0.3s ease reverse'; setTimeout(function() { overlay.remove(); }, 300); }
-            if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
+            if (isBan) { await supabaseClient.auth.signOut(); window.location.href = 'index.html'; return; }
             renderNotifications();
             setTimeout(checkAnnouncementPopup, 500);
         }
@@ -1497,8 +1497,8 @@
         async function loadFriends() {
             try {
                 // Use same approach as friends.html (no status column filter)
-                var result1 = await supabase.from('friendships').select('friend_id').eq('user_id', currentUser.id);
-                var result2 = await supabase.from('friendships').select('user_id').eq('friend_id', currentUser.id);
+                var result1 = await supabaseClient.from('friendships').select('friend_id').eq('user_id', currentUser.id);
+                var result2 = await supabaseClient.from('friendships').select('user_id').eq('friend_id', currentUser.id);
                 
                 var friendIds = [];
                 (result1.data || []).forEach(function(f) { friendIds.push(f.friend_id); });
@@ -1524,7 +1524,7 @@
         
         async function loadBlockedUsers() {
             try {
-                var result = await supabase.from('blocked_users').select('blocked_id').eq('blocker_id', currentUser.id);
+                var result = await supabaseClient.from('blocked_users').select('blocked_id').eq('blocker_id', currentUser.id);
                 blockedUsers = (result.data || []).map(function(b) { return b.blocked_id; });
             } catch(e) { blockedUsers = []; }
         }
@@ -1796,7 +1796,7 @@
         async function joinGroup(groupId) {
             try {
                 // Check if user is banned from this group
-                var banCheck = await supabase.from('study_group_members')
+                var banCheck = await supabaseClient.from('study_group_members')
                     .select('role')
                     .eq('group_id', groupId)
                     .eq('user_id', currentUser.id)
@@ -1808,7 +1808,7 @@
                     return;
                 }
                 
-                var result = await supabase.from('study_group_members').insert({ group_id: groupId, user_id: currentUser.id, role: 'member' });
+                var result = await supabaseClient.from('study_group_members').insert({ group_id: groupId, user_id: currentUser.id, role: 'member' });
                 if (result.error) { showToast(result.error.code === '23505' ? 'Already a member' : 'Failed to join', 'error'); return; }
                 showToast('Joined!', 'success');
                 await loadMyGroups();
@@ -1820,7 +1820,7 @@
         async function askToJoin(groupId) {
             try {
                 // Check if user is banned from this group
-                var banCheck = await supabase.from('study_group_members')
+                var banCheck = await supabaseClient.from('study_group_members')
                     .select('role')
                     .eq('group_id', groupId)
                     .eq('user_id', currentUser.id)
@@ -1833,11 +1833,11 @@
                 }
                 
                 // Get group info for notification
-                var groupResult = await supabase.from('study_groups').select('name, creator_id').eq('id', groupId).single();
+                var groupResult = await supabaseClient.from('study_groups').select('name, creator_id').eq('id', groupId).single();
                 var group = groupResult.data;
                 
                 // Create join request
-                var result = await supabase.from('group_join_requests').insert({
+                var result = await supabaseClient.from('group_join_requests').insert({
                     group_id: groupId,
                     user_id: currentUser.id,
                     status: 'pending'
@@ -1850,11 +1850,11 @@
                 }
                 
                 // Get user's name for notification
-                var profileResult = await supabase.from('profiles').select('first_name, last_name').eq('id', currentUser.id).single();
+                var profileResult = await supabaseClient.from('profiles').select('first_name, last_name').eq('id', currentUser.id).single();
                 var userName = getName(profileResult.data);
                 
                 // Notify group admin
-                await supabase.from('notifications').insert({
+                await supabaseClient.from('notifications').insert({
                     user_id: group.creator_id,
                     title: 'Join Request',
                     message: userName + ' wants to join ' + group.name,
@@ -1875,13 +1875,13 @@
                 
                 if (accept) {
                     // Add user to group
-                    await supabase.from('study_group_members').insert({ group_id: groupId, user_id: userId, role: 'member' });
+                    await supabaseClient.from('study_group_members').insert({ group_id: groupId, user_id: userId, role: 'member' });
                     
                     // Get group name
-                    var groupResult = await supabase.from('study_groups').select('name').eq('id', groupId).single();
+                    var groupResult = await supabaseClient.from('study_groups').select('name').eq('id', groupId).single();
                     
                     // Notify the user
-                    await supabase.from('notifications').insert({
+                    await supabaseClient.from('notifications').insert({
                         user_id: userId,
                         title: 'Request Accepted',
                         message: 'You can now join ' + groupResult.data.name,
@@ -1894,10 +1894,10 @@
                 }
                 
                 // Update request status
-                await supabase.from('group_join_requests').update({ status: accept ? 'accepted' : 'declined' }).eq('group_id', groupId).eq('user_id', userId);
+                await supabaseClient.from('group_join_requests').update({ status: accept ? 'accepted' : 'declined' }).eq('group_id', groupId).eq('user_id', userId);
                 
                 // Mark notification as read
-                await supabase.from('notifications').update({ is_read: true }).eq('id', notifId);
+                await supabaseClient.from('notifications').update({ is_read: true }).eq('id', notifId);
                 await loadNotifications();
                 if (currentGroup && currentGroup.id === groupId) await loadGroupMembers();
             } catch(e) { showToast('Failed', 'error'); console.error(e); }
@@ -1941,7 +1941,7 @@
                 };
                 if (tempReplyId) insertData.reply_to_id = tempReplyId;
                 
-                var result = await supabase.from('study_group_messages').insert(insertData).select('*, profiles:sender_id(id, first_name, last_name, full_name, avatar_url)').single();
+                var result = await supabaseClient.from('study_group_messages').insert(insertData).select('*, profiles:sender_id(id, first_name, last_name, full_name, avatar_url)').single();
                 
                 if (result.error) { 
                     // Remove temp message on error
@@ -1975,7 +1975,7 @@
                         });
                         
                         // Insert notifications in batch
-                        var notifResult = await supabase.from('notifications').insert(notificationData);
+                        var notifResult = await supabaseClient.from('notifications').insert(notificationData);
                         if (notifResult.error) {
                             console.error('Failed to send notifications:', notifResult.error);
                         } else {
@@ -2041,7 +2041,7 @@
         
         async function promoteToAdmin(userId) {
             try {
-                await supabase.from('study_group_members').update({ role: 'admin' }).eq('group_id', currentGroup.id).eq('user_id', userId);
+                await supabaseClient.from('study_group_members').update({ role: 'admin' }).eq('group_id', currentGroup.id).eq('user_id', userId);
                 showToast('Promoted to admin', 'success');
                 await loadGroupMembers();
                 renderMembersList();
@@ -2050,7 +2050,7 @@
         
         async function removeMember(userId) {
             try {
-                await supabase.from('study_group_members').delete().eq('group_id', currentGroup.id).eq('user_id', userId);
+                await supabaseClient.from('study_group_members').delete().eq('group_id', currentGroup.id).eq('user_id', userId);
                 showToast('Member removed', 'success');
                 await loadGroupMembers();
                 renderMembersList();
@@ -2063,7 +2063,7 @@
             document.getElementById('confirmMessage').textContent = 'Ban this user from the group? They will not be able to rejoin.';
             confirmCallback = async function() {
                 try {
-                    await supabase.from('study_group_members').update({ role: 'banned' }).eq('group_id', currentGroup.id).eq('user_id', userId);
+                    await supabaseClient.from('study_group_members').update({ role: 'banned' }).eq('group_id', currentGroup.id).eq('user_id', userId);
                     showToast('User banned', 'success');
                     closeConfirmModal();
                     await loadGroupMembers();
@@ -2076,7 +2076,7 @@
         
         async function unbanMember(userId) {
             try {
-                await supabase.from('study_group_members').delete().eq('group_id', currentGroup.id).eq('user_id', userId);
+                await supabaseClient.from('study_group_members').delete().eq('group_id', currentGroup.id).eq('user_id', userId);
                 showToast('User unbanned', 'success');
                 await loadGroupMembers();
                 renderBannedUsers();
@@ -2235,7 +2235,7 @@
         
         async function addMemberToGroup(userId) {
             try {
-                var result = await supabase.from('study_group_members').insert({ group_id: currentGroup.id, user_id: userId, role: 'member' });
+                var result = await supabaseClient.from('study_group_members').insert({ group_id: currentGroup.id, user_id: userId, role: 'member' });
                 if (result.error) { 
                     showToast(result.error.code === '23505' ? 'Already a member' : 'Failed: ' + result.error.message, 'error'); 
                     console.error('Add member error:', result.error);
@@ -2245,7 +2245,7 @@
                 
                 // Send notification to the added member
                 var adderName = currentUser.user_metadata?.full_name || 'Someone';
-                var notifResult = await supabase.from('notifications').insert({
+                var notifResult = await supabaseClient.from('notifications').insert({
                     user_id: userId,
                     type: 'message',
                     title: 'Added to Study Group',
@@ -2355,14 +2355,14 @@
                 var avatarUrl = null;
                 if (croppedImageBlob) {
                     var fileName = 'group_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9) + '.jpg';
-                    var uploadResult = await supabase.storage.from('avatars').upload(fileName, croppedImageBlob);
+                    var uploadResult = await supabaseClient.storage.from('avatars').upload(fileName, croppedImageBlob);
                     if (!uploadResult.error) {
-                        var urlResult = supabase.storage.from('avatars').getPublicUrl(fileName);
+                        var urlResult = supabaseClient.storage.from('avatars').getPublicUrl(fileName);
                         avatarUrl = urlResult.data.publicUrl;
                     }
                 }
                 
-                var insertResult = await supabase.from('study_groups').insert({
+                var insertResult = await supabaseClient.from('study_groups').insert({
                     name: name, description: desc, course_code: course, avatar_url: avatarUrl, is_private: isPrivate, creator_id: currentUser.id
                 }).select().single();
                 
@@ -2371,14 +2371,14 @@
                 var group = insertResult.data;
                 
                 // Add creator as admin
-                await supabase.from('study_group_members').insert({ group_id: group.id, user_id: currentUser.id, role: 'admin' });
+                await supabaseClient.from('study_group_members').insert({ group_id: group.id, user_id: currentUser.id, role: 'admin' });
                 
                 // Add selected members and send notifications
                 var creatorName = currentUser.user_metadata?.full_name || 'Someone';
                 var memberNotifications = [];
                 
                 for (var i = 0; i < selectedMembers.length; i++) {
-                    await supabase.from('study_group_members').insert({ group_id: group.id, user_id: selectedMembers[i].id, role: 'member' });
+                    await supabaseClient.from('study_group_members').insert({ group_id: group.id, user_id: selectedMembers[i].id, role: 'member' });
                     
                     // Prepare notification for this member
                     memberNotifications.push({
@@ -2392,7 +2392,7 @@
                 
                 // Send all notifications
                 if (memberNotifications.length > 0) {
-                    var notifResult = await supabase.from('notifications').insert(memberNotifications);
+                    var notifResult = await supabaseClient.from('notifications').insert(memberNotifications);
                     if (notifResult.error) {
                         console.error('Failed to send group invite notifications:', notifResult.error);
                     } else {
@@ -2457,7 +2457,7 @@
             if (userId === currentUser.id) return;
             selectedProfileUser = userId;
             try {
-                var result = await supabase.from('profiles').select('*').eq('id', userId).single();
+                var result = await supabaseClient.from('profiles').select('*').eq('id', userId).single();
                 var p = result.data;
                 if (!p) return;
                 
@@ -2491,11 +2491,11 @@
         async function toggleBlockUser(userId) {
             try {
                 if (blockedUsers.indexOf(userId) !== -1) {
-                    await supabase.from('blocked_users').delete().eq('blocker_id', currentUser.id).eq('blocked_id', userId);
+                    await supabaseClient.from('blocked_users').delete().eq('blocker_id', currentUser.id).eq('blocked_id', userId);
                     blockedUsers = blockedUsers.filter(function(id) { return id !== userId; });
                     showToast('Unblocked', 'success');
                 } else {
-                    await supabase.from('blocked_users').insert({ blocker_id: currentUser.id, blocked_id: userId });
+                    await supabaseClient.from('blocked_users').insert({ blocker_id: currentUser.id, blocked_id: userId });
                     blockedUsers.push(userId);
                     showToast('Blocked', 'success');
                 }
@@ -2512,7 +2512,7 @@
             var details = document.getElementById('reportDetails').value;
             if (!reason) { showToast('Select a reason', 'error'); return; }
             try {
-                await supabase.from('user_reports').insert({ reporter_id: currentUser.id, reported_id: reportTargetId, reason: reason, details: details, context: 'study_group', context_id: currentGroup ? currentGroup.id : null });
+                await supabaseClient.from('user_reports').insert({ reporter_id: currentUser.id, reported_id: reportTargetId, reason: reason, details: details, context: 'study_group', context_id: currentGroup ? currentGroup.id : null });
                 closeReportModal(); closeProfileModal();
                 showToast('Report submitted', 'success');
             } catch(e) { showToast('Failed to submit', 'error'); }
@@ -2535,9 +2535,9 @@
                     if (isOnlyAdmin && currentMembers.length > 1) {
                         var others = currentMembers.filter(function(m) { return m.user_id !== currentUser.id; });
                         var random = others[Math.floor(Math.random() * others.length)];
-                        await supabase.from('study_group_members').update({ role: 'admin' }).eq('group_id', currentGroup.id).eq('user_id', random.user_id);
+                        await supabaseClient.from('study_group_members').update({ role: 'admin' }).eq('group_id', currentGroup.id).eq('user_id', random.user_id);
                     }
-                    await supabase.from('study_group_members').delete().eq('group_id', currentGroup.id).eq('user_id', currentUser.id);
+                    await supabaseClient.from('study_group_members').delete().eq('group_id', currentGroup.id).eq('user_id', currentUser.id);
                     closeConfirmModal(); closeGroupInfoModal(); closeChatMenu();
                     currentGroup = null;
                     document.getElementById('chatEmpty').style.display = 'flex';
@@ -2560,7 +2560,7 @@
             
             confirmCallback = async function() {
                 try {
-                    await supabase.from('study_groups').delete().eq('id', currentGroup.id);
+                    await supabaseClient.from('study_groups').delete().eq('id', currentGroup.id);
                     closeConfirmModal(); closeGroupInfoModal();
                     currentGroup = null;
                     document.getElementById('chatEmpty').style.display = 'flex';
@@ -2583,7 +2583,7 @@
         // NOTIFICATIONS
         // ============================================
         async function handleNotifClick(id, type, refId) {
-            try { await supabase.from('notifications').update({ is_read: true }).eq('id', id); } catch(e) {}
+            try { await supabaseClient.from('notifications').update({ is_read: true }).eq('id', id); } catch(e) {}
             
             // Check if this is a group notification by reference_id
             if (refId && refId.startsWith('group:')) {
@@ -2604,7 +2604,7 @@
         
         async function markAllNotificationsRead() {
             try {
-                await supabase.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id);
+                await supabaseClient.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id);
                 for (var i = 0; i < notifications.length; i++) notifications[i].is_read = true;
                 renderNotifications();
             } catch(e) {}
@@ -2640,7 +2640,7 @@
         // ============================================
         function subscribeToRealtime() {
             // Messages channel - handle new messages in real-time
-            supabase.channel('sg-messages').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'study_group_messages' }, async function(payload) {
+            supabaseClient.channel('sg-messages').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'study_group_messages' }, async function(payload) {
                 if (currentGroup && payload.new.group_id === currentGroup.id) {
                     // Only add if not already in list (avoid duplicates from optimistic update)
                     var exists = groupMessages.some(function(m) { return m.id === payload.new.id; });
@@ -2665,7 +2665,7 @@
             }).subscribe();
             
             // Members channel - update counters in real-time
-            supabase.channel('sg-members').on('postgres_changes', { event: '*', schema: 'public', table: 'study_group_members' }, function(payload) {
+            supabaseClient.channel('sg-members').on('postgres_changes', { event: '*', schema: 'public', table: 'study_group_members' }, function(payload) {
                 if (currentGroup) {
                     loadGroupMembers().then(function() { 
                         updateMembersDisplay(); 
@@ -2684,7 +2684,7 @@
             }).subscribe();
             
             // Online status channel - update when any profile's online status changes
-            supabase.channel('sg-online').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, function(payload) {
+            supabaseClient.channel('sg-online').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, function(payload) {
                 if (payload.new.is_online) checkFriendOnline(payload.new);
                 if (currentGroup) {
                     loadGroupMembers().then(function() { 
@@ -2699,7 +2699,7 @@
             }).subscribe();
             
             // Notifications channel
-            supabase.channel('sg-notif-' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: 'user_id=eq.' + currentUser.id }, function(payload) {
+            supabaseClient.channel('sg-notif-' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: 'user_id=eq.' + currentUser.id }, function(payload) {
                 console.log('Study Groups: New notification received:', payload);
                 notifications.unshift(payload.new);
                 renderNotifications();
@@ -2713,7 +2713,7 @@
             }).subscribe(function(status) { console.log('Study Groups notification subscription:', status); });
             
             // Sidebar badges
-            supabase.channel('sg-msg-badge-' + currentUser.id).on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: 'receiver_id=eq.' + currentUser.id }, function() { loadSidebarBadges(); }).subscribe();
+            supabaseClient.channel('sg-msg-badge-' + currentUser.id).on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: 'receiver_id=eq.' + currentUser.id }, function() { loadSidebarBadges(); }).subscribe();
         }
         
         function checkFriendOnline(profile) {
@@ -2871,14 +2871,14 @@
         async function uploadGroupAvatarBlob(blob) {
             try {
                 var fileName = 'group_' + currentGroup.id + '_' + Date.now() + '.jpg';
-                var uploadResult = await supabase.storage.from('avatars').upload(fileName, blob);
+                var uploadResult = await supabaseClient.storage.from('avatars').upload(fileName, blob);
                 
                 if (uploadResult.error) { showToast('Upload failed', 'error'); return; }
                 
-                var urlResult = supabase.storage.from('avatars').getPublicUrl(fileName);
+                var urlResult = supabaseClient.storage.from('avatars').getPublicUrl(fileName);
                 var publicUrl = urlResult.data.publicUrl;
                 
-                await supabase.from('study_groups').update({ avatar_url: publicUrl }).eq('id', currentGroup.id);
+                await supabaseClient.from('study_groups').update({ avatar_url: publicUrl }).eq('id', currentGroup.id);
                 currentGroup.avatar_url = publicUrl;
                 document.getElementById('chatAvatar').innerHTML = '<img src="' + escapeHtml(publicUrl) + '">';
                 closeGroupAvatarModal();
@@ -2891,7 +2891,7 @@
         async function removeGroupAvatar() {
             if (avatarMode === 'edit' && currentGroup) {
                 try {
-                    await supabase.from('study_groups').update({ avatar_url: null }).eq('id', currentGroup.id);
+                    await supabaseClient.from('study_groups').update({ avatar_url: null }).eq('id', currentGroup.id);
                     currentGroup.avatar_url = null;
                     var initials = getInitials(currentGroup.name);
                     document.getElementById('chatAvatar').innerHTML = initials;
@@ -3040,7 +3040,7 @@
             }
             
             try {
-                await supabase.from('study_group_messages').update({ is_deleted: true }).eq('id', contextMenuMessageId);
+                await supabaseClient.from('study_group_messages').update({ is_deleted: true }).eq('id', contextMenuMessageId);
                 groupMessages = groupMessages.filter(function(m) { return m.id !== contextMenuMessageId; });
                 renderMessages();
                 showToast('Message deleted', 'success');
@@ -3066,7 +3066,7 @@
             
             try {
                 for (var i = 0; i < myMsgIds.length; i++) {
-                    await supabase.from('study_group_messages').update({ is_deleted: true }).eq('id', myMsgIds[i]);
+                    await supabaseClient.from('study_group_messages').update({ is_deleted: true }).eq('id', myMsgIds[i]);
                 }
                 groupMessages = groupMessages.filter(function(m) { return myMsgIds.indexOf(m.id) === -1; });
                 showToast(myMsgIds.length + ' message(s) deleted', 'success');
@@ -3162,7 +3162,7 @@
                     var userId = forwardToUsers[i];
                     for (var j = 0; j < messagesToForward.length; j++) {
                         var msg = messagesToForward[j];
-                        await supabase.from('messages').insert({
+                        await supabaseClient.from('messages').insert({
                             sender_id: currentUser.id,
                             receiver_id: userId,
                             content: '[Forwarded from ' + (currentGroup ? currentGroup.name : 'group') + ']: ' + msg.content
@@ -3216,7 +3216,7 @@
             try {
                 for (var i = 0; i < messagesToReport.length; i++) {
                     var msg = messagesToReport[i];
-                    await supabase.from('reports').insert({
+                    await supabaseClient.from('reports').insert({
                         reporter_id: currentUser.id,
                         reported_id: msg.sender_id,
                         type: 'group_message',
@@ -3241,7 +3241,7 @@
             openMessageReportModal();
         }
         
-        async function handleLogout() { await updateOnlineStatus(false); await supabase.auth.signOut(); window.location.href = 'index.html'; }
+        async function handleLogout() { await updateOnlineStatus(false); await supabaseClient.auth.signOut(); window.location.href = 'index.html'; }
         
         // ============================================
         // NOTIFICATIONS MODAL
@@ -3255,7 +3255,7 @@
         function closeNotificationsModal() { document.getElementById('notificationsModal').style.display = 'none'; }
         
         async function loadAllNotifications() {
-            var response = await supabase.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(100);
+            var response = await supabaseClient.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(100);
             var allNotifs = response.data || [];
             var list = document.getElementById('allNotifList');
             if (allNotifs.length === 0) {
@@ -3278,7 +3278,7 @@
         }
         
         async function handleNotifClickModal(id, type, refId) {
-            await supabase.from('notifications').update({ is_read: true }).eq('id', id);
+            await supabaseClient.from('notifications').update({ is_read: true }).eq('id', id);
             closeNotificationsModal();
             
             // Check if this is a group notification by reference_id
@@ -3296,7 +3296,7 @@
         }
         
         async function markAllNotificationsReadModal() {
-            await supabase.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id);
+            await supabaseClient.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id);
             notifications.forEach(function(n) { n.is_read = true; });
             renderNotifications();
             await loadAllNotifications();
@@ -3305,7 +3305,7 @@
         
         async function clearAllNotifications() {
             if (!confirm('Are you sure you want to clear all notifications? This cannot be undone.')) return;
-            const { error } = await supabase.from('notifications').delete().eq('user_id', currentUser.id); 
+            const { error } = await supabaseClient.from('notifications').delete().eq('user_id', currentUser.id); 
             if (error) { console.error('Delete failed:', error); showToast('Failed to clear. Check database permissions.', 'error'); return; }
             notifications = [];
             renderNotifications();
@@ -3355,7 +3355,7 @@
                 isInGroupCall = true;
                 isMuted = false;
                 
-                await supabase.from('group_call_signals').insert({
+                await supabaseClient.from('group_call_signals').insert({
                     group_id: currentGroup.id,
                     user_id: currentUser.id,
                     signal_type: 'call_started'
@@ -3383,7 +3383,7 @@
                 isInGroupCall = true;
                 isMuted = false;
                 
-                await supabase.from('group_call_signals').insert({
+                await supabaseClient.from('group_call_signals').insert({
                     group_id: currentGroup.id,
                     user_id: currentUser.id,
                     signal_type: 'user_joined'
@@ -3410,7 +3410,7 @@
                 
                 call.on('stream', async function(remoteStream) {
                     playRemoteAudio(userId, remoteStream);
-                    var profileResult = await supabase.from('profiles').select('full_name, avatar_url').eq('id', userId).single();
+                    var profileResult = await supabaseClient.from('profiles').select('full_name, avatar_url').eq('id', userId).single();
                     if (profileResult.data) {
                         addParticipantToUI(userId, profileResult.data.full_name, profileResult.data.avatar_url, false);
                     }
@@ -3432,7 +3432,7 @@
             
             call.on('stream', async function(remoteStream) {
                 playRemoteAudio(callerId, remoteStream);
-                var profileResult = await supabase.from('profiles').select('full_name, avatar_url').eq('id', callerId).single();
+                var profileResult = await supabaseClient.from('profiles').select('full_name, avatar_url').eq('id', callerId).single();
                 if (profileResult.data) {
                     addParticipantToUI(callerId, profileResult.data.full_name, profileResult.data.avatar_url, false);
                 }
@@ -3486,7 +3486,7 @@
         
         async function endGroupCall() {
             if (currentGroup) {
-                await supabase.from('group_call_signals').insert({
+                await supabaseClient.from('group_call_signals').insert({
                     group_id: currentGroup.id,
                     user_id: currentUser.id,
                     signal_type: 'user_left'

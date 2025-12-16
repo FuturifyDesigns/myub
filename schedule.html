@@ -522,7 +522,7 @@
     <script>
         const SUPABASE_URL = 'https://weuxtwmaqmbhskjpjdyi.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndldXh0d21hcW1iaHNranBqZHlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NTYzMTcsImV4cCI6MjA4MDMzMjMxN30.J-0Nd0MY6-g_ltbBNHwOulqZuQfb8mKIRgx0dAaJ76o';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let currentUser = null;
         let schedules = [];
@@ -587,14 +587,14 @@
         }
 
         async function init() {
-            const { data: { session } } = await supabase.auth.getSession();
+            const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) { window.location.href = 'index.html'; return; }
             currentUser = session.user;
             
             // Check if user is banned
-            const { data: banProfile } = await supabase.from('profiles').select('is_banned').eq('id', currentUser.id).single();
+            const { data: banProfile } = await supabaseClient.from('profiles').select('is_banned').eq('id', currentUser.id).single();
             if (banProfile && banProfile.is_banned) {
-                await supabase.auth.signOut();
+                await supabaseClient.auth.signOut();
                 alert('Your account has been suspended. Please contact an administrator.');
                 window.location.href = 'index.html';
                 return;
@@ -635,7 +635,7 @@
         function startNotificationPolling() {
             setInterval(async () => {
                 const lastNotifId = notifications.length > 0 ? notifications[0].id : null;
-                const { data: newNotifs } = await supabase.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(5);
+                const { data: newNotifs } = await supabaseClient.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(5);
                 if (newNotifs && newNotifs.length > 0 && (!lastNotifId || newNotifs[0].id !== lastNotifId)) {
                     const existingIds = notifications.map(n => n.id);
                     const trulyNew = newNotifs.filter(n => !existingIds.includes(n.id));
@@ -650,7 +650,7 @@
         }
 
         async function loadProfile() {
-            const { data } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
+            const { data } = await supabaseClient.from('profiles').select('*').eq('id', currentUser.id).single();
             if (data) {
                 const name = data.full_name || data.first_name || 'User';
                 const avatarEl = document.getElementById('userAvatar');
@@ -661,15 +661,15 @@
         }
 
         async function loadSchedules() {
-            const { data, error } = await supabase.from('schedules').select('*').eq('user_id', currentUser.id).order('start_time', { ascending: true });
+            const { data, error } = await supabaseClient.from('schedules').select('*').eq('user_id', currentUser.id).order('start_time', { ascending: true });
             if (!error && data) schedules = data;
         }
 
         async function loadSidebarBadges() {
-            const { count: msgCount } = await supabase.from('messages').select('*', { count: 'exact', head: true }).eq('receiver_id', currentUser.id).eq('is_read', false).neq('is_deleted', true);
+            const { count: msgCount } = await supabaseClient.from('messages').select('*', { count: 'exact', head: true }).eq('receiver_id', currentUser.id).eq('is_read', false).neq('is_deleted', true);
             const msgBadge = document.getElementById('msgBadge');
             if (msgCount > 0) { msgBadge.textContent = msgCount; msgBadge.style.display = 'inline'; } else { msgBadge.style.display = 'none'; }
-            const { count: friendCount } = await supabase.from('friend_requests').select('*', { count: 'exact', head: true }).eq('receiver_id', currentUser.id).eq('status', 'pending');
+            const { count: friendCount } = await supabaseClient.from('friend_requests').select('*', { count: 'exact', head: true }).eq('receiver_id', currentUser.id).eq('status', 'pending');
             const friendsBadge = document.getElementById('friendsBadge');
             if (friendCount > 0) { friendsBadge.textContent = friendCount; friendsBadge.style.display = 'inline'; } else { friendsBadge.style.display = 'none'; }
         }
@@ -863,8 +863,8 @@
                 reminder_before: parseInt(document.getElementById('eventReminder').value) || 30
             };
             let error;
-            if (editingEventId) error = (await supabase.from('schedules').update(eventData).eq('id', editingEventId)).error;
-            else error = (await supabase.from('schedules').insert(eventData)).error;
+            if (editingEventId) error = (await supabaseClient.from('schedules').update(eventData).eq('id', editingEventId)).error;
+            else error = (await supabaseClient.from('schedules').insert(eventData)).error;
             if (error) { console.error('Error saving event:', error); showToast('Failed to save event', 'error'); return; }
             showToast(editingEventId ? 'Event updated!' : 'Event created!', 'success');
             closeEventModal(); await loadSchedules(); renderCalendar(); renderUpcoming();
@@ -872,20 +872,20 @@
 
         async function deleteEvent() {
             if (!editingEventId || !confirm('Delete this event?')) return;
-            const { error } = await supabase.from('schedules').delete().eq('id', editingEventId);
+            const { error } = await supabaseClient.from('schedules').delete().eq('id', editingEventId);
             if (error) { showToast('Failed to delete event', 'error'); return; }
             showToast('Event deleted', 'success'); closeEventModal(); await loadSchedules(); renderCalendar(); renderUpcoming();
         }
 
         async function deleteEventDirect(eventId) {
             if (!confirm('Delete this event?')) return;
-            const { error } = await supabase.from('schedules').delete().eq('id', eventId);
+            const { error } = await supabaseClient.from('schedules').delete().eq('id', eventId);
             if (error) { showToast('Failed to delete event', 'error'); return; }
             showToast('Event deleted', 'success'); await loadSchedules(); renderCalendar(); renderUpcoming();
         }
 
         async function loadNotifications() {
-            const { data } = await supabase.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(20);
+            const { data } = await supabaseClient.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(20);
             notifications = data || [];
             renderNotifications();
             checkAnnouncementPopup();
@@ -915,12 +915,12 @@
         async function dismissAnnouncement(announcementId) {
             const notification = (typeof notificationsList !== 'undefined' ? notificationsList : notifications).find(n => n.id === announcementId);
             const isBan = notification && notification.type === 'ban';
-            await supabase.from('notifications').update({ is_read: true }).eq('id', announcementId);
+            await supabaseClient.from('notifications').update({ is_read: true }).eq('id', announcementId);
             const idx = notifications.findIndex(n => n.id === announcementId);
             if (idx !== -1) notifications[idx].is_read = true;
             const overlay = document.querySelector('.announcement-overlay');
             if (overlay) { overlay.style.animation = 'fadeIn 0.3s ease reverse'; setTimeout(() => overlay.remove(), 300); }
-            if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
+            if (isBan) { await supabaseClient.auth.signOut(); window.location.href = 'index.html'; return; }
             renderNotifications();
             setTimeout(checkAnnouncementPopup, 500);
         }
@@ -939,7 +939,7 @@
         }
 
         async function handleNotifClick(id, type, refId) {
-            await supabase.from('notifications').update({ is_read: true }).eq('id', id);
+            await supabaseClient.from('notifications').update({ is_read: true }).eq('id', id);
             document.getElementById('notificationDropdown').classList.remove('show');
             if (refId && refId.startsWith('group:')) { location.href = 'study-groups.html?id=' + refId.replace('group:', ''); return; }
             if (type.includes('friend')) location.href = 'friends.html';
@@ -948,7 +948,7 @@
         }
 
         async function markAllRead() {
-            await supabase.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id);
+            await supabaseClient.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id);
             notifications.forEach(n => n.is_read = true);
             renderNotifications();
         }
@@ -957,7 +957,7 @@
         function closeNotificationsModal() { document.getElementById('notificationsModal').classList.remove('show'); }
 
         async function loadAllNotifications() {
-            const { data } = await supabase.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(100);
+            const { data } = await supabaseClient.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(100);
             const allNotifs = data || [], list = document.getElementById('allNotifList');
             if (allNotifs.length === 0) { list.innerHTML = '<div style="padding:40px;text-align:center;color:#94a3b8;">No notifications</div>'; return; }
             list.innerHTML = allNotifs.map(n => {
@@ -969,12 +969,12 @@
             }).join('');
         }
 
-        async function handleNotifClickModal(id, type, refId) { await supabase.from('notifications').update({ is_read: true }).eq('id', id); closeNotificationsModal(); if (refId && refId.startsWith('group:')) { location.href = 'study-groups.html?id=' + refId.replace('group:', ''); return; } if (type.includes('friend')) location.href = 'friends.html'; else if (type.includes('message')) location.href = 'messages.html'; else if (type.includes('group')) location.href = 'study-groups.html'; }
-        async function markAllNotificationsReadModal() { await supabase.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id); notifications.forEach(n => n.is_read = true); renderNotifications(); loadAllNotifications(); }
-        async function clearAllNotifications() { if (!confirm('Clear all notifications?')) return; const { error } = await supabase.from('notifications').delete().eq('user_id', currentUser.id); if (error) { showToast('Failed to clear. Check database permissions.', 'error'); return; } notifications = []; renderNotifications(); loadAllNotifications(); closeNotificationsModal(); showToast('Notifications cleared', 'success'); }
+        async function handleNotifClickModal(id, type, refId) { await supabaseClient.from('notifications').update({ is_read: true }).eq('id', id); closeNotificationsModal(); if (refId && refId.startsWith('group:')) { location.href = 'study-groups.html?id=' + refId.replace('group:', ''); return; } if (type.includes('friend')) location.href = 'friends.html'; else if (type.includes('message')) location.href = 'messages.html'; else if (type.includes('group')) location.href = 'study-groups.html'; }
+        async function markAllNotificationsReadModal() { await supabaseClient.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id); notifications.forEach(n => n.is_read = true); renderNotifications(); loadAllNotifications(); }
+        async function clearAllNotifications() { if (!confirm('Clear all notifications?')) return; const { error } = await supabaseClient.from('notifications').delete().eq('user_id', currentUser.id); if (error) { showToast('Failed to clear. Check database permissions.', 'error'); return; } notifications = []; renderNotifications(); loadAllNotifications(); closeNotificationsModal(); showToast('Notifications cleared', 'success'); }
 
         function setupRealtimeSubscriptions() {
-            supabase.channel('schedule_notifications_' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${currentUser.id}` }, p => { 
+            supabaseClient.channel('schedule_notifications_' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${currentUser.id}` }, p => { 
                 console.log('Schedule: New notification received:', p);
                 notifications.unshift(p.new); 
                 renderNotifications();
@@ -986,11 +986,11 @@
                     showToast(p.new.title || 'New notification', 'success');
                 }
             }).subscribe((status) => console.log('Schedule notification subscription:', status));
-            supabase.channel('schedule_messages_' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `receiver_id=eq.${currentUser.id}` }, () => loadSidebarBadges()).subscribe();
-            supabase.channel('schedule_friends_' + currentUser.id).on('postgres_changes', { event: '*', schema: 'public', table: 'friendships' }, () => loadSidebarBadges()).subscribe();
-            supabase.channel('friends_online_status_' + currentUser.id).on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, async p => {
+            supabaseClient.channel('schedule_messages_' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `receiver_id=eq.${currentUser.id}` }, () => loadSidebarBadges()).subscribe();
+            supabaseClient.channel('schedule_friends_' + currentUser.id).on('postgres_changes', { event: '*', schema: 'public', table: 'friendships' }, () => loadSidebarBadges()).subscribe();
+            supabaseClient.channel('friends_online_status_' + currentUser.id).on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, async p => {
                 if (p.new.is_online && !p.old?.is_online) {
-                    const { data: f } = await supabase.from('friendships').select('*').or(`user_id.eq.${currentUser.id},friend_id.eq.${currentUser.id}`).or(`user_id.eq.${p.new.id},friend_id.eq.${p.new.id}`).maybeSingle();
+                    const { data: f } = await supabaseClient.from('friendships').select('*').or(`user_id.eq.${currentUser.id},friend_id.eq.${currentUser.id}`).or(`user_id.eq.${p.new.id},friend_id.eq.${p.new.id}`).maybeSingle();
                     if (f) showFriendOnlineToast(p.new.full_name || p.new.first_name || 'A friend');
                 }
             }).subscribe();
@@ -1002,7 +1002,7 @@
         function toggleNotifications(e) { e.stopPropagation(); document.getElementById('notificationDropdown').classList.toggle('show'); }
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
         function toggleDarkMode() { document.body.classList.toggle('dark-mode'); localStorage.setItem('darkMode', document.body.classList.contains('dark-mode')); }
-        function logout() { supabase.auth.signOut().then(() => location.href = 'index.html'); }
+        function logout() { supabaseClient.auth.signOut().then(() => location.href = 'index.html'); }
         function showToast(msg, type = '') { const t = document.getElementById('toast'); t.textContent = msg; t.className = 'toast show ' + type; setTimeout(() => t.classList.remove('show'), 3000); }
         function escapeHtml(str) { if (!str) return ''; const div = document.createElement('div'); div.textContent = str; return div.innerHTML; }
         function formatTime(date) { return new Date(date).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }); }

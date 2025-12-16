@@ -671,7 +671,7 @@
     <script>
         const SUPABASE_URL = 'https://weuxtwmaqmbhskjpjdyi.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndldXh0d21hcW1iaHNranBqZHlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NTYzMTcsImV4cCI6MjA4MDMzMjMxN30.J-0Nd0MY6-g_ltbBNHwOulqZuQfb8mKIRgx0dAaJ76o';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let currentUser = null;
         let friends = [];
@@ -685,14 +685,14 @@
         let selectedProfileUser = null;
 
         async function init() {
-            const { data: { session } } = await supabase.auth.getSession();
+            const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) { window.location.href = 'index.html'; return; }
             currentUser = session.user;
             
             // Check if user is banned
-            const { data: profile } = await supabase.from('profiles').select('is_banned').eq('id', currentUser.id).single();
+            const { data: profile } = await supabaseClient.from('profiles').select('is_banned').eq('id', currentUser.id).single();
             if (profile && profile.is_banned) {
-                await supabase.auth.signOut();
+                await supabaseClient.auth.signOut();
                 alert('Your account has been suspended. Please contact an administrator.');
                 window.location.href = 'index.html';
                 return;
@@ -730,7 +730,7 @@
         function startNotificationPolling() {
             setInterval(async () => {
                 const lastNotifId = notifications.length > 0 ? notifications[0].id : null;
-                const { data: newNotifs } = await supabase.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(5);
+                const { data: newNotifs } = await supabaseClient.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(5);
                 if (newNotifs && newNotifs.length > 0 && (!lastNotifId || newNotifs[0].id !== lastNotifId)) {
                     const existingIds = notifications.map(n => n.id);
                     const trulyNew = newNotifs.filter(n => !existingIds.includes(n.id));
@@ -745,7 +745,7 @@
         }
 
         async function updateOnlineStatus(isOnline) {
-            await supabase.from('profiles').update({ is_online: isOnline, last_seen: new Date().toISOString() }).eq('id', currentUser.id);
+            await supabaseClient.from('profiles').update({ is_online: isOnline, last_seen: new Date().toISOString() }).eq('id', currentUser.id);
         }
 
         function startHeartbeat() {
@@ -754,11 +754,11 @@
         }
 
         async function loadFriends() {
-            const { data: f1 } = await supabase.from('friendships').select('friend_id').eq('user_id', currentUser.id);
-            const { data: f2 } = await supabase.from('friendships').select('user_id').eq('friend_id', currentUser.id);
+            const { data: f1 } = await supabaseClient.from('friendships').select('friend_id').eq('user_id', currentUser.id);
+            const { data: f2 } = await supabaseClient.from('friendships').select('user_id').eq('friend_id', currentUser.id);
             const friendIds = [...(f1||[]).map(f => f.friend_id), ...(f2||[]).map(f => f.user_id)];
             if (friendIds.length === 0) { friends = []; updateStats(); renderFriends(); return; }
-            const { data: profiles } = await supabase.from('profiles').select('id, first_name, last_name, full_name, program_name, avatar_url, is_online, last_seen').in('id', friendIds);
+            const { data: profiles } = await supabaseClient.from('profiles').select('id, first_name, last_name, full_name, program_name, avatar_url, is_online, last_seen').in('id', friendIds);
             friends = profiles || [];
             updateStats();
             renderFriends();
@@ -797,9 +797,9 @@
         function filterFriends() { renderFriends(); }
 
         async function loadRequests() {
-            const { data: incoming } = await supabase.from('friend_requests').select('id, created_at, sender:profiles!friend_requests_sender_id_fkey(id, first_name, last_name, full_name, program_name, avatar_url, is_online)').eq('receiver_id', currentUser.id).eq('status', 'pending');
+            const { data: incoming } = await supabaseClient.from('friend_requests').select('id, created_at, sender:profiles!friend_requests_sender_id_fkey(id, first_name, last_name, full_name, program_name, avatar_url, is_online)').eq('receiver_id', currentUser.id).eq('status', 'pending');
             incomingRequests = incoming || [];
-            const { data: outgoing } = await supabase.from('friend_requests').select('id, created_at, receiver:profiles!friend_requests_receiver_id_fkey(id, first_name, last_name, full_name, program_name, avatar_url)').eq('sender_id', currentUser.id).eq('status', 'pending');
+            const { data: outgoing } = await supabaseClient.from('friend_requests').select('id, created_at, receiver:profiles!friend_requests_receiver_id_fkey(id, first_name, last_name, full_name, program_name, avatar_url)').eq('sender_id', currentUser.id).eq('status', 'pending');
             outgoingRequests = outgoing || [];
             updateStats();
             renderRequests();
@@ -846,8 +846,8 @@
 
         async function acceptRequest(requestId, senderId) {
             try {
-                await supabase.from('friend_requests').update({ status: 'accepted', updated_at: new Date().toISOString() }).eq('id', requestId);
-                await supabase.from('friendships').insert([{ user_id: currentUser.id, friend_id: senderId }, { user_id: senderId, friend_id: currentUser.id }]);
+                await supabaseClient.from('friend_requests').update({ status: 'accepted', updated_at: new Date().toISOString() }).eq('id', requestId);
+                await supabaseClient.from('friendships').insert([{ user_id: currentUser.id, friend_id: senderId }, { user_id: senderId, friend_id: currentUser.id }]);
                 await createNotification(senderId, 'friend_accepted', 'Friend Request Accepted', 'accepted your friend request');
                 showToast('Friend request accepted!', 'success');
                 await loadFriends(); await loadRequests();
@@ -855,22 +855,22 @@
         }
 
         async function declineRequest(requestId) {
-            await supabase.from('friend_requests').update({ status: 'rejected' }).eq('id', requestId);
+            await supabaseClient.from('friend_requests').update({ status: 'rejected' }).eq('id', requestId);
             showToast('Request declined'); await loadRequests();
         }
 
         async function cancelRequest(requestId) {
-            await supabase.from('friend_requests').delete().eq('id', requestId);
+            await supabaseClient.from('friend_requests').delete().eq('id', requestId);
             showToast('Request cancelled'); await loadRequests();
         }
 
         async function sendFriendRequest(userId, userName) {
             // Check if already friends
-            const { data: friendship } = await supabase.from('friendships').select('id').or(`and(user_id.eq.${currentUser.id},friend_id.eq.${userId}),and(user_id.eq.${userId},friend_id.eq.${currentUser.id})`).maybeSingle();
+            const { data: friendship } = await supabaseClient.from('friendships').select('id').or(`and(user_id.eq.${currentUser.id},friend_id.eq.${userId}),and(user_id.eq.${userId},friend_id.eq.${currentUser.id})`).maybeSingle();
             if (friendship) { showToast('Already friends!', 'error'); return; }
             
             // Check for existing pending request
-            const { data: existing } = await supabase.from('friend_requests').select('id, status').or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${userId}),and(sender_id.eq.${userId},receiver_id.eq.${currentUser.id})`).maybeSingle();
+            const { data: existing } = await supabaseClient.from('friend_requests').select('id, status').or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${userId}),and(sender_id.eq.${userId},receiver_id.eq.${currentUser.id})`).maybeSingle();
             
             // If there's an existing request that's not pending (rejected/cancelled), delete it first
             if (existing) {
@@ -879,10 +879,10 @@
                     return;
                 }
                 // Delete old non-pending request
-                await supabase.from('friend_requests').delete().eq('id', existing.id);
+                await supabaseClient.from('friend_requests').delete().eq('id', existing.id);
             }
             
-            await supabase.from('friend_requests').insert({ sender_id: currentUser.id, receiver_id: userId });
+            await supabaseClient.from('friend_requests').insert({ sender_id: currentUser.id, receiver_id: userId });
             await createNotification(userId, 'friend_request', 'New Friend Request', 'sent you a friend request');
             showToast(`Request sent to ${userName}!`, 'success');
             await loadRequests(); 
@@ -899,9 +899,9 @@
 
         async function removeFriend(friendId) {
             // Delete friendship
-            await supabase.from('friendships').delete().or(`and(user_id.eq.${currentUser.id},friend_id.eq.${friendId}),and(user_id.eq.${friendId},friend_id.eq.${currentUser.id})`);
+            await supabaseClient.from('friendships').delete().or(`and(user_id.eq.${currentUser.id},friend_id.eq.${friendId}),and(user_id.eq.${friendId},friend_id.eq.${currentUser.id})`);
             // Also delete any existing friend requests between both users so they can send new ones
-            await supabase.from('friend_requests').delete().or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${friendId}),and(sender_id.eq.${friendId},receiver_id.eq.${currentUser.id})`);
+            await supabaseClient.from('friend_requests').delete().or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${friendId}),and(sender_id.eq.${friendId},receiver_id.eq.${currentUser.id})`);
             showToast('Friend removed'); closeConfirmModal(); await loadFriends(); await loadRequests();
         }
 
@@ -910,7 +910,7 @@
             const container = document.getElementById('searchResults');
             if (!query) { container.innerHTML = '<div class="empty-state"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg><h3>Find Students</h3><p>Search by name or program</p></div>'; return; }
             container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--gray-400);">Searching...</div>';
-            const { data: results } = await supabase.from('profiles').select('id, first_name, last_name, full_name, program_name, avatar_url, is_online').or(`full_name.ilike.%${query}%,first_name.ilike.%${query}%,last_name.ilike.%${query}%,program_name.ilike.%${query}%`).neq('id', currentUser.id).limit(20);
+            const { data: results } = await supabaseClient.from('profiles').select('id, first_name, last_name, full_name, program_name, avatar_url, is_online').or(`full_name.ilike.%${query}%,first_name.ilike.%${query}%,last_name.ilike.%${query}%,program_name.ilike.%${query}%`).neq('id', currentUser.id).limit(20);
             if (!results || results.length === 0) { container.innerHTML = '<div class="empty-state"><h3>No students found</h3><p>Try a different search</p></div>'; return; }
             
             // Filter out blocked users (both directions)
@@ -940,7 +940,7 @@
         document.getElementById('findSearch')?.addEventListener('keypress', e => { if (e.key === 'Enter') searchStudents(); });
 
         async function loadNotifications() {
-            const { data } = await supabase.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(10);
+            const { data } = await supabaseClient.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(10);
             notifications = data || [];
             renderNotifications();
             checkAnnouncementPopup();
@@ -971,14 +971,14 @@
             const notification = notifications.find(n => n.id === announcementId);
             const isBan = notification && notification.type === 'ban';
             
-            await supabase.from('notifications').update({ is_read: true }).eq('id', announcementId);
+            await supabaseClient.from('notifications').update({ is_read: true }).eq('id', announcementId);
             const idx = notifications.findIndex(n => n.id === announcementId);
             if (idx !== -1) notifications[idx].is_read = true;
             const overlay = document.querySelector('.announcement-overlay');
             if (overlay) { overlay.style.animation = 'fadeIn 0.3s ease reverse'; setTimeout(() => overlay.remove(), 300); }
             
             if (isBan) {
-                await supabase.auth.signOut();
+                await supabaseClient.auth.signOut();
                 window.location.href = 'index.html';
                 return;
             }
@@ -1005,7 +1005,7 @@
         }
 
         async function handleNotifClick(id, type, refId) {
-            await supabase.from('notifications').update({ is_read: true }).eq('id', id);
+            await supabaseClient.from('notifications').update({ is_read: true }).eq('id', id);
             const n = notifications.find(x => x.id === id); if (n) n.is_read = true;
             renderNotifications();
             document.getElementById('notificationDropdown').classList.remove('show');
@@ -1017,7 +1017,7 @@
         }
 
         async function markAllNotificationsRead() {
-            await supabase.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id);
+            await supabaseClient.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id);
             notifications.forEach(n => n.is_read = true);
             renderNotifications();
             showToast('Marked all as read');
@@ -1026,7 +1026,7 @@
         function toggleNotifications() { event.stopPropagation(); document.getElementById('notificationDropdown').classList.toggle('show'); }
 
         async function createNotification(userId, type, title, body) {
-            await supabase.from('notifications').insert({ user_id: userId, type, title, body });
+            await supabaseClient.from('notifications').insert({ user_id: userId, type, title, body });
         }
 
         // Notification sound
@@ -1048,12 +1048,12 @@
 
         function subscribeToRealtime() {
             // Listen for incoming friend requests
-            supabase.channel('friend-requests-in').on('postgres_changes', { event: '*', schema: 'public', table: 'friend_requests', filter: `receiver_id=eq.${currentUser.id}` }, () => { loadRequests(); loadSidebarBadges(); playNotificationSound(); }).subscribe();
+            supabaseClient.channel('friend-requests-in').on('postgres_changes', { event: '*', schema: 'public', table: 'friend_requests', filter: `receiver_id=eq.${currentUser.id}` }, () => { loadRequests(); loadSidebarBadges(); playNotificationSound(); }).subscribe();
             // Listen for changes to our outgoing requests (when someone accepts/rejects)
-            supabase.channel('friend-requests-out').on('postgres_changes', { event: '*', schema: 'public', table: 'friend_requests', filter: `sender_id=eq.${currentUser.id}` }, () => { loadRequests(); renderDiscoverUsers(); }).subscribe();
+            supabaseClient.channel('friend-requests-out').on('postgres_changes', { event: '*', schema: 'public', table: 'friend_requests', filter: `sender_id=eq.${currentUser.id}` }, () => { loadRequests(); renderDiscoverUsers(); }).subscribe();
             // Listen for friendship changes
-            supabase.channel('friendships').on('postgres_changes', { event: '*', schema: 'public', table: 'friendships' }, () => { loadFriends(); loadRequests(); }).subscribe();
-            supabase.channel('notifications-friends-' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${currentUser.id}` }, (p) => { 
+            supabaseClient.channel('friendships').on('postgres_changes', { event: '*', schema: 'public', table: 'friendships' }, () => { loadFriends(); loadRequests(); }).subscribe();
+            supabaseClient.channel('notifications-friends-' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${currentUser.id}` }, (p) => { 
                 console.log('Friends page: New notification received:', p);
                 notifications.unshift(p.new); 
                 renderNotifications(); 
@@ -1065,7 +1065,7 @@
                     showToast(p.new.title || 'New notification', 'success');
                 }
             }).subscribe((status) => console.log('Friends notification subscription:', status));
-            supabase.channel('online-status-friends-' + currentUser.id).on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, (p) => {
+            supabaseClient.channel('online-status-friends-' + currentUser.id).on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, (p) => {
                 // Update friends list
                 const idx = friends.findIndex(f => f.id === p.new.id);
                 if (idx !== -1) { 
@@ -1094,7 +1094,7 @@
             }).subscribe();
             
             // Sidebar messages badge real-time
-            supabase.channel('friends-messages-' + currentUser.id).on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: `receiver_id=eq.${currentUser.id}` }, () => loadSidebarBadges()).subscribe();
+            supabaseClient.channel('friends-messages-' + currentUser.id).on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: `receiver_id=eq.${currentUser.id}` }, () => loadSidebarBadges()).subscribe();
         }
 
         function showFriendOnlineToast(friendName) {
@@ -1113,9 +1113,9 @@
         }
 
         async function loadSidebarBadges() {
-            const { count: msgCount } = await supabase.from('messages').select('id', { count: 'exact' }).eq('receiver_id', currentUser.id).eq('is_read', false).eq('is_deleted', false);
+            const { count: msgCount } = await supabaseClient.from('messages').select('id', { count: 'exact' }).eq('receiver_id', currentUser.id).eq('is_read', false).eq('is_deleted', false);
             updateSidebarBadge('sidebarMsgBadge', msgCount || 0);
-            const { count: reqCount } = await supabase.from('friend_requests').select('id', { count: 'exact' }).eq('receiver_id', currentUser.id).eq('status', 'pending');
+            const { count: reqCount } = await supabaseClient.from('friend_requests').select('id', { count: 'exact' }).eq('receiver_id', currentUser.id).eq('status', 'pending');
             updateSidebarBadge('sidebarFriendsBadge', reqCount || 0);
         }
 
@@ -1299,11 +1299,11 @@
         async function blockUser(userId, userName) {
             if (isBlocked(userId)) { showToast('User already blocked', 'error'); return; }
             try {
-                await supabase.from('blocked_users').insert({ blocker_id: currentUser.id, blocked_id: userId });
+                await supabaseClient.from('blocked_users').insert({ blocker_id: currentUser.id, blocked_id: userId });
                 // Also remove friendship if exists
-                await supabase.from('friendships').delete().or(`and(user_id.eq.${currentUser.id},friend_id.eq.${userId}),and(user_id.eq.${userId},friend_id.eq.${currentUser.id})`);
+                await supabaseClient.from('friendships').delete().or(`and(user_id.eq.${currentUser.id},friend_id.eq.${userId}),and(user_id.eq.${userId},friend_id.eq.${currentUser.id})`);
                 // Cancel any pending requests
-                await supabase.from('friend_requests').delete().or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${userId}),and(sender_id.eq.${userId},receiver_id.eq.${currentUser.id})`);
+                await supabaseClient.from('friend_requests').delete().or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${userId}),and(sender_id.eq.${userId},receiver_id.eq.${currentUser.id})`);
                 showToast(`${userName} has been blocked`, 'success');
                 await Promise.all([loadBlockedUsers(), loadFriends(), loadRequests()]);
                 closeProfileModal();
@@ -1312,7 +1312,7 @@
 
         async function unblockUser(userId, userName) {
             try {
-                await supabase.from('blocked_users').delete().eq('blocker_id', currentUser.id).eq('blocked_id', userId);
+                await supabaseClient.from('blocked_users').delete().eq('blocker_id', currentUser.id).eq('blocked_id', userId);
                 showToast(`${userName} has been unblocked`, 'success');
                 await loadBlockedUsers();
                 renderBlockedModal();
@@ -1369,7 +1369,7 @@
             if (!reason) { showToast('Please select a reason', 'error'); return; }
 
             try {
-                await supabase.from('user_reports').insert({
+                await supabaseClient.from('user_reports').insert({
                     reporter_id: currentUser.id,
                     reported_id: userId,
                     report_type: 'user',
@@ -1524,7 +1524,7 @@
         function closeConfirmModal() { document.getElementById('confirmModal').classList.remove('show'); confirmCallback = null; }
         function confirmAction() { if (confirmCallback) confirmCallback(); }
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('show'); }
-        async function handleLogout() { await updateOnlineStatus(false); await supabase.auth.signOut(); window.location.href = 'index.html'; }
+        async function handleLogout() { await updateOnlineStatus(false); await supabaseClient.auth.signOut(); window.location.href = 'index.html'; }
 
         // All Notifications Modal
         async function openNotificationsModal() {
@@ -1534,7 +1534,7 @@
         }
         function closeNotificationsModal() { document.getElementById('notificationsModal').classList.remove('show'); }
         async function loadAllNotifications() {
-            const { data } = await supabase.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(100);
+            const { data } = await supabaseClient.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(100);
             const allNotifs = data || [];
             const list = document.getElementById('allNotifList');
             if (allNotifs.length === 0) { list.innerHTML = '<div class="notif-empty" style="padding:40px;text-align:center;color:var(--gray-400);"><p>No notifications</p></div>'; return; }
@@ -1547,9 +1547,9 @@
                 return `<div class="notif-dropdown-item ${n.is_read ? '' : 'unread'}" onclick="handleNotifClickModal('${n.id}','${type}','${refId}')"><div class="notif-icon ${iconClass}"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">${iconSvg}</svg></div><div class="notif-content"><h4>${escapeHtml(n.title || 'Notification')}</h4><p>${escapeHtml(n.body || '')}</p><div class="time">${formatTimeAgo(n.created_at)}</div></div></div>`;
             }).join('');
         }
-        async function handleNotifClickModal(id, type, refId) { await supabase.from('notifications').update({ is_read: true }).eq('id', id); closeNotificationsModal(); if (refId && refId.startsWith('group:')) { window.location.href = 'study-groups.html?id=' + refId.replace('group:', ''); return; } if (type === 'friend_request' || type === 'friend_accept' || type === 'friend_accepted') switchTab('requests'); else if (type === 'message') window.location.href = 'messages.html'; else if (type === 'study_group') window.location.href = 'study-groups.html'; else if (type === 'admin_warning' || type === 'announcement') window.location.href = 'dashboard.html'; }
-        async function markAllNotificationsReadModal() { await supabase.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id); notifications.forEach(n => n.is_read = true); renderNotifications(); await loadAllNotifications(); showToast('All marked as read'); }
-        async function clearAllNotifications() { if (!confirm('Clear all notifications?')) return; const { error } = await supabase.from('notifications').delete().eq('user_id', currentUser.id); if (error) { console.error('Delete failed:', error); showToast('Failed to clear. Check database permissions.', 'error'); return; } notifications = []; renderNotifications(); loadAllNotifications(); closeNotificationsModal(); showToast('Notifications cleared'); }
+        async function handleNotifClickModal(id, type, refId) { await supabaseClient.from('notifications').update({ is_read: true }).eq('id', id); closeNotificationsModal(); if (refId && refId.startsWith('group:')) { window.location.href = 'study-groups.html?id=' + refId.replace('group:', ''); return; } if (type === 'friend_request' || type === 'friend_accept' || type === 'friend_accepted') switchTab('requests'); else if (type === 'message') window.location.href = 'messages.html'; else if (type === 'study_group') window.location.href = 'study-groups.html'; else if (type === 'admin_warning' || type === 'announcement') window.location.href = 'dashboard.html'; }
+        async function markAllNotificationsReadModal() { await supabaseClient.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id); notifications.forEach(n => n.is_read = true); renderNotifications(); await loadAllNotifications(); showToast('All marked as read'); }
+        async function clearAllNotifications() { if (!confirm('Clear all notifications?')) return; const { error } = await supabaseClient.from('notifications').delete().eq('user_id', currentUser.id); if (error) { console.error('Delete failed:', error); showToast('Failed to clear. Check database permissions.', 'error'); return; } notifications = []; renderNotifications(); loadAllNotifications(); closeNotificationsModal(); showToast('Notifications cleared'); }
 
         init();
         

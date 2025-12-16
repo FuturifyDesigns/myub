@@ -1384,7 +1384,7 @@
     <script>
         const SUPABASE_URL = 'https://weuxtwmaqmbhskjpjdyi.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndldXh0d21hcW1iaHNranBqZHlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NTYzMTcsImV4cCI6MjA4MDMzMjMxN30.J-0Nd0MY6-g_ltbBNHwOulqZuQfb8mKIRgx0dAaJ76o';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let currentUser = null;
         let userProfile = null;
@@ -1403,15 +1403,15 @@
             },
             async sendHeartbeat() {
                 if (!currentUser) return;
-                try { await supabase.rpc('heartbeat'); } catch (e) { console.error(e); }
+                try { await supabaseClient.rpc('heartbeat'); } catch (e) { console.error(e); }
             },
             async setOnline() {
                 if (!currentUser) return;
-                try { await supabase.rpc('update_online_status', { is_online_status: true }); } catch (e) { console.error(e); }
+                try { await supabaseClient.rpc('update_online_status', { is_online_status: true }); } catch (e) { console.error(e); }
             },
             async setOffline() {
                 if (!currentUser) return;
-                try { await supabase.rpc('update_online_status', { is_online_status: false }); } catch (e) { console.error(e); }
+                try { await supabaseClient.rpc('update_online_status', { is_online_status: false }); } catch (e) { console.error(e); }
             },
             stopHeartbeat() {
                 if (heartbeatInterval) { clearInterval(heartbeatInterval); heartbeatInterval = null; }
@@ -1441,7 +1441,7 @@
         let notificationsList = [];
 
         async function loadNotifications() {
-            const { data } = await supabase.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(10);
+            const { data } = await supabaseClient.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(10);
             notificationsList = data || [];
             renderNotifications();
             checkAnnouncementPopup();
@@ -1471,12 +1471,12 @@
         async function dismissAnnouncement(announcementId) {
             const notification = (typeof notificationsList !== 'undefined' ? notificationsList : notifications).find(n => n.id === announcementId);
             const isBan = notification && notification.type === 'ban';
-            await supabase.from('notifications').update({ is_read: true }).eq('id', announcementId);
+            await supabaseClient.from('notifications').update({ is_read: true }).eq('id', announcementId);
             const idx = notificationsList.findIndex(n => n.id === announcementId);
             if (idx !== -1) notificationsList[idx].is_read = true;
             const overlay = document.querySelector('.announcement-overlay');
             if (overlay) { overlay.style.animation = 'fadeIn 0.3s ease reverse'; setTimeout(() => overlay.remove(), 300); }
-            if (isBan) { await supabase.auth.signOut(); window.location.href = 'index.html'; return; }
+            if (isBan) { await supabaseClient.auth.signOut(); window.location.href = 'index.html'; return; }
             renderNotifications();
             setTimeout(checkAnnouncementPopup, 500);
         }
@@ -1502,7 +1502,7 @@
         }
 
         async function handleNotifClick(id, type, refId) {
-            await supabase.from('notifications').update({ is_read: true }).eq('id', id);
+            await supabaseClient.from('notifications').update({ is_read: true }).eq('id', id);
             const n = notificationsList.find(x => x.id === id); if (n) n.is_read = true;
             renderNotifications();
             document.getElementById('notificationDropdown').classList.remove('show');
@@ -1513,7 +1513,7 @@
         }
 
         async function markAllNotificationsRead() {
-            await supabase.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id);
+            await supabaseClient.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id);
             notificationsList.forEach(n => n.is_read = true);
             renderNotifications();
         }
@@ -1529,19 +1529,19 @@
         let friends = [];
         
         async function loadFriendsForOnline() {
-            const { data: f1 } = await supabase.from('friendships').select('friend_id').eq('user_id', currentUser.id);
-            const { data: f2 } = await supabase.from('friendships').select('user_id').eq('friend_id', currentUser.id);
+            const { data: f1 } = await supabaseClient.from('friendships').select('friend_id').eq('user_id', currentUser.id);
+            const { data: f2 } = await supabaseClient.from('friendships').select('user_id').eq('friend_id', currentUser.id);
             const friendIds = [...(f1||[]).map(f => f.friend_id), ...(f2||[]).map(f => f.user_id)];
             if (friendIds.length > 0) {
-                const { data: profiles } = await supabase.from('profiles').select('id, first_name, last_name, full_name, is_online').in('id', friendIds);
+                const { data: profiles } = await supabaseClient.from('profiles').select('id, first_name, last_name, full_name, is_online').in('id', friendIds);
                 friends = profiles || [];
             } else friends = [];
         }
 
         async function loadSidebarBadges() {
-            const { count: msgCount } = await supabase.from('messages').select('id', { count: 'exact' }).eq('receiver_id', currentUser.id).eq('is_read', false).eq('is_deleted', false);
+            const { count: msgCount } = await supabaseClient.from('messages').select('id', { count: 'exact' }).eq('receiver_id', currentUser.id).eq('is_read', false).eq('is_deleted', false);
             updateSidebarBadge('sidebarMsgBadge', msgCount || 0);
-            const { count: reqCount } = await supabase.from('friend_requests').select('id', { count: 'exact' }).eq('receiver_id', currentUser.id).eq('status', 'pending');
+            const { count: reqCount } = await supabaseClient.from('friend_requests').select('id', { count: 'exact' }).eq('receiver_id', currentUser.id).eq('status', 'pending');
             updateSidebarBadge('sidebarFriendsBadge', reqCount || 0);
         }
 
@@ -1554,7 +1554,7 @@
         }
 
         function subscribeToNotifications() {
-            supabase.channel('profile-notifications-' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${currentUser.id}` }, (p) => { 
+            supabaseClient.channel('profile-notifications-' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${currentUser.id}` }, (p) => { 
                 console.log('Profile: New notification received:', p);
                 notificationsList.unshift(p.new); 
                 renderNotifications();
@@ -1568,7 +1568,7 @@
             }).subscribe((status) => console.log('Profile notification subscription:', status));
             
             // Friend online status - only notify on fresh logins (offline > 30 seconds)
-            supabase.channel('profile-online-status-' + currentUser.id).on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, (p) => {
+            supabaseClient.channel('profile-online-status-' + currentUser.id).on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, (p) => {
                 const friend = friends.find(f => f.id === p.new.id);
                 if (friend) {
                     const wasOffline = !friend.is_online;
@@ -1586,8 +1586,8 @@
             }).subscribe();
             
             // Sidebar badges real-time
-            supabase.channel('profile-messages-' + currentUser.id).on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: `receiver_id=eq.${currentUser.id}` }, () => loadSidebarBadges()).subscribe();
-            supabase.channel('profile-friend-requests-' + currentUser.id).on('postgres_changes', { event: '*', schema: 'public', table: 'friend_requests', filter: `receiver_id=eq.${currentUser.id}` }, () => loadSidebarBadges()).subscribe();
+            supabaseClient.channel('profile-messages-' + currentUser.id).on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: `receiver_id=eq.${currentUser.id}` }, () => loadSidebarBadges()).subscribe();
+            supabaseClient.channel('profile-friend-requests-' + currentUser.id).on('postgres_changes', { event: '*', schema: 'public', table: 'friend_requests', filter: `receiver_id=eq.${currentUser.id}` }, () => loadSidebarBadges()).subscribe();
         }
         
         function playNotificationSound() {
@@ -1624,14 +1624,14 @@
         let viewingUserId = null; // ID of user being viewed (null = own profile)
 
         async function init() {
-            const { data: { session } } = await supabase.auth.getSession();
+            const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) { window.location.href = 'index.html'; return; }
             currentUser = session.user;
             
             // Check if user is banned
-            const { data: banProfile } = await supabase.from('profiles').select('is_banned').eq('id', currentUser.id).single();
+            const { data: banProfile } = await supabaseClient.from('profiles').select('is_banned').eq('id', currentUser.id).single();
             if (banProfile && banProfile.is_banned) {
-                await supabase.auth.signOut();
+                await supabaseClient.auth.signOut();
                 alert('Your account has been suspended. Please contact an administrator.');
                 window.location.href = 'index.html';
                 return;
@@ -1664,7 +1664,7 @@
 
             if (profile?.is_banned) {
                 alert('Your account has been suspended. Reason: ' + (profile.ban_reason || 'Violation of terms'));
-                await supabase.auth.signOut();
+                await supabaseClient.auth.signOut();
                 window.location.href = 'index.html';
                 return;
             }
@@ -1705,7 +1705,7 @@
         function startNotificationPolling() {
             setInterval(async () => {
                 const lastNotifId = notificationsList.length > 0 ? notificationsList[0].id : null;
-                const { data: newNotifs } = await supabase.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(5);
+                const { data: newNotifs } = await supabaseClient.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(5);
                 if (newNotifs && newNotifs.length > 0 && (!lastNotifId || newNotifs[0].id !== lastNotifId)) {
                     const existingIds = notificationsList.map(n => n.id);
                     const trulyNew = newNotifs.filter(n => !existingIds.includes(n.id));
@@ -1992,7 +1992,7 @@
                     updated_at: new Date().toISOString()
                 };
 
-                const { error } = await supabase.from('profiles').update(updates).eq('id', currentUser.id);
+                const { error } = await supabaseClient.from('profiles').update(updates).eq('id', currentUser.id);
                 if (error) throw error;
 
                 await loadProfile();
@@ -2140,13 +2140,13 @@
                 const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.9));
                 const fileName = `${currentUser.id}/${Date.now()}.jpg`;
 
-                const { error: uploadError } = await supabase.storage
+                const { error: uploadError } = await supabaseClient.storage
                     .from('avatars')
                     .upload(fileName, blob, { contentType: 'image/jpeg', cacheControl: '3600', upsert: true });
 
                 if (uploadError) throw uploadError;
 
-                const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(fileName);
+                const { data: urlData } = supabaseClient.storage.from('avatars').getPublicUrl(fileName);
 
                 const { error: updateError } = await supabase
                     .from('profiles')
@@ -2200,7 +2200,7 @@
 
                 if (error) throw error;
 
-                await supabase.auth.signOut();
+                await supabaseClient.auth.signOut();
                 window.location.href = 'index.html';
             } catch (err) {
                 showToast(err.message, 'error');
@@ -2231,7 +2231,7 @@
         async function handleLogout() {
             OnlineStatus.stopHeartbeat();
             await OnlineStatus.setOffline();
-            await supabase.auth.signOut();
+            await supabaseClient.auth.signOut();
             window.location.href = 'index.html';
         }
 
@@ -2267,7 +2267,7 @@
         }
         function closeNotificationsModal() { document.getElementById('notificationsModal').classList.remove('show'); }
         async function loadAllNotificationsModal() {
-            const { data } = await supabase.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(100);
+            const { data } = await supabaseClient.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(100);
             const allNotifs = data || [];
             const list = document.getElementById('allNotifList');
             if (allNotifs.length === 0) { list.innerHTML = '<div class="notif-empty" style="padding:40px;text-align:center;color:var(--gray-400);"><p>No notifications</p></div>'; return; }
@@ -2280,9 +2280,9 @@
                 return `<div class="notif-dropdown-item ${n.is_read ? '' : 'unread'}" onclick="handleNotifClickModal('${n.id}','${type}','${refId}')"><div class="notif-icon ${iconClass}"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">${iconSvg}</svg></div><div class="notif-content"><h4>${escapeHtml(n.title || 'Notification')}</h4><p>${escapeHtml(n.body || '')}</p><div class="time">${formatNotifTime(n.created_at)}</div></div></div>`;
             }).join('');
         }
-        async function handleNotifClickModal(id, type, refId) { await supabase.from('notifications').update({ is_read: true }).eq('id', id); closeNotificationsModal(); if (refId && refId.startsWith('group:')) { window.location.href = 'study-groups.html?id=' + refId.replace('group:', ''); return; } if (type.includes('friend')) window.location.href = 'friends.html'; else if (type.includes('message')) window.location.href = 'messages.html'; else if (type.includes('group')) window.location.href = 'study-groups.html'; }
-        async function markAllNotificationsReadModal() { await supabase.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id); notificationsList.forEach(n => n.is_read = true); renderNotifications(); await loadAllNotificationsModal(); showToast('All marked as read'); }
-        async function clearAllNotifications() { if (!confirm('Clear all notifications?')) return; const { error } = await supabase.from('notifications').delete().eq('user_id', currentUser.id); if (error) { console.error('Delete failed:', error); showToast('Failed to clear. Check database permissions.', 'error'); return; } notificationsList = []; renderNotifications(); loadAllNotificationsModal(); closeNotificationsModal(); showToast('Notifications cleared', 'success'); }
+        async function handleNotifClickModal(id, type, refId) { await supabaseClient.from('notifications').update({ is_read: true }).eq('id', id); closeNotificationsModal(); if (refId && refId.startsWith('group:')) { window.location.href = 'study-groups.html?id=' + refId.replace('group:', ''); return; } if (type.includes('friend')) window.location.href = 'friends.html'; else if (type.includes('message')) window.location.href = 'messages.html'; else if (type.includes('group')) window.location.href = 'study-groups.html'; }
+        async function markAllNotificationsReadModal() { await supabaseClient.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id); notificationsList.forEach(n => n.is_read = true); renderNotifications(); await loadAllNotificationsModal(); showToast('All marked as read'); }
+        async function clearAllNotifications() { if (!confirm('Clear all notifications?')) return; const { error } = await supabaseClient.from('notifications').delete().eq('user_id', currentUser.id); if (error) { console.error('Delete failed:', error); showToast('Failed to clear. Check database permissions.', 'error'); return; } notificationsList = []; renderNotifications(); loadAllNotificationsModal(); closeNotificationsModal(); showToast('Notifications cleared', 'success'); }
 
         init();
         

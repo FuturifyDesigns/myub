@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyUB Notification Debugger</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: #f1f5f9;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1a365d;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        .status {
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            font-size: 14px;
+            word-break: break-all;
+        }
+        .success { background: #dcfce7; color: #166534; border-left: 4px solid #22c55e; }
+        .error { background: #fee2e2; color: #991b1b; border-left: 4px solid #ef4444; }
+        .warning { background: #fef3c7; color: #92400e; border-left: 4px solid #f59e0b; }
+        .info { background: #dbeafe; color: #1e40af; border-left: 4px solid #3b82f6; }
+        button {
+            width: 100%;
+            padding: 16px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            background: #1a365d;
+            color: white;
+        }
+        button:active { background: #2c5282; }
+        button:disabled { background: #cbd5e1; cursor: not-allowed; }
+        .log {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .log-item {
+            margin: 4px 0;
+            padding: 4px;
+            border-bottom: 1px solid #334155;
+        }
+        .step {
+            background: #f8fafc;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+        }
+        .step-title {
+            font-weight: 600;
+            color: #1a365d;
+            margin-bottom: 8px;
+        }
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #1a365d;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 MyUB Notification Debugger</h1>
+        
+        <div id="status"></div>
+        
+        <button id="testBtn" onclick="runTest()">🧪 Run Full Test</button>
+        <button id="insertBtn" onclick="insertNotification()">📝 Insert Test Notification</button>
+        <button id="checkBtn" onclick="triggerCheck()">🔔 Trigger SW Check</button>
+        <button id="clearBtn" onclick="clearLogs()">🗑️ Clear Logs</button>
+        
+        <div class="log" id="log"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://weuxtwmaqmbhskjpjdyi.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndldXh0d21hcW1iaHNranBqZHlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NTYzMTcsImV4cCI6MjA4MDMzMjMxN30.J-0Nd0MY6-g_ltbBNHwOulqZuQfb8mKIRgx0dAaJ76o';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        let currentUser = null;
+        
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const time = new Date().toLocaleTimeString();
+            const item = document.createElement('div');
+            item.className = 'log-item';
+            item.innerHTML = `<strong>[${time}]</strong> ${message}`;
+            logDiv.appendChild(item);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.textContent = message;
+            statusDiv.appendChild(div);
+        }
+        
+        function clearLogs() {
+            document.getElementById('log').innerHTML = '';
+            document.getElementById('status').innerHTML = '';
+        }
+        
+        async function init() {
+            log('🚀 Initializing...');
+            
+            // Check auth
+            const { data: { user } } = await supabase.auth.getUser();
+            
+            if (!user) {
+                showStatus('❌ Not logged in! Please log in to MyUB first.', 'error');
+                log('❌ No user session found');
+                document.getElementById('testBtn').disabled = true;
+                document.getElementById('insertBtn').disabled = true;
+                document.getElementById('checkBtn').disabled = true;
+                return;
+            }
+            
+            currentUser = user;
+            showStatus('✅ Logged in as: ' + user.email, 'success');
+            log('✅ User ID: ' + user.id);
+            
+            // Check SW
+            if (!('serviceWorker' in navigator)) {
+                showStatus('❌ Service Workers not supported!', 'error');
+                return;
+            }
+            
+            const reg = await navigator.serviceWorker.getRegistration();
+            if (!reg) {
+                showStatus('⚠️ Service Worker not registered', 'warning');
+                log('⚠️ No service worker found');
+            } else {
+                showStatus('✅ Service Worker registered', 'success');
+                log('✅ SW State: ' + (reg.active?.state || 'not active'));
+                
+                // Listen for SW messages
+                navigator.serviceWorker.addEventListener('message', (event) => {
+                    if (event.data.type === 'SW_LOG') {
+                        log('📡 [SW]: ' + event.data.message);
+                    } else if (event.data.type === 'SW_ERROR') {
+                        log('❌ [SW ERROR]: ' + event.data.message);
+                        showStatus('SW Error: ' + event.data.message, 'error');
+                    } else if (event.data.type === 'SW_NOTIFICATION_SHOWN') {
+                        log('🔔 [SW] Notification shown: ' + event.data.title);
+                        showStatus('✅ Notification shown: ' + event.data.title, 'success');
+                    }
+                });
+                
+                // Send config
+                if (reg.active) {
+                    reg.active.postMessage({
+                        type: 'SET_SUPABASE_CONFIG',
+                        url: SUPABASE_URL,
+                        key: SUPABASE_KEY,
+                        userId: user.id
+                    });
+                    log('✅ Config sent to service worker');
+                    showStatus('✅ Service Worker configured', 'success');
+                }
+            }
+            
+            // Check notification permission
+            if (Notification.permission === 'granted') {
+                showStatus('✅ Notification permission granted', 'success');
+            } else {
+                showStatus('⚠️ Notification permission: ' + Notification.permission, 'warning');
+            }
+            
+            log('✅ Initialization complete');
+        }
+        
+        async function insertNotification() {
+            if (!currentUser) {
+                alert('Not logged in!');
+                return;
+            }
+            
+            log('📝 Inserting test notification...');
+            
+            const { data, error } = await supabase
+                .from('notification_queue')
+                .insert({
+                    user_id: currentUser.id,
+                    type: 'test',
+                    title: 'Debug Test',
+                    body: 'This is a test notification from the debugger!',
+                    icon: '/icons/icon-192x192.png',
+                    badge: '/icons/favicon-48x48.png',
+                    data: { url: '/dashboard.html' },
+                    delivered: false
+                });
+            
+            if (error) {
+                log('❌ Insert failed: ' + error.message);
+                showStatus('❌ Insert failed: ' + error.message, 'error');
+            } else {
+                log('✅ Test notification inserted into database');
+                showStatus('✅ Notification inserted! Now trigger check.', 'success');
+            }
+        }
+        
+        async function triggerCheck() {
+            log('🔔 Triggering service worker check...');
+            
+            const reg = await navigator.serviceWorker.ready;
+            
+            if (!reg.active) {
+                log('❌ Service worker not active');
+                showStatus('❌ Service worker not active', 'error');
+                return;
+            }
+            
+            reg.active.postMessage({ type: 'CHECK_NOTIFICATIONS' });
+            log('✅ Check message sent to service worker');
+            showStatus('⏳ Checking... Watch for [SW] logs below', 'info');
+            
+            // Check database after delay
+            setTimeout(async () => {
+                const { data } = await supabase
+                    .from('notification_queue')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .eq('delivered', false);
+                
+                log('📊 Undelivered notifications in DB: ' + (data?.length || 0));
+                
+                if (data && data.length > 0) {
+                    showStatus('⚠️ Still have ' + data.length + ' undelivered notification(s)', 'warning');
+                } else {
+                    showStatus('✅ All notifications delivered!', 'success');
+                }
+            }, 3000);
+        }
+        
+        async function runTest() {
+            clearLogs();
+            log('🧪 Starting full test...');
+            
+            await init();
+            
+            log('\n📝 Step 1: Inserting notification...');
+            await insertNotification();
+            
+            await new Promise(r => setTimeout(r, 1000));
+            
+            log('\n🔔 Step 2: Triggering check...');
+            await triggerCheck();
+            
+            log('\n⏳ Waiting for results...');
+            showStatus('⏳ Test running... Watch logs below', 'info');
+        }
+        
+        // Auto-init on load
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>

@@ -3339,7 +3339,7 @@
         // Initialize call notifications across all pages
         if (window.MyUBCalls) {
             try {
-                MyUBCalls.init(supabase);
+                MyUBCalls.init(supabaseClient);
             } catch (error) {
                 console.error('MyUB: Error initializing calls:', error);
             }
@@ -3364,7 +3364,7 @@
                 
                 if (status.subscribed) {
                     // Already subscribed, just setup realtime listener
-                    await MyUBNotifications.init(supabase, currentUser.id);
+                    await MyUBNotifications.init(supabaseClient, currentUser.id);
                     console.log('MyUB: Notifications already enabled and listening');
                 } else if (status.supported && status.permission === 'default') {
                     // Show permission prompt after 5 seconds
@@ -3372,7 +3372,7 @@
                         MyUBNotifications.showPermissionPrompt(
                             async function() {
                                 console.log('MyUB: User accepted notification prompt');
-                                const result = await MyUBNotifications.init(supabase, currentUser.id);
+                                const result = await MyUBNotifications.init(supabaseClient, currentUser.id);
                                 if (result.success) {
                                     console.log('MyUB: Notifications enabled successfully!');
                                     showToast('🔔 Notifications enabled! You\'ll receive alerts for messages and updates.', 'success');
@@ -3387,7 +3387,7 @@
                     }, 5000);
                 } else if (status.permission === 'granted' && !status.subscribed) {
                     // Permission granted but not subscribed yet, subscribe now
-                    await MyUBNotifications.init(supabase, currentUser.id);
+                    await MyUBNotifications.init(supabaseClient, currentUser.id);
                     console.log('MyUB: Notifications initialized');
                 }
             } catch (error) {

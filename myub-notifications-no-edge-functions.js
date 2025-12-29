@@ -40,6 +40,10 @@
         init: async function(supabase, userId) {
             console.log('MyUB Notifications: Initializing...');
             
+            // Store for badge updates
+            this.supabaseClient = supabase;
+            this.userId = userId;
+            
             try {
                 // Request permission and subscribe to push
                 var permissionResult = await this.requestPermission(supabase, userId);
@@ -47,6 +51,10 @@
                 if (permissionResult.success) {
                     // Setup realtime listener for this user's notifications
                     await this.setupRealtimeListener(supabase, userId);
+                    
+                    // Update initial badge count
+                    await this.updateBadgeCount();
+                    
                     return { success: true };
                 } else {
                     return permissionResult;
@@ -188,6 +196,9 @@
                 } else {
                     // Page is hidden - send push via service worker
                     this.sendPushViaServiceWorker(notification);
+                    
+                    // Update badge count (only for push notifications)
+                    await this.updateBadgeCount();
                 }
                 
                 // Mark as delivered
@@ -227,6 +238,9 @@
                 }
                 notif.close();
             };
+            
+            // Update badge count
+            this.updateBadgeCount();
         },
         
         /**
@@ -394,7 +408,66 @@
                 document.body.removeChild(overlay);
                 if (onDecline) onDecline();
             };
-        }
+        },
+        
+        /**
+         * Update app badge count with unread notifications
+         */
+        updateBadgeCount: async function() {
+            try {
+                // Check if Badge API is supported
+                if (!navigator.setAppBadge) {
+                    console.log('MyUB: Badge API not supported');
+                    return;
+                }
+                
+                // Get unread count from database
+                var supabase = this.supabaseClient;
+                if (!supabase || !this.userId) {
+                    console.log('MyUB: Cannot update badge - no supabase or userId');
+                    return;
+                }
+                
+                // Count unread notifications
+                var result = await supabase
+                    .from('notification_queue')
+                    .select('id', { count: 'exact', head: true })
+                    .eq('user_id', this.userId)
+                    .eq('delivered', false);
+                
+                var count = result.count || 0;
+                
+                if (count > 0) {
+                    await navigator.setAppBadge(count);
+                    console.log('MyUB: Badge count set to', count);
+                } else {
+                    await navigator.clearAppBadge();
+                    console.log('MyUB: Badge cleared');
+                }
+            } catch (error) {
+                console.error('MyUB: Error updating badge:', error);
+            }
+        },
+        
+        /**
+         * Clear app badge
+         */
+        clearBadge: async function() {
+            try {
+                if (navigator.clearAppBadge) {
+                    await navigator.clearAppBadge();
+                    console.log('MyUB: Badge cleared');
+                }
+            } catch (error) {
+                console.error('MyUB: Error clearing badge:', error);
+            }
+        },
+        
+        /**
+         * Store supabase and userId for badge updates
+         */
+        supabaseClient: null,
+        userId: null
     };
     
     // Export to global scope

@@ -3393,6 +3393,22 @@
         
         // Call notification init
         initNotifications();
+        
+        // Clear badge when user opens the app
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden && window.MyUBNotifications) {
+                // User opened the app, clear badge
+                MyUBNotifications.clearBadge();
+                console.log('MyUB: App opened, clearing badge');
+            }
+        });
+        
+        // Also clear badge on page load (user is viewing the page)
+        if (window.MyUBNotifications) {
+            setTimeout(function() {
+                MyUBNotifications.clearBadge();
+            }, 2000);
+        }
     </script>
 
     <!-- Push Notification Scripts -->

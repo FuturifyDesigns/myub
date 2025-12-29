@@ -3534,28 +3534,5 @@
         }
     </script>
 
-    <!-- Push Notification Scripts -->
-    <script src="myub-notifications-no-edge-functions.js"></script>
-    <script src="myub-notification-triggers-no-edge-functions.js"></script>
-    
-    <!-- OneSignal Initialization -->
-    <script>
-        window.OneSignalDeferred = window.OneSignalDeferred || [];
-        OneSignalDeferred.push(async function(OneSignal) {
-            await OneSignal.init({
-                appId: "c5e50154-18dd-43ae-a347-220898d8f1e7",
-                allowLocalhostAsSecureOrigin: true
-            });
-            
-            console.log('OneSignal: Initialized');
-            
-            // Set external user ID when logged in
-            if (currentUser && currentUser.id) {
-                await OneSignal.login(currentUser.id);
-                console.log('OneSignal: User logged in:', currentUser.id);
-            }
-        });
-    </script>
-
 </body>
 </html>

@@ -986,13 +986,9 @@
                 
                 await supabaseClient.from('notifications').insert({ user_id: currentConversation, type: 'message', title: 'New Message', body: content.substring(0, 50) });
             } catch (e) { showToast('Failed to send', 'error'); }
-                            url: 'https://www.myub.online/messages.html?conversation=' + currentUser.id
-                        })
-                    });
-                    
-                    if (response.ok) {
-                        console.log('MyUB: OneSignal notification sent');
-                    }
+        }
+        
+        // Reply functions
                 } catch (notifError) {
                     console.error('OneSignal notification failed:', notifError);
                 }

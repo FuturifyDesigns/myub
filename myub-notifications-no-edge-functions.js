@@ -103,9 +103,11 @@
                 var saveResult = await this.saveSubscription(supabase, userId, subscription);
                 
                 if (saveResult.success) {
+                    console.log('MyUB: Subscribed successfully');
                     return { success: true, subscription: subscription };
                 } else {
-                    return { success: false, error: 'Failed to save subscription' };
+                    console.error('MyUB: Failed to save subscription:', saveResult.error);
+                    return { success: false, error: 'Failed to save subscription: ' + saveResult.error };
                 }
                 
             } catch (error) {
@@ -119,6 +121,8 @@
          */
         saveSubscription: async function(supabase, userId, subscription) {
             try {
+                console.log('MyUB: Saving subscription to database...');
+                
                 var subscriptionData = {
                     user_id: userId,
                     endpoint: subscription.endpoint,
@@ -127,17 +131,36 @@
                     updated_at: new Date().toISOString()
                 };
                 
-                var { data, error } = await supabase
-                    .from('push_subscriptions')
-                    .upsert(subscriptionData, { onConflict: 'user_id' });
+                console.log('MyUB: Subscription data:', {
+                    user_id: subscriptionData.user_id,
+                    endpoint: subscriptionData.endpoint.substring(0, 50) + '...'
+                });
                 
-                if (error) {
-                    return { success: false, error: error.message };
+                // First, try to delete existing subscription for this user
+                var deleteResult = await supabase
+                    .from('push_subscriptions')
+                    .delete()
+                    .eq('user_id', userId);
+                
+                if (deleteResult.error) {
+                    console.log('MyUB: Delete old subscription (if any):', deleteResult.error.message);
                 }
                 
-                return { success: true, data: data };
+                // Then insert new subscription
+                var insertResult = await supabase
+                    .from('push_subscriptions')
+                    .insert(subscriptionData);
+                
+                if (insertResult.error) {
+                    console.error('MyUB: Insert subscription error:', insertResult.error);
+                    return { success: false, error: insertResult.error.message };
+                }
+                
+                console.log('MyUB: Subscription saved successfully');
+                return { success: true };
                 
             } catch (error) {
+                console.error('MyUB: Save subscription exception:', error);
                 return { success: false, error: error.message };
             }
         },

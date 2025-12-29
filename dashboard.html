@@ -12,6 +12,9 @@
     <script src="myub-calls.js"></script>
     <script src="myub-utils.js"></script>
     
+    <!-- OneSignal Push Notifications -->
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    
     <style>
         * {
             margin: 0;
@@ -1787,6 +1790,9 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="MyUB">
     
+    <!-- OneSignal SDK -->
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    
     <!-- Canonical URL -->
     <link rel="canonical" href="https://www.myub.online/">
 
@@ -3345,58 +3351,46 @@
             }
         }
 
-        // Initialize push notifications
-        async function initNotifications() {
+        // Initialize OneSignal Push Notifications
+        async function initOneSignal() {
             try {
-                // Wait a bit for user to be authenticated
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                // Wait for OneSignal to load
+                await new Promise(resolve => setTimeout(resolve, 1000));
                 
                 if (!currentUser || !currentUser.id) {
-                    console.log('MyUB: No user, skipping notifications');
+                    console.log('MyUB: No user, skipping OneSignal init');
                     return;
                 }
                 
-                console.log('MyUB: Initializing notifications for user:', currentUser.id);
+                console.log('MyUB: Initializing OneSignal for user:', currentUser.id);
                 
-                // Check if already subscribed
-                const status = await MyUBNotifications.getStatus();
-                console.log('MyUB: Notification status:', status);
-                
-                if (status.subscribed) {
-                    // Already subscribed, just setup realtime listener
-                    await MyUBNotifications.init(supabaseClient, currentUser.id);
-                    console.log('MyUB: Notifications already enabled and listening');
-                } else if (status.supported && status.permission === 'default') {
-                    // Show permission prompt after 5 seconds
-                    setTimeout(() => {
-                        MyUBNotifications.showPermissionPrompt(
-                            async function() {
-                                console.log('MyUB: User accepted notification prompt');
-                                const result = await MyUBNotifications.init(supabaseClient, currentUser.id);
-                                if (result.success) {
-                                    console.log('MyUB: Notifications enabled successfully!');
-                                    showToast('🔔 Notifications enabled! You\'ll receive alerts for messages and updates.', 'success');
-                                } else {
-                                    console.error('MyUB: Failed to enable notifications:', result.error);
-                                }
-                            },
-                            function() {
-                                console.log('MyUB: User declined notification prompt');
-                            }
-                        );
+                window.OneSignalDeferred = window.OneSignalDeferred || [];
+                OneSignalDeferred.push(async function(OneSignal) {
+                    await OneSignal.init({
+                        appId: "c5e50154-18dd-43ae-a347-220898d8f1e7",
+                        allowLocalhostAsSecureOrigin: true
+                    });
+                    
+                    // Set external user ID (your Supabase user ID)
+                    await OneSignal.login(currentUser.id);
+                    console.log('MyUB: OneSignal initialized with user ID:', currentUser.id);
+                    
+                    // Show notification prompt after delay
+                    setTimeout(async () => {
+                        const permission = await OneSignal.Notifications.permission;
+                        if (permission === 'default') {
+                            await OneSignal.Slidedown.promptPush();
+                        }
                     }, 5000);
-                } else if (status.permission === 'granted' && !status.subscribed) {
-                    // Permission granted but not subscribed yet, subscribe now
-                    await MyUBNotifications.init(supabaseClient, currentUser.id);
-                    console.log('MyUB: Notifications initialized');
-                }
+                });
+                
             } catch (error) {
-                console.error('MyUB: Error initializing notifications:', error);
+                console.error('MyUB: Error initializing OneSignal:', error);
             }
         }
         
-        // Call notification init
-        initNotifications();
+        // Call OneSignal init
+        initOneSignal();
         
         // Configure Service Worker for background notifications
         async function configureServiceWorker() {
@@ -3474,12 +3468,61 @@
         // Configure service worker after a delay
         setTimeout(configureServiceWorker, 3000);
         
+        // Check for missed notifications when app opens
+        async function checkMissedNotifications() {
+            try {
+                console.log('MyUB: Checking for missed notifications...');
+                
+                const { data: notifications } = await supabaseClient
+                    .from('notification_queue')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .eq('delivered', false)
+                    .order('created_at', { ascending: false });
+                
+                if (notifications && notifications.length > 0) {
+                    console.log('MyUB: Found', notifications.length, 'missed notification(s)');
+                    
+                    // Show them as regular notifications since app is now open
+                    for (const notif of notifications) {
+                        // Show browser notification
+                        if (Notification.permission === 'granted') {
+                            new Notification(notif.title, {
+                                body: notif.body,
+                                icon: notif.icon || '/icons/icon-192x192.png',
+                                tag: notif.tag || 'missed-' + notif.id
+                            });
+                        }
+                        
+                        // Mark as delivered
+                        await supabaseClient
+                            .from('notification_queue')
+                            .update({ delivered: true, delivered_at: new Date().toISOString() })
+                            .eq('id', notif.id);
+                    }
+                    
+                    // Update badge
+                    if (window.MyUBNotifications) {
+                        await MyUBNotifications.updateBadgeCount();
+                    }
+                }
+            } catch (error) {
+                console.error('MyUB: Error checking missed notifications:', error);
+            }
+        }
+        
+        // Check for missed notifications on load
+        setTimeout(checkMissedNotifications, 2000);
+        
         // Clear badge when user opens the app
         document.addEventListener('visibilitychange', function() {
             if (!document.hidden && window.MyUBNotifications) {
                 // User opened the app, clear badge
                 MyUBNotifications.clearBadge();
                 console.log('MyUB: App opened, clearing badge');
+                
+                // Also check for any new missed notifications
+                checkMissedNotifications();
             }
         });
         
@@ -3494,6 +3537,25 @@
     <!-- Push Notification Scripts -->
     <script src="myub-notifications-no-edge-functions.js"></script>
     <script src="myub-notification-triggers-no-edge-functions.js"></script>
+    
+    <!-- OneSignal Initialization -->
+    <script>
+        window.OneSignalDeferred = window.OneSignalDeferred || [];
+        OneSignalDeferred.push(async function(OneSignal) {
+            await OneSignal.init({
+                appId: "c5e50154-18dd-43ae-a347-220898d8f1e7",
+                allowLocalhostAsSecureOrigin: true
+            });
+            
+            console.log('OneSignal: Initialized');
+            
+            // Set external user ID when logged in
+            if (currentUser && currentUser.id) {
+                await OneSignal.login(currentUser.id);
+                console.log('OneSignal: User logged in:', currentUser.id);
+            }
+        });
+    </script>
 
 </body>
 </html>

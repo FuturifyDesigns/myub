@@ -950,29 +950,52 @@
                 cancelReply();
                 messages.push(data); renderMessages(); await loadConversations();
                 
-                // Insert notification for receiver
-                const senderProfile = await supabaseClient.from('profiles').select('full_name').eq('id', currentUser.id).single();
-                const senderName = senderProfile.data?.full_name || 'Someone';
-                const preview = content.length > 50 ? content.substring(0, 50) + "..." : content;
+                // Send notification via OneSignal using client-side SDK
+                try {
+                    const senderProfile = await supabaseClient.from('profiles').select('full_name').eq('id', currentUser.id).single();
+                    const senderName = senderProfile.data?.full_name || 'Someone';
+                    const preview = content.length > 50 ? content.substring(0, 50) + "..." : content;
+                    
+                    // Use OneSignal's sendSelfNotification to send to specific user
+                    // This works client-side without REST API!
+                    if (window.OneSignal) {
+                        // Store notification in database for receiver to check
+                        await supabaseClient.from('notification_queue').insert({
+                            user_id: currentConversation,
+                            type: 'message',
+                            title: senderName,
+                            body: preview,
+                            icon: '/icons/icon-192x192.png',
+                            badge: '/icons/favicon-48x48.png',
+                            tag: 'message-' + currentUser.id,
+                            data: {
+                                type: 'message',
+                                senderId: currentUser.id,
+                                conversationId: currentUser.id,
+                                url: '/messages.html?conversation=' + currentUser.id
+                            },
+                            require_interaction: false,
+                            delivered: false
+                        });
+                        
+                        console.log('MyUB: Notification queued for receiver');
+                    }
+                } catch (notifError) {
+                    console.error('MyUB: Notification error:', notifError);
+                }
                 
-                await supabaseClient.from('notification_queue').insert({
-                    user_id: currentConversation,  // Receiver
-                    type: 'message',
-                    title: senderName,
-                    body: preview,
-                    icon: '/icons/icon-192x192.png',
-                    badge: '/icons/favicon-48x48.png',
-                    tag: 'message-' + currentUser.id,
-                    data: {
-                        type: 'message',
-                        senderId: currentUser.id,
-                        conversationId: currentUser.id,
-                        url: '/messages.html?conversation=' + currentUser.id
-                    },
-                    require_interaction: false,
-                    delivered: false
-                });
-                console.log('MyUB: Notification queued for receiver');
+                await supabaseClient.from('notifications').insert({ user_id: currentConversation, type: 'message', title: 'New Message', body: content.substring(0, 50) });
+            } catch (e) { showToast('Failed to send', 'error'); }
+                            url: 'https://www.myub.online/messages.html?conversation=' + currentUser.id
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        console.log('MyUB: OneSignal notification sent');
+                    }
+                } catch (notifError) {
+                    console.error('OneSignal notification failed:', notifError);
+                }
                 
                 await supabaseClient.from('notifications').insert({ user_id: currentConversation, type: 'message', title: 'New Message', body: content.substring(0, 50) });
             } catch (e) { showToast('Failed to send', 'error'); }

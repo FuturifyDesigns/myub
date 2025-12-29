@@ -275,10 +275,6 @@
             }
         },
         
-        // ============================================
-        // HELPER FUNCTIONS
-        // ============================================
-        
         /**
          * Get current user ID
          */
@@ -298,7 +294,7 @@
         isUserActive: function() {
             var lastActivity = window.lastUserActivity || Date.now();
             var idleTime = Date.now() - lastActivity;
-            return idleTime < 30000; // Active if interacted in last 30 seconds
+            return idleTime < 30000;
         }
     };
     

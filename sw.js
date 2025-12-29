@@ -98,11 +98,31 @@ self.addEventListener('message', (event) => {
 async function checkForNotifications() {
   if (!SUPABASE_URL || !SUPABASE_KEY || !USER_ID) {
     console.log('[ServiceWorker] No Supabase config, skipping check');
+    
+    // Notify page
+    self.clients.matchAll().then(clients => {
+      clients.forEach(client => {
+        client.postMessage({
+          type: 'SW_LOG',
+          message: 'No Supabase config set'
+        });
+      });
+    });
     return;
   }
   
   try {
     console.log('[ServiceWorker] Fetching notifications for user:', USER_ID);
+    
+    // Notify page we're checking
+    self.clients.matchAll().then(clients => {
+      clients.forEach(client => {
+        client.postMessage({
+          type: 'SW_LOG',
+          message: 'Checking notifications for user: ' + USER_ID
+        });
+      });
+    });
     
     const response = await fetch(
       `${SUPABASE_URL}/rest/v1/notification_queue?user_id=eq.${USER_ID}&delivered=eq.false&select=*`,
@@ -117,11 +137,31 @@ async function checkForNotifications() {
     
     if (!response.ok) {
       console.error('[ServiceWorker] Fetch failed:', response.status);
+      
+      // Notify page of error
+      self.clients.matchAll().then(clients => {
+        clients.forEach(client => {
+          client.postMessage({
+            type: 'SW_ERROR',
+            message: 'Fetch failed: ' + response.status + ' ' + response.statusText
+          });
+        });
+      });
       return;
     }
     
     const notifications = await response.json();
     console.log('[ServiceWorker] Found notifications:', notifications.length);
+    
+    // Notify page
+    self.clients.matchAll().then(clients => {
+      clients.forEach(client => {
+        client.postMessage({
+          type: 'SW_LOG',
+          message: 'Found ' + notifications.length + ' notification(s)'
+        });
+      });
+    });
     
     // Show each notification
     for (const notif of notifications) {
@@ -134,6 +174,8 @@ async function checkForNotifications() {
         requireInteraction: notif.require_interaction || false,
         vibrate: [200, 100, 200]
       });
+      
+      console.log('[ServiceWorker] Notification shown:', notif.title);
       
       // Mark as delivered
       await fetch(
@@ -154,6 +196,16 @@ async function checkForNotifications() {
       );
       
       console.log('[ServiceWorker] Notification delivered:', notif.title);
+      
+      // Notify page
+      self.clients.matchAll().then(clients => {
+        clients.forEach(client => {
+          client.postMessage({
+            type: 'SW_NOTIFICATION_SHOWN',
+            title: notif.title
+          });
+        });
+      });
     }
     
     // Update badge
@@ -165,6 +217,17 @@ async function checkForNotifications() {
     
   } catch (error) {
     console.error('[ServiceWorker] Check notifications error:', error);
+    
+    // Notify page of error
+    self.clients.matchAll().then(clients => {
+      clients.forEach(client => {
+        client.postMessage({
+          type: 'SW_ERROR',
+          message: error.message,
+          stack: error.stack
+        });
+      });
+    });
   }
 }
 

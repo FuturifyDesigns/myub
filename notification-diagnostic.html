@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyUB Notification Diagnostic</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Arial', sans-serif; 
+            background: #f1f5f9; 
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 { color: #1a365d; margin-bottom: 20px; }
+        h2 { color: #2c5282; margin-top: 30px; margin-bottom: 15px; }
+        .status { 
+            padding: 15px; 
+            margin: 10px 0;
+            border-radius: 8px;
+            font-family: monospace;
+        }
+        .success { background: #dcfce7; color: #166534; }
+        .error { background: #fee2e2; color: #991b1b; }
+        .warning { background: #fef3c7; color: #92400e; }
+        .info { background: #dbeafe; color: #1e40af; }
+        button {
+            background: #1a365d;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px 10px 0;
+        }
+        button:hover { background: #2c5282; }
+        .code {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #1a365d;
+            margin: 10px 0;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 MyUB Notification System Diagnostic</h1>
+        <p>This page will check if your notification system is set up correctly.</p>
+
+        <h2>📋 File Check</h2>
+        <div id="fileCheck"></div>
+
+        <h2>🔌 Browser Support</h2>
+        <div id="browserCheck"></div>
+
+        <h2>📜 Loaded Scripts</h2>
+        <div id="scriptCheck"></div>
+
+        <h2>🔑 Configuration</h2>
+        <div id="configCheck"></div>
+
+        <h2>🧪 Manual Tests</h2>
+        <button onclick="testNotificationAPI()">Test Notification API</button>
+        <button onclick="testServiceWorker()">Test Service Worker</button>
+        <button onclick="testVAPIDKey()">Test VAPID Key</button>
+        <div id="testResults"></div>
+
+        <h2>📊 System Status</h2>
+        <div id="statusCheck"></div>
+
+        <h2>💡 Recommendations</h2>
+        <div id="recommendations"></div>
+    </div>
+
+    <script src="myub-notifications-no-edge-functions.js"></script>
+    <script src="myub-notification-triggers-no-edge-functions.js"></script>
+
+    <script>
+        function addStatus(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.textContent = message;
+            container.appendChild(div);
+        }
+
+        function addCode(containerId, code) {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = 'code';
+            div.textContent = code;
+            container.appendChild(div);
+        }
+
+        // Check files
+        async function checkFiles() {
+            const files = [
+                'myub-notifications-no-edge-functions.js',
+                'myub-notification-triggers-no-edge-functions.js',
+                'sw.js'
+            ];
+
+            for (const file of files) {
+                try {
+                    const response = await fetch(file, { method: 'HEAD' });
+                    if (response.ok) {
+                        addStatus('fileCheck', `✅ ${file} - Found`, 'success');
+                    } else {
+                        addStatus('fileCheck', `❌ ${file} - Not found (${response.status})`, 'error');
+                    }
+                } catch (error) {
+                    addStatus('fileCheck', `❌ ${file} - Error: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        // Check browser support
+        function checkBrowserSupport() {
+            const checks = [
+                { name: 'Notification API', test: 'Notification' in window },
+                { name: 'Service Worker', test: 'serviceWorker' in navigator },
+                { name: 'Push Manager', test: 'PushManager' in window },
+                { name: 'Badge API', test: 'setAppBadge' in navigator }
+            ];
+
+            checks.forEach(check => {
+                if (check.test) {
+                    addStatus('browserCheck', `✅ ${check.name} - Supported`, 'success');
+                } else {
+                    addStatus('browserCheck', `❌ ${check.name} - Not supported`, 'error');
+                }
+            });
+
+            addStatus('browserCheck', `Permission: ${Notification.permission}`, 
+                Notification.permission === 'granted' ? 'success' : 'warning');
+        }
+
+        // Check loaded scripts
+        function checkLoadedScripts() {
+            if (typeof MyUBNotifications !== 'undefined') {
+                addStatus('scriptCheck', '✅ MyUBNotifications - Loaded', 'success');
+                addCode('scriptCheck', `Version: ${MyUBNotifications.version || 'Unknown'}`);
+            } else {
+                addStatus('scriptCheck', '❌ MyUBNotifications - NOT LOADED', 'error');
+            }
+
+            if (typeof MyUBNotificationTriggers !== 'undefined') {
+                addStatus('scriptCheck', '✅ MyUBNotificationTriggers - Loaded', 'success');
+            } else {
+                addStatus('scriptCheck', '❌ MyUBNotificationTriggers - NOT LOADED', 'error');
+            }
+        }
+
+        // Check configuration
+        function checkConfiguration() {
+            if (typeof MyUBNotifications !== 'undefined') {
+                const key = MyUBNotifications.vapidPublicKey;
+                if (key && key !== 'YOUR_VAPID_PUBLIC_KEY_HERE') {
+                    addStatus('configCheck', '✅ VAPID Public Key - Configured', 'success');
+                    addCode('configCheck', `Key: ${key.substring(0, 30)}...`);
+                } else {
+                    addStatus('configCheck', '❌ VAPID Public Key - Not configured', 'error');
+                }
+            } else {
+                addStatus('configCheck', '❌ Cannot check - MyUBNotifications not loaded', 'error');
+            }
+        }
+
+        // Test functions
+        async function testNotificationAPI() {
+            const results = document.getElementById('testResults');
+            results.innerHTML = '';
+            
+            if (Notification.permission === 'granted') {
+                new Notification('Test Notification', {
+                    body: 'This is a test notification from MyUB!',
+                    icon: '/icons/icon-192x192.png'
+                });
+                addStatus('testResults', '✅ Test notification sent!', 'success');
+            } else {
+                const permission = await Notification.requestPermission();
+                if (permission === 'granted') {
+                    new Notification('Test Notification', {
+                        body: 'Permission granted! Notifications working!',
+                        icon: '/icons/icon-192x192.png'
+                    });
+                    addStatus('testResults', '✅ Permission granted and test sent!', 'success');
+                } else {
+                    addStatus('testResults', '❌ Permission denied', 'error');
+                }
+            }
+        }
+
+        async function testServiceWorker() {
+            const results = document.getElementById('testResults');
+            results.innerHTML = '';
+
+            if ('serviceWorker' in navigator) {
+                try {
+                    const registration = await navigator.serviceWorker.register('/sw.js');
+                    addStatus('testResults', '✅ Service Worker registered successfully!', 'success');
+                    addCode('testResults', `Scope: ${registration.scope}`);
+                } catch (error) {
+                    addStatus('testResults', `❌ Service Worker registration failed: ${error.message}`, 'error');
+                }
+            } else {
+                addStatus('testResults', '❌ Service Workers not supported', 'error');
+            }
+        }
+
+        async function testVAPIDKey() {
+            const results = document.getElementById('testResults');
+            results.innerHTML = '';
+
+            if (typeof MyUBNotifications === 'undefined') {
+                addStatus('testResults', '❌ MyUBNotifications not loaded', 'error');
+                return;
+            }
+
+            const key = MyUBNotifications.vapidPublicKey;
+            if (!key) {
+                addStatus('testResults', '❌ VAPID key not found', 'error');
+            } else if (key === 'YOUR_VAPID_PUBLIC_KEY_HERE') {
+                addStatus('testResults', '❌ VAPID key not configured (still placeholder)', 'error');
+            } else if (key.startsWith('BJD7Nri0Duea5eki0mextwdsqEYhXUenO7kpOtL5vwdA0tFNzstI')) {
+                addStatus('testResults', '✅ Your VAPID key is configured correctly!', 'success');
+                addCode('testResults', key);
+            } else {
+                addStatus('testResults', '⚠️ VAPID key configured but doesn\'t match expected key', 'warning');
+                addCode('testResults', key);
+            }
+        }
+
+        // Check status
+        async function checkStatus() {
+            if (typeof MyUBNotifications !== 'undefined') {
+                try {
+                    const status = await MyUBNotifications.getStatus();
+                    addStatus('statusCheck', `Supported: ${status.supported}`, 
+                        status.supported ? 'success' : 'error');
+                    addStatus('statusCheck', `Permission: ${status.permission}`, 
+                        status.permission === 'granted' ? 'success' : 'warning');
+                    addStatus('statusCheck', `Subscribed: ${status.subscribed}`, 
+                        status.subscribed ? 'success' : 'warning');
+                } catch (error) {
+                    addStatus('statusCheck', `❌ Error: ${error.message}`, 'error');
+                }
+            } else {
+                addStatus('statusCheck', '❌ MyUBNotifications not loaded - cannot check status', 'error');
+            }
+        }
+
+        // Recommendations
+        function showRecommendations() {
+            const recommendations = [];
+
+            if (typeof MyUBNotifications === 'undefined') {
+                recommendations.push('❌ CRITICAL: Upload myub-notifications-no-edge-functions.js');
+            }
+
+            if (typeof MyUBNotificationTriggers === 'undefined') {
+                recommendations.push('❌ CRITICAL: Upload myub-notification-triggers-no-edge-functions.js');
+            }
+
+            if (Notification.permission !== 'granted') {
+                recommendations.push('⚠️ Click "Test Notification API" button to enable permissions');
+            }
+
+            if (typeof MyUBNotifications !== 'undefined') {
+                const key = MyUBNotifications.vapidPublicKey;
+                if (!key || key === 'YOUR_VAPID_PUBLIC_KEY_HERE') {
+                    recommendations.push('❌ CRITICAL: Configure VAPID public key in JS file');
+                }
+            }
+
+            if (!('serviceWorker' in navigator)) {
+                recommendations.push('❌ Browser doesn\'t support Service Workers');
+            }
+
+            if (recommendations.length === 0) {
+                addStatus('recommendations', '✅ Everything looks good! Test with dashboard.html', 'success');
+            } else {
+                recommendations.forEach(rec => {
+                    const type = rec.startsWith('❌') ? 'error' : 'warning';
+                    addStatus('recommendations', rec, type);
+                });
+            }
+        }
+
+        // Run all checks
+        window.addEventListener('load', async () => {
+            await checkFiles();
+            checkBrowserSupport();
+            checkLoadedScripts();
+            checkConfiguration();
+            await checkStatus();
+            showRecommendations();
+        });
+    </script>
+</body>
+</html>

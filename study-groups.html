@@ -1998,23 +1998,49 @@
                     console.log('Sending notifications to', otherMembers.length, 'members');
                     
                     if (otherMembers.length > 0) {
+                        var senderProfile = await supabaseClient.from('profiles').select('full_name').eq('id', currentUser.id).single();
+                        var senderFullName = senderProfile.data?.full_name || 'Someone';
+                        var preview = tempContent.length > 50 ? tempContent.substring(0, 50) + '...' : tempContent;
+                        
                         var notificationData = otherMembers.map(function(m) {
+                            return {
+                                user_id: m.user_id,
+                                type: 'group_message',
+                                title: senderFullName + ' in ' + currentGroup.name,
+                                body: preview,
+                                icon: '/icons/icon-192x192.png',
+                                badge: '/icons/favicon-48x48.png',
+                                tag: 'group-message-' + currentGroup.id,
+                                data: {
+                                    type: 'group_message',
+                                    groupId: currentGroup.id,
+                                    senderId: currentUser.id,
+                                    url: '/study-groups.html?group=' + currentGroup.id
+                                },
+                                require_interaction: false,
+                                delivered: false
+                            };
+                        });
+                        
+                        // Insert into notification_queue (for push notifications)
+                        var notifResult = await supabaseClient.from('notification_queue').insert(notificationData);
+                        if (notifResult.error) {
+                            console.error('Failed to send notifications:', notifResult.error);
+                        } else {
+                            console.log('Notifications queued for', otherMembers.length, 'members');
+                        }
+                        
+                        // Also insert into old notifications table (for in-app)
+                        var oldNotifData = otherMembers.map(function(m) {
                             return {
                                 user_id: m.user_id,
                                 type: 'message',
                                 title: currentGroup.name + ' - New Message',
-                                body: senderName + ': ' + truncateText(tempContent, 50),
+                                body: senderFullName + ': ' + preview,
                                 reference_id: 'group:' + currentGroup.id
                             };
                         });
-                        
-                        // Insert notifications in batch
-                        var notifResult = await supabaseClient.from('notifications').insert(notificationData);
-                        if (notifResult.error) {
-                            console.error('Failed to send notifications:', notifResult.error);
-                        } else {
-                            console.log('Notifications sent successfully to', otherMembers.length, 'members');
-                        }
+                        await supabaseClient.from('notifications').insert(oldNotifData);
                     }
                 }
             } catch(e) { 

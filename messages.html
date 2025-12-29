@@ -1228,6 +1228,32 @@
                     showToast('New message received', 'success'); 
                 }
                 await loadConversations();
+                
+                // 🔔 TRIGGER PUSH NOTIFICATION
+                // Get sender info and trigger notification
+                try {
+                    if (window.MyUBNotificationTriggers) {
+                        const senderProfile = await supabaseClient
+                            .from('profiles')
+                            .select('full_name')
+                            .eq('id', senderId)
+                            .single();
+                        
+                        const senderName = senderProfile.data?.full_name || 'Someone';
+                        
+                        await MyUBNotificationTriggers.onNewMessage(
+                            supabaseClient,
+                            senderId,
+                            senderName,
+                            msg.content,
+                            senderId
+                        );
+                        console.log('MyUB: Notification triggered for new message');
+                    }
+                } catch (error) {
+                    console.error('MyUB: Error triggering notification:', error);
+                }
+
             }).subscribe();
             supabaseClient.channel('message-reads').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'messages', filter: `sender_id=eq.${currentUser.id}` }, (payload) => { const msgIdx = messages.findIndex(m => m.id === payload.new.id); if (msgIdx !== -1) { messages[msgIdx].is_read = payload.new.is_read; renderMessages(); } }).subscribe();
             supabaseClient.channel('online-status-messages').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, (payload) => {

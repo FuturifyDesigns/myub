@@ -25,7 +25,7 @@
 
     var MyUBNotifications = {
         version: '3.0.0',
-        vapidPublicKey: 'YOUR_VAPID_PUBLIC_KEY_HERE',
+        vapidPublicKey: 'BJD7Nri0Duea5eki0mextwdsqEYhXUenO7kpOtL5vwdA0tFNzstI-jrizDA4GUO-HqRvIOUpwomLBQqDR1Yu4Ck',
         realtimeChannel: null,
         subscription: null,
         

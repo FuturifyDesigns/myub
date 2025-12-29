@@ -3340,6 +3340,59 @@
         if (window.MyUBCalls) {
             MyUBCalls.init();
         }
+
+        // Initialize push notifications
+        async function initNotifications() {
+            try {
+                // Wait a bit for user to be authenticated
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                if (!currentUser || !currentUser.id) {
+                    console.log('MyUB: No user, skipping notifications');
+                    return;
+                }
+                
+                console.log('MyUB: Initializing notifications for user:', currentUser.id);
+                
+                // Check if already subscribed
+                const status = await MyUBNotifications.getStatus();
+                console.log('MyUB: Notification status:', status);
+                
+                if (status.subscribed) {
+                    // Already subscribed, just setup realtime listener
+                    await MyUBNotifications.init(supabase, currentUser.id);
+                    console.log('MyUB: Notifications already enabled and listening');
+                } else if (status.supported && status.permission === 'default') {
+                    // Show permission prompt after 5 seconds
+                    setTimeout(() => {
+                        MyUBNotifications.showPermissionPrompt(
+                            async function() {
+                                console.log('MyUB: User accepted notification prompt');
+                                const result = await MyUBNotifications.init(supabase, currentUser.id);
+                                if (result.success) {
+                                    console.log('MyUB: Notifications enabled successfully!');
+                                    showToast('🔔 Notifications enabled! You\'ll receive alerts for messages and updates.', 'success');
+                                } else {
+                                    console.error('MyUB: Failed to enable notifications:', result.error);
+                                }
+                            },
+                            function() {
+                                console.log('MyUB: User declined notification prompt');
+                            }
+                        );
+                    }, 5000);
+                } else if (status.permission === 'granted' && !status.subscribed) {
+                    // Permission granted but not subscribed yet, subscribe now
+                    await MyUBNotifications.init(supabase, currentUser.id);
+                    console.log('MyUB: Notifications initialized');
+                }
+            } catch (error) {
+                console.error('MyUB: Error initializing notifications:', error);
+            }
+        }
+        
+        // Call notification init
+        initNotifications();
     </script>
 
     <!-- Push Notification Scripts -->

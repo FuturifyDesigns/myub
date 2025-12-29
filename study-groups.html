@@ -2693,10 +2693,63 @@
                     if (infoCount) infoCount.textContent = groupMessages.length;
                 }
                 loadMyGroups();
+                
+                // 🔔 TRIGGER PUSH NOTIFICATION for study group messages
+                try {
+                    if (window.MyUBNotificationTriggers) {
+                        var message = payload.new;
+                        
+                        // Don't notify for own messages
+                        if (message.sender_id !== currentUser.id) {
+                            // Check if this user is a member of this group
+                            var memberCheck = await supabaseClient
+                                .from('study_group_members')
+                                .select('user_id')
+                                .eq('group_id', message.group_id)
+                                .eq('user_id', currentUser.id)
+                                .single();
+                            
+                            if (memberCheck.data) {
+                                // Get group name and sender name
+                                var groupResult = await supabaseClient
+                                    .from('study_groups')
+                                    .select('name')
+                                    .eq('id', message.group_id)
+                                    .single();
+                                
+                                var senderResult = await supabaseClient
+                                    .from('profiles')
+                                    .select('full_name')
+                                    .eq('id', message.sender_id)
+                                    .single();
+                                
+                                var groupName = groupResult.data?.name || 'Study Group';
+                                var senderName = senderResult.data?.full_name || 'Someone';
+                                
+                                // Use onNewMessage but with group context
+                                var preview = message.content.length > 50 
+                                    ? message.content.substring(0, 50) + '...' 
+                                    : message.content;
+                                
+                                // Trigger notification with group name in title
+                                await MyUBNotificationTriggers.onNewMessage(
+                                    supabaseClient,
+                                    message.sender_id,
+                                    senderName + ' in ' + groupName,
+                                    preview,
+                                    'group-' + message.group_id
+                                );
+                                console.log('MyUB: Study group message notification triggered');
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error('MyUB: Error triggering study group message notification:', error);
+                }
             }).subscribe();
             
             // Members channel - update counters in real-time
-            supabaseClient.channel('sg-members').on('postgres_changes', { event: '*', schema: 'public', table: 'study_group_members' }, function(payload) {
+            supabaseClient.channel('sg-members').on('postgres_changes', { event: '*', schema: 'public', table: 'study_group_members' }, async function(payload) {
                 if (currentGroup) {
                     loadGroupMembers().then(function() { 
                         updateMembersDisplay(); 
@@ -2712,6 +2765,40 @@
                     });
                 }
                 loadMyGroups();
+                
+                // 🔔 TRIGGER PUSH NOTIFICATION for study group invite
+                try {
+                    if (window.MyUBNotificationTriggers && payload.eventType === 'INSERT') {
+                        var member = payload.new;
+                        // Only notify if this user was added (not if they're the one adding)
+                        if (member.user_id === currentUser.id && member.added_by !== currentUser.id) {
+                            var groupResult = await supabaseClient
+                                .from('study_groups')
+                                .select('name')
+                                .eq('id', member.group_id)
+                                .single();
+                            
+                            var inviterResult = await supabaseClient
+                                .from('profiles')
+                                .select('full_name')
+                                .eq('id', member.added_by)
+                                .single();
+                            
+                            var groupName = groupResult.data?.name || 'A study group';
+                            var inviterName = inviterResult.data?.full_name || 'Someone';
+                            
+                            await MyUBNotificationTriggers.onStudyGroupInvite(
+                                supabaseClient,
+                                member.group_id,
+                                groupName,
+                                inviterName
+                            );
+                            console.log('MyUB: Study group invite notification triggered');
+                        }
+                    }
+                } catch (error) {
+                    console.error('MyUB: Error triggering study group notification:', error);
+                }
             }).subscribe();
             
             // Online status channel - update when any profile's online status changes
@@ -3652,9 +3739,5 @@
         </div>
     </div>
 
-
-    <!-- Push Notification Scripts -->
-    <script src="myub-notifications-no-edge-functions.js"></script>
-    <script src="myub-notification-triggers-no-edge-functions.js"></script>
 </body>
 </html>

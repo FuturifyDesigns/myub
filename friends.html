@@ -1079,9 +1079,66 @@
 
         function subscribeToRealtime() {
             // Listen for incoming friend requests
-            supabaseClient.channel('friend-requests-in').on('postgres_changes', { event: '*', schema: 'public', table: 'friend_requests', filter: `receiver_id=eq.${currentUser.id}` }, () => { loadRequests(); loadSidebarBadges(); playNotificationSound(); }).subscribe();
+            supabaseClient.channel('friend-requests-in').on('postgres_changes', { event: '*', schema: 'public', table: 'friend_requests', filter: `receiver_id=eq.${currentUser.id}` }, async (payload) => { 
+                loadRequests(); 
+                loadSidebarBadges(); 
+                playNotificationSound(); 
+                
+                // 🔔 TRIGGER PUSH NOTIFICATION for new friend request
+                try {
+                    if (window.MyUBNotificationTriggers && payload.eventType === 'INSERT') {
+                        const request = payload.new;
+                        const senderProfile = await supabaseClient
+                            .from('profiles')
+                            .select('full_name, avatar_url')
+                            .eq('id', request.sender_id)
+                            .single();
+                        
+                        const senderName = senderProfile.data?.full_name || 'Someone';
+                        const senderAvatar = senderProfile.data?.avatar_url || null;
+                        
+                        await MyUBNotificationTriggers.onFriendRequest(
+                            supabaseClient,
+                            request.sender_id,
+                            senderName,
+                            senderAvatar
+                        );
+                        console.log('MyUB: Friend request notification triggered');
+                    }
+                } catch (error) {
+                    console.error('MyUB: Error triggering friend request notification:', error);
+                }
+            }).subscribe();
             // Listen for changes to our outgoing requests (when someone accepts/rejects)
-            supabaseClient.channel('friend-requests-out').on('postgres_changes', { event: '*', schema: 'public', table: 'friend_requests', filter: `sender_id=eq.${currentUser.id}` }, () => { loadRequests(); renderDiscoverUsers(); }).subscribe();
+            supabaseClient.channel('friend-requests-out').on('postgres_changes', { event: '*', schema: 'public', table: 'friend_requests', filter: `sender_id=eq.${currentUser.id}` }, async (payload) => { 
+                loadRequests(); 
+                renderDiscoverUsers(); 
+                
+                // 🔔 TRIGGER PUSH NOTIFICATION when friend request is accepted
+                try {
+                    if (window.MyUBNotificationTriggers && payload.eventType === 'UPDATE' && payload.new.status === 'accepted') {
+                        const request = payload.new;
+                        const accepterProfile = await supabaseClient
+                            .from('profiles')
+                            .select('full_name, avatar_url')
+                            .eq('id', request.receiver_id)
+                            .single();
+                        
+                        const accepterName = accepterProfile.data?.full_name || 'Someone';
+                        const accepterAvatar = accepterProfile.data?.avatar_url || null;
+                        
+                        await MyUBNotificationTriggers.onFriendRequestAccepted(
+                            supabaseClient,
+                            request.receiver_id,
+                            accepterName,
+                            accepterAvatar
+                        );
+                        console.log('MyUB: Friend request accepted notification triggered');
+                    }
+                } catch (error) {
+                    console.error('MyUB: Error triggering friend accepted notification:', error);
+                }
+            }).subscribe();
             // Listen for friendship changes
             supabaseClient.channel('friendships').on('postgres_changes', { event: '*', schema: 'public', table: 'friendships' }, () => { loadFriends(); loadRequests(); }).subscribe();
             supabaseClient.channel('notifications-friends-' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${currentUser.id}` }, (p) => { 
@@ -1601,9 +1658,5 @@
         }
     </script>
 
-
-    <!-- Push Notification Scripts -->
-    <script src="myub-notifications-no-edge-functions.js"></script>
-    <script src="myub-notification-triggers-no-edge-functions.js"></script>
 </body>
 </html>

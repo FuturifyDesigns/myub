@@ -103,21 +103,54 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
-// Handle push notifications (future feature)
+// Handle push notifications
 self.addEventListener('push', (event) => {
-  console.log('[ServiceWorker] Push received');
-  const options = {
-    body: event.data ? event.data.text() : 'New notification from MyUB',
+  console.log('[ServiceWorker] Push notification received');
+  
+  let notificationData = {
+    title: 'MyUB',
+    body: 'You have a new notification',
     icon: '/icons/icon-192x192.png',
     badge: '/icons/favicon-48x48.png',
-    vibrate: [100, 50, 100],
+    vibrate: [200, 100, 200],
+    tag: 'myub-notification',
+    requireInteraction: false,
     data: {
-      dateOfArrival: Date.now(),
-      primaryKey: 1
+      url: '/dashboard.html',
+      timestamp: Date.now()
     }
   };
+
+  // Parse notification data if available
+  if (event.data) {
+    try {
+      const pushData = event.data.json();
+      notificationData = {
+        title: pushData.title || notificationData.title,
+        body: pushData.body || notificationData.body,
+        icon: pushData.icon || notificationData.icon,
+        badge: pushData.badge || notificationData.badge,
+        vibrate: pushData.vibrate || notificationData.vibrate,
+        tag: pushData.tag || notificationData.tag,
+        requireInteraction: pushData.requireInteraction || notificationData.requireInteraction,
+        data: pushData.data || notificationData.data
+      };
+    } catch (error) {
+      console.error('[ServiceWorker] Error parsing push data:', error);
+    }
+  }
+
   event.waitUntil(
-    self.registration.showNotification('MyUB', options)
+    self.registration.showNotification(notificationData.title, {
+      body: notificationData.body,
+      icon: notificationData.icon,
+      badge: notificationData.badge,
+      vibrate: notificationData.vibrate,
+      tag: notificationData.tag,
+      requireInteraction: notificationData.requireInteraction,
+      data: notificationData.data,
+      actions: notificationData.actions || []
+    })
   );
 });
 
@@ -125,7 +158,35 @@ self.addEventListener('push', (event) => {
 self.addEventListener('notificationclick', (event) => {
   console.log('[ServiceWorker] Notification clicked');
   event.notification.close();
+
+  // Get the URL to open from notification data
+  const urlToOpen = event.notification.data?.url || '/dashboard.html';
+  
+  // Handle action button clicks
+  if (event.action) {
+    console.log('[ServiceWorker] Action clicked:', event.action);
+    // You can handle different actions here
+  }
+
   event.waitUntil(
-    clients.openWindow('/dashboard.html')
+    clients.matchAll({ type: 'window', includeUncontrolled: true })
+      .then((clientList) => {
+        // Check if there's already a window open
+        for (let i = 0; i < clientList.length; i++) {
+          const client = clientList[i];
+          if (client.url.includes('myub.online') && 'focus' in client) {
+            // Focus existing window and navigate to URL
+            return client.focus().then(() => {
+              if ('navigate' in client) {
+                return client.navigate(urlToOpen);
+              }
+            });
+          }
+        }
+        // If no window is open, open a new one
+        if (clients.openWindow) {
+          return clients.openWindow(urlToOpen);
+        }
+      })
   );
 });

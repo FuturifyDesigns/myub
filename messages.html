@@ -989,15 +989,6 @@
         }
         
         // Reply functions
-                } catch (notifError) {
-                    console.error('OneSignal notification failed:', notifError);
-                }
-                
-                await supabaseClient.from('notifications').insert({ user_id: currentConversation, type: 'message', title: 'New Message', body: content.substring(0, 50) });
-            } catch (e) { showToast('Failed to send', 'error'); }
-        }
-        
-        // Reply functions
         function setReply(msgId) {
             const msg = messages.find(m => m.id === msgId);
             if (!msg) return;
@@ -1853,23 +1844,6 @@
 
     <!-- MyUB Calls Script -->
     <script src="myub-calls.js"></script>
-
-    <!-- Push Notification Scripts -->
-    <script src="myub-notifications-no-edge-functions.js"></script>
-    <script src="myub-notification-triggers-no-edge-functions.js"></script>
-    
-    <script>
-        // Clear badge when user opens messages page
-        if (window.MyUBNotifications) {
-            MyUBNotifications.clearBadge();
-        }
-        
-        document.addEventListener('visibilitychange', function() {
-            if (!document.hidden && window.MyUBNotifications) {
-                MyUBNotifications.clearBadge();
-            }
-        });
-    </script>
 
     <!-- OneSignal handles service worker registration -->
 

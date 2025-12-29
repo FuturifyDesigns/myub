@@ -3398,6 +3398,61 @@
         // Call notification init
         initNotifications();
         
+        // Configure Service Worker for background notifications
+        async function configureServiceWorker() {
+            if ('serviceWorker' in navigator && currentUser) {
+                try {
+                    const registration = await navigator.serviceWorker.ready;
+                    
+                    // Send Supabase config to service worker
+                    registration.active.postMessage({
+                        type: 'SET_SUPABASE_CONFIG',
+                        url: SUPABASE_URL,
+                        key: SUPABASE_KEY,
+                        userId: currentUser.id
+                    });
+                    
+                    console.log('MyUB: Service worker configured for background notifications');
+                    
+                    // Register periodic sync (if supported)
+                    if ('periodicSync' in registration) {
+                        try {
+                            await registration.periodicSync.register('check-notifications', {
+                                minInterval: 60 * 1000 // Check every minute
+                            });
+                            console.log('MyUB: Periodic sync registered');
+                        } catch (error) {
+                            console.log('MyUB: Periodic sync not available:', error);
+                        }
+                    }
+                    
+                    // Fallback: Use visibility change to trigger checks
+                    document.addEventListener('visibilitychange', async () => {
+                        if (document.hidden) {
+                            console.log('MyUB: Page hidden, scheduling notification check');
+                            // Wait a bit, then check
+                            setTimeout(async () => {
+                                try {
+                                    if ('serviceWorker' in navigator) {
+                                        const reg = await navigator.serviceWorker.ready;
+                                        reg.active.postMessage({ type: 'CHECK_NOTIFICATIONS' });
+                                    }
+                                } catch (error) {
+                                    console.error('MyUB: Check notifications error:', error);
+                                }
+                            }, 3000);
+                        }
+                    });
+                    
+                } catch (error) {
+                    console.error('MyUB: Service worker config error:', error);
+                }
+            }
+        }
+        
+        // Configure service worker after a delay
+        setTimeout(configureServiceWorker, 3000);
+        
         // Clear badge when user opens the app
         document.addEventListener('visibilitychange', function() {
             if (!document.hidden && window.MyUBNotifications) {

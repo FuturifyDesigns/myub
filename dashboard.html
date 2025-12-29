@@ -3416,13 +3416,21 @@
                     await OneSignal.login(currentUser.id);
                     console.log('MyUB: OneSignal initialized with user ID:', currentUser.id);
                     
-                    // Show notification prompt after delay
+                    // Show notification prompt immediately
                     setTimeout(async () => {
                         const permission = await OneSignal.Notifications.permission;
+                        console.log('MyUB: Notification permission:', permission);
+                        
                         if (permission === 'default') {
+                            console.log('MyUB: Showing prompt...');
                             await OneSignal.Slidedown.promptPush();
+                        } else if (permission === 'denied') {
+                            console.log('MyUB: Notifications denied by user');
+                            showToast('Please enable notifications in browser settings', 'info');
+                        } else {
+                            console.log('MyUB: Notifications already granted');
                         }
-                    }, 5000);
+                    }, 3000);
                 });
                 
             } catch (error) {

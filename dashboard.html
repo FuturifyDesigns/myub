@@ -3338,7 +3338,11 @@
         
         // Initialize call notifications across all pages
         if (window.MyUBCalls) {
-            MyUBCalls.init();
+            try {
+                MyUBCalls.init(supabase);
+            } catch (error) {
+                console.error('MyUB: Error initializing calls:', error);
+            }
         }
 
         // Initialize push notifications

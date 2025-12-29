@@ -111,7 +111,7 @@
     <script>
         const SUPABASE_URL = 'https://weuxtwmaqmbhskjpjdyi.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndldXh0d21hcW1iaHNranBqZHlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NTYzMTcsImV4cCI6MjA4MDMzMjMxN30.J-0Nd0MY6-g_ltbBNHwOulqZuQfb8mKIRgx0dAaJ76o';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const debugSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         
         let currentUser = null;
         
@@ -142,7 +142,7 @@
             log('🚀 Initializing...');
             
             // Check auth
-            const { data: { user } } = await supabase.auth.getUser();
+            const { data: { user } } = await debugSupabase.auth.getUser();
             
             if (!user) {
                 showStatus('❌ Not logged in! Please log in to MyUB first.', 'error');
@@ -215,7 +215,7 @@
             
             log('📝 Inserting test notification...');
             
-            const { data, error } = await supabase
+            const { data, error } = await debugSupabase
                 .from('notification_queue')
                 .insert({
                     user_id: currentUser.id,
@@ -254,7 +254,7 @@
             
             // Check database after delay
             setTimeout(async () => {
-                const { data } = await supabase
+                const { data } = await debugSupabase
                     .from('notification_queue')
                     .select('*')
                     .eq('user_id', currentUser.id)

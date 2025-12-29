@@ -950,35 +950,33 @@
                 cancelReply();
                 messages.push(data); renderMessages(); await loadConversations();
                 
-                // Send notification via OneSignal using client-side SDK
+                // Send push notification via Cloudflare Worker
                 try {
                     const senderProfile = await supabaseClient.from('profiles').select('full_name').eq('id', currentUser.id).single();
                     const senderName = senderProfile.data?.full_name || 'Someone';
                     const preview = content.length > 50 ? content.substring(0, 50) + "..." : content;
                     
-                    // Use OneSignal's sendSelfNotification to send to specific user
-                    // This works client-side without REST API!
-                    if (window.OneSignal) {
-                        // Store notification in database for receiver to check
-                        await supabaseClient.from('notification_queue').insert({
-                            user_id: currentConversation,
-                            type: 'message',
+                    // Call Cloudflare Worker to send OneSignal notification
+                    const notifResponse = await fetch('https://myub-push-notifications.futurifydesigns.workers.dev', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            userId: currentConversation,
                             title: senderName,
                             body: preview,
-                            icon: '/icons/icon-192x192.png',
-                            badge: '/icons/favicon-48x48.png',
-                            tag: 'message-' + currentUser.id,
                             data: {
                                 type: 'message',
                                 senderId: currentUser.id,
                                 conversationId: currentUser.id,
                                 url: '/messages.html?conversation=' + currentUser.id
-                            },
-                            require_interaction: false,
-                            delivered: false
-                        });
-                        
-                        console.log('MyUB: Notification queued for receiver');
+                            }
+                        })
+                    });
+                    
+                    if (notifResponse.ok) {
+                        console.log('MyUB: Push notification sent via OneSignal');
+                    } else {
+                        console.error('MyUB: Push notification failed');
                     }
                 } catch (notifError) {
                     console.error('MyUB: Notification error:', notifError);

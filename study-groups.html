@@ -2002,33 +2002,30 @@
                         var senderFullName = senderProfile.data?.full_name || 'Someone';
                         var preview = tempContent.length > 50 ? tempContent.substring(0, 50) + '...' : tempContent;
                         
-                        var notificationData = otherMembers.map(function(m) {
-                            return {
-                                user_id: m.user_id,
-                                type: 'group_message',
-                                title: senderFullName + ' in ' + currentGroup.name,
-                                body: preview,
-                                icon: '/icons/icon-192x192.png',
-                                badge: '/icons/favicon-48x48.png',
-                                tag: 'group-message-' + currentGroup.id,
-                                data: {
-                                    type: 'group_message',
-                                    groupId: currentGroup.id,
-                                    senderId: currentUser.id,
-                                    url: '/study-groups.html?group=' + currentGroup.id
-                                },
-                                require_interaction: false,
-                                delivered: false
-                            };
-                        });
-                        
-                        // Insert into notification_queue (for push notifications)
-                        var notifResult = await supabaseClient.from('notification_queue').insert(notificationData);
-                        if (notifResult.error) {
-                            console.error('Failed to send notifications:', notifResult.error);
-                        } else {
-                            console.log('Notifications queued for', otherMembers.length, 'members');
+                        // Send push notification to each member via Cloudflare Worker
+                        for (var member of otherMembers) {
+                            try {
+                                await fetch('https://myub-push-notifications.futurifydesigns.workers.dev', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        userId: member.user_id,
+                                        title: senderFullName + ' in ' + currentGroup.name,
+                                        body: preview,
+                                        data: {
+                                            type: 'group_message',
+                                            groupId: currentGroup.id,
+                                            senderId: currentUser.id,
+                                            url: '/study-groups.html?group=' + currentGroup.id
+                                        }
+                                    })
+                                });
+                            } catch (err) {
+                                console.error('Push notification failed for member:', err);
+                            }
                         }
+                        
+                        console.log('Push notifications sent to', otherMembers.length, 'members');
                         
                         // Also insert into old notifications table (for in-app)
                         var oldNotifData = otherMembers.map(function(m) {

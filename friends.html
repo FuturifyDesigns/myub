@@ -1060,7 +1060,32 @@
         function toggleNotifications() { event.stopPropagation(); document.getElementById('notificationDropdown').classList.toggle('show'); }
 
         async function createNotification(userId, type, title, body) {
+            // Insert into old notifications table
             await supabaseClient.from('notifications').insert({ user_id: userId, type, title, body });
+            
+            // Send push notification via Cloudflare Worker
+            try {
+                const senderProfile = await supabaseClient.from('profiles').select('full_name').eq('id', currentUser.id).single();
+                const senderName = senderProfile.data?.full_name || 'Someone';
+                
+                await fetch('https://myub-push-notifications.futurifydesigns.workers.dev', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: userId,
+                        title: title,
+                        body: senderName + ' ' + body,
+                        data: {
+                            type: type,
+                            senderId: currentUser.id,
+                            url: type === 'friend_request' ? '/friends.html?tab=requests' : '/friends.html'
+                        }
+                    })
+                });
+                console.log('MyUB: Push notification sent for', type);
+            } catch (error) {
+                console.error('MyUB: Push notification error:', error);
+            }
         }
 
         // Notification sound

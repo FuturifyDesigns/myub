@@ -949,6 +949,31 @@
                 input.value = ''; input.style.height = 'auto'; document.getElementById('sendBtn').disabled = true;
                 cancelReply();
                 messages.push(data); renderMessages(); await loadConversations();
+                
+                // Insert notification for receiver
+                const senderProfile = await supabaseClient.from('profiles').select('full_name').eq('id', currentUser.id).single();
+                const senderName = senderProfile.data?.full_name || 'Someone';
+                const preview = content.length > 50 ? content.substring(0, 50) + "..." : content;
+                
+                await supabaseClient.from('notification_queue').insert({
+                    user_id: currentConversation,  // Receiver
+                    type: 'message',
+                    title: senderName,
+                    body: preview,
+                    icon: '/icons/icon-192x192.png',
+                    badge: '/icons/favicon-48x48.png',
+                    tag: 'message-' + currentUser.id,
+                    data: {
+                        type: 'message',
+                        senderId: currentUser.id,
+                        conversationId: currentUser.id,
+                        url: '/messages.html?conversation=' + currentUser.id
+                    },
+                    require_interaction: false,
+                    delivered: false
+                });
+                console.log('MyUB: Notification queued for receiver');
+                
                 await supabaseClient.from('notifications').insert({ user_id: currentConversation, type: 'message', title: 'New Message', body: content.substring(0, 50) });
             } catch (e) { showToast('Failed to send', 'error'); }
         }
@@ -1267,13 +1292,29 @@
                         
                         const senderName = senderProfile.data?.full_name || 'Someone';
                         
-                        await MyUBNotificationTriggers.onNewMessage(
-                            supabaseClient,
-                            senderId,
-                            senderName,
-                            msg.content,
-                            senderId
-                        );
+                        // Insert notification directly (bypass trigger to specify receiver)
+                        const preview = msg.content.length > 50 ? msg.content.substring(0, 50) + "..." : msg.content;
+                        
+                        await supabaseClient
+                            .from('notification_queue')
+                            .insert({
+                                user_id: currentUser.id,  // Receiver (current user on this page)
+                                type: 'message',
+                                title: senderName,
+                                body: preview,
+                                icon: '/icons/icon-192x192.png',
+                                badge: '/icons/favicon-48x48.png',
+                                tag: 'message-' + senderId,
+                                data: {
+                                    type: 'message',
+                                    senderId: senderId,
+                                    conversationId: senderId,
+                                    url: '/messages.html?conversation=' + senderId
+                                },
+                                require_interaction: false,
+                                delivered: false
+                            });
+                        
                         console.log('MyUB: Notification triggered for new message from', senderName);
                     }
                 } catch (error) {

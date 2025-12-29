@@ -1255,6 +1255,30 @@
                     showToast('New message received', 'success'); 
                 }
                 await loadConversations();
+                
+                // 🔔 TRIGGER PUSH NOTIFICATION
+                try {
+                    if (window.MyUBNotificationTriggers) {
+                        const senderProfile = await supabaseClient
+                            .from('profiles')
+                            .select('full_name')
+                            .eq('id', senderId)
+                            .single();
+                        
+                        const senderName = senderProfile.data?.full_name || 'Someone';
+                        
+                        await MyUBNotificationTriggers.onNewMessage(
+                            supabaseClient,
+                            senderId,
+                            senderName,
+                            msg.content,
+                            senderId
+                        );
+                        console.log('MyUB: Notification triggered for new message from', senderName);
+                    }
+                } catch (error) {
+                    console.error('MyUB: Error triggering notification:', error);
+                }
             }).subscribe();
             supabaseClient.channel('message-reads').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'messages', filter: `sender_id=eq.${currentUser.id}` }, (payload) => { const msgIdx = messages.findIndex(m => m.id === payload.new.id); if (msgIdx !== -1) { messages[msgIdx].is_read = payload.new.is_read; renderMessages(); } }).subscribe();
             supabaseClient.channel('online-status-messages').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, (payload) => {
@@ -1769,6 +1793,23 @@
 
     <!-- MyUB Calls Script -->
     <script src="myub-calls.js"></script>
+
+    <!-- Push Notification Scripts -->
+    <script src="myub-notifications-no-edge-functions.js"></script>
+    <script src="myub-notification-triggers-no-edge-functions.js"></script>
+    
+    <script>
+        // Clear badge when user opens messages page
+        if (window.MyUBNotifications) {
+            MyUBNotifications.clearBadge();
+        }
+        
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden && window.MyUBNotifications) {
+                MyUBNotifications.clearBadge();
+            }
+        });
+    </script>
 
     <!-- PWA Service Worker Registration -->
     <script>

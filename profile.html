@@ -2321,10 +2321,14 @@
         if (window.MyUBCalls) {
             MyUBCalls.init(supabaseClient);
         }
+        
+        // Start heartbeat
+        if (window.MyUBHeartbeat && currentUser) {
+            MyUBHeartbeat.start(supabaseClient, currentUser);
+        }
     </script>
 
-    <!-- Push Notification Scripts -->
-    <script src="myub-notifications-no-edge-functions.js"></script>
-    <script src="myub-notification-triggers-no-edge-functions.js"></script>
+    <!-- MyUB Heartbeat Script -->
+    <script src="myub-heartbeat.js"></script>
 </body>
 </html>

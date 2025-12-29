@@ -1673,7 +1673,15 @@
         if (window.MyUBCalls) {
             MyUBCalls.init(supabaseClient);
         }
+        
+        // Start heartbeat
+        if (window.MyUBHeartbeat && currentUser) {
+            MyUBHeartbeat.start(supabaseClient, currentUser);
+        }
     </script>
+    
+    <!-- MyUB Heartbeat Script -->
+    <script src="myub-heartbeat.js"></script>
 
     <!-- OneSignal handles service worker registration -->
 

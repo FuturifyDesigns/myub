@@ -976,7 +976,8 @@
                     if (notifResponse.ok) {
                         console.log('MyUB: Push notification sent via OneSignal');
                     } else {
-                        console.error('MyUB: Push notification failed');
+                        const errorData = await notifResponse.json();
+                        console.error('MyUB: Push notification failed:', errorData);
                     }
                 } catch (notifError) {
                     console.error('MyUB: Notification error:', notifError);
@@ -1842,6 +1843,15 @@
 
     <!-- MyUB Calls Script -->
     <script src="myub-calls.js"></script>
+    
+    <!-- MyUB Heartbeat Script -->
+    <script src="myub-heartbeat.js"></script>
+    <script>
+        // Start heartbeat when user is loaded
+        if (window.currentUser && window.supabaseClient) {
+            MyUBHeartbeat.start(supabaseClient, currentUser);
+        }
+    </script>
 
     <!-- OneSignal handles service worker registration -->
 

@@ -1884,10 +1884,33 @@
                 }
                 
                 // Get user's name for notification
-                var profileResult = await supabaseClient.from('profiles').select('first_name, last_name').eq('id', currentUser.id).single();
+                var profileResult = await supabaseClient.from('profiles').select('first_name, last_name, full_name').eq('id', currentUser.id).single();
                 var userName = getName(profileResult.data);
+                var fullName = profileResult.data?.full_name || userName;
                 
-                // Notify group admin
+                // Send push notification to group creator
+                try {
+                    await fetch('https://myub-push-notifications.futurifydesigns.workers.dev', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            userId: group.creator_id,
+                            title: 'Join Request - ' + group.name,
+                            body: fullName + ' wants to join your group',
+                            data: {
+                                type: 'group_join_request',
+                                groupId: groupId,
+                                requesterId: currentUser.id,
+                                url: '/study-groups.html?group=' + groupId
+                            }
+                        })
+                    });
+                    console.log('MyUB: Join request notification sent');
+                } catch (error) {
+                    console.error('MyUB: Join request notification error:', error);
+                }
+                
+                // Notify group admin (in-app)
                 await supabaseClient.from('notifications').insert({
                     user_id: group.creator_id,
                     title: 'Join Request',
@@ -3712,6 +3735,15 @@
         // START APP
         // ============================================
         init();
+    </script>
+    
+    <!-- MyUB Heartbeat Script -->
+    <script src="myub-heartbeat.js"></script>
+    <script>
+        // Start heartbeat when user is loaded
+        if (window.currentUser && window.supabaseClient && window.MyUBHeartbeat) {
+            MyUBHeartbeat.start(supabaseClient, currentUser);
+        }
     </script>
 
     <!-- PWA Service Worker Registration -->

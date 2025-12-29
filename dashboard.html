@@ -3237,9 +3237,50 @@
             }
         });
 
+        // Heartbeat system - update online status every 30 seconds
+        let heartbeatInterval = null;
+        
+        async function startHeartbeat() {
+            // Update immediately
+            if (currentUser) {
+                await supabaseClient.rpc('update_online_status', { is_online_status: true });
+            }
+            
+            // Then update every 30 seconds
+            heartbeatInterval = setInterval(async () => {
+                if (currentUser && !document.hidden) {
+                    try {
+                        await supabaseClient.rpc('update_online_status', { is_online_status: true });
+                        console.log('MyUB: Heartbeat sent');
+                    } catch (error) {
+                        console.error('MyUB: Heartbeat failed:', error);
+                    }
+                }
+            }, 30000); // 30 seconds
+        }
+        
+        function stopHeartbeat() {
+            if (heartbeatInterval) {
+                clearInterval(heartbeatInterval);
+                heartbeatInterval = null;
+            }
+        }
+        
+        // Start heartbeat after user is loaded
+        if (currentUser) {
+            startHeartbeat();
+        }
+
         // Handle beforeunload
         window.addEventListener('beforeunload', async () => {
+            stopHeartbeat();
             if (currentUser) {
+                // Use sendBeacon for more reliable delivery
+                const data = new FormData();
+                data.append('user_id', currentUser.id);
+                navigator.sendBeacon('https://myub.online/set-offline.php', data);
+                
+                // Also try the RPC (may or may not work)
                 await supabaseClient.rpc('update_online_status', { is_online_status: false });
             }
         });

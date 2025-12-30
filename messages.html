@@ -874,7 +874,16 @@
             const searchQuery = document.getElementById('convSearch').value.toLowerCase();
             const filtered = conversations.filter(c => { if (!c.user) return false; const name = (c.user.full_name || `${c.user.first_name} ${c.user.last_name}`).toLowerCase(); return name.includes(searchQuery); });
             if (filtered.length === 0) { container.innerHTML = `<div class="conversations-empty"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg><h3>${searchQuery ? 'No conversations found' : 'No messages yet'}</h3><p>${searchQuery ? 'Try a different search' : 'Start chatting with friends!'}</p></div>`; return; }
-            container.innerHTML = filtered.map(conv => { const user = conv.user; const name = user.full_name || `${user.first_name} ${user.last_name}`; const initials = getInitials(name); const isActive = currentChatUser?.id === user.id; const timeStr = formatConvTime(conv.lastMessageTime); return `<div class="conversation-item ${isActive ? 'active' : ''} ${conv.unreadCount > 0 ? 'unread' : ''}" onclick="openConversation('${user.id}')"><div class="conv-avatar">${user.avatar_url ? `<img src="${user.avatar_url}" alt="">` : initials}<div class="conv-online ${user.is_online ? '' : 'offline'}"></div></div><div class="conv-info"><div class="conv-name">${escapeHtml(name)}</div><div class="conv-preview">${escapeHtml(truncate(conv.lastMessage, 35))}</div></div><div class="conv-meta"><div class="conv-time">${timeStr}</div>${conv.unreadCount > 0 ? `<div class="conv-unread-badge">${conv.unreadCount}</div>` : ''}</div></div>`; }).join('');
+            container.innerHTML = filtered.map(conv => { 
+                const user = conv.user; 
+                const name = user.full_name || `${user.first_name} ${user.last_name}`; 
+                const initials = getInitials(name); 
+                const isActive = currentChatUser?.id === user.id; 
+                const timeStr = formatConvTime(conv.lastMessageTime);
+                // Show "No messages" if lastMessage is empty or undefined
+                const preview = conv.lastMessage ? truncate(conv.lastMessage, 35) : 'No messages';
+                return `<div class="conversation-item ${isActive ? 'active' : ''} ${conv.unreadCount > 0 ? 'unread' : ''}" onclick="openConversation('${user.id}')"><div class="conv-avatar">${user.avatar_url ? `<img src="${user.avatar_url}" alt="">` : initials}<div class="conv-online ${user.is_online ? '' : 'offline'}"></div></div><div class="conv-info"><div class="conv-name">${escapeHtml(name)}</div><div class="conv-preview" style="${!conv.lastMessage ? 'font-style:italic;opacity:0.6;' : ''}">${escapeHtml(preview)}</div></div><div class="conv-meta"><div class="conv-time">${timeStr}</div>${conv.unreadCount > 0 ? `<div class="conv-unread-badge">${conv.unreadCount}</div>` : ''}</div></div>`; 
+            }).join('');
         }
 
         function renderMessages() {
@@ -1143,34 +1152,58 @@
             confirmCallback = async () => { 
                 try {
                     const messageIds = Array.from(selectedMessages);
-                    console.log('Deleting messages:', messageIds);
+                    console.log('Attempting to delete messages:', messageIds);
+                    console.log('Current user ID:', currentUser.id);
                     
-                    // Delete messages from database where sender is current user
-                    const { error, data } = await supabaseClient
-                        .from('messages')
-                        .delete()
-                        .in('id', messageIds)
-                        .eq('sender_id', currentUser.id)
-                        .select();
+                    // First verify all selected messages belong to current user
+                    const messagesToDelete = messages.filter(m => 
+                        messageIds.includes(m.id) && m.sender_id === currentUser.id
+                    );
                     
-                    if (error) {
-                        console.error('Delete error:', error);
-                        showToast('Failed to delete messages', 'error');
-                    } else {
-                        console.log('Deleted messages:', data);
+                    const validIds = messagesToDelete.map(m => m.id);
+                    console.log('Valid message IDs to delete:', validIds);
+                    
+                    if (validIds.length === 0) {
+                        showToast('No valid messages to delete', 'error');
+                        closeConfirmModal();
+                        return;
+                    }
+                    
+                    // Delete each message individually to ensure proper deletion
+                    let deletedCount = 0;
+                    for (const msgId of validIds) {
+                        const { error } = await supabaseClient
+                            .from('messages')
+                            .delete()
+                            .eq('id', msgId)
+                            .eq('sender_id', currentUser.id);
+                        
+                        if (!error) {
+                            deletedCount++;
+                            console.log('Successfully deleted message:', msgId);
+                        } else {
+                            console.error('Failed to delete message:', msgId, error);
+                        }
+                    }
+                    
+                    if (deletedCount > 0) {
+                        console.log(`Total deleted: ${deletedCount} messages`);
                         
                         // Immediately remove messages from local array
-                        messages = messages.filter(m => !messageIds.includes(m.id));
+                        messages = messages.filter(m => !validIds.includes(m.id));
                         
                         // Render immediately
                         renderMessages();
                         
-                        showToast(`${data?.length || selectedMessages.size} message(s) deleted`);
+                        showToast(`${deletedCount} message(s) deleted`);
                         exitSelectionMode();
                         
                         // Reload conversations to update preview
                         await loadConversations();
+                    } else {
+                        showToast('Failed to delete messages', 'error');
                     }
+                    
                 } catch (err) {
                     console.error('Delete exception:', err);
                     showToast('Failed to delete messages', 'error');

@@ -3405,6 +3405,21 @@
                 
                 console.log('MyUB: Initializing OneSignal for user:', currentUser.id);
                 
+                // First, try native browser permission request
+                const currentPermission = Notification.permission;
+                
+                if (currentPermission === 'default') {
+                    // Request native permission first (this always shows prompt)
+                    console.log('MyUB: Requesting native notification permission...');
+                    const permission = await Notification.requestPermission();
+                    
+                    if (permission !== 'granted') {
+                        console.log('MyUB: Notification permission denied');
+                        return;
+                    }
+                }
+                
+                // Then initialize OneSignal
                 window.OneSignalDeferred = window.OneSignalDeferred || [];
                 OneSignalDeferred.push(async function(OneSignal) {
                     await OneSignal.init({
@@ -3415,22 +3430,6 @@
                     // Set external user ID (your Supabase user ID)
                     await OneSignal.login(currentUser.id);
                     console.log('MyUB: OneSignal initialized with user ID:', currentUser.id);
-                    
-                    // Show notification prompt immediately
-                    setTimeout(async () => {
-                        const permission = await OneSignal.Notifications.permission;
-                        console.log('MyUB: Notification permission:', permission);
-                        
-                        if (permission === 'default') {
-                            console.log('MyUB: Showing prompt...');
-                            await OneSignal.Slidedown.promptPush();
-                        } else if (permission === 'denied') {
-                            console.log('MyUB: Notifications denied by user');
-                            showToast('Please enable notifications in browser settings', 'info');
-                        } else {
-                            console.log('MyUB: Notifications already granted');
-                        }
-                    }, 3000);
                 });
                 
             } catch (error) {

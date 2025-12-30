@@ -2349,9 +2349,6 @@
             // Check for first-time user welcome modal
             checkFirstTimeUser();
             
-            // Register Service Worker for PWA
-            registerServiceWorker();
-            
             // Initialize OneSignal for push notifications
             initOneSignal();
             
@@ -3420,37 +3417,6 @@
         }
 
         // =============================================
-        // PWA SERVICE WORKER REGISTRATION
-        // =============================================
-        async function registerServiceWorker() {
-            if ('serviceWorker' in navigator) {
-                try {
-                    const registration = await navigator.serviceWorker.register('/sw.js');
-                    console.log('Service Worker registered successfully:', registration);
-                    
-                    // Wait for service worker to be ready
-                    const serviceWorker = registration.installing || registration.waiting || registration.active;
-                    if (serviceWorker) {
-                        console.log('Service Worker state:', serviceWorker.state);
-                    }
-                    
-                    // Register background sync
-                    if ('sync' in registration) {
-                        try {
-                            await registration.sync.register('check-notifications');
-                            console.log('Background sync registered');
-                        } catch (error) {
-                            console.log('Background sync not available:', error.message);
-                        }
-                    }
-                    
-                } catch (error) {
-                    console.error('Service Worker registration failed:', error);
-                }
-            }
-        }
-
-        // =============================================
         // APP BADGE API
         // =============================================
         async function updateAppBadge(count) {
@@ -3515,7 +3481,7 @@
                     });
                 }
                 
-                // Initialize OneSignal
+                // Initialize OneSignal without problematic options
                 await window.OneSignal.init({
                     appId: "c5e50154-18dd-43ae-a347-220898d8f1e7",
                     allowLocalhostAsSecureOrigin: true,
@@ -3527,9 +3493,6 @@
                 // Set external user ID
                 await window.OneSignal.login(currentUser.id);
                 console.log('OneSignal initialized for user:', currentUser.id);
-                
-                // Enable automatic subscription
-                await window.OneSignal.Notifications.setDefaultUrl("/dashboard.html");
                 
                 // Check subscription status
                 const isSubscribed = await window.OneSignal.User.PushSubscription.optedIn;
@@ -3544,6 +3507,7 @@
                 
             } catch (error) {
                 console.error('OneSignal init error:', error);
+                // Continue without OneSignal - it's not critical
             }
         }
 

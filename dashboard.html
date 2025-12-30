@@ -1871,12 +1871,12 @@
                     <h4>🐛 Found a Bug? Have Suggestions?</h4>
                     <p>We're constantly improving MyUB. Your feedback helps us make it better for everyone!</p>
                     <div class="contact-links">
-                        <a href="mailto:support@myub.online" class="contact-link">
+                        <a href="/cdn-cgi/l/email-protection#780b0d0808170a0c3815010d1a5617161411161d" class="contact-link">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
                                 <polyline points="22,6 12,13 2,6"/>
                             </svg>
-                            support@myub.online
+                            <span class="__cf_email__" data-cfemail="c6b5b3b6b6a9b4b286abbfb3a4e8a9a8aaafa8a3">[email&#160;protected]</span>
                         </a>
                         <a href="https://wa.me/26777783823" target="_blank" class="contact-link">
                             <svg viewBox="0 0 24 24" fill="currentColor">
@@ -2274,7 +2274,7 @@
         </div>
     </div>
 
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         // Supabase
         const SUPABASE_URL = 'https://weuxtwmaqmbhskjpjdyi.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndldXh0d21hcW1iaHNranBqZHlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NTYzMTcsImV4cCI6MjA4MDMzMjMxN30.J-0Nd0MY6-g_ltbBNHwOulqZuQfb8mKIRgx0dAaJ76o';
@@ -2348,9 +2348,6 @@
             
             // Check for first-time user welcome modal
             checkFirstTimeUser();
-            
-            // Register Service Worker for PWA
-            registerServiceWorker();
             
             // Initialize OneSignal for push notifications
             initOneSignal();
@@ -3420,35 +3417,7 @@
         }
 
         // =============================================
-        // PWA SERVICE WORKER REGISTRATION
-        // =============================================
-        async function registerServiceWorker() {
-            if ('serviceWorker' in navigator) {
-                try {
-                    const registration = await navigator.serviceWorker.register('/sw.js');
-                    console.log('Service Worker registered successfully:', registration);
-                    
-                    // Wait for service worker to be ready
-                    const serviceWorker = registration.installing || registration.waiting || registration.active;
-                    if (serviceWorker) {
-                        console.log('Service Worker state:', serviceWorker.state);
-                    }
-                    
-                    // Register background sync
-                    if ('sync' in registration) {
-                        try {
-                            await registration.sync.register('check-notifications');
-                            console.log('Background sync registered');
-                        } catch (error) {
-                            console.log('Background sync not available:', error.message);
-                        }
-                    }
-                    
-                } catch (error) {
-                    console.error('Service Worker registration failed:', error);
-                }
-            }
-        }
+
 
         // =============================================
         // APP BADGE API
@@ -3608,15 +3577,4 @@
             try {
                 if (!window.OneSignal) {
                     console.log('OneSignal not loaded');
-                    return;
-                }
-                await OneSignal.Slidedown.promptPush();
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        };
-        
-    </script>
-
-</body>
-</html>
+ 

@@ -306,7 +306,7 @@
             width: 44px; 
             height: 44px; 
             border: none; 
-            background: linear-gradient(135deg, #FFF9E6 0%, #FFE066 100%); 
+            background: transparent; 
             border-radius: 12px; 
             cursor: pointer; 
             display: flex; 
@@ -315,16 +315,18 @@
             flex-shrink: 0; 
             position: relative; 
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-            box-shadow: 0 2px 8px rgba(255, 193, 7, 0.15);
         }
         .emoji-btn:hover { 
-            background: linear-gradient(135deg, #FFE066 0%, #FFC107 100%); 
-            transform: translateY(-2px) scale(1.05); 
-            box-shadow: 0 4px 16px rgba(255, 193, 7, 0.3);
+            transform: translateY(-2px) scale(1.1); 
         }
         .emoji-btn:active {
             transform: translateY(0) scale(1);
-            box-shadow: 0 2px 8px rgba(255, 193, 7, 0.15);
+        }
+        .emoji-btn img { 
+            transition: all 0.3s ease;
+        }
+        .emoji-btn:hover img { 
+            transform: scale(1.1) rotate(5deg);
         }
         .emoji-btn svg { 
             width: 24px; 
@@ -864,7 +866,7 @@
                 <div class="reply-bar" id="replyBar"><div class="reply-bar-content"><div class="reply-bar-name" id="replyBarName">Replying to User</div><div class="reply-bar-text" id="replyBarText">Message preview...</div></div><button class="reply-bar-close" onclick="cancelReply()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button></div>
                 <div class="chat-input-area" id="chatInputArea" style="display:none;">
                     <button class="emoji-btn" onclick="toggleEmojiPicker()">
-                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <img src="emoji-button.jpg" alt="😊" style="width: 28px; height: 28px; border-radius: 50%;">
                         <div class="emoji-picker" id="emojiPicker"></div>
                     </button>
                     <div class="chat-input-wrapper">

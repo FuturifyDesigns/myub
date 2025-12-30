@@ -939,9 +939,16 @@
             }
             
             if (window.MyUBCalls && window.MyUBCalls.startCall) {
-                window.MyUBCalls.startCall(currentConversation, currentChatUser.full_name, 'video');
+                // Pass the receiver user object with required properties
+                const receiver = {
+                    id: currentChatUser.id,
+                    full_name: currentChatUser.full_name || `${currentChatUser.first_name} ${currentChatUser.last_name}`,
+                    avatar_url: currentChatUser.avatar_url
+                };
+                window.MyUBCalls.startCall(receiver, 'video');
             } else {
-                showToast('Calling feature is loading...', 'info');
+                console.error('MyUBCalls not loaded');
+                showToast('Calling feature is not available. Please refresh the page.', 'error');
             }
         }
         
@@ -952,9 +959,16 @@
             }
             
             if (window.MyUBCalls && window.MyUBCalls.startCall) {
-                window.MyUBCalls.startCall(currentConversation, currentChatUser.full_name, 'voice');
+                // Pass the receiver user object with required properties
+                const receiver = {
+                    id: currentChatUser.id,
+                    full_name: currentChatUser.full_name || `${currentChatUser.first_name} ${currentChatUser.last_name}`,
+                    avatar_url: currentChatUser.avatar_url
+                };
+                window.MyUBCalls.startCall(receiver, 'voice');
             } else {
-                showToast('Calling feature is loading...', 'info');
+                console.error('MyUBCalls not loaded');
+                showToast('Calling feature is not available. Please refresh the page.', 'error');
             }
         }
 
@@ -1874,6 +1888,12 @@
 
     <!-- MyUB Calls Script -->
     <script src="myub-calls.js"></script>
+    <script>
+        // Initialize MyUBCalls when user is loaded
+        if (window.currentUser && window.supabaseClient && window.MyUBCalls) {
+            MyUBCalls.init(supabaseClient, currentUser);
+        }
+    </script>
     
     <!-- MyUB Heartbeat Script -->
     <script src="myub-heartbeat.js"></script>

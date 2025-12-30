@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enable Notifications - MyUB</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a365d 0%, #2563eb 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #1a365d;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+        p {
+            color: #64748b;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        button {
+            width: 100%;
+            padding: 16px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        button:active {
+            background: #1d4ed8;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .success { background: #dcfce7; color: #166534; }
+        .error { background: #fee2e2; color: #991b1b; }
+        .info { background: #dbeafe; color: #1e40af; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🔔 Enable Notifications</h1>
+        <p>Allow MyUB to send you notifications about messages, friend requests, and study group updates - even when the app is closed!</p>
+        
+        <button onclick="requestNativePermission()">Enable Notifications (Native)</button>
+        <button onclick="requestOneSignalPermission()">Enable Notifications (OneSignal)</button>
+        <button onclick="checkStatus()">Check Status</button>
+        
+        <div id="status"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    
+    <script>
+        const SUPABASE_URL = 'https://weuxtwmaqmbhskjpjdyi.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndldXh0d21hcW1iaHNranBqZHlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NTYzMTcsImV4cCI6MjA4MDMzMjMxN30.J-0Nd0MY6-g_ltbBNHwOulqZuQfb8mKIRgx0dAaJ76o';
+        const notifSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = 'status ' + type;
+            statusDiv.innerHTML = message;
+        }
+        
+        // Method 1: Native browser notification permission
+        async function requestNativePermission() {
+            try {
+                showStatus('Requesting permission...', 'info');
+                
+                const permission = await Notification.requestPermission();
+                
+                if (permission === 'granted') {
+                    showStatus('✅ Notifications enabled! Now initializing OneSignal...', 'success');
+                    
+                    // After browser permission, init OneSignal
+                    setTimeout(initOneSignal, 1000);
+                } else if (permission === 'denied') {
+                    showStatus('❌ Notifications blocked. Please enable in browser settings.', 'error');
+                } else {
+                    showStatus('⚠️ Permission dismissed', 'info');
+                }
+            } catch (error) {
+                showStatus('❌ Error: ' + error.message, 'error');
+            }
+        }
+        
+        // Method 2: OneSignal prompt
+        async function requestOneSignalPermission() {
+            try {
+                showStatus('Loading OneSignal...', 'info');
+                
+                if (!window.OneSignal) {
+                    showStatus('⏳ Waiting for OneSignal to load...', 'info');
+                    setTimeout(requestOneSignalPermission, 1000);
+                    return;
+                }
+                
+                await OneSignal.Slidedown.promptPush();
+                showStatus('OneSignal prompt shown!', 'success');
+                
+            } catch (error) {
+                showStatus('❌ Error: ' + error.message, 'error');
+            }
+        }
+        
+        // Check current status
+        async function checkStatus() {
+            let status = '<strong>Status Check:</strong><br><br>';
+            
+            // Check browser permission
+            const browserPerm = Notification.permission;
+            status += `Browser Permission: ${browserPerm}<br>`;
+            
+            // Check OneSignal
+            if (window.OneSignal) {
+                try {
+                    const osPerm = await OneSignal.Notifications.permission;
+                    const subId = await OneSignal.User.PushSubscription.id;
+                    status += `OneSignal Permission: ${osPerm}<br>`;
+                    status += `Subscription ID: ${subId || 'Not subscribed'}<br>`;
+                } catch (e) {
+                    status += `OneSignal: ${e.message}<br>`;
+                }
+            } else {
+                status += 'OneSignal: Not loaded<br>';
+            }
+            
+            showStatus(status, 'info');
+        }
+        
+        // Initialize OneSignal
+        async function initOneSignal() {
+            try {
+                const { data: { user } } = await notifSupabase.auth.getUser();
+                
+                if (!user) {
+                    showStatus('⚠️ Not logged in. Please log in to MyUB first.', 'info');
+                    return;
+                }
+                
+                window.OneSignalDeferred = window.OneSignalDeferred || [];
+                OneSignalDeferred.push(async function(OneSignal) {
+                    await OneSignal.init({
+                        appId: "c5e50154-18dd-43ae-a347-220898d8f1e7",
+                        allowLocalhostAsSecureOrigin: true
+                    });
+                    
+                    await OneSignal.login(user.id);
+                    showStatus('✅ OneSignal initialized! You can now close this page.', 'success');
+                    
+                    setTimeout(() => {
+                        window.location.href = '/dashboard.html';
+                    }, 2000);
+                });
+                
+            } catch (error) {
+                showStatus('❌ Error initializing OneSignal: ' + error.message, 'error');
+            }
+        }
+        
+        // Auto-check on load
+        window.addEventListener('load', () => {
+            setTimeout(checkStatus, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -698,6 +698,19 @@
             if (!session) { window.location.href = 'index.html'; return; }
             currentUser = session.user;
             
+            // Initialize MyUBCalls after user session is confirmed
+            console.log('[DEBUG] Initializing MyUBCalls...');
+            if (window.MyUBCalls) {
+                try {
+                    window.MyUBCalls.init(supabaseClient);
+                    console.log('[DEBUG] MyUBCalls initialized successfully');
+                } catch (error) {
+                    console.error('[DEBUG] MyUBCalls initialization error:', error);
+                }
+            } else {
+                console.error('[DEBUG] MyUBCalls not found on window object');
+            }
+            
             // Check if user is banned
             const { data: profile } = await supabaseClient.from('profiles').select('is_banned').eq('id', currentUser.id).single();
             if (profile && profile.is_banned) {
@@ -933,10 +946,18 @@
 
         // ========== CALLING FUNCTIONS ==========
         function startVideoCall() {
+            console.log('[DEBUG] startVideoCall called');
+            console.log('[DEBUG] currentConversation:', currentConversation);
+            console.log('[DEBUG] currentChatUser:', currentChatUser);
+            
             if (!currentConversation || !currentChatUser) {
+                console.error('[DEBUG] Missing conversation or chat user');
                 showToast('Please select a conversation first', 'error');
                 return;
             }
+            
+            console.log('[DEBUG] window.MyUBCalls:', window.MyUBCalls);
+            console.log('[DEBUG] MyUBCalls.startCall:', window.MyUBCalls ? window.MyUBCalls.startCall : 'undefined');
             
             if (window.MyUBCalls && window.MyUBCalls.startCall) {
                 // Pass the receiver user object and true for video
@@ -945,18 +966,33 @@
                     full_name: currentChatUser.full_name || `${currentChatUser.first_name} ${currentChatUser.last_name}`,
                     avatar_url: currentChatUser.avatar_url
                 };
-                window.MyUBCalls.startCall(receiver, true);
+                console.log('[DEBUG] Starting video call with receiver:', receiver);
+                try {
+                    window.MyUBCalls.startCall(receiver, true);
+                    console.log('[DEBUG] startCall executed successfully');
+                } catch (error) {
+                    console.error('[DEBUG] Error calling startCall:', error);
+                    showToast('Failed to start call: ' + error.message, 'error');
+                }
             } else {
-                console.error('MyUBCalls not loaded');
+                console.error('[DEBUG] MyUBCalls not available');
                 showToast('Calling feature is not available. Please refresh the page.', 'error');
             }
         }
         
         function startVoiceCall() {
+            console.log('[DEBUG] startVoiceCall called');
+            console.log('[DEBUG] currentConversation:', currentConversation);
+            console.log('[DEBUG] currentChatUser:', currentChatUser);
+            
             if (!currentConversation || !currentChatUser) {
+                console.error('[DEBUG] Missing conversation or chat user');
                 showToast('Please select a conversation first', 'error');
                 return;
             }
+            
+            console.log('[DEBUG] window.MyUBCalls:', window.MyUBCalls);
+            console.log('[DEBUG] MyUBCalls.startCall:', window.MyUBCalls ? window.MyUBCalls.startCall : 'undefined');
             
             if (window.MyUBCalls && window.MyUBCalls.startCall) {
                 // Pass the receiver user object and false for voice-only
@@ -965,9 +1001,16 @@
                     full_name: currentChatUser.full_name || `${currentChatUser.first_name} ${currentChatUser.last_name}`,
                     avatar_url: currentChatUser.avatar_url
                 };
-                window.MyUBCalls.startCall(receiver, false);
+                console.log('[DEBUG] Starting voice call with receiver:', receiver);
+                try {
+                    window.MyUBCalls.startCall(receiver, false);
+                    console.log('[DEBUG] startCall executed successfully');
+                } catch (error) {
+                    console.error('[DEBUG] Error calling startCall:', error);
+                    showToast('Failed to start call: ' + error.message, 'error');
+                }
             } else {
-                console.error('MyUBCalls not loaded');
+                console.error('[DEBUG] MyUBCalls not available');
                 showToast('Calling feature is not available. Please refresh the page.', 'error');
             }
         }
@@ -1888,12 +1931,6 @@
 
     <!-- MyUB Calls Script -->
     <script src="myub-calls.js"></script>
-    <script>
-        // Initialize MyUBCalls when supabase is ready
-        if (window.supabaseClient && window.MyUBCalls) {
-            MyUBCalls.init(supabaseClient);
-        }
-    </script>
     
     <!-- MyUB Heartbeat Script -->
     <script src="myub-heartbeat.js"></script>

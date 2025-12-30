@@ -3441,6 +3441,19 @@
         // Call OneSignal init
         initOneSignal();
         
+        // Manual notification enable (call from console: manuallyEnableNotifications())
+        window.manuallyEnableNotifications = async function() {
+            try {
+                if (!window.OneSignal) {
+                    console.log('OneSignal not loaded');
+                    return;
+                }
+                await OneSignal.Slidedown.promptPush();
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        };
+        
         // Configure Service Worker for background notifications
         async function configureServiceWorker() {
             if ('serviceWorker' in navigator && currentUser) {

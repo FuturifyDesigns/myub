@@ -3528,8 +3528,8 @@
                 await window.OneSignal.login(currentUser.id);
                 console.log('OneSignal initialized for user:', currentUser.id);
                 
-                // Enable automatic subscription
-                await window.OneSignal.Notifications.setDefaultUrl("/dashboard.html");
+                // Enable automatic subscription with absolute URL
+                await window.OneSignal.Notifications.setDefaultUrl(window.location.origin + "/dashboard.html");
                 
                 // Check subscription status
                 const isSubscribed = await window.OneSignal.User.PushSubscription.optedIn;

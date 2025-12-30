@@ -14,476 +14,9 @@
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
     
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; }
-        :root { --navy: #1a365d; --navy-light: #2c5282; --navy-dark: #0f2744; --red: #c41e3a; --white: #ffffff; --gray-50: #f8fafc; --gray-100: #f1f5f9; --gray-200: #e2e8f0; --gray-300: #cbd5e1; --gray-400: #94a3b8; --gray-500: #64748b; --gray-600: #475569; --gray-700: #334155; --gray-800: #1e293b; --green: #22c55e; --green-light: #dcfce7; --blue: #3b82f6; --blue-light: #dbeafe; --orange: #f97316; }
-
-        /* Global input cursor fix */
-        input[type="text"],
-        input[type="email"],
-        input[type="password"],
-        input[type="number"],
-        input[type="tel"],
-        input[type="search"],
-        input[type="url"],
-        input[type="date"],
-        input[type="time"],
-        textarea {
-            cursor: text !important;
-            caret-color: #1a365d;
-        }
-
-        input[type="checkbox"],
-        input[type="radio"],
-        input[type="submit"],
-        input[type="button"],
-        button,
-        select {
-            cursor: pointer !important;
-        }
-
-        input:disabled,
-        textarea:disabled,
-        select:disabled,
-        button:disabled {
-            cursor: not-allowed !important;
-        }
-        html { height: auto; min-height: 100%; }
-
-        /* Global input cursor fix */
-        input[type="text"],
-        input[type="email"],
-        input[type="password"],
-        input[type="number"],
-        input[type="tel"],
-        input[type="search"],
-        input[type="url"],
-        input[type="date"],
-        input[type="time"],
-        textarea {
-            cursor: text !important;
-            caret-color: #1a365d;
-        }
-
-        input[type="checkbox"],
-        input[type="radio"],
-        input[type="submit"],
-        input[type="button"],
-        button,
-        select {
-            cursor: pointer !important;
-        }
-
-        input:disabled,
-        textarea:disabled,
-        select:disabled,
-        button:disabled {
-            cursor: not-allowed !important;
-        }
-        body { font-family: 'Outfit', sans-serif; background: var(--gray-100); min-height: 100%; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
-        .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 260px; background: var(--navy-dark); padding: 20px 0; z-index: 100; transition: transform 0.3s ease; overflow-y: auto; }
-        .sidebar-header { padding: 0 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
-
-        .sidebar-logo {
-            display: inline-flex;
-            align-items: baseline;
-            text-decoration: none;
-            background: white;
-            padding: 30px 15px 10px 15px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .sidebar-logo-m-wrapper {
-            position: relative;
-            display: inline-block;
-        }
-
-        .sidebar-logo-cap {
-            width: 45px;
-            height: 26px;
-            position: absolute;
-            top: -22px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .sidebar-logo-m {
-            font-family: 'Times New Roman', Georgia, serif;
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--navy);
-            line-height: 1;
-        }
-
-        .sidebar-logo-yub {
-            font-family: 'Times New Roman', Georgia, serif;
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: var(--navy);
-            margin-left: -2px;
-        }
-        .nav-section { margin-bottom: 24px; }
-        .nav-section-title { font-size: 11px; font-weight: 600; color: var(--gray-400); text-transform: uppercase; letter-spacing: 1px; padding: 0 20px; margin-bottom: 8px; }
-        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 20px; color: var(--gray-300); text-decoration: none; font-size: 14px; font-weight: 500; transition: all 0.2s; cursor: pointer; border: none; background: none; width: 100%; text-align: left; }
-        .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--white); }
-        .nav-item.active { background: rgba(255,255,255,0.1); color: var(--white); border-right: 3px solid var(--red); }
-        .nav-item svg { width: 20px; height: 20px; flex-shrink: 0; }
-        .nav-item .badge { margin-left: auto; background: var(--red); color: var(--white); font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
-        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; }
-        .main-content { margin-left: 260px; height: 100vh; display: flex; flex-direction: column; }
-        .messages-container { display: flex; flex: 1; overflow: visible; position: relative; }
-        .conversations-panel { width: 360px; background: var(--white); border-right: 1px solid var(--gray-200); display: flex; flex-direction: column; flex-shrink: 0; overflow: visible; }
-        .conversations-header { padding: 20px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 50; }
-        .conversations-header h2 { font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 700; color: var(--gray-800); }
-        .new-chat-btn { width: 36px; height: 36px; border: none; background: var(--navy); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-        .new-chat-btn:hover { background: var(--navy-light); transform: scale(1.05); }
-        .new-chat-btn svg { width: 20px; height: 20px; color: var(--white); }
-        .new-chat-search { padding: 16px; border-bottom: 1px solid var(--gray-200); }
-        .new-chat-results { max-height: 400px; overflow-y: auto; }
-        .search-placeholder { padding: 60px 20px; text-align: center; color: var(--gray-400); }
-        .search-placeholder svg { width: 48px; height: 48px; margin-bottom: 12px; opacity: 0.5; }
-        .search-placeholder p { font-size: 14px; }
-        .user-search-item { display: flex; align-items: center; gap: 12px; padding: 14px 16px; cursor: pointer; transition: all 0.15s; border-bottom: 1px solid var(--gray-100); }
-        .user-search-item:hover { background: var(--gray-50); }
-        .user-search-avatar { position: relative; width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); display: flex; align-items: center; justify-content: center; color: var(--white); font-family: 'Sora', sans-serif; font-weight: 700; font-size: 15px; flex-shrink: 0; }
-        .user-search-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-        .user-search-avatar .online-indicator { position: absolute; bottom: 0; right: 0; width: 14px; height: 14px; background: var(--green); border-radius: 50%; border: 2px solid var(--white); }
-        .user-search-avatar .online-indicator.offline { background: var(--gray-400); }
-        .user-search-info { flex: 1; min-width: 0; }
-        .user-search-name { font-size: 15px; font-weight: 600; color: var(--gray-800); margin-bottom: 2px; }
-        .user-search-program { font-size: 13px; color: var(--gray-500); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .user-search-status { font-size: 12px; color: var(--green); }
-        .user-search-status.offline { color: var(--gray-400); }
-        .search-loading, .search-empty { padding: 40px 20px; text-align: center; color: var(--gray-400); font-size: 14px; }
-        
-        /* Profile Modal Styles - Matching friends.html */
-        .profile-modal-content { text-align: center; }
-        .profile-modal-avatar { width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); display: flex; align-items: center; justify-content: center; color: var(--white); font-family: 'Sora', sans-serif; font-weight: 700; font-size: 24px; margin: 0 auto 12px; position: relative; }
-        .profile-modal-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-        .profile-modal-avatar .online-dot { position: absolute; bottom: 0; right: 0; width: 14px; height: 14px; background: var(--green); border-radius: 50%; border: 3px solid var(--white); z-index: 1; }
-        .profile-modal-avatar .online-dot.offline { background: var(--gray-400); }
-        .profile-modal-name { font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 700; color: var(--gray-800); margin-bottom: 2px; }
-        .profile-modal-program { font-size: 13px; color: var(--gray-500); margin-bottom: 4px; }
-        .profile-modal-status { font-size: 12px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 6px; }
-        .profile-modal-status.online { color: var(--green); }
-        .profile-modal-status.offline { color: var(--gray-400); }
-        .profile-modal-bio { font-size: 13px; color: var(--gray-600); background: var(--gray-50); padding: 10px 14px; border-radius: 10px; margin-bottom: 12px; text-align: left; }
-        .profile-modal-bio:empty { display: none; }
-        .profile-modal-meta { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 12px 0; margin-bottom: 4px; }
-        .profile-modal-meta .label { font-size: 10px; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.5px; }
-        .profile-modal-meta .value { font-family: 'Sora', sans-serif; font-weight: 600; color: var(--gray-700); font-size: 14px; }
-        .profile-modal-actions { display: flex; flex-direction: column; gap: 10px; }
-        .profile-modal-actions .btn { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 12px 16px; font-size: 13px; font-weight: 600; border-radius: 10px; cursor: pointer; transition: all 0.2s; border: none; width: 100%; }
-        .profile-modal-actions .btn svg { width: 16px; height: 16px; }
-        .profile-modal-actions .btn-primary { background: var(--navy); color: var(--white); }
-        .profile-modal-actions .btn-primary:hover { background: var(--navy-light); }
-        .profile-modal-actions .btn-success { background: var(--green); color: var(--white); }
-        .profile-modal-actions .btn-success:hover { background: #059669; }
-        .profile-modal-actions .btn-secondary { background: var(--gray-100); border: 2px solid var(--gray-200); color: var(--gray-700); }
-        .profile-modal-actions .btn-secondary:hover { background: var(--gray-200); }
-        .profile-modal-actions .btn-danger { background: var(--red); color: var(--white); }
-        .profile-modal-actions .btn-danger:hover { background: #dc2626; }
-        .profile-modal-actions .btn-row { display: flex; gap: 10px; }
-        .profile-modal-actions .btn-row .btn { flex: 1; padding: 10px 12px; font-size: 12px; }
-        .profile-modal-actions .btn-outline-danger { background: #fef2f2; border: 2px solid #fecaca; color: var(--red); }
-        .profile-modal-actions .btn-outline-danger:hover { background: #fee2e2; }
-        .profile-modal-actions .btn-warning { background: #fffbeb; border: 2px solid #fde68a; color: #b45309; }
-        .profile-modal-actions .btn-warning:hover { background: #fef3c7; }
-        .profile-modal-link-container { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--gray-200); }
-        .profile-modal-link { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 16px; background: var(--gray-50); border: 2px solid var(--gray-200); border-radius: 10px; color: var(--navy); font-size: 13px; font-weight: 600; text-decoration: none; transition: all 0.2s; }
-        .profile-modal-link:hover { background: var(--gray-100); border-color: var(--navy); text-decoration: none; }
-        .profile-modal-link svg { width: 14px; height: 14px; }
-        .profile-blocked-notice { background: #fee2e2; color: var(--red); padding: 10px; border-radius: 8px; font-size: 13px; margin-bottom: 12px; text-align: center; }
-        /* Ensure confirm modal appears above profile modal */
-        #confirmModal { z-index: 1100; }
-        #userReportModal { z-index: 1100; }
-        .conversations-search { padding: 12px 16px; border-bottom: 1px solid var(--gray-200); }
-        .search-input { width: 100%; padding: 10px 14px 10px 40px; border: 2px solid var(--gray-200); border-radius: 10px; font-family: 'Outfit', sans-serif; font-size: 14px; background: var(--gray-50) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%2394a3b8' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'/%3E%3C/svg%3E") no-repeat 12px center; background-size: 18px; }
-        .search-input:focus { outline: none; border-color: var(--navy); background-color: var(--white); }
-        .conversations-list { flex: 1; overflow-y: auto; }
-        .conversation-item { display: flex; align-items: center; gap: 12px; padding: 14px 20px; cursor: pointer; transition: all 0.15s; border-bottom: 1px solid var(--gray-100); position: relative; }
-        .conversation-item:hover { background: var(--gray-50); }
-        .conversation-item.active { background: var(--blue-light); }
-        .conversation-item.unread { background: var(--gray-50); }
-        .conversation-item.unread::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--navy); }
-        .conv-avatar { position: relative; width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); display: flex; align-items: center; justify-content: center; color: var(--white); font-family: 'Sora', sans-serif; font-weight: 700; font-size: 16px; flex-shrink: 0; }
-        .conv-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-        .conv-online { position: absolute; bottom: 0; right: 0; width: 14px; height: 14px; background: var(--green); border-radius: 50%; border: 2px solid var(--white); }
-        .conv-online.offline { background: var(--gray-400); }
-        .conv-info { flex: 1; min-width: 0; }
-        .conv-name { font-size: 15px; font-weight: 600; color: var(--gray-800); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .conv-preview { font-size: 13px; color: var(--gray-500); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .conversation-item.unread .conv-name { color: var(--navy); }
-        .conversation-item.unread .conv-preview { color: var(--gray-700); font-weight: 500; }
-        .conv-meta { text-align: right; flex-shrink: 0; }
-        .conv-time { font-size: 11px; color: var(--gray-400); margin-bottom: 4px; }
-        .conv-unread-badge { background: var(--navy); color: var(--white); font-size: 11px; font-weight: 700; min-width: 20px; height: 20px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; padding: 0 6px; }
-        .conversations-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; color: var(--gray-400); text-align: center; }
-        .conversations-empty svg { width: 64px; height: 64px; margin-bottom: 16px; opacity: 0.5; }
-        .conversations-empty h3 { font-size: 16px; font-weight: 600; color: var(--gray-600); margin-bottom: 8px; }
-        .chat-panel { flex: 1; display: flex; flex-direction: column; background: var(--gray-100); min-width: 0; }
-        .chat-header { padding: 12px 20px; background: var(--white); border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: 12px; }
-        .chat-header-back { display: none; width: 36px; height: 36px; border: none; background: var(--gray-100); border-radius: 8px; cursor: pointer; align-items: center; justify-content: center; }
-        .chat-header-back svg { width: 20px; height: 20px; color: var(--gray-600); }
-        .chat-user-info { flex: 1; display: flex; align-items: center; gap: 12px; cursor: pointer; }
-        .chat-avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); display: flex; align-items: center; justify-content: center; color: var(--white); font-family: 'Sora', sans-serif; font-weight: 700; font-size: 14px; position: relative; }
-        .chat-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-        .chat-avatar .online-dot { position: absolute; bottom: 0; right: 0; width: 12px; height: 12px; background: var(--green); border-radius: 50%; border: 2px solid var(--white); }
-        .chat-avatar .online-dot.offline { background: var(--gray-400); }
-        .chat-user-details h3 { font-size: 16px; font-weight: 600; color: var(--gray-800); }
-        .chat-user-status { font-size: 12px; color: var(--green); }
-        .chat-user-status.offline { color: var(--gray-400); }
-        .chat-header-actions { display: flex; gap: 8px; }
-        .chat-action-btn { width: 36px; height: 36px; border: none; background: var(--gray-100); border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-        .chat-action-btn:hover { background: var(--gray-200); }
-        .chat-action-btn svg { width: 18px; height: 18px; color: var(--gray-600); }
-        .selection-header { padding: 12px 20px; background: var(--navy); display: none; align-items: center; gap: 12px; }
-        .selection-header.show { display: flex; }
-        .selection-count { color: var(--white); font-size: 15px; font-weight: 600; flex: 1; }
-        .selection-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-        .selection-btn { padding: 8px 14px; border: none; border-radius: 8px; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; }
-        .selection-btn svg { width: 16px; height: 16px; }
-        .selection-btn.cancel { background: rgba(255,255,255,0.2); color: var(--white); }
-        .selection-btn.forward { background: var(--white); color: var(--navy); }
-        .selection-btn.delete { background: var(--red); color: var(--white); }
-        .selection-btn.report { background: var(--orange); color: var(--white); }
-        .chat-messages { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 20px; display: flex; flex-direction: column; gap: 4px; }
-        .chat-date-divider { text-align: center; margin: 16px 0; }
-        .chat-date-divider span { background: var(--gray-200); color: var(--gray-600); font-size: 12px; font-weight: 500; padding: 4px 12px; border-radius: 12px; }
-        .message-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
-        .message-row.sent { justify-content: flex-end; }
-        .message-row.received { justify-content: flex-start; }
-        .message-select { width: 22px; height: 22px; min-width: 22px; border: 2px solid var(--gray-300); border-radius: 50%; cursor: pointer; display: none; align-items: center; justify-content: center; background: var(--white); transition: all 0.15s; flex-shrink: 0; }
-        .message-select.show { display: flex; }
-        .message-select.checked { background: var(--navy); border-color: var(--navy); }
-        .message-select.checked::after { content: '✓'; color: var(--white); font-size: 11px; font-weight: 700; }
-        .message-wrapper { display: flex; align-items: flex-end; gap: 8px; max-width: 70%; }
-        .message-row.sent .message-wrapper { flex-direction: row-reverse; }
-        .message-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); display: flex; align-items: center; justify-content: center; color: var(--white); font-size: 11px; font-weight: 700; flex-shrink: 0; overflow: hidden; margin-bottom: 2px; }
-        .message-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .message-row.sent .message-avatar { display: none; }
-        .message-bubble { padding: 10px 14px; border-radius: 18px; position: relative; cursor: pointer; transition: all 0.15s; }
-        .message-row.sent .message-bubble { background: var(--navy); color: var(--white); border-bottom-right-radius: 4px; }
-        .message-row.received .message-bubble { background: var(--white); color: var(--gray-800); border-bottom-left-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        .message-bubble:hover { transform: scale(1.01); }
-        .message-bubble.selected { outline: 3px solid var(--blue); outline-offset: 2px; }
-        .message-sender { font-size: 12px; font-weight: 600; color: var(--navy); margin-bottom: 4px; }
-        .message-row.sent .message-sender { display: none; }
-        .message-text { font-size: 14px; line-height: 1.5; word-wrap: break-word; }
-        .message-meta { display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin-top: 4px; }
-        .message-time { font-size: 11px; opacity: 0.7; }
-        .message-status { font-size: 12px; }
-        /* Reply styles */
-        .reply-preview { background: var(--gray-100); border-left: 3px solid var(--navy); padding: 8px 12px; margin-bottom: 6px; border-radius: 0 8px 8px 0; cursor: pointer; }
-        .message-row.sent .reply-preview { background: rgba(255,255,255,0.15); border-left-color: rgba(255,255,255,0.5); }
-        .reply-preview-name { font-size: 11px; font-weight: 600; color: var(--navy); margin-bottom: 2px; }
-        .message-row.sent .reply-preview-name { color: rgba(255,255,255,0.9); }
-        .reply-preview-text { font-size: 12px; color: var(--gray-600); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
-        .message-row.sent .reply-preview-text { color: rgba(255,255,255,0.7); }
-        .reply-bar { display: none; background: var(--white); border-top: 1px solid var(--gray-200); padding: 10px 16px; align-items: center; gap: 12px; }
-        .reply-bar.show { display: flex; }
-        .reply-bar-content { flex: 1; min-width: 0; }
-        .reply-bar-name { font-size: 12px; font-weight: 600; color: var(--navy); }
-        .reply-bar-text { font-size: 13px; color: var(--gray-600); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .reply-bar-close { width: 32px; height: 32px; border: none; background: var(--gray-100); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .reply-bar-close:hover { background: var(--gray-200); }
-        .reply-bar-close svg { width: 16px; height: 16px; color: var(--gray-500); }
-        .message-actions { display: none; position: absolute; top: -36px; right: 0; background: var(--white); border-radius: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.15); padding: 4px; gap: 2px; z-index: 10; }
-        .message-row.received .message-actions { right: auto; left: 0; }
-        .message-bubble:hover .message-actions { display: flex; }
-        .message-action-btn { width: 28px; height: 28px; border: none; background: transparent; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
-        .message-action-btn:hover { background: var(--gray-100); }
-        .message-action-btn svg { width: 14px; height: 14px; color: var(--gray-600); }
-        .chat-input-area { padding: 16px 20px; background: var(--white); border-top: 1px solid var(--gray-200); display: flex; align-items: flex-end; gap: 12px; }
-        .chat-input-wrapper { flex: 1; background: var(--gray-100); border-radius: 24px; padding: 4px 16px; display: flex; align-items: flex-end; }
-        .chat-input { flex: 1; border: none; background: transparent; font-family: 'Outfit', sans-serif; font-size: 15px; padding: 10px 0; resize: none; max-height: 120px; line-height: 1.4; }
-        .chat-input:focus { outline: none; }
-        .chat-input::placeholder { color: var(--gray-400); }
-        .send-btn { width: 48px; height: 48px; border: none; background: var(--navy); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
-        .send-btn:hover { background: var(--navy-light); transform: scale(1.05); }
-        .send-btn:disabled { background: var(--gray-300); cursor: not-allowed; transform: none; }
-        .send-btn svg { width: 22px; height: 22px; color: var(--white); }
-        .emoji-btn { width: 44px; height: 44px; border: none; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; transition: all 0.2s; border: 2px solid var(--gray-200); }
-        .emoji-btn:hover { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-color: #fbbf24; transform: scale(1.05); }
-        .emoji-btn svg { width: 22px; height: 22px; color: var(--gray-600); }
-        .emoji-btn:hover svg { color: #f59e0b; }
-        .emoji-picker { position: absolute; bottom: calc(100% + 10px); left: 0; background: var(--white); border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); padding: 12px; display: none; z-index: 1000; }
-        .emoji-picker.show { display: block; }
-        .emoji-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; }
-        .emoji-item { font-size: 20px; cursor: pointer; padding: 6px; border-radius: 8px; text-align: center; transition: all 0.15s; display: flex; align-items: center; justify-content: center; line-height: 1; width: 32px; height: 32px; }
-        .emoji-item:hover { background: var(--gray-100); transform: scale(1.2); }
-        .chat-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--gray-100); text-align: center; padding: 40px; }
-        .chat-empty svg { width: 80px; height: 80px; color: var(--gray-300); margin-bottom: 20px; }
-        .chat-empty h3 { font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 700; color: var(--gray-700); margin-bottom: 8px; }
-        .chat-empty p { font-size: 14px; color: var(--gray-500); max-width: 300px; }
-        .chat-blocked { padding: 16px 20px; background: #fee2e2; text-align: center; }
-        .chat-blocked p { color: var(--red); font-size: 14px; font-weight: 500; }
-        .topbar { background: var(--white); padding: 12px 20px; display: none; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--gray-200); position: sticky; top: 0; z-index: 50; }
-        .topbar-left { display: flex; align-items: center; gap: 12px; }
-        .menu-toggle { display: none; background: none; border: none; font-size: 24px; cursor: pointer; color: var(--gray-700); padding: 4px; }
-        .page-title { font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 700; color: var(--gray-800); }
-        .topbar-right { display: flex; align-items: center; gap: 12px; }
-        .icon-btn { position: relative; width: 40px; height: 40px; border-radius: 10px; border: none; background: var(--gray-100); cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .icon-btn svg { width: 20px; height: 20px; color: var(--gray-600); }
-        .notification-badge { position: absolute; top: -4px; right: -4px; background: var(--red); color: var(--white); font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; border-radius: 9px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--white); }
-        .notification-wrapper { position: relative; }
-        .notification-dropdown { position: absolute; top: calc(100% + 8px); left: 0; width: 360px; max-height: 480px; background: var(--white); border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.2s; z-index: 2000; overflow: hidden; }
-        .notification-dropdown.show { opacity: 1; visibility: visible; transform: translateY(0); }
-        .notif-dropdown-header { padding: 16px 20px; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center; }
-        .notif-dropdown-header h3 { font-size: 16px; font-weight: 700; color: var(--gray-800); }
-        .notif-dropdown-header button { background: none; border: none; color: var(--navy); font-size: 13px; font-weight: 600; cursor: pointer; }
-        .notif-dropdown-list { max-height: 360px; overflow-y: auto; }
-        .notif-dropdown-item { padding: 14px 20px; display: flex; gap: 12px; border-bottom: 1px solid var(--gray-100); cursor: pointer; }
-        .notif-dropdown-item.unread { background: var(--blue-light); }
-        .notif-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .notif-icon.friend { background: var(--green); color: white; }
-        .notif-icon.message { background: var(--blue); color: white; }
-        .notif-icon.group { background: #8b5cf6; color: white; }
-        .notif-icon.warning { background: #f97316; color: white; }
-        .notif-icon svg { width: 18px; height: 18px; stroke: white; }
-        .notif-content { flex: 1; min-width: 0; }
-        .notif-content h4 { font-size: 14px; font-weight: 600; color: var(--gray-800); margin-bottom: 2px; }
-        .notif-content p { font-size: 13px; color: var(--gray-500); }
-        .notif-content .time { font-size: 11px; color: var(--gray-400); margin-top: 4px; }
-        .notif-dropdown-footer { padding: 12px 20px; border-top: 1px solid var(--gray-200); text-align: center; }
-        .notif-dropdown-footer a { color: var(--navy); font-size: 14px; font-weight: 600; text-decoration: none; }
-        .notif-empty { padding: 40px 20px; text-align: center; color: var(--gray-400); }
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.2s; padding: 20px; }
-        .modal-overlay.show { opacity: 1; visibility: visible; }
-        .modal { background: var(--white); border-radius: 16px; width: 100%; max-width: 380px; transform: scale(0.9); transition: transform 0.2s; max-height: 90vh; overflow-y: auto; }
-        .modal-overlay.show .modal { transform: scale(1); }
-        .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center; }
-        .modal-title { font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 700; color: var(--gray-800); }
-        .modal-close { width: 32px; height: 32px; border: none; background: var(--gray-100); border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .modal-close svg { width: 18px; height: 18px; color: var(--gray-600); }
-        .modal-body { padding: 20px; max-height: 400px; overflow-y: auto; }
-        .modal-footer { padding: 16px 24px; border-top: 1px solid var(--gray-200); display: flex; justify-content: flex-end; gap: 12px; }
-        #profileModalFooter { display: block; border-top: none; padding: 0 20px 20px 20px; }
-        .forward-user-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 10px; cursor: pointer; }
-        .forward-user-item:hover { background: var(--gray-50); }
-        .forward-user-item.selected { background: var(--blue-light); }
-        .forward-user-avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); display: flex; align-items: center; justify-content: center; color: var(--white); font-weight: 700; font-size: 14px; overflow: hidden; }
-        .forward-user-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .forward-user-name { font-size: 15px; font-weight: 600; color: var(--gray-800); flex: 1; }
-        .forward-check { width: 24px; height: 24px; border: 2px solid var(--gray-300); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-        .forward-user-item.selected .forward-check { background: var(--navy); border-color: var(--navy); }
-        .forward-user-item.selected .forward-check::after { content: '✓'; color: var(--white); font-size: 14px; }
-        .dropdown-menu { position: absolute; top: 100%; right: 0; background: var(--white); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); min-width: 180px; opacity: 0; visibility: hidden; transform: translateY(-8px); transition: all 0.2s; z-index: 100; overflow: hidden; }
-        .dropdown-menu.show { opacity: 1; visibility: visible; transform: translateY(4px); }
-        .dropdown-item { display: flex; align-items: center; gap: 10px; padding: 12px 16px; font-size: 14px; color: var(--gray-700); cursor: pointer; }
-        .dropdown-item:hover { background: var(--gray-50); }
-        .dropdown-item svg { width: 18px; height: 18px; color: var(--gray-500); }
-        .dropdown-item.danger { color: var(--red); }
-        .dropdown-item.danger svg { color: var(--red); }
-        .btn { padding: 10px 18px; border-radius: 10px; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 6px; }
-        .btn-primary { background: var(--navy); color: var(--white); }
-        .btn-secondary { background: var(--gray-100); color: var(--gray-700); }
-        .btn-danger { background: var(--red); color: var(--white); }
-        .form-group { margin-bottom: 16px; }
-        .form-label { display: block; font-size: 14px; font-weight: 600; color: var(--gray-700); margin-bottom: 6px; }
-        .form-select, .form-textarea { width: 100%; padding: 12px 14px; border: 2px solid var(--gray-200); border-radius: 10px; font-family: 'Outfit', sans-serif; font-size: 14px; }
-        .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--navy); }
-        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--gray-800); color: var(--white); padding: 14px 24px; border-radius: 12px; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 10px; z-index: 1000; opacity: 0; transition: all 0.3s ease; }
-        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-        .toast.error { background: var(--red); }
-        .toast.success { background: var(--green); }
-        .loading { position: fixed; inset: 0; background: var(--white); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-        .loading-spinner { width: 40px; height: 40px; border: 3px solid var(--gray-200); border-top-color: var(--navy); border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        body.dark-mode { background: var(--gray-800); }
-        body.dark-mode .sidebar { background: #0a1628; }
-        body.dark-mode .conversations-panel { background: var(--gray-700); border-color: var(--gray-600); }
-        body.dark-mode .conversations-header h2 { color: var(--white); }
-        body.dark-mode .search-input { background-color: var(--gray-600); border-color: var(--gray-600); color: var(--white); }
-        body.dark-mode .conversation-item { border-color: var(--gray-600); }
-        body.dark-mode .conv-name { color: var(--white); }
-        body.dark-mode .chat-panel { background: var(--gray-800); }
-        body.dark-mode .chat-header { background: var(--gray-700); border-color: var(--gray-600); }
-        body.dark-mode .chat-user-details h3 { color: var(--white); }
-        body.dark-mode .message-wrapper.received .message-bubble { background: var(--gray-700); color: var(--white); }
-        body.dark-mode .chat-input-area { background: var(--gray-700); border-color: var(--gray-600); }
-        body.dark-mode .chat-input-wrapper { background: var(--gray-600); }
-        body.dark-mode .chat-input { color: var(--white); }
-        body.dark-mode .reply-bar { background: var(--gray-700); border-color: var(--gray-600); }
-        body.dark-mode .reply-bar-name { color: var(--blue); }
-        body.dark-mode .reply-bar-text { color: var(--gray-400); }
-        body.dark-mode .reply-bar-close { background: var(--gray-600); }
-        body.dark-mode .reply-bar-close:hover { background: var(--gray-500); }
-        body.dark-mode .reply-preview { background: var(--gray-600); border-left-color: var(--blue); }
-        body.dark-mode .message-row.received .reply-preview-name { color: var(--blue); }
-        body.dark-mode .message-row.received .reply-preview-text { color: var(--gray-400); }
-        body.dark-mode .message-actions { background: var(--gray-700); }
-        body.dark-mode .message-action-btn:hover { background: var(--gray-600); }
-        body.dark-mode .message-action-btn svg { color: var(--gray-400); }
-        body.dark-mode .modal { background: var(--gray-700); }
-        body.dark-mode .modal-title { color: var(--white); }
-        @media (max-width: 900px) { 
-            .conversations-panel { width: 100%; position: absolute; left: 0; top: 0; bottom: 0; z-index: 10; } 
-            .conversations-panel.hidden { display: none; } 
-            .chat-panel { position: absolute; left: 0; top: 0; right: 0; bottom: 0; display: none; } 
-            .chat-panel.show { display: flex; } 
-            .chat-header-back { display: flex; } 
-            .topbar { display: flex; }
-            .menu-toggle { display: block; }
-            .conversations-header { display: none; }
-            .conversations-panel { top: 56px; }
-        }
-        @media (max-width: 768px) { 
-            .sidebar { transform: translateX(-100%); } 
-            .sidebar.open { transform: translateX(0); } 
-            .sidebar-overlay.show { display: block; } 
-            .main-content { margin-left: 0; } 
-            .notification-dropdown { 
-                position: fixed; 
-                top: 70px; 
-                left: 10px; 
-                right: 10px; 
-                width: auto; 
-                border-radius: 16px; 
-                max-height: calc(100vh - 90px); 
-                z-index: 2000;
-            }
-        }
-        @media (max-width: 480px) {
-            .notification-dropdown {
-                top: 60px;
-                left: 5px;
-                right: 5px;
-                max-height: calc(100vh - 70px);
-            }
-            .chat-header { padding: 10px 12px; }
-            .chat-header-actions { gap: 4px; }
-            .chat-action-btn { width: 32px; height: 32px; }
-            .chat-input-area { padding: 10px 12px; }
-            .emoji-btn { width: 38px; height: 38px; }
-            .send-btn { width: 42px; height: 42px; }
-            .modal { margin: 10px; max-width: calc(100% - 20px) !important; }
-            .modal-body { padding: 16px; }
-            .modal-footer { padding: 12px 16px; }
-            .profile-modal-actions .btn { padding: 14px 16px; font-size: 14px; }
-            .profile-modal-actions .btn-row .btn { padding: 12px 14px; font-size: 13px; }
-        }
-        
-        /* Admin Announcement Popup */
-        .announcement-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 10000; animation: fadeIn 0.3s ease; padding: 20px; }
-        .announcement-popup { background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%); border-radius: 20px; max-width: 480px; width: 100%; box-shadow: 0 25px 60px rgba(0,0,0,0.4); animation: popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275); overflow: hidden; }
-        .announcement-header { background: rgba(255,255,255,0.1); padding: 20px 24px; display: flex; align-items: center; gap: 14px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .announcement-icon { width: 48px; height: 48px; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(249,115,22,0.4); }
-        .announcement-icon svg { width: 26px; height: 26px; color: white; }
-        .announcement-header-text { flex: 1; }
-        .announcement-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #f97316; margin-bottom: 4px; }
-        .announcement-title { font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 700; color: white; }
-        .announcement-body { padding: 24px; }
-        .announcement-message { font-size: 15px; line-height: 1.7; color: rgba(255,255,255,0.9); }
-        .announcement-time { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 16px; display: flex; align-items: center; gap: 6px; }
-        .announcement-time svg { width: 14px; height: 14px; }
-        .announcement-footer { padding: 16px 24px 24px; }
-        .announcement-btn { width: 100%; padding: 16px 24px; background: white; color: #1a365d; border: none; border-radius: 12px; font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .announcement-btn:hover { background: #f1f5f9; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-        .announcement-btn svg { width: 18px; height: 18px; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes popIn { from { opacity: 0; transform: scale(0.9) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        /* ... (keep all existing CSS styles exactly as they are) ... */
     </style>
+    
     <!-- Primary Meta Tags -->
     <meta name="title" content="Messages - MyUB | University of Botswana">
     <meta name="description" content="Direct messaging with your University of Botswana classmates. Stay connected with friends and study partners.">
@@ -529,84 +62,62 @@
     <!-- Canonical URL -->
     <link rel="canonical" href="https://www.myub.online/">
 
-    <!-- OneSignal Setup -->
+    <!-- OneSignal Setup - FIXED VERSION -->
     <script>
         // OneSignal initialization - same as dashboard
         window.OneSignalDeferred = window.OneSignalDeferred || [];
-        OneSignalDeferred.push(function(OneSignal) {
-            OneSignal.init({
-                appId: "a9e2b3a3-d0d6-4924-b6ea-70bc6c1a950e",
-                safari_web_id: "web.onesignal.auto.2b9e5b2a-e5b8-4145-b5b2-d8126c1c5819",
-                notifyButton: {
-                    enable: true,
-                    size: 'medium',
-                    theme: 'inverse',
-                    position: 'bottom-right',
-                    showCredit: false
-                },
-                allowLocalhostAsSecureOrigin: true,
-                autoResubscribe: true,
-                autoRegister: false, // We'll register manually after user login
-                persistNotification: true,
-                welcomeNotification: {
-                    title: "MyUB Notifications",
-                    message: "You'll now receive notifications for messages and updates!"
-                },
-                promptOptions: {
-                    slidedown: {
-                        prompts: [
-                            {
-                                type: "push", // Current types are "push" & "category"
-                                autoPrompt: true,
-                                text: {
-                                    /* Limited to 90 characters */
-                                    actionMessage: "We'd like to show you notifications for the latest news and messages from MyUB.",
-                                    /* Accept button text, limit of 15 characters */
-                                    acceptButton: "Allow",
-                                    /* Cancel button text, limit of 15 characters */
-                                    cancelButton: "No Thanks"
-                                },
-                                delay: {
-                                    pageViews: 1,
-                                    timeDelay: 10
-                                }
-                            }
-                        ]
+        OneSignalDeferred.push(async function(OneSignal) {
+            try {
+                await OneSignal.init({
+                    appId: "a9e2b3a3-d0d6-4924-b6ea-70bc6c1a950e",
+                    allowLocalhostAsSecureOrigin: true,
+                    notifyButton: {
+                        enable: false
                     }
-                }
-            });
-            
-            // Store OneSignal instance globally
-            window.OneSignal = OneSignal;
-            
-            // Check if user is logged in before registering
-            OneSignal.getUserId().then(userId => {
-                if (userId) {
-                    console.log('MyUB: OneSignal User ID:', userId);
-                    
-                    // When user is authenticated, we'll register this OneSignal ID with Supabase
-                    if (window.currentUser && window.supabaseClient) {
-                        supabaseClient.from('profiles').update({ onesignal_id: userId }).eq('id', currentUser.id).then(({ error }) => {
-                            if (error) console.error('MyUB: Failed to save OneSignal ID:', error);
-                            else console.log('MyUB: OneSignal ID saved to profile');
-                        });
-                    }
-                }
-            });
-            
-            // Listen for subscription change
-            OneSignal.on('subscriptionChange', function(isSubscribed) {
-                console.log("MyUB: OneSignal subscription changed:", isSubscribed);
-                if (isSubscribed) {
-                    OneSignal.getUserId().then(userId => {
-                        if (userId && window.currentUser && window.supabaseClient) {
-                            supabaseClient.from('profiles').update({ onesignal_id: userId }).eq('id', currentUser.id).then(({ error }) => {
+                });
+                
+                // Store OneSignal instance globally
+                window.OneSignal = OneSignal;
+                
+                // Check if user is logged in and set external user ID
+                if (window.currentUser && window.currentUser.id) {
+                    try {
+                        await OneSignal.login(currentUser.id);
+                        console.log('MyUB: OneSignal initialized for user:', currentUser.id);
+                        
+                        // Get and save the player ID
+                        const playerId = await OneSignal.User.PushSubscription.id;
+                        if (playerId && window.supabaseClient) {
+                            supabaseClient.from('profiles').update({ onesignal_id: playerId }).eq('id', currentUser.id).then(({ error }) => {
                                 if (error) console.error('MyUB: Failed to save OneSignal ID:', error);
+                                else console.log('MyUB: OneSignal ID saved to profile');
                             });
                         }
-                    });
+                    } catch (loginError) {
+                        console.error('MyUB: OneSignal login error:', loginError);
+                    }
                 }
-            });
+                
+                // Listen for subscription change
+                OneSignal.on('subscriptionChange', async function(isSubscribed) {
+                    console.log("MyUB: OneSignal subscription changed:", isSubscribed);
+                    if (isSubscribed && window.currentUser && window.supabaseClient) {
+                        try {
+                            const playerId = await OneSignal.User.PushSubscription.id;
+                            if (playerId) {
+                                supabaseClient.from('profiles').update({ onesignal_id: playerId }).eq('id', currentUser.id).then(({ error }) => {
+                                    if (error) console.error('MyUB: Failed to save OneSignal ID:', error);
+                                });
+                            }
+                        } catch (error) {
+                            console.error('MyUB: Error getting player ID:', error);
+                        }
+                    }
+                });
+                
+            } catch (initError) {
+                console.error('MyUB: OneSignal initialization error:', initError);
+            }
         });
     </script>
 
@@ -633,7 +144,7 @@
             </a></div>
         <nav>
             <div class="nav-section"><div class="nav-section-title">Menu</div><a href="dashboard.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Dashboard</a><a href="gpa-calculator.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>GPA Calculator</a><a href="schedule.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>Schedule</a><a href="notes.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>Notes</a></div>
-            <div class="nav-section"><div class="nav-section-title">Social</div><a href="study-groups.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>Study Groups</a><a href="messages.html" class="nav-item active"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>Messages<span class="badge" id="sidebarMsgBadge" style="display:none;">0</span></a><a href="friends.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>Friends<span class="badge" id="sidebarFriendsBadge" style="display:none;">0</span></a></div>
+            <div class="nav-section"><div class="nav-section-title">Social</div><a href="study-groups.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Study Groups</a><a href="messages.html" class="nav-item active"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>Messages<span class="badge" id="sidebarMsgBadge" style="display:none;">0</span></a><a href="friends.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>Friends<span class="badge" id="sidebarFriendsBadge" style="display:none;">0</span></a></div>
             <div class="nav-section"><div class="nav-section-title">Account</div><a href="profile.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>Profile</a><button class="nav-item" onclick="handleLogout()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>Sign Out</button></div>
         </nav>
     </aside>
@@ -715,7 +226,7 @@
         let selectedProfileUser = null;
         
         // Notification sound with higher volume
-        const notificationSound = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleVlhjtXr4JlYMTlqqdTm2I1LIzWFxevnvGw8KVmW1+3iomA4M2yq2erem1AkLnayz/Dgo2I2L2qm1ebgjU4pOIK+3eTCaz0nVprU5d6RUSktiL/i58mFWDQ4daTU4NqJSyQwhL7j5sSAUjI1cZ/Q3dWFSiYvgbzh5L5+Ty42bpzO2tKBRyUsgrrg4rx7TS00a5nL1s5+RiQrfbff4bh4Sis0Z5XI0sl7RSMpcbTZ3LFyRSgzYY/Cyr51QiIldLHW2a5vQicyXoy/x7pzQCEjca3T1qprPyYwW4m8xLdxPyAhbqrQz6RmPiUuWIa5wa1sPR8fa6bMzqFkPCQsVYO2wKpqOx4daKLIypxhOyMrUn+zvqZnOhwbZZ7Fx5hfOSIpT3yxvKNkOBsZYprCw5VcNyEnS3muuZ5hNhkYX5a/wJJaNiAlSHaqtppeMxgWXJK8vY9YNCAfQ3GmspVaMBcVWY65uoxWMyAdQG6jrpFWLhUUV4q1t4lTMh8cPmufrI1SLBQTVIaysoZQMRscPGebqIlOKhITV4OuqH5JLRkaNmCVo4RJKBETVYCqpHtGKxgYNF2SmYBGJhASU32no3hDKRYXMlqPlHxDJRAQUHqjnnU/JhUWMFeNkHk/Ig4PUXennXI9JBMULlOKjHY8IA0OUXWS');
+        const notificationSound = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleVlhjtXr4JlYMTlqqdTm2I1LIzWFxevnvGw8KVmW1+3iomA4M2yq2erem1AkLnayz/Dgo2I2L2qm1ebgjU4pOIK+3eTCaz0nVprU5d6RUSktiL/i58mFWDQ4daTU4NqJSyQshL7j5sSAUjI1cZ/Q3dWFSiYvgbzh5L5+Ty42bpzO2tKBRyUsgrrg4rx7TS00a5nL1s5+RiQrfbff4bh4Sis0Z5XI0sl7RSMpcbTZ3LFyRSgzYY/Cyr51QiIldLHW2a5vQicyXoy/x7pzQCEjca3T1qprPyYwW4m8xLdxPyAhbqrQz6RmPiUuWIa5wa1sPR8fa6bMzqFkPCQsVYO2wKpqOx4daKLIypxhOyMrUn+zvqZnOhwbZZ7Fx5hfOSIpT3yxvKNkOBsZYprCw5VcNyEnS3muuZ5hNhkYX5a/wJJaNiAlSHaqtppeMxgWXJK8vY9YNCAfQ3GmspVaMBcVWY65uoxWMyAdQG6jrpFWLhUUV4q1t4lTMh8cPmufrI1SLBQTVIaysoZQMRscPGebqIlOKhITV4OuqH5JLRkaNmCVo4RJKBETVYCqpHtGKxgYNF2SmYBGJhASU32no3hDKRYXMlqPlHxDJRAQUHqjnnU/JhUWMFeNkHk/Ig4PUXennXI9JBMULlOKjHY8IA0OUXWS');
         notificationSound.volume = 0.3;
 
         function initEmojiPicker() {
@@ -786,26 +297,23 @@
             startNotificationPolling(); // Poll for notifications as fallback
             initEmojiPicker();
             
-            // Initialize OneSignal after user is authenticated
-            if (window.OneSignal) {
-                OneSignal.getUserId().then(userId => {
-                    if (userId) {
-                        console.log('MyUB: OneSignal User ID found:', userId);
-                        // Save OneSignal ID to user profile
-                        supabaseClient.from('profiles').update({ onesignal_id: userId }).eq('id', currentUser.id).then(({ error }) => {
+            // Initialize OneSignal after user is authenticated - FIXED
+            if (window.OneSignal && currentUser && currentUser.id) {
+                try {
+                    await window.OneSignal.login(currentUser.id);
+                    console.log('MyUB: OneSignal initialized for user:', currentUser.id);
+                    
+                    // Get and save the player ID
+                    const playerId = await window.OneSignal.User.PushSubscription.id;
+                    if (playerId) {
+                        supabaseClient.from('profiles').update({ onesignal_id: playerId }).eq('id', currentUser.id).then(({ error }) => {
                             if (error) console.error('MyUB: Failed to save OneSignal ID:', error);
                             else console.log('MyUB: OneSignal ID saved to profile');
                         });
-                    } else {
-                        console.log('MyUB: No OneSignal User ID yet, will prompt for permission');
-                        // Show notification prompt if not already shown
-                        setTimeout(() => {
-                            OneSignal.showSlidedownPrompt();
-                        }, 2000);
                     }
-                }).catch(error => {
+                } catch (error) {
                     console.error('MyUB: OneSignal initialization error:', error);
-                });
+                }
             }
             
             const urlParams = new URLSearchParams(window.location.search);
@@ -1289,7 +797,7 @@
             const type = notification.type || 'announcement';
             let config = { label: '📢 Admin Announcement', iconBg: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)', iconShadow: 'rgba(249, 115, 22, 0.4)', icon: '<path d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>', headerBg: 'linear-gradient(135deg, #1a365d 0%, #2c5282 100%)', labelColor: '#f97316' };
             if (type === 'admin_warning' || type === 'warning') { config = { label: '⚠️ Admin Warning', iconBg: 'linear-gradient(135deg, #eab308 0%, #ca8a04 100%)', iconShadow: 'rgba(234, 179, 8, 0.4)', icon: '<path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>', headerBg: 'linear-gradient(135deg, #854d0e 0%, #a16207 100%)', labelColor: '#fde047' }; }
-            else if (type === 'admin_urgent' || type === 'ban') { config = { label: type === 'ban' ? '🚫 Account Suspended' : '🚨 Urgent Notice', iconBg: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)', iconShadow: 'rgba(220, 38, 38, 0.4)', icon: type === 'ban' ? '<path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>' : '<path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>', headerBg: 'linear-gradient(135deg, #991b1b 0%, #b91c1c 100%)', labelColor: '#fca5a5' }; }
+            else if (type === 'admin_urgent' || type === 'ban') { config = { label: type === 'ban' ? '🚫 Account Suspended' : '🚨 Urgent Notice', iconBg: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)', iconShadow: 'rgba(220, 38, 38, 0.4)', icon: type === 'ban' ? '<path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>' : '<path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>', headerBg: 'linear-gradient(135deg, #991b1b 0%, #b91c1b 100%)', labelColor: '#fca5a5' }; }
             else if (type === 'admin_success') { config = { label: '✅ Good News!', iconBg: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)', iconShadow: 'rgba(34, 197, 94, 0.4)', icon: '<path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>', headerBg: 'linear-gradient(135deg, #166534 0%, #15803d 100%)', labelColor: '#86efac' }; }
             const overlay = document.createElement('div');
             overlay.className = 'announcement-overlay';

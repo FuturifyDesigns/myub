@@ -3430,6 +3430,38 @@
                     // Set external user ID (your Supabase user ID)
                     await OneSignal.login(currentUser.id);
                     console.log('MyUB: OneSignal initialized with user ID:', currentUser.id);
+                    
+                    // Force subscribe to push notifications
+                    try {
+                        const isPushSupported = await OneSignal.Notifications.isPushSupported();
+                        console.log('MyUB: Push supported:', isPushSupported);
+                        
+                        if (isPushSupported) {
+                            const permission = await OneSignal.Notifications.permission;
+                            
+                            if (permission === 'granted') {
+                                // Permission granted but might not be subscribed yet
+                                const pushSubscription = await OneSignal.User.PushSubscription.optIn();
+                                console.log('MyUB: Push subscription:', pushSubscription);
+                                
+                                // Verify subscription
+                                setTimeout(async () => {
+                                    const subId = await OneSignal.User.PushSubscription.id;
+                                    const optedIn = await OneSignal.User.PushSubscription.optedIn;
+                                    console.log('MyUB: Subscription ID:', subId);
+                                    console.log('MyUB: Opted in:', optedIn);
+                                    
+                                    if (optedIn && subId) {
+                                        showToast('✅ Notifications enabled!', 'success');
+                                    } else {
+                                        console.error('MyUB: Failed to subscribe to push');
+                                    }
+                                }, 2000);
+                            }
+                        }
+                    } catch (error) {
+                        console.error('MyUB: Subscription error:', error);
+                    }
                 });
                 
             } catch (error) {

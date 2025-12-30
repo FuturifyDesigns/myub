@@ -939,13 +939,13 @@
             }
             
             if (window.MyUBCalls && window.MyUBCalls.startCall) {
-                // Pass the receiver user object with required properties
+                // Pass the receiver user object and true for video
                 const receiver = {
                     id: currentChatUser.id,
                     full_name: currentChatUser.full_name || `${currentChatUser.first_name} ${currentChatUser.last_name}`,
                     avatar_url: currentChatUser.avatar_url
                 };
-                window.MyUBCalls.startCall(receiver, 'video');
+                window.MyUBCalls.startCall(receiver, true);
             } else {
                 console.error('MyUBCalls not loaded');
                 showToast('Calling feature is not available. Please refresh the page.', 'error');
@@ -959,13 +959,13 @@
             }
             
             if (window.MyUBCalls && window.MyUBCalls.startCall) {
-                // Pass the receiver user object with required properties
+                // Pass the receiver user object and false for voice-only
                 const receiver = {
                     id: currentChatUser.id,
                     full_name: currentChatUser.full_name || `${currentChatUser.first_name} ${currentChatUser.last_name}`,
                     avatar_url: currentChatUser.avatar_url
                 };
-                window.MyUBCalls.startCall(receiver, 'voice');
+                window.MyUBCalls.startCall(receiver, false);
             } else {
                 console.error('MyUBCalls not loaded');
                 showToast('Calling feature is not available. Please refresh the page.', 'error');
@@ -1889,9 +1889,9 @@
     <!-- MyUB Calls Script -->
     <script src="myub-calls.js"></script>
     <script>
-        // Initialize MyUBCalls when user is loaded
-        if (window.currentUser && window.supabaseClient && window.MyUBCalls) {
-            MyUBCalls.init(supabaseClient, currentUser);
+        // Initialize MyUBCalls when supabase is ready
+        if (window.supabaseClient && window.MyUBCalls) {
+            MyUBCalls.init(supabaseClient);
         }
     </script>
     

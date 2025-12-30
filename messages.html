@@ -1109,7 +1109,25 @@
 
         function enterSelectionMode() { isSelectionMode = true; selectedMessages.clear(); document.getElementById('selectionHeader').classList.add('show'); document.getElementById('chatHeader').style.display = 'none'; updateSelectionCount(); renderMessages(); }
         function exitSelectionMode() { isSelectionMode = false; selectedMessages.clear(); document.getElementById('selectionHeader').classList.remove('show'); if (currentChatUser) document.getElementById('chatHeader').style.display = 'flex'; renderMessages(); }
-        function toggleMessageSelect(msgId) { if (selectedMessages.has(msgId)) selectedMessages.delete(msgId); else selectedMessages.add(msgId); updateSelectionCount(); renderMessages(); }
+        function toggleMessageSelect(msgId) { 
+            // Find the message
+            const msg = messages.find(m => m.id === msgId);
+            
+            // Only allow selecting messages sent by current user
+            if (msg && msg.sender_id !== currentUser.id) {
+                showToast('You can only delete your own messages', 'error');
+                return;
+            }
+            
+            if (selectedMessages.has(msgId)) {
+                selectedMessages.delete(msgId);
+            } else {
+                selectedMessages.add(msgId);
+            }
+            
+            updateSelectionCount();
+            renderMessages();
+        }
         function handleMessageClick(event, msgId) { if (isSelectionMode) { event.stopPropagation(); toggleMessageSelect(msgId); } }
         function updateSelectionCount() { document.getElementById('selectionCount').textContent = `${selectedMessages.size} selected`; }
 
@@ -1124,20 +1142,34 @@
             
             confirmCallback = async () => { 
                 try {
+                    const messageIds = Array.from(selectedMessages);
+                    console.log('Deleting messages:', messageIds);
+                    
                     // Delete messages from database where sender is current user
-                    const { error } = await supabaseClient
+                    const { error, data } = await supabaseClient
                         .from('messages')
                         .delete()
-                        .in('id', Array.from(selectedMessages))
-                        .eq('sender_id', currentUser.id);
+                        .in('id', messageIds)
+                        .eq('sender_id', currentUser.id)
+                        .select();
                     
                     if (error) {
                         console.error('Delete error:', error);
                         showToast('Failed to delete messages', 'error');
                     } else {
-                        showToast(`${selectedMessages.size} message(s) deleted`);
+                        console.log('Deleted messages:', data);
+                        
+                        // Immediately remove messages from local array
+                        messages = messages.filter(m => !messageIds.includes(m.id));
+                        
+                        // Render immediately
+                        renderMessages();
+                        
+                        showToast(`${data?.length || selectedMessages.size} message(s) deleted`);
                         exitSelectionMode();
-                        await loadMessages(currentConversation);
+                        
+                        // Reload conversations to update preview
+                        await loadConversations();
                     }
                 } catch (err) {
                     console.error('Delete exception:', err);

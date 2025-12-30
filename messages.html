@@ -950,29 +950,38 @@
                 cancelReply();
                 messages.push(data); renderMessages(); await loadConversations();
                 
-                // Insert notification for receiver
-                const senderProfile = await supabaseClient.from('profiles').select('full_name').eq('id', currentUser.id).single();
-                const senderName = senderProfile.data?.full_name || 'Someone';
-                const preview = content.length > 50 ? content.substring(0, 50) + "..." : content;
-                
-                await supabaseClient.from('notification_queue').insert({
-                    user_id: currentConversation,  // Receiver
-                    type: 'message',
-                    title: senderName,
-                    body: preview,
-                    icon: '/icons/icon-192x192.png',
-                    badge: '/icons/favicon-48x48.png',
-                    tag: 'message-' + currentUser.id,
-                    data: {
-                        type: 'message',
-                        senderId: currentUser.id,
-                        conversationId: currentUser.id,
-                        url: '/messages.html?conversation=' + currentUser.id
-                    },
-                    require_interaction: false,
-                    delivered: false
-                });
-                console.log('MyUB: Notification queued for receiver');
+                // Send push notification via Cloudflare Worker
+                try {
+                    const senderProfile = await supabaseClient.from('profiles').select('full_name').eq('id', currentUser.id).single();
+                    const senderName = senderProfile.data?.full_name || 'Someone';
+                    const preview = content.length > 50 ? content.substring(0, 50) + "..." : content;
+                    
+                    // Call Cloudflare Worker to send OneSignal notification
+                    const notifResponse = await fetch('https://myub-push-notifications.futurifydesigns.workers.dev', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            userId: currentConversation,
+                            title: senderName,
+                            body: preview,
+                            data: {
+                                type: 'message',
+                                senderId: currentUser.id,
+                                conversationId: currentUser.id,
+                                url: '/messages.html?conversation=' + currentUser.id
+                            }
+                        })
+                    });
+                    
+                    if (notifResponse.ok) {
+                        console.log('MyUB: Push notification sent via OneSignal');
+                    } else {
+                        const errorData = await notifResponse.json();
+                        console.error('MyUB: Push notification failed:', errorData);
+                    }
+                } catch (notifError) {
+                    console.error('MyUB: Notification error:', notifError);
+                }
                 
                 await supabaseClient.from('notifications').insert({ user_id: currentConversation, type: 'message', title: 'New Message', body: content.substring(0, 50) });
             } catch (e) { showToast('Failed to send', 'error'); }
@@ -1834,34 +1843,17 @@
 
     <!-- MyUB Calls Script -->
     <script src="myub-calls.js"></script>
-
-    <!-- Push Notification Scripts -->
-    <script src="myub-notifications-no-edge-functions.js"></script>
-    <script src="myub-notification-triggers-no-edge-functions.js"></script>
     
+    <!-- MyUB Heartbeat Script -->
+    <script src="myub-heartbeat.js"></script>
     <script>
-        // Clear badge when user opens messages page
-        if (window.MyUBNotifications) {
-            MyUBNotifications.clearBadge();
+        // Start heartbeat when user is loaded
+        if (window.currentUser && window.supabaseClient) {
+            MyUBHeartbeat.start(supabaseClient, currentUser);
         }
-        
-        document.addEventListener('visibilitychange', function() {
-            if (!document.hidden && window.MyUBNotifications) {
-                MyUBNotifications.clearBadge();
-            }
-        });
     </script>
 
-    <!-- PWA Service Worker Registration -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('ServiceWorker registered:', reg.scope))
-                    .catch(err => console.log('ServiceWorker registration failed:', err));
-            });
-        }
-    </script>
+    <!-- OneSignal handles service worker registration -->
 
 </body>
 </html>

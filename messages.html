@@ -9,6 +9,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="myub-utils.js"></script>
+    
+    <!-- OneSignal SDK -->
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; }
         :root { --navy: #1a365d; --navy-light: #2c5282; --navy-dark: #0f2744; --red: #c41e3a; --white: #ffffff; --gray-50: #f8fafc; --gray-100: #f1f5f9; --gray-200: #e2e8f0; --gray-300: #cbd5e1; --gray-400: #94a3b8; --gray-500: #64748b; --gray-600: #475569; --gray-700: #334155; --gray-800: #1e293b; --green: #22c55e; --green-light: #dcfce7; --blue: #3b82f6; --blue-light: #dbeafe; --orange: #f97316; }
@@ -525,6 +529,87 @@
     <!-- Canonical URL -->
     <link rel="canonical" href="https://www.myub.online/">
 
+    <!-- OneSignal Setup -->
+    <script>
+        // OneSignal initialization - same as dashboard
+        window.OneSignalDeferred = window.OneSignalDeferred || [];
+        OneSignalDeferred.push(function(OneSignal) {
+            OneSignal.init({
+                appId: "a9e2b3a3-d0d6-4924-b6ea-70bc6c1a950e",
+                safari_web_id: "web.onesignal.auto.2b9e5b2a-e5b8-4145-b5b2-d8126c1c5819",
+                notifyButton: {
+                    enable: true,
+                    size: 'medium',
+                    theme: 'inverse',
+                    position: 'bottom-right',
+                    showCredit: false
+                },
+                allowLocalhostAsSecureOrigin: true,
+                autoResubscribe: true,
+                autoRegister: false, // We'll register manually after user login
+                persistNotification: true,
+                welcomeNotification: {
+                    title: "MyUB Notifications",
+                    message: "You'll now receive notifications for messages and updates!"
+                },
+                promptOptions: {
+                    slidedown: {
+                        prompts: [
+                            {
+                                type: "push", // Current types are "push" & "category"
+                                autoPrompt: true,
+                                text: {
+                                    /* Limited to 90 characters */
+                                    actionMessage: "We'd like to show you notifications for the latest news and messages from MyUB.",
+                                    /* Accept button text, limit of 15 characters */
+                                    acceptButton: "Allow",
+                                    /* Cancel button text, limit of 15 characters */
+                                    cancelButton: "No Thanks"
+                                },
+                                delay: {
+                                    pageViews: 1,
+                                    timeDelay: 10
+                                }
+                            }
+                        ]
+                    }
+                }
+            });
+            
+            // Store OneSignal instance globally
+            window.OneSignal = OneSignal;
+            
+            // Check if user is logged in before registering
+            OneSignal.getUserId().then(userId => {
+                if (userId) {
+                    console.log('MyUB: OneSignal User ID:', userId);
+                    
+                    // When user is authenticated, we'll register this OneSignal ID with Supabase
+                    if (window.currentUser && window.supabaseClient) {
+                        supabaseClient.from('profiles').update({ onesignal_id: userId }).eq('id', currentUser.id).then(({ error }) => {
+                            if (error) console.error('MyUB: Failed to save OneSignal ID:', error);
+                            else console.log('MyUB: OneSignal ID saved to profile');
+                        });
+                    }
+                }
+            });
+            
+            // Listen for subscription change
+            OneSignal.on('subscriptionChange', function(isSubscribed) {
+                console.log("MyUB: OneSignal subscription changed:", isSubscribed);
+                if (isSubscribed) {
+                    OneSignal.getUserId().then(userId => {
+                        if (userId && window.currentUser && window.supabaseClient) {
+                            supabaseClient.from('profiles').update({ onesignal_id: userId }).eq('id', currentUser.id).then(({ error }) => {
+                                if (error) console.error('MyUB: Failed to save OneSignal ID:', error);
+                            });
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+
 </head>
 <body>
     <div class="loading" id="loadingScreen"><div class="loading-spinner"></div></div>
@@ -630,7 +715,7 @@
         let selectedProfileUser = null;
         
         // Notification sound with higher volume
-        const notificationSound = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleVlhjtXr4JlYMTlqqdTm2I1LIzWFxevnvGw8KVmW1+3iomA4M2yq2erem1AkLnayz/Dgo2I2L2qm1ebgjU4pOIK+3eTCaz0nVprU5d6RUSktiL/i58mFWDQ4daTU4NqJSyQwhL7j5sSAUjI1cZ/Q3dWFSiYvgbzh5L5+Ty42bpzO2tKBRyUsgrrg4rx7TS00a5nL1s5+RiQrfbff4bh4Sis0Z5XI0sl7RSMpebjc37V1SCo0ZJLFzsZ4QyInc7TZ3LFyRSgzYY/Cyr51QiIldLHW2a5vQicyXoy/x7pzQCEjca3T1qprPyYwW4m8xLdxPyAhbqrQz6RmPiUuWIa5wa1sPR8fa6bMzqFkPCQsVYO2wKpqOx4daKLIypxhOyMrUn+zvqZnOhwbZZ7Fx5hfOSIpT3yxvKNkOBsZYprCw5VcNyEnS3muuZ5hNhkYX5a/wJJaNiAlSHaqtppeMxgWXJK8vY9YNCAfQ3GmspVaMBcVWY65uoxWMyAdQG6jrpFWLhUUV4q1t4lTMh8cPmufrI1SLBQTVIaysoZQMRscPGebqIlOKhITV4OuqH5JLRkaNmCVo4RJKBETVYCqpHtGKxgYNF2SmYBGJhASU32no3hDKRYXMlqPlHxDJRAQUHqjnnU/JhUWMFeNkHk/Ig4PUXennXI9JBMULlOKjHY8IA0OUXWS');
+        const notificationSound = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleVlhjtXr4JlYMTlqqdTm2I1LIzWFxevnvGw8KVmW1+3iomA4M2yq2erem1AkLnayz/Dgo2I2L2qm1ebgjU4pOIK+3eTCaz0nVprU5d6RUSktiL/i58mFWDQ4daTU4NqJSyQwhL7j5sSAUjI1cZ/Q3dWFSiYvgbzh5L5+Ty42bpzO2tKBRyUsgrrg4rx7TS00a5nL1s5+RiQrfbff4bh4Sis0Z5XI0sl7RSMpcbTZ3LFyRSgzYY/Cyr51QiIldLHW2a5vQicyXoy/x7pzQCEjca3T1qprPyYwW4m8xLdxPyAhbqrQz6RmPiUuWIa5wa1sPR8fa6bMzqFkPCQsVYO2wKpqOx4daKLIypxhOyMrUn+zvqZnOhwbZZ7Fx5hfOSIpT3yxvKNkOBsZYprCw5VcNyEnS3muuZ5hNhkYX5a/wJJaNiAlSHaqtppeMxgWXJK8vY9YNCAfQ3GmspVaMBcVWY65uoxWMyAdQG6jrpFWLhUUV4q1t4lTMh8cPmufrI1SLBQTVIaysoZQMRscPGebqIlOKhITV4OuqH5JLRkaNmCVo4RJKBETVYCqpHtGKxgYNF2SmYBGJhASU32no3hDKRYXMlqPlHxDJRAQUHqjnnU/JhUWMFeNkHk/Ig4PUXennXI9JBMULlOKjHY8IA0OUXWS');
         notificationSound.volume = 0.3;
 
         function initEmojiPicker() {
@@ -700,6 +785,29 @@
             startHeartbeat();
             startNotificationPolling(); // Poll for notifications as fallback
             initEmojiPicker();
+            
+            // Initialize OneSignal after user is authenticated
+            if (window.OneSignal) {
+                OneSignal.getUserId().then(userId => {
+                    if (userId) {
+                        console.log('MyUB: OneSignal User ID found:', userId);
+                        // Save OneSignal ID to user profile
+                        supabaseClient.from('profiles').update({ onesignal_id: userId }).eq('id', currentUser.id).then(({ error }) => {
+                            if (error) console.error('MyUB: Failed to save OneSignal ID:', error);
+                            else console.log('MyUB: OneSignal ID saved to profile');
+                        });
+                    } else {
+                        console.log('MyUB: No OneSignal User ID yet, will prompt for permission');
+                        // Show notification prompt if not already shown
+                        setTimeout(() => {
+                            OneSignal.showSlidedownPrompt();
+                        }, 2000);
+                    }
+                }).catch(error => {
+                    console.error('MyUB: OneSignal initialization error:', error);
+                });
+            }
+            
             const urlParams = new URLSearchParams(window.location.search);
             const userId = urlParams.get('user');
             if (userId) await openConversation(userId);
@@ -1491,7 +1599,7 @@
                                 </div>
                                 <div class="user-search-status ${user.is_online ? '' : 'offline'}">${user.is_online ? 'Online' : ''}</div>
                             </div>`;
-                    }).join('');
+                }).join('');
                 } catch (e) {
                     console.error('Search error:', e);
                     container.innerHTML = '<div class="search-empty">Error searching users</div>';
@@ -1852,8 +1960,6 @@
             MyUBHeartbeat.start(supabaseClient, currentUser);
         }
     </script>
-
-    <!-- OneSignal handles service worker registration -->
 
 </body>
 </html>

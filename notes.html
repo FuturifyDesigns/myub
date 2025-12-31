@@ -558,7 +558,6 @@
             </div>
             <div class="modal-footer" style="justify-content:space-between;border-top:1px solid var(--gray-200);padding-top:16px;">
                 <div style="display:flex;flex-direction:column;gap:4px;">
-                    <div style="color:var(--gray-500);font-size:13px;"><span id="viewNoteCategory"></span></div>
                     <div style="color:var(--gray-400);font-size:12px;"><span id="viewNoteTimestamp"></span></div>
                 </div>
                 <div style="display:flex;gap:12px;">
@@ -594,15 +593,6 @@
                 <div class="form-group" style="margin-top:16px;">
                     <label style="display:block;margin-bottom:8px;font-weight:500;color:var(--gray-700);">Content</label>
                     <div id="editNoteContent" contenteditable="true" style="width:100%;min-height:300px;padding:16px;border:1px solid var(--gray-300);border-radius:8px;font-size:15px;line-height:1.6;background:white;" data-placeholder="Enter note content..."></div>
-                </div>
-                <div class="form-group" style="margin-top:16px;">
-                    <label style="display:block;margin-bottom:8px;font-weight:500;color:var(--gray-700);">Category</label>
-                    <select id="editNoteCategory" style="width:100%;padding:12px;border:1px solid var(--gray-300);border-radius:8px;font-size:15px;cursor:pointer;">
-                        <option value="personal">Personal</option>
-                        <option value="academic">Academic</option>
-                        <option value="work">Work</option>
-                        <option value="other">Other</option>
-                    </select>
                 </div>
             </div>
             <div class="modal-footer" style="border-top:1px solid var(--gray-200);padding-top:16px;">
@@ -1015,7 +1005,6 @@
             viewingNoteId = noteId;
             document.getElementById('viewNoteTitle').textContent = note.title || 'Untitled';
             document.getElementById('viewNoteContent').innerHTML = note.content || '<p style="color:var(--gray-400);">No content</p>';
-            document.getElementById('viewNoteCategory').textContent = 'Category: ' + (note.category ? note.category.charAt(0).toUpperCase() + note.category.slice(1) : 'Other');
             document.getElementById('viewNoteTimestamp').textContent = 'Last updated ' + formatTimeAgo(note.updated_at);
             document.getElementById('viewNoteModal').classList.add('show');
         }
@@ -1032,10 +1021,11 @@
                 showToast('Error: No note selected', 'error');
                 return;
             }
+            const noteIdToEdit = viewingNoteId; // Store it before closing modal
             closeViewNoteModal();
             // Small delay to ensure view modal closes before edit opens
             setTimeout(() => {
-                editNote(viewingNoteId);
+                editNote(noteIdToEdit);
             }, 100);
         }
         
@@ -1055,7 +1045,6 @@
             editingNoteId = noteId;
             document.getElementById('editNoteTitle').value = note.title || '';
             document.getElementById('editNoteContent').innerHTML = note.content || '';
-            document.getElementById('editNoteCategory').value = note.category || 'other';
             document.getElementById('editNoteModal').classList.add('show');
             console.log('Edit modal should now be visible');
         }
@@ -1070,7 +1059,6 @@
             
             const title = document.getElementById('editNoteTitle').value.trim();
             const content = document.getElementById('editNoteContent').innerHTML.trim();
-            const category = document.getElementById('editNoteCategory').value;
             
             if (!title) {
                 showToast('Please enter a title', 'error');
@@ -1083,7 +1071,6 @@
                     .update({
                         title: title,
                         content: content,
-                        category: category,
                         updated_at: new Date().toISOString()
                     })
                     .eq('id', editingNoteId)

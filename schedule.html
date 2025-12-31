@@ -1051,7 +1051,6 @@
             }
             
             const eventData = { 
-                user_id: currentUser.id, 
                 title, 
                 event_type: document.getElementById('eventType').value, 
                 start_time: new Date(startTime).toISOString(), 
@@ -1060,10 +1059,32 @@
                 description: description || null, 
                 reminder_before: parseInt(document.getElementById('eventReminder').value) || 30
             };
+            
             let error;
-            if (editingEventId) error = (await supabaseClient.from('schedules').update(eventData).eq('id', editingEventId)).error;
-            else error = (await supabaseClient.from('schedules').insert(eventData)).error;
-            if (error) { console.error('Error saving event:', error); showToast('Failed to save event', 'error'); return; }
+            if (editingEventId) {
+                // Update existing event (don't include user_id)
+                console.log('Updating event:', editingEventId, eventData);
+                const result = await supabaseClient.from('schedules').update(eventData).eq('id', editingEventId).eq('user_id', currentUser.id);
+                error = result.error;
+                if (error) {
+                    console.error('Update error details:', error);
+                }
+            } else {
+                // Create new event (include user_id)
+                eventData.user_id = currentUser.id;
+                console.log('Creating event:', eventData);
+                const result = await supabaseClient.from('schedules').insert(eventData);
+                error = result.error;
+                if (error) {
+                    console.error('Insert error details:', error);
+                }
+            }
+            
+            if (error) { 
+                console.error('Error saving event:', error); 
+                showToast('Failed to save event: ' + (error.message || error.code || 'Unknown error'), 'error'); 
+                return; 
+            }
             showToast(editingEventId ? 'Event updated!' : 'Event created!', 'success');
             closeEventModal(); await loadSchedules(); renderCalendar(); renderUpcoming();
         }

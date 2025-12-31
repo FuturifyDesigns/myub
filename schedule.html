@@ -1064,25 +1064,39 @@
             if (editingEventId) {
                 // Update existing event (don't include user_id)
                 console.log('Updating event:', editingEventId, eventData);
-                const result = await supabaseClient.from('schedules').update(eventData).eq('id', editingEventId).eq('user_id', currentUser.id);
-                error = result.error;
-                if (error) {
-                    console.error('Update error details:', error);
+                try {
+                    const result = await supabaseClient
+                        .from('schedules')
+                        .update(eventData, { returning: 'minimal' })  // Skip returning the row which might trigger the error
+                        .eq('id', editingEventId)
+                        .eq('user_id', currentUser.id);
+                    error = result.error;
+                    if (error) {
+                        console.error('Update error details:', error);
+                    }
+                } catch (e) {
+                    console.error('Update exception:', e);
+                    error = e;
                 }
             } else {
                 // Create new event (include user_id)
                 eventData.user_id = currentUser.id;
                 console.log('Creating event:', eventData);
-                const result = await supabaseClient.from('schedules').insert(eventData);
-                error = result.error;
-                if (error) {
-                    console.error('Insert error details:', error);
+                try {
+                    const result = await supabaseClient.from('schedules').insert(eventData);
+                    error = result.error;
+                    if (error) {
+                        console.error('Insert error details:', error);
+                    }
+                } catch (e) {
+                    console.error('Insert exception:', e);
+                    error = e;
                 }
             }
             
             if (error) { 
                 console.error('Error saving event:', error); 
-                showToast('Failed to save event: ' + (error.message || error.code || 'Unknown error'), 'error'); 
+                showToast('Failed to save event: ' + (error.message || error.code || 'Database error'), 'error'); 
                 return; 
             }
             showToast(editingEventId ? 'Event updated!' : 'Event created!', 'success');

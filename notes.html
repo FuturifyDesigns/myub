@@ -551,7 +551,7 @@
                     </svg>
                     <span id="viewNoteTitle"></span>
                 </h2>
-                <button class="close-btn" onclick="closeViewNoteModal()">×</button>
+                <button class="close-btn" onclick="event.stopPropagation();closeViewNoteModal();">×</button>
             </div>
             <div class="modal-body" style="flex:1;overflow-y:auto;">
                 <div id="viewNoteContent" style="padding:24px;background:var(--gray-50);border-radius:12px;min-height:300px;font-size:15px;line-height:1.7;color:var(--gray-800);"></div>
@@ -562,13 +562,13 @@
                     <div style="color:var(--gray-400);font-size:12px;"><span id="viewNoteTimestamp"></span></div>
                 </div>
                 <div style="display:flex;gap:12px;">
-                    <button onclick="editFromView()" class="btn-primary" style="background:var(--navy);">
+                    <button onclick="event.stopPropagation();editFromView();" class="btn-primary" style="background:var(--navy);">
                         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:18px;height:18px;">
                             <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                         </svg>
                         Edit Note
                     </button>
-                    <button onclick="closeViewNoteModal()" class="btn-secondary">Close</button>
+                    <button onclick="event.stopPropagation();closeViewNoteModal();" class="btn-secondary">Close</button>
                 </div>
             </div>
         </div>
@@ -584,7 +584,7 @@
                     </svg>
                     Edit Note
                 </h2>
-                <button class="close-btn" onclick="closeEditNoteModal()">×</button>
+                <button class="close-btn" onclick="event.stopPropagation();closeEditNoteModal();">×</button>
             </div>
             <div class="modal-body" style="flex:1;overflow-y:auto;">
                 <div class="form-group">
@@ -606,15 +606,15 @@
                 </div>
             </div>
             <div class="modal-footer" style="border-top:1px solid var(--gray-200);padding-top:16px;">
-                <button onclick="deleteNoteFromEdit()" class="btn-secondary" style="background:var(--red);color:white;margin-right:auto;">
+                <button onclick="event.stopPropagation();deleteNoteFromEdit();" class="btn-secondary" style="background:var(--red);color:white;margin-right:auto;">
                     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:18px;height:18px;">
                         <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                     </svg>
                     Delete
                 </button>
                 <div style="display:flex;gap:12px;">
-                    <button onclick="closeEditNoteModal()" class="btn-secondary">Cancel</button>
-                    <button onclick="saveNoteEdit()" class="btn-primary">
+                    <button onclick="event.stopPropagation();closeEditNoteModal();" class="btn-secondary">Cancel</button>
+                    <button onclick="event.stopPropagation();saveNoteEdit();" class="btn-primary">
                         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:18px;height:18px;">
                             <path d="M5 13l4 4L19 7"/>
                         </svg>
@@ -1026,23 +1026,38 @@
         }
         
         function editFromView() {
-            if (!viewingNoteId) return;
+            console.log('editFromView called, viewingNoteId:', viewingNoteId);
+            if (!viewingNoteId) {
+                console.error('No viewingNoteId set');
+                showToast('Error: No note selected', 'error');
+                return;
+            }
             closeViewNoteModal();
-            editNote(viewingNoteId);
+            // Small delay to ensure view modal closes before edit opens
+            setTimeout(() => {
+                editNote(viewingNoteId);
+            }, 100);
         }
         
         // Edit Note Functions
         let editingNoteId = null;
         
         function editNote(noteId) {
+            console.log('editNote called with noteId:', noteId);
             const note = notes.find(n => n.id === noteId);
-            if (!note) return;
+            if (!note) {
+                console.error('Note not found:', noteId);
+                showToast('Error: Note not found', 'error');
+                return;
+            }
             
+            console.log('Found note:', note);
             editingNoteId = noteId;
             document.getElementById('editNoteTitle').value = note.title || '';
             document.getElementById('editNoteContent').innerHTML = note.content || '';
             document.getElementById('editNoteCategory').value = note.category || 'other';
             document.getElementById('editNoteModal').classList.add('show');
+            console.log('Edit modal should now be visible');
         }
         
         function closeEditNoteModal() {

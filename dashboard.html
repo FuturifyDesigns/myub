@@ -2586,7 +2586,7 @@
                     }
                 });
 
-                const gpa = earnedCredits > 0 ? (totalPoints / earnedCredits).toFixed(2) : 0;
+                const gpa = earnedCredits > 0 ? (totalPoints / earnedCredits).toFixed(1) : 0;
                 const gpaPercent = (gpa / 5) * 100;
 
                 document.getElementById('creditsCount').textContent = earnedCredits;

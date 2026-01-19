@@ -658,7 +658,7 @@
                     </div>
                     <div class="progression-complete" id="progressionComplete" style="display: none;">
                         <div class="progression-complete-icon">🎓</div>
-                        <div class="progression-complete-text">Congratulations! You've completed your credit requirements!</div>
+                        <div class="progression-complete-text" id="progressionCompleteText">Congratulations! You have acquired the minimum credits to graduate. Well done!</div>
                     </div>
                 </div>
 
@@ -844,6 +844,7 @@
         let userProfile = null;
         let courses = [];
         let semesters = {};
+        let openSemesters = {}; // Track which semesters are open/closed
         let deleteTarget = { type: null, id: null, key: null };
 
         // Credit requirements by program type
@@ -1109,6 +1110,13 @@
             
             // Load user profile for program info
             await loadProfile();
+            
+            // Load semester open states from localStorage
+            const savedStates = localStorage.getItem('myub_openSemesters');
+            if (savedStates) {
+                openSemesters = JSON.parse(savedStates);
+            }
+            
             await loadCourses();
             await loadNotifications();
             await loadFriends();
@@ -1193,6 +1201,18 @@
                 progressBar.classList.add('complete');
                 document.getElementById('progressionComplete').style.display = 'block';
                 document.querySelector('.progression-footer').style.display = 'none';
+                
+                // Set dynamic congratulations message based on program type
+                const completeTextEl = document.getElementById('progressionCompleteText');
+                if (programType === 'certificate') {
+                    completeTextEl.textContent = 'Congratulations! You have acquired the minimum credits for your Certificate. Well done!';
+                } else if (programType === 'diploma') {
+                    completeTextEl.textContent = 'Congratulations! You have acquired the minimum credits for your Diploma. Well done!';
+                } else if (programType === 'graduate') {
+                    completeTextEl.textContent = 'Congratulations! You have acquired the minimum credits for your Graduate degree. Well done!';
+                } else {
+                    completeTextEl.textContent = 'Congratulations! You have acquired the minimum credits to graduate. Well done!';
+                }
             } else {
                 progressBar.classList.remove('complete');
                 document.getElementById('progressionComplete').style.display = 'none';
@@ -1351,7 +1371,8 @@
                 const semGPA = calculateGPA(sem.courses); 
                 const semCredits = sem.courses.reduce((sum, c) => sum + (c.credits || 0), 0); 
                 const yearNum = sem.year.replace('Year ', '');
-                return `<div class="semester-section open" data-key="${key}">
+                const isOpen = openSemesters[key] === true; // Check if this semester should be open
+                return `<div class="semester-section ${isOpen ? 'open' : ''}" data-key="${key}">
                     <div class="semester-header" onclick="toggleSemester('${key}')">
                         <div class="semester-info">
                             <div class="semester-icon">Y${yearNum}</div>
@@ -1416,7 +1437,14 @@
             }).join('');
         }
 
-        function toggleSemester(key) { document.querySelector(`.semester-section[data-key="${key}"]`).classList.toggle('open'); }
+        function toggleSemester(key) { 
+            const element = document.querySelector(`.semester-section[data-key="${key}"]`);
+            element.classList.toggle('open');
+            
+            // Save the new state
+            openSemesters[key] = element.classList.contains('open');
+            localStorage.setItem('myub_openSemesters', JSON.stringify(openSemesters));
+        }
         
         function updateSummary() { 
             const gpa = calculateGPA(courses); 

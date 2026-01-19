@@ -1,0 +1,2664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio - Futurify Designs</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="shortcut icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="apple-touch-icon" href="logo-512.png">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://futurfydesigns.com/portfolio">
+    <meta property="og:title" content="Portfolio - Futurify Designs">
+    <meta property="og:description" content="Explore our collection of stunning website designs and digital experiences crafted by Futurify Designs.">
+    <meta property="og:image" content="https://futurfydesigns.com/logo-512.png">
+    <meta property="og:site_name" content="Futurify Designs">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Portfolio - Futurify Designs">
+    <meta name="twitter:description" content="Explore our collection of stunning website designs and digital experiences.">
+    <meta name="twitter:image" content="https://futurfydesigns.com/logo-512.png">
+    
+    <!-- Schema.org Organization Structured Data for Google Search -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": "Portfolio - Futurify Designs",
+      "description": "Professional portfolio showcasing web development projects and digital solutions by Futurify Designs",
+      "url": "https://futurfydesigns.com/portfolio",
+      "mainEntity": {
+        "@type": "Organization",
+        "name": "Futurify Designs",
+        "alternateName": "Futurify",
+        "url": "https://futurfydesigns.com",
+        "logo": "https://futurfydesigns.com/logo-512.png",
+        "description": "Professional web development and digital solutions company based in Gaborone, Botswana."
+      }
+    }
+    </script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+        }
+
+        html {
+            overflow-x: hidden;
+            max-width: 100vw;
+            position: relative;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 15%, #e9ecef 30%, #dee2e6 45%, #adb5bd 60%, #6c757d 75%, #495057 85%, #343a40 95%, #000000 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+            max-width: 100vw;
+            width: 100%;
+        }
+        
+        /* Prevent any element from causing horizontal scroll */
+        body > * {
+            max-width: 100vw;
+        }
+
+        /* Custom Scrollbar - Grey Theme */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #0a0a1a;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #adb5bd, #6c757d);
+            border-radius: 6px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #6c757d, #adb5bd);
+        }
+        
+        /* Firefox Scrollbar */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #adb5bd #0a0a1a;
+        }
+
+        /* Remove tap highlight and focus outline on all interactive elements */
+        a, button, input, select, textarea, [role="button"] {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+            outline: none;
+        }
+
+        button:focus, a:focus, input:focus, select:focus, textarea:focus {
+            outline: none;
+        }
+
+        /* Disclaimer Popup */
+        .disclaimer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .disclaimer-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .disclaimer-box {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+            position: relative;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .disclaimer-overlay.active .disclaimer-box {
+            transform: scale(1);
+        }
+
+        .disclaimer-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 15%, #e9ecef 30%, #dee2e6 45%, #adb5bd 60%, #6c757d 75%, #495057 85%, #343a40 95%, #000000 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .disclaimer-icon i {
+            color: white;
+            font-size: 28px;
+        }
+
+        .disclaimer-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #2d3748;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .disclaimer-text {
+            font-size: 15px;
+            line-height: 1.7;
+            color: #4a5568;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .disclaimer-button {
+            background: linear-gradient(135deg, #495057 0%, #343a40 50%, #212529 100%);
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: block;
+            margin: 0 auto;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .disclaimer-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+            background: linear-gradient(135deg, #343a40 0%, #212529 50%, #000000 100%);
+        }
+
+        .disclaimer-note {
+            font-size: 13px;
+            color: #718096;
+            text-align: center;
+            margin-top: 15px;
+            font-style: italic;
+        }
+
+        /* Animated Background Particles */
+
+        /* Opening Animation */
+        .opening-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 15%, #e9ecef 30%, #dee2e6 45%, #adb5bd 60%, #6c757d 75%, #495057 85%, #343a40 95%, #000000 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            animation: fadeOut 0.8s ease-in-out 2.5s forwards;
+        }
+
+        .opening-content {
+            text-align: center;
+            animation: scaleIn 1s ease-out;
+        }
+
+        .opening-logo {
+            font-size: 120px;
+            font-weight: 900;
+            background: linear-gradient(45deg, #fff, #e0e0ff, #fff);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 2s ease-in-out infinite, pulse 2s ease-in-out infinite;
+            text-shadow: 0 0 60px rgba(255, 255, 255, 0.8);
+            letter-spacing: 5px;
+        }
+
+        .opening-text {
+            font-size: 40px;
+            font-weight: 700;
+            color: white;
+            margin-top: -10px;
+            letter-spacing: 20px;
+            animation: slideIn 1s ease-out 0.5s backwards;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.6);
+        }
+
+        @keyframes scaleIn {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes shimmer {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes slideIn {
+            0% {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+                visibility: visible;
+            }
+            99% {
+                opacity: 0;
+                visibility: visible;
+            }
+            100% {
+                opacity: 0;
+                visibility: hidden;
+            }
+        }
+
+        .particles {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100px);
+                opacity: 0;
+            }
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px 50px;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 900;
+            color: #fff;
+            text-decoration: none;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            display: inline-block;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .logo:hover {
+            animation: logoPulse 0.8s ease-in-out infinite;
+            transform: scale(1.15);
+            color: #fff;
+        }
+
+        @keyframes logoPulse {
+            0%, 100% {
+                text-shadow: 0 0 15px rgba(255, 255, 255, 1),
+                             0 0 30px rgba(255, 255, 255, 0.8),
+                             0 0 45px rgba(168, 237, 234, 0.9),
+                             0 0 60px rgba(168, 237, 234, 0.7);
+                filter: brightness(1.2);
+            }
+            50% {
+                text-shadow: 0 0 25px rgba(255, 255, 255, 1),
+                             0 0 50px rgba(255, 255, 255, 1),
+                             0 0 75px rgba(168, 237, 234, 1),
+                             0 0 100px rgba(168, 237, 234, 0.8),
+                             0 0 125px rgba(168, 237, 234, 0.6);
+                filter: brightness(1.5);
+            }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #fff;
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+        /* Hamburger Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            z-index: 101;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: #fff;
+            margin: 3px 0;
+            transition: all 0.3s ease;
+            border-radius: 3px;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(8px, 8px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(8px, -8px);
+        }
+
+        /* Mobile Navigation */
+        @media (max-width: 768px) {
+            .hamburger {
+                display: flex !important;
+            }
+
+            .nav-links {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100% !important;
+                height: 100vh !important;
+                background: rgba(10, 10, 26, 0.98) !important;
+                backdrop-filter: blur(10px) !important;
+                flex-direction: column !important;
+                justify-content: center !important;
+                align-items: center !important;
+                gap: 0 !important;
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+                z-index: 100;
+            }
+
+            .nav-links.active {
+                transform: translateX(0);
+            }
+
+            .nav-links li, .nav-links a {
+                width: 100%;
+                text-align: center;
+            }
+
+            .nav-links li {
+                padding: 20px 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .nav-links li:first-child {
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .nav-links a {
+                font-size: 24px !important;
+                font-weight: 600 !important;
+                display: block;
+                padding: 10px 0 !important;
+            }
+
+            .nav-links a::after {
+                display: none !important;
+            }
+        }
+
+
+        /* Portfolio Container */
+        .portfolio-container {
+            max-width: 1100px;
+            margin: 100px auto 60px;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 15px;
+            opacity: 0;
+            animation: fadeInDown 1s ease-out forwards;
+        }
+
+        .page-title h1 {
+            font-size: 40px;
+            color: #fff;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page-subtitle {
+            text-align: center;
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 60px;
+            opacity: 0;
+            animation: fadeInDown 1s ease-out 0.2s forwards;
+        }
+
+        /* Portfolio Grid */
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 35px;
+            margin-bottom: 60px;
+        }
+
+        /* Project Card */
+        .project-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            animation: fadeInUp 0.8s ease-out forwards;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .project-card:nth-child(1) { animation-delay: 0.2s; }
+        .project-card:nth-child(2) { animation-delay: 0.3s; }
+        .project-card:nth-child(3) { animation-delay: 0.4s; }
+        .project-card:nth-child(4) { animation-delay: 0.5s; }
+        .project-card:nth-child(5) { animation-delay: 0.6s; }
+        .project-card:nth-child(6) { animation-delay: 0.7s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.7s ease;
+            z-index: 1;
+        }
+
+        .project-card:hover::before {
+            left: 100%;
+        }
+
+        .project-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Project Thumbnail with Slideshow */
+        .project-thumbnail {
+            width: 100%;
+            height: 280px;
+            position: relative;
+            overflow: hidden;
+            background: #000;
+            border-radius: 8px;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Video Player Overlay */
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 3;
+            pointer-events: none;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .project-card:hover .video-overlay {
+            opacity: 0;
+        }
+
+        /* Play Button */
+        .play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70px;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 4;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+            cursor: pointer;
+        }
+
+        .play-button::before {
+            content: '';
+            width: 0;
+            height: 0;
+            border-left: 20px solid #667eea;
+            border-top: 12px solid transparent;
+            border-bottom: 12px solid transparent;
+            margin-left: 5px;
+        }
+
+        .project-card:hover .play-button {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(1.2);
+        }
+
+        /* Video Progress Bar */
+        .video-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0%;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            z-index: 5;
+            transition: width 0.1s linear;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.8);
+        }
+
+        .project-card:hover .video-progress {
+            animation: progressBar 4.5s linear infinite;
+        }
+
+        @keyframes progressBar {
+            0% {
+                width: 0%;
+            }
+            100% {
+                width: 100%;
+            }
+        }
+
+        /* Video Frame Effect */
+        .video-frame {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            pointer-events: none;
+            z-index: 6;
+        }
+
+        /* Scanline Effect */
+        .scanline {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 50%,
+                rgba(255, 255, 255, 0.03) 50%
+            );
+            background-size: 100% 4px;
+            z-index: 2;
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        /* Recording Indicator */
+        .recording-dot {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            width: 12px;
+            height: 12px;
+            background: #ff4757;
+            border-radius: 50%;
+            z-index: 7;
+            opacity: 0;
+            box-shadow: 0 0 10px rgba(255, 71, 87, 0.8);
+        }
+
+        .project-card:hover .recording-dot {
+            opacity: 1;
+            animation: recording-pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes recording-pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scale(1.1);
+            }
+        }
+
+        .slideshow-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slideshow-image {
+            max-width: 95%;
+            max-height: 95%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            object-position: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            border-radius: 4px;
+        }
+
+        .slideshow-image.active {
+            opacity: 1;
+        }
+
+        .project-thumbnail::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60%;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+            z-index: 1;
+        }
+
+        /* Project Badge */
+        .project-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(168, 237, 234, 0.9);
+            color: #1a1a2e;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 2;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Project Content */
+        .project-content {
+            padding: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .project-title {
+            font-size: 20px;
+            color: #fff;
+            font-weight: 600;
+            margin-bottom: 10px;
+            transition: color 0.3s ease;
+        }
+
+        .project-card:hover .project-title {
+            color: rgba(168, 237, 234, 1);
+        }
+
+        .project-description {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.95);
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .project-tag {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.9);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .project-card:hover .project-tag {
+            background: rgba(168, 237, 234, 0.2);
+            border-color: rgba(168, 237, 234, 0.5);
+            color: rgba(168, 237, 234, 1);
+        }
+
+        /* View Demo Button */
+        .view-demo-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 24px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .view-demo-btn:hover {
+            transform: translateX(5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            background: #fff;
+        }
+
+        .view-demo-btn i {
+            font-size: 14px;
+            transition: transform 0.3s ease;
+        }
+
+        .view-demo-btn:hover i {
+            transform: translateX(5px);
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 60px 20px 30px;
+            margin-top: 80px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 32px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h3,
+        .footer-section h4 {
+            color: #fff;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .footer-logo {
+            font-size: 20px;
+            font-weight: 900;
+            background: linear-gradient(45deg, #ffffff, #a8edea);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .footer-tagline {
+            font-size: 16px;
+            color: #fff;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .footer-description {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.95);
+            line-height: 1.6;
+        }
+
+        .footer-title {
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .footer-links,
+        .footer-contact {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-links li,
+        .footer-contact li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.95);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .footer-links a:hover {
+            color: #fff;
+            transform: translateX(5px);
+        }
+
+        .footer-contact li {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .footer-contact i {
+            width: 18px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .footer-social a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            color: #fff;
+            font-size: 16px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .footer-social a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: #fff;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-bottom p {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .heart {
+            color: #ff6b6b;
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% {
+                transform: scale(1);
+            }
+            10%, 30% {
+                transform: scale(1.1);
+            }
+            20%, 40% {
+                transform: scale(0.9);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1100px) {
+            .portfolio-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 24px;
+            }
+        }
+
+        @media (max-width: 968px) {
+            .nav-links {
+                gap: 16px;
+            }
+
+            nav {
+                padding: 20px 30px;
+            }
+
+            .page-title h1 {
+                font-size: 38px;
+            }
+
+            .footer-content {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 24px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .disclaimer-box {
+                padding: 32px 24px;
+                max-width: 90%;
+            }
+
+            .disclaimer-icon {
+                width: 50px;
+                height: 50px;
+            }
+
+            .disclaimer-icon i {
+                font-size: 24px;
+            }
+
+            .disclaimer-title {
+                font-size: 22px;
+                margin-bottom: 12px;
+            }
+
+            .disclaimer-text {
+                font-size: 14px;
+                margin-bottom: 20px;
+            }
+
+            .disclaimer-button {
+                padding: 12px 32px;
+                font-size: 15px;
+            }
+
+            .disclaimer-note {
+                font-size: 12px;
+            }
+
+            .portfolio-container {
+                margin: 90px auto 40px;
+                padding: 0 20px;
+            }
+
+            .page-title h1 {
+                font-size: 20px;
+            }
+
+            .page-subtitle {
+                font-size: 16px;
+            }
+
+            .portfolio-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .project-thumbnail {
+                height: 250px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            nav {
+                padding: 15px 20px;
+            }
+
+            .logo {
+                font-size: 20px;
+            }
+
+            .nav-links {
+                gap: 12px;
+            }
+
+            .nav-links a {
+                font-size: 13px;
+            }
+
+            .page-title h1 {
+                font-size: 20px;
+            }
+
+            .page-subtitle {
+                font-size: 14px;
+            }
+
+            .project-content {
+                padding: 20px;
+            }
+
+            .project-title {
+                font-size: 20px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 24px;
+                text-align: center;
+            }
+
+            .footer-links a:hover {
+                transform: none;
+            }
+
+            .footer-contact li {
+                justify-content: center;
+            }
+
+            .footer-social {
+                justify-content: center;
+            }
+
+            .footer {
+                padding: 32px 20px 20px;
+                margin-top: 60px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-title h1 {
+                font-size: 20px;
+            }
+
+            .nav-links a {
+                font-size: 12px;
+            }
+        }
+    
+        @media (prefers-color-scheme: dark) {
+            body, .hero-background, .opening-overlay, .opening-animation {
+                background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 20%, #404040 40%, #1a1a1a 60%, #0d0d0d 80%, #000000 100%) !important;
+            }
+        }
+
+        /* WhatsApp Tooltip */
+        .whatsapp-button::before {
+            content: "Chat with me! 💬";
+            position: absolute;
+            bottom: 70px;
+            right: 0;
+            background: #25D366;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s, transform 0.3s;
+            transform: translateY(10px);
+            box-shadow: 0 5px 20px rgba(37, 211, 102, 0.4);
+        }
+        
+        .whatsapp-button:hover::before {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+
+        /* Notification Style Quote Popup */
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: -400px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            transition: right 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s, visibility 0.3s;
+            z-index: -1;
+            max-width: 350px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            opacity: 0;
+            visibility: hidden;
+            display: none;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        
+        .notification.show {
+            right: 30px;
+            opacity: 1;
+            visibility: visible;
+            display: block;
+            pointer-events: auto;
+            z-index: 10001;
+        }
+        
+        .notification-close {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0, 0, 0, 0.3);
+            border: none;
+            border-radius: 50%;
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 28px;
+            cursor: pointer;
+            font-weight: 700;
+            width: 42px;
+            height: 42px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            -webkit-tap-highlight-color: transparent;
+            z-index: 10002;
+            padding: 0;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        
+        .notification.show .notification-close {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+        
+        .notification-close:hover,
+        .notification-close:active {
+            color: #fff;
+            background: rgba(0, 0, 0, 0.5);
+            transform: scale(1.15);
+        }
+        
+        .motivation-popup {
+            position: fixed;
+            display: none;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .motivation-popup.show {
+            display: block;
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            z-index: 10001;
+        }
+        
+        .motivation-popup-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            color: rgba(102, 126, 234, 0.8);
+            font-size: 32px;
+            cursor: pointer;
+            font-weight: 700;
+            width: 50px;
+            height: 50px;
+            line-height: 1;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            -webkit-tap-highlight-color: transparent;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        
+        .motivation-popup.show .motivation-popup-close {
+            display: flex;
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+        
+        .motivation-popup-close:hover {
+            color: #667eea;
+            background: rgba(255, 255, 255, 0.4);
+            transform: scale(1.1);
+        }
+        
+        
+        .notification-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+            text-align: center;
+            animation: notificationIconPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes notificationIconPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .notification-text {
+            font-size: 15px;
+            line-height: 1.6;
+            font-weight: 600;
+            text-align: center;
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+        
+        .notification-author {
+            font-size: 13px;
+            font-weight: 700;
+            text-align: right;
+            margin-top: 10px;
+            opacity: 0.9;
+        }
+        
+        @media (max-width: 768px) {
+            .notification {
+                top: 80px;
+                right: auto;
+                left: -100%;
+                max-width: calc(100% - 30px);
+                width: calc(100% - 30px);
+                display: none;
+            }
+            
+            .notification.show {
+                left: 15px;
+                display: block;
+            }
+            
+            /* WhatsApp mobile positioning - bottom right */
+            #whatsappButton {
+                bottom: 20px !important;
+                right: 20px !important;
+                width: 50px !important;
+                height: 50px !important;
+            }
+        }
+
+        /* Business Hours Clock */
+        .business-hours-widget {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            z-index: 999;
+            min-width: 200px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .business-hours-widget.collapsed {
+            right: -220px;
+            box-shadow: none;
+        }
+
+        .widget-toggle {
+            position: absolute;
+            left: -35px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 35px;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-right: none;
+            border-radius: 10px 0 0 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .widget-toggle:hover {
+            background: rgba(255, 255, 255, 0.15);
+            left: -38px;
+        }
+
+        .toggle-icon {
+            color: #fff;
+            font-size: 18px;
+            transition: transform 0.3s ease;
+        }
+
+        .business-hours-widget.collapsed .toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .widget-content {
+            transition: opacity 0.3s ease;
+        }
+
+        .business-hours-widget.collapsed .widget-content {
+            opacity: 0;
+        }
+
+        .clock-container {
+            margin-bottom: 8px;
+        }
+
+        .clock-time {
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 2px;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .clock-status {
+            margin-top: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .status-open {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        .status-almost-closing {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .status-closed {
+            background: linear-gradient(135deg, #4e54c8 0%, #8f94fb 100%);
+            color: white;
+        }
+
+        .status-almost-open {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: white;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 0 10px rgba(17, 153, 142, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(17, 153, 142, 0.8);
+            }
+        }
+
+        /* Status Notice Modal */
+        .status-notice {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            padding: 28px;
+            border-radius: 24px;
+            box-shadow: 0 16px 64px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            z-index: 10001;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .status-notice.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+            pointer-events: all;
+        }
+
+        .status-notice-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 10000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .status-notice-overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .notice-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .notice-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .notice-message {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .notice-close {
+            padding: 12px 32px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .notice-close:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 24px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Mobile responsive for clock widget */
+        @media (max-width: 768px) {
+            .business-hours-widget {
+                top: 80px;
+                right: 10px;
+                padding: 12px;
+                min-width: 150px;
+            }
+
+            .business-hours-widget.collapsed {
+                right: -170px;
+            }
+
+            .widget-toggle {
+                left: -30px;
+                width: 30px;
+                height: 60px;
+            }
+
+            .widget-toggle:hover {
+                left: -33px;
+            }
+
+            .clock-time {
+                font-size: 20px;
+            }
+
+            .clock-status {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+        }
+
+    </style>
+
+    
+</head>
+<body>
+    <!-- Opening Animation -->
+    <div class="opening-animation">
+        <div class="opening-content">
+            <div class="opening-logo">P</div>
+            <div class="opening-text">ORTFOLIO</div>
+        </div>
+    </div>
+
+    <!-- Disclaimer Popup -->
+    <div class="disclaimer-overlay" id="disclaimerOverlay">
+        <div class="disclaimer-box">
+            <div class="disclaimer-icon">
+                <i class="fas fa-info-circle"></i>
+            </div>
+            <h2 class="disclaimer-title">Portfolio Notice</h2>
+            <p class="disclaimer-text">
+                Welcome to the Futurify Designs portfolio! Some of the projects showcased here are fully functional and live websites, while others are demo showcases designed to highlight the design skills and capabilities brought by Futurify Designs.
+            </p>
+            <p class="disclaimer-text">
+                Please note that demo projects may have simulated backend functionalities or non-functional features, as they are intended for visual presentation purposes.
+            </p>
+            <button class="disclaimer-button" id="disclaimerButton">Continue to Portfolio</button>
+            <p class="disclaimer-note">Click to continue to portfolio</p>
+        </div>
+    </div>
+
+    <!-- Animated Background Particles -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <a href="home f.html" class="logo">F</a>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="home f.html">Home</a></li>
+                <li><a href="portfolio f.html" class="active">Portfolio</a></li>
+                <li><a href="pricing f.html">Pricing</a></li>
+                <li><a href="about f.html">About</a></li>
+                <li><a href="contact f.html">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Business Hours Widget -->
+    <div class="business-hours-widget" id="businessWidget">
+        <div class="widget-toggle" onclick="toggleWidget()" title="Toggle Timer">
+            <span class="toggle-icon">◀</span>
+        </div>
+        <div class="widget-content">
+            <div class="clock-container">
+                <div class="clock-time" id="clock">--:--:--</div>
+            </div>
+            <div class="clock-status" id="status">Loading...</div>
+        </div>
+    </div>
+
+    <!-- Status Notice -->
+    <div class="status-notice-overlay" id="noticeOverlay"></div>
+    <div class="status-notice" id="statusNotice">
+        <div class="notice-icon" id="noticeIcon">🔔</div>
+        <div class="notice-title" id="noticeTitle">Status Update</div>
+        <div class="notice-message" id="noticeMessage"></div>
+        <button class="notice-close" onclick="closeNotice()">Got it!</button>
+    </div>
+
+
+    <!-- Portfolio Container -->
+    <div class="portfolio-container">
+        <div class="page-title">
+            <h1>My Portfolio</h1>
+        </div>
+        <p class="page-subtitle">Explore my collection of stunning website designs</p>
+
+        <!-- Portfolio Grid -->
+        <div class="portfolio-grid">
+            <!-- AquaWorld Project -->
+            <div class="project-card" data-project="aquaworld">
+                <div class="project-thumbnail">
+                    <div class="slideshow-container">
+                        <img src="mainpageaqua.png" class="slideshow-image active" alt="AquaWorld Main">
+                        <img src="secondpageaqua.png" class="slideshow-image" alt="AquaWorld Second">
+                        <img src="lastpageaqua.png" class="slideshow-image" alt="AquaWorld Last">
+                    </div>
+                    <div class="video-overlay"></div>
+                    <div class="play-button"></div>
+                    <div class="video-progress"></div>
+                    <div class="video-frame"></div>
+                    <div class="scanline"></div>
+                    <div class="recording-dot"></div>
+                    <span class="project-badge">Interactive</span>
+                </div>
+                <div class="project-content">
+                    <h3 class="project-title">AquaWorld</h3>
+                    <p class="project-description">An immersive ocean exploration experience with interactive animations and smooth scrolling effects.</p>
+                    <div class="project-tags">
+                        <span class="project-tag">HTML5</span>
+                        <span class="project-tag">CSS3</span>
+                        <span class="project-tag">JavaScript</span>
+                        <span class="project-tag">Animations</span>
+                    </div>
+                    <a href="aquaworld/" class="view-demo-btn" target="_blank">
+                        <span>View Demo</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Bitemaster Project -->
+            <div class="project-card" data-project="bitemaster">
+                <div class="project-thumbnail">
+                    <div class="slideshow-container">
+                        <img src="mainpagebitemasters.png" class="slideshow-image active" alt="Bitemaster Main">
+                        <img src="secondpagebitemasters.png" class="slideshow-image" alt="Bitemaster Second">
+                        <img src="lastpagebitemasters.png" class="slideshow-image" alt="Bitemaster Last">
+                    </div>
+                    <div class="video-overlay"></div>
+                    <div class="play-button"></div>
+                    <div class="video-progress"></div>
+                    <div class="video-frame"></div>
+                    <div class="scanline"></div>
+                    <div class="recording-dot"></div>
+                    <span class="project-badge">Restaurant</span>
+                </div>
+                <div class="project-content">
+                    <h3 class="project-title">Bitemaster</h3>
+                    <p class="project-description">A modern restaurant website with elegant menu displays and mouth watering food photography.</p>
+                    <div class="project-tags">
+                        <span class="project-tag">Responsive</span>
+                        <span class="project-tag">Modern UI</span>
+                        <span class="project-tag">Food Gallery</span>
+                    </div>
+                    <a href="bitemasters/" class="view-demo-btn" target="_blank">
+                        <span>View Demo</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Fashion Project -->
+            <div class="project-card" data-project="fashion">
+                <div class="project-thumbnail">
+                    <div class="slideshow-container">
+                        <img src="mainpagefashionbloom.png" class="slideshow-image active" alt="Fashion Bloom Main">
+                        <img src="secondpagefashionbloom.png" class="slideshow-image" alt="Fashion Bloom Second">
+                        <img src="lastpagefashionbloom.png" class="slideshow-image" alt="Fashion Bloom Last">
+                    </div>
+                    <div class="video-overlay"></div>
+                    <div class="play-button"></div>
+                    <div class="video-progress"></div>
+                    <div class="video-frame"></div>
+                    <div class="scanline"></div>
+                    <div class="recording-dot"></div>
+                    <span class="project-badge">E-Commerce</span>
+                </div>
+                <div class="project-content">
+                    <h3 class="project-title">Fashion Bloom</h3>
+                    <p class="project-description">Stylish fashion e-commerce interface with product showcases and trendy design aesthetics.</p>
+                    <div class="project-tags">
+                        <span class="project-tag">Fashion</span>
+                        <span class="project-tag">Shopping</span>
+                        <span class="project-tag">Modern</span>
+                    </div>
+                    <a href="fashionbloom/" class="view-demo-btn" target="_blank">
+                        <span>View Demo</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Luxe Project -->
+            <div class="project-card" data-project="luxe">
+                <div class="project-thumbnail">
+                    <div class="slideshow-container">
+                        <img src="mainpageluxe.png" class="slideshow-image active" alt="Luxe Main">
+                        <img src="secondpageluxe.png" class="slideshow-image" alt="Luxe Second">
+                        <img src="lastpageluxe.png" class="slideshow-image" alt="Luxe Last">
+                    </div>
+                    <div class="video-overlay"></div>
+                    <div class="play-button"></div>
+                    <div class="video-progress"></div>
+                    <div class="video-frame"></div>
+                    <div class="scanline"></div>
+                    <div class="recording-dot"></div>
+                    <span class="project-badge">Furniture</span>
+                </div>
+                <div class="project-content">
+                    <h3 class="project-title">Luxe</h3>
+                    <p class="project-description">Premium furniture e-commerce store featuring elegant home furnishings with sophisticated design.</p>
+                    <div class="project-tags">
+                        <span class="project-tag">Furniture</span>
+                        <span class="project-tag">E-Commerce</span>
+                        <span class="project-tag">Premium</span>
+                    </div>
+                    <a href="luxe/" class="view-demo-btn" target="_blank">
+                        <span>View Demo</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Nexus Project -->
+            <div class="project-card" data-project="nexus">
+                <div class="project-thumbnail">
+                    <div class="slideshow-container">
+                        <img src="mainpagenexus.png" class="slideshow-image active" alt="Nexus Main">
+                        <img src="secondpagenexus.png" class="slideshow-image" alt="Nexus Second">
+                        <img src="lastpagenexus.png" class="slideshow-image" alt="Nexus Last">
+                    </div>
+                    <div class="video-overlay"></div>
+                    <div class="play-button"></div>
+                    <div class="video-progress"></div>
+                    <div class="video-frame"></div>
+                    <div class="scanline"></div>
+                    <div class="recording-dot"></div>
+                    <span class="project-badge">Gaming</span>
+                </div>
+                <div class="project-content">
+                    <h3 class="project-title">Nexus</h3>
+                    <p class="project-description">Dynamic video gaming e-commerce platform featuring the latest games, consoles, and gaming accessories.</p>
+                    <div class="project-tags">
+                        <span class="project-tag">Gaming</span>
+                        <span class="project-tag">E-Commerce</span>
+                        <span class="project-tag">Interactive</span>
+                    </div>
+                    <a href="nexus/" class="view-demo-btn" target="_blank">
+                        <span>View Demo</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- MindEase Project -->
+            <div class="project-card" data-project="mindease">
+                <div class="project-thumbnail">
+                    <div class="slideshow-container">
+                        <img src="mainpagemindease.png" class="slideshow-image active" alt="MindEase Main">
+                        <img src="secondpagemindease.png" class="slideshow-image" alt="MindEase Second">
+                        <img src="lastpagemindease.png" class="slideshow-image" alt="MindEase Last">
+                    </div>
+                    <div class="video-overlay"></div>
+                    <div class="play-button"></div>
+                    <div class="video-progress"></div>
+                    <div class="video-frame"></div>
+                    <div class="scanline"></div>
+                    <div class="recording-dot"></div>
+                    <span class="project-badge">Wellness</span>
+                </div>
+                <div class="project-content">
+                    <h3 class="project-title">MindEase</h3>
+                    <p class="project-description">Calming mental wellness platform with soothing design and mindfulness focused user experience.</p>
+                    <div class="project-tags">
+                        <span class="project-tag">Wellness</span>
+                        <span class="project-tag">Calm Design</span>
+                        <span class="project-tag">Health</span>
+                    </div>
+                    <a href="mindease/" class="view-demo-btn" target="_blank">
+                        <span>View Demo</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- MyUB Project -->
+            <div class="project-card" data-project="myub">
+                <div class="project-thumbnail">
+                    <div class="slideshow-container">
+                        <img src="screen_1.png" class="slideshow-image active" alt="MyUB Login">
+                        <img src="screen_2.png" class="slideshow-image" alt="MyUB GPA Calculator">
+                        <img src="screen_3.png" class="slideshow-image" alt="MyUB Profile">
+                    </div>
+                    <div class="video-overlay"></div>
+                    <div class="play-button"></div>
+                    <div class="video-progress"></div>
+                    <div class="video-frame"></div>
+                    <div class="scanline"></div>
+                    <div class="recording-dot"></div>
+                    <span class="project-badge">Education</span>
+                </div>
+                <div class="project-content">
+                    <h3 class="project-title">MyUB</h3>
+                    <p class="project-description">A student companion portal to help guide students by tracking their school progress, GPA calculations, and academic journey.</p>
+                    <div class="project-tags">
+                        <span class="project-tag">Student Portal</span>
+                        <span class="project-tag">Dashboard</span>
+                        <span class="project-tag">Education</span>
+                    </div>
+                    <a href="index.html" class="view-demo-btn" target="_blank">
+                        <span>View Demo</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3 class="footer-logo">F</h3>
+                    <p class="footer-tagline">Futurify Designs</p>
+                    <p class="footer-description">Crafting Tomorrow's Digital Experiences</p>
+                </div>
+
+                <div class="footer-section">
+                    <h4 class="footer-title">Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="home f.html">Home</a></li>
+                        <li><a href="portfolio f.html">Portfolio</a></li>
+                        <li><a href="about f.html">About</a></li>
+                        <li><a href="contact f.html">Contact</a></li>
+                        <li><a href="pricing f.html">Pricing</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4 class="footer-title">Get In Touch</h4>
+                    <ul class="footer-contact">
+                        <li><i class="fas fa-envelope"></i> <a href="/cdn-cgi/l/email-protection#a8cedddcdddac1ced1cccddbc1cfc6dbe8cfc5c9c1c486cbc7c5" style="color: inherit; text-decoration: none;"><span class="__cf_email__" data-cfemail="c8aebdbcbdbaa1aeb1acadbba1afa6bb88afa5a9a1a4e6aba7a5">[email&#160;protected]</span></a></li>
+                        <li><i class="fas fa-phone"></i> +267 777 83823</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Gaborone, Botswana</li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4 class="footer-title">Follow Me</h4>
+                    <div class="footer-social">
+                        <a href="https://www.linkedin.com/in/leon-maunge-6153b2212" target="_blank" title="LinkedIn">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a href="https://www.instagram.com/futurifydesigns" target="_blank" title="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="https://www.tiktok.com/@futurifydesigns" target="_blank" title="TikTok">
+                            <i class="fab fa-tiktok"></i>
+                        </a>
+                        <a href="https://wa.me/26777783823" target="_blank" title="WhatsApp">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 Futurify Designs. All rights reserved.</p>
+                <p>Designed & Built in Botswana</p>
+                <p style="margin-top: 10px; font-size: 13px;">
+                    <a href="privacy_policy.html" style="color: rgba(255,255,255,0.7); text-decoration: none; margin: 0 10px; transition: color 0.3s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">Privacy Policy</a> | 
+                    <a href="terms_of_service.html" style="color: rgba(255,255,255,0.7); text-decoration: none; margin: 0 10px; transition: color 0.3s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">Terms of Service</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+        // Hamburger Menu Toggle
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.getElementById('navLinks');
+
+        if (hamburger && navLinks) {
+            hamburger.addEventListener('click', () => {
+                hamburger.classList.toggle('active');
+                navLinks.classList.toggle('active');
+                document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : 'auto';
+            });
+
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.addEventListener('click', () => {
+                    hamburger.classList.remove('active');
+                    navLinks.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                });
+            });
+        }
+    </script>
+
+
+
+    <!-- WhatsApp Button -->
+    <a href="https://wa.me/26777783823?text=Hi%20Futurify%20Designs!%20I'm%20interested%20in%20your%20web%20design%20services.%20Can%20we%20discuss%3F" 
+       target="_blank" 
+       rel="noopener noreferrer"
+       class="whatsapp-button" 
+       id="whatsappButton" 
+       style="position:fixed;bottom:30px;right:30px;width:60px;height:60px;border-radius:50%;background:#25D366;cursor:pointer;z-index:10000;display:none;align-items:center;justify-content:center;box-shadow:0 10px 30px rgba(37,211,102,0.4);transition:all 0.3s ease;text-decoration:none;"
+       title="Chat on WhatsApp">
+        <svg viewBox="0 0 24 24" style="width:30px;height:30px;fill:#fff;">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.87 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+        </svg>
+    </a>
+    <style>
+    @keyframes whatsappPulse {
+        0%, 100% { transform: scale(1); box-shadow: 0 10px 30px rgba(37,211,102,0.4); }
+        50% { transform: scale(1.05); box-shadow: 0 15px 40px rgba(37,211,102,0.6); }
+    }
+    .whatsapp-button {
+        animation: whatsappPulse 2s infinite;
+    }
+    </style>
+
+    <!-- Session Modal -->
+    <div id="sessionModal" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(102,126,234,0.9);backdrop-filter:blur(10px);z-index:100001;display:none;align-items:center;justify-content:center;padding:20px;">
+        <div style="background:linear-gradient(135deg,#fff,#f8f9fa);padding:40px 30px;border-radius:20px;text-align:center;max-width:500px;width:100%;box-shadow:0 20px 60px rgba(102,126,234,0.5);border:2px solid rgba(102,126,234,0.3);">
+            <div style="font-size:50px;margin-bottom:15px;">👋</div>
+            <h2 style="color:#667eea;font-size:24px;font-weight:900;margin-bottom:12px;">Still There?</h2>
+            <p style="color:rgba(0,0,0,0.7);font-size:15px;margin-bottom:25px;line-height:1.6;font-weight:600;">We noticed you've been away for a while! Just checking in to make sure everything's going great. Click below to continue your journey with us! ✨</p>
+            <button id="continueSession" style="padding:14px 35px;border:none;border-radius:30px;cursor:pointer;font-weight:900;font-size:15px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;box-shadow:0 8px 20px rgba(102,126,234,0.4);transition:transform 0.2s;">Yes, I'm Here!</button>
+        </div>
+    </div>
+
+    <!-- Motivational Quote Popup -->
+    <div class="motivation-popup" id="motivationPopup">
+        <button class="motivation-popup-close" id="closeQuote">×</button>
+        <div class="motivation-popup-icon" id="quoteIcon">💡</div>
+        <div class="motivation-popup-text" id="quoteText"></div>
+        <div class="motivation-popup-author" id="quoteAuthor"></div>
+    </div>
+
+    <!-- Motivational Quote Notification -->
+    <div class="notification" id="notification">
+        <button class="notification-close" id="closeNotification">×</button>
+        <div class="notification-icon" id="notificationIcon"></div>
+        <div class="notification-text" id="notificationText"></div>
+        <div class="notification-author" id="notificationAuthor"></div>
+    </div>
+
+    <script>
+        // Create floating particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 50;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                // Random horizontal position
+                particle.style.left = Math.random() * 100 + '%';
+                
+                // Position particles randomly across the full height so they're already floating
+                particle.style.top = Math.random() * 120 + '%';
+                
+                // Random animation delay for staggered effect
+                particle.style.animationDelay = -(Math.random() * 15) + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        createParticles();
+
+        // Slideshow functionality
+        const projectCards = document.querySelectorAll('.project-card');
+
+        projectCards.forEach(card => {
+            const images = card.querySelectorAll('.slideshow-image');
+            let currentIndex = 0;
+            let slideshowInterval = null;
+            let isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            let slideshowActive = false;
+
+            // Function to start slideshow
+            function startSlideshow() {
+                if (slideshowActive) return; // Already running
+                slideshowActive = true;
+                
+                slideshowInterval = setInterval(() => {
+                    // Remove active class from current image
+                    images[currentIndex].classList.remove('active');
+                    
+                    // Move to next image
+                    currentIndex = (currentIndex + 1) % images.length;
+                    
+                    // Add active class to new image
+                    images[currentIndex].classList.add('active');
+                }, 1500); // Change image every 1.5 seconds
+            }
+
+            // Function to stop slideshow
+            function stopSlideshow() {
+                clearInterval(slideshowInterval);
+                slideshowActive = false;
+                
+                // Remove active from all images
+                images.forEach(img => img.classList.remove('active'));
+                
+                // Reset to first image
+                currentIndex = 0;
+                images[0].classList.add('active');
+            }
+
+            // For Desktop: Use hover (mouseenter/mouseleave)
+            card.addEventListener('mouseenter', () => {
+                if (!isMobile) {
+                    startSlideshow();
+                }
+            });
+
+            card.addEventListener('mouseleave', () => {
+                if (!isMobile) {
+                    stopSlideshow();
+                }
+            });
+
+            // For Mobile: Use tap/click to toggle slideshow
+            if (isMobile) {
+                let isSliding = false;
+                
+                card.addEventListener('click', (e) => {
+                    // Don't trigger if clicking the "View Demo" button
+                    if (e.target.closest('.view-demo-btn')) {
+                        return;
+                    }
+                    
+                    if (!isSliding) {
+                        // Start slideshow
+                        isSliding = true;
+                        card.classList.add('slideshow-active');
+                        startSlideshow();
+                    } else {
+                        // Stop slideshow
+                        isSliding = false;
+                        card.classList.remove('slideshow-active');
+                        stopSlideshow();
+                    }
+                });
+            }
+        });
+
+        // Disclaimer Popup Logic
+        const disclaimerOverlay = document.getElementById('disclaimerOverlay');
+        const disclaimerButton = document.getElementById('disclaimerButton');
+
+        // Check if user has already seen the disclaimer in this session
+        const hasSeenDisclaimer = sessionStorage.getItem('portfolioDisclaimerSeen');
+
+        // Only show disclaimer if user hasn't seen it in this session
+        if (!hasSeenDisclaimer) {
+            // Show disclaimer after opening animation completes (3.3 seconds)
+            setTimeout(() => {
+                disclaimerOverlay.classList.add('active');
+            }, 3300); // Opening animation duration (2.5s) + fade out (0.8s)
+        }
+
+        // Close disclaimer when button is clicked
+        disclaimerButton.addEventListener('click', () => {
+            disclaimerOverlay.classList.remove('active');
+            // Remember that user has seen the disclaimer in this session
+            sessionStorage.setItem('portfolioDisclaimerSeen', 'true');
+        });
+
+        // Close disclaimer when clicking outside the box
+        disclaimerOverlay.addEventListener('click', (e) => {
+            if (e.target === disclaimerOverlay) {
+                disclaimerOverlay.classList.remove('active');
+                // Remember that user has seen the disclaimer in this session
+                sessionStorage.getItem('portfolioDisclaimerSeen', 'true');
+            }
+        });
+
+        // Business Hours Clock
+        // Track last hour a notice was shown to detect hour changes
+        let lastNoticeHour = -1;
+
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            const clockEl = document.getElementById('clock');
+            if (clockEl) {
+                clockEl.textContent = `${hours}:${minutes}:${seconds}`;
+            }
+            
+            // Update status badge in real-time
+            updateStatus(now);
+        }
+
+        function updateStatus(now) {
+            const hour = now.getHours();
+            const statusEl = document.getElementById('status');
+            if (!statusEl) return;
+            
+            // Business hours: 9 AM to 6 PM
+            const openHour = 9;
+            const closeHour = 18;
+            
+            let statusClass, statusText;
+            
+            if (hour >= openHour && hour < closeHour) {
+                // Open
+                if (hour === closeHour - 1) {
+                    // Almost closing (5 PM - 6 PM)
+                    statusClass = 'status-almost-closing';
+                    statusText = 'Almost Closing';
+                } else {
+                    statusClass = 'status-open';
+                    statusText = 'Open';
+                }
+            } else {
+                // Closed
+                if (hour === openHour - 1 || (hour === 8 && now.getMinutes() >= 0)) {
+                    // Almost open (8 AM - 9 AM)
+                    statusClass = 'status-almost-open';
+                    statusText = 'Almost Open';
+                } else {
+                    statusClass = 'status-closed';
+                    statusText = 'Closed';
+                }
+            }
+            
+            statusEl.className = 'clock-status ' + statusClass;
+            statusEl.textContent = statusText;
+            
+            // Hour-change detection: Show notice at appropriate times
+            if (hour !== lastNoticeHour) {
+                if (hour === openHour) {
+                    // 9 AM - We're Open!
+                    showStatusNotice('✅', 'We\'re Open!', 'Our services are operational! Feel free to contact us via WhatsApp, phone, or email. We\'re here to help with your web design needs!');
+                    lastNoticeHour = hour;
+                } else if (hour === openHour - 1) {
+                    // 8 AM - Almost Open
+                    showStatusNotice('🌅', 'Opening Soon', 'We\'re about to open! Our team will be available at 9 AM. You can still look around and send us a message - we\'ll respond as soon as we\'re open!');
+                    lastNoticeHour = hour;
+                } else if (hour === closeHour - 1) {
+                    // 5 PM - Almost Closing
+                    showStatusNotice('⚠️', 'Almost Closing Time', 'We\'re about to close for the day. You can still browse and contact us, but we\'ll get back to you when we reopen tomorrow at 9 AM!');
+                    lastNoticeHour = hour;
+                } else if (hour === closeHour) {
+                    // 6 PM - We're Closed
+                    showStatusNotice('🌙', 'We\'re Closed', 'Thanks for visiting! We\'re currently closed. You can still browse our website and contact us - we\'ll get back to you when we reopen at 9 AM. Business hours: 9 AM - 6 PM.');
+                    lastNoticeHour = hour;
+                }
+            }
+        }
+
+        // Status Notice System - Complete with all transitions
+        function showStatusNotice(icon, title, message, noticeType) {
+            const now = new Date();
+            const hour = now.getHours();
+            // Use noticeType if provided, otherwise use title; include hour to allow same notice type at different times
+            const typeKey = noticeType || title.replace(/\s/g, '_');
+            const noticeKey = `notice_${typeKey}_${hour}_${now.toDateString()}`;
+            
+            // Check if this specific notice was already shown for this hour today
+            if (sessionStorage.getItem(noticeKey)) {
+                return;
+            }
+            
+            const noticeIconEl = document.getElementById('noticeIcon');
+            const noticeTitleEl = document.getElementById('noticeTitle');
+            const noticeMessageEl = document.getElementById('noticeMessage');
+            const noticeOverlayEl = document.getElementById('noticeOverlay');
+            const statusNoticeEl = document.getElementById('statusNotice');
+            
+            if (!noticeIconEl || !noticeTitleEl || !noticeMessageEl || !noticeOverlayEl || !statusNoticeEl) return;
+            
+            noticeIconEl.textContent = icon;
+            noticeTitleEl.textContent = title;
+            noticeMessageEl.textContent = message;
+            
+            noticeOverlayEl.classList.add('show');
+            statusNoticeEl.classList.add('show');
+            
+            // Mark this specific notice as shown for this hour
+            sessionStorage.setItem(noticeKey, 'true');
+        }
+
+        function closeNotice() {
+            const noticeOverlayEl = document.getElementById('noticeOverlay');
+            const statusNoticeEl = document.getElementById('statusNotice');
+            
+            if (noticeOverlayEl) noticeOverlayEl.classList.remove('show');
+            if (statusNoticeEl) statusNoticeEl.classList.remove('show');
+        }
+
+        function checkAndShowNotice() {
+            const now = new Date();
+            const hour = now.getHours();
+            
+            const openHour = 9;
+            const closeHour = 18;
+            
+            // Delay to let opening animation finish
+            setTimeout(() => {
+                if (hour >= openHour && hour < closeHour) {
+                    // Open hours
+                    if (hour === closeHour - 1) {
+                        // Almost closing (5 PM - 6 PM)
+                        showStatusNotice(
+                            '⚠️', 
+                            'Almost Closing Time', 
+                            'We\'re about to close for the day. You can still browse and contact us, but we\'ll get back to you when we reopen tomorrow at 9 AM!',
+                            'almost_closing'
+                        );
+                    } else {
+                        // Regular open (9 AM - 5 PM)
+                        showStatusNotice(
+                            '✅', 
+                            'We\'re Open!', 
+                            'Our services are operational! Feel free to contact us via WhatsApp, phone, or email. We\'re here to help with your web design needs!',
+                            'open'
+                        );
+                    }
+                } else {
+                    // Closed hours
+                    if (hour === openHour - 1 || (hour === 8 && now.getMinutes() >= 0)) {
+                        // Almost open (8 AM - 9 AM)
+                        showStatusNotice(
+                            '🌅', 
+                            'Opening Soon', 
+                            'We\'re about to open! Our team will be available at 9 AM. You can still look around and send us a message - we\'ll respond as soon as we\'re open!',
+                            'almost_open'
+                        );
+                    } else {
+                        // Regular closed (after 6 PM, before 8 AM)
+                        showStatusNotice(
+                            '🌙', 
+                            'We\'re Closed', 
+                            'Thanks for visiting! We\'re currently closed. You can still browse our website and contact us - we\'ll get back to you when we reopen at 9 AM. Business hours: 9 AM - 6 PM.',
+                            'closed'
+                        );
+                    }
+                }
+            }, 3000);
+        }
+
+        // Check for ALL status changes every minute
+        function checkForStatusChanges() {
+            const now = new Date();
+            const hour = now.getHours();
+            const minute = now.getMinutes();
+            
+            const openHour = 9;
+            const closeHour = 18;
+            
+            // Check at the START of each hour for status transitions
+            if (minute === 0) {
+                const todayKey = new Date().toDateString();
+                
+                // Transition 1: Open → Almost Closing (5:00 PM)
+                if (hour === closeHour - 1) {
+                    const noticeKey = `notice_almost_closing_${todayKey}`;
+                    if (!sessionStorage.getItem(noticeKey)) {
+                        showStatusNotice(
+                            '⚠️', 
+                            'Almost Closing Time', 
+                            'We\'re about to close for the day. You can still browse and contact us, but we\'ll get back to you when we reopen tomorrow at 9 AM!',
+                            'almost_closing'
+                        );
+                    }
+                }
+                
+                // Transition 2: Almost Closing → Closed (6:00 PM)
+                else if (hour === closeHour) {
+                    const noticeKey = `notice_closed_${todayKey}`;
+                    if (!sessionStorage.getItem(noticeKey)) {
+                        showStatusNotice(
+                            '🌙', 
+                            'We\'re Closed', 
+                            'Thanks for visiting! We\'re currently closed. You can still browse our website and contact us - we\'ll get back to you when we reopen at 9 AM. Business hours: 9 AM - 6 PM.',
+                            'closed'
+                        );
+                    }
+                }
+                
+                // Transition 3: Closed → Almost Open (8:00 AM)
+                else if (hour === openHour - 1) {
+                    const noticeKey = `notice_almost_open_${todayKey}`;
+                    if (!sessionStorage.getItem(noticeKey)) {
+                        showStatusNotice(
+                            '🌅', 
+                            'Opening Soon', 
+                            'We\'re about to open! Our team will be available at 9 AM. You can still look around and send us a message - we\'ll respond as soon as we\'re open!',
+                            'almost_open'
+                        );
+                    }
+                }
+                
+                // Transition 4: Almost Open → Open (9:00 AM)
+                else if (hour === openHour) {
+                    const noticeKey = `notice_open_${todayKey}`;
+                    if (!sessionStorage.getItem(noticeKey)) {
+                        showStatusNotice(
+                            '✅', 
+                            'We\'re Open!', 
+                            'Our services are operational! Feel free to contact us via WhatsApp, phone, or email. We\'re here to help with your web design needs!',
+                            'open'
+                        );
+                    }
+                }
+            }
+        }
+
+        // Toggle widget visibility
+        function toggleWidget() {
+            const widget = document.getElementById('businessWidget');
+            if (!widget) return;
+            
+            const isCollapsed = widget.classList.contains('collapsed');
+            
+            if (isCollapsed) {
+                widget.classList.remove('collapsed');
+                localStorage.setItem('widgetCollapsed', 'false');
+            } else {
+                widget.classList.add('collapsed');
+                localStorage.setItem('widgetCollapsed', 'true');
+            }
+        }
+
+        // Initialize widget state from localStorage
+        function initWidgetState() {
+            const widget = document.getElementById('businessWidget');
+            if (!widget) return;
+            
+            const isCollapsed = localStorage.getItem('widgetCollapsed') === 'true';
+            
+            if (isCollapsed) {
+                widget.classList.add('collapsed');
+            }
+        }
+
+        // Initialize clock and notice
+        if (document.getElementById('clock')) {
+            initWidgetState();
+            setInterval(updateClock, 1000);  // Update clock every second
+            updateClock();
+            checkAndShowNotice();  // Initial notice on page load
+            
+            // Check for status changes every minute
+            setInterval(checkForStatusChanges, 60000);
+        }
+
+        // Close notice when clicking overlay
+        const noticeOverlay = document.getElementById('noticeOverlay');
+        if (noticeOverlay) {
+            noticeOverlay.addEventListener('click', closeNotice);
+        }
+
+        // Show WhatsApp button after animation
+        setTimeout(function() {
+            var whatsappBtn = document.getElementById('whatsappButton');
+            if (whatsappBtn) whatsappBtn.style.display = 'flex';
+        }, 3000);
+
+        // WhatsApp button hover effects
+        var whatsappBtn = document.getElementById('whatsappButton');
+        if (whatsappBtn) {
+            whatsappBtn.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.1)';
+                this.style.boxShadow = '0 15px 40px rgba(37,211,102,0.6)';
+            });
+            whatsappBtn.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+                this.style.boxShadow = '0 10px 30px rgba(37,211,102,0.4)';
+            });
+        }
+
+        // Motivational Quotes
+        var quotes = [
+            { text: "The only way to do great work is to love what you do.", author: "Steve Jobs", icon: "💪" },
+            { text: "Success is not final, failure is not fatal: it is the courage to continue that counts.", author: "Winston Churchill", icon: "🌟" },
+            { text: "Your website is the center of your digital presence.", author: "Web Design Truth", icon: "🌐" },
+            { text: "Don't wait for opportunity. Create it.", author: "Unknown", icon: "🚀" },
+            { text: "The best time to plant a tree was 20 years ago. The second best time is now.", author: "Chinese Proverb", icon: "🌱" },
+            { text: "Dream big. Start small. But most of all, start.", author: "Simon Sinek", icon: "✨" },
+            { text: "Your online presence is your first impression. Make it count.", author: "Digital Marketing", icon: "💎" },
+            { text: "Innovation distinguishes between a leader and a follower.", author: "Steve Jobs", icon: "🎯" },
+            { text: "The secret of getting ahead is getting started.", author: "Mark Twain", icon: "🔥" },
+            { text: "Quality is not an act, it is a habit.", author: "Aristotle", icon: "⭐" }
+        ];
+        
+        // Show notification
+        function showNotification() {
+            var notification = document.getElementById('notification');
+            var icon = document.getElementById('notificationIcon');
+            var text = document.getElementById('notificationText');
+            var author = document.getElementById('notificationAuthor');
+            
+            if (notification && icon && text && author) {
+                var quote = quotes[Math.floor(Math.random() * quotes.length)];
+                icon.textContent = quote.icon;
+                text.textContent = '"' + quote.text + '"';
+                author.textContent = '— ' + quote.author;
+                notification.classList.add('show');
+                
+                setTimeout(function() {
+                    notification.classList.remove('show');
+                }, 10000);
+            }
+        }
+        
+        setInterval(function() { showNotification(); }, (Math.random() * 60000) + 120000);
+        setTimeout(function() { showNotification(); }, 30000);
+        
+        var closeNotificationBtn = document.getElementById('closeNotification');
+        if (closeNotificationBtn) {
+            closeNotificationBtn.onclick = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var notif = document.getElementById('notification');
+                if (notif) {
+                    notif.classList.remove('show');
+                }
+            };
+            // Add touch support
+            closeNotificationBtn.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                var notif = document.getElementById('notification');
+                if (notif) {
+                    notif.classList.remove('show');
+                }
+            });
+        }
+
+        // Session timeout
+        var sessionTimeout;
+        function resetSession() {
+            clearTimeout(sessionTimeout);
+            sessionTimeout = setTimeout(function() {
+                var modal = document.getElementById('sessionModal');
+                if (modal) modal.style.display = 'flex';
+            }, 30 * 60 * 1000); // 30 minutes
+        }
+        
+        // Continue session button handler
+        var contBtn = document.getElementById('continueSession');
+        if (contBtn) {
+            // Remove any existing listeners
+            contBtn.onclick = null;
+            
+            // Add new click handler
+            contBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var modal = document.getElementById('sessionModal');
+                if (modal) {
+                    modal.style.display = 'none';
+                }
+                resetSession();
+                console.log('Session continued');
+            });
+            
+            // Add hover effect
+            contBtn.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.05)';
+            });
+            contBtn.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+            });
+        }
+        
+        // Reset session on user activity
+        document.addEventListener('mousemove', resetSession);
+        document.addEventListener('keypress', resetSession);
+        document.addEventListener('scroll', resetSession);
+        document.addEventListener('click', resetSession);
+        resetSession();
+
+        // Slideshow functionality for project cards
+        document.querySelectorAll('.project-card').forEach(function(card) {
+            var images = card.querySelectorAll('.slideshow-image');
+            var currentIndex = 0;
+            var interval;
+
+            function showNextImage() {
+                images[currentIndex].classList.remove('active');
+                currentIndex = (currentIndex + 1) % images.length;
+                images[currentIndex].classList.add('active');
+            }
+
+            card.addEventListener('mouseenter', function() {
+                interval = setInterval(showNextImage, 1500);
+            });
+
+            card.addEventListener('mouseleave', function() {
+                clearInterval(interval);
+                images.forEach(function(img, index) {
+                    img.classList.remove('active');
+                    if (index === 0) img.classList.add('active');
+                });
+                currentIndex = 0;
+            });
+        });
+    </script>
+</body>
+</html>

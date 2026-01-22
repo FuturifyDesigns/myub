@@ -3305,7 +3305,7 @@
                     
                     html += '<div class="notif-dropdown-item' + (n.is_read ? '' : ' unread') + '" onclick="handleNotifClick(\'' + n.id + '\',\'' + type + '\',\'' + (n.reference_id || '') + '\')">';
                     html += '<div class="notif-icon ' + iconClass + '"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">' + iconSvg + '</svg></div>';
-                    html += '<div class="notif-content"><h4>' + escapeHtml(n.title || 'Notification') + '</h4><p>' + escapeHtml(n.body || n.message || '') + '</p><div class="time">' + formatTimeAgo(n.created_at) + '</div>';
+                    html += '<div class="notif-content"><h4>' + escapeHtml(n.title || 'Notification') + '</h4><p>' + escapeHtml(n.body || '') + '</p><div class="time">' + formatTimeAgo(n.created_at) + '</div>';
                     
                     // Action buttons for join requests (for admins)
                     if (n.type === 'group_join_request' && !n.is_read && n.reference_id) {
@@ -3494,7 +3494,6 @@
                     user_id: group.creator_id,
                     title: 'Join Request',
                     body: userName + ' wants to join ' + group.name,
-                    message: userName + ' wants to join ' + group.name,
                     type: 'group_join_request',
                     reference_id: groupId + ':' + currentUser.id
                 });

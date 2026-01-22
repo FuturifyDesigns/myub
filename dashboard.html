@@ -3571,4 +3571,16 @@
         window.manuallyEnableNotifications = async function() {
             try {
                 if (!window.OneSignal) {
-                    console.log('OneSignal not
+                    console.log('OneSignal not loaded. Please include OneSignal script in the page.');
+                    return;
+                }
+                await OneSignal.Slidedown.promptPush();
+                console.log('Push notification prompt shown');
+            } catch (error) {
+                console.error('Error enabling notifications manually:', error);
+            }
+        };
+    </script>
+
+</body>
+</html>

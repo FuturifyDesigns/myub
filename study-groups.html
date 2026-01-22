@@ -1542,6 +1542,65 @@
             color: #ffffff !important;
         }
 
+        /* Group Badges - Private, Pending, Request */
+        body.dark-mode .group-badge {
+            font-weight: 600 !important;
+        }
+
+        body.dark-mode .group-badge.private {
+            background: #422006 !important;
+            color: #fcd34d !important;
+        }
+
+        body.dark-mode .group-badge.pending {
+            background: #1e3a5f !important;
+            color: #93c5fd !important;
+        }
+
+        body.dark-mode .group-badge.request {
+            background: #1e3a5f !important;
+            color: #93c5fd !important;
+        }
+
+        /* Notification Actions - Accept/Decline buttons */
+        body.dark-mode .notif-actions {
+            margin-top: 8px !important;
+        }
+
+        body.dark-mode .notif-actions button {
+            font-weight: 600 !important;
+        }
+
+        body.dark-mode .notif-actions .accept {
+            background: #16a34a !important;
+            color: #ffffff !important;
+        }
+
+        body.dark-mode .notif-actions .accept:hover {
+            background: #15803d !important;
+        }
+
+        body.dark-mode .notif-actions .decline {
+            background: #475569 !important;
+            color: #ffffff !important;
+        }
+
+        body.dark-mode .notif-actions .decline:hover {
+            background: #64748b !important;
+        }
+
+        /* Ask to Join Button */
+        body.dark-mode .btn-outline {
+            background: transparent !important;
+            border: 1px solid #60a5fa !important;
+            color: #60a5fa !important;
+        }
+
+        body.dark-mode .btn-outline:hover {
+            background: #1e3a5f !important;
+            color: #93c5fd !important;
+        }
+
         /* DIVIDERS */
         body.dark-mode .divider,
         body.dark-mode hr {
@@ -3416,7 +3475,7 @@
                     user_id: group.creator_id,
                     title: 'Join Request',
                     message: userName + ' wants to join ' + group.name,
-                    type: 'message',
+                    type: 'group_join_request',
                     reference_id: groupId + ':' + currentUser.id
                 });
                 

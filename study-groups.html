@@ -3551,17 +3551,70 @@
                     
                     // Get group name
                     var groupResult = await supabaseClient.from('study_groups').select('name').eq('id', groupId).single();
+                    var groupName = groupResult.data.name;
                     
-                    // Notify the user
+                    // Send push notification to the user
+                    try {
+                        await fetch('https://myub-push-notifications.futurifydesigns.workers.dev', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                userId: userId,
+                                title: 'Request Accepted! 🎉',
+                                body: 'You have been accepted into ' + groupName,
+                                data: {
+                                    type: 'group_join_accepted',
+                                    groupId: groupId,
+                                    url: '/study-groups.html?group=' + groupId
+                                }
+                            })
+                        });
+                    } catch (error) {
+                        console.error('Push notification error:', error);
+                    }
+                    
+                    // In-app notification
                     await supabaseClient.from('notifications').insert({
                         user_id: userId,
                         title: 'Request Accepted',
-                        message: 'You can now join ' + groupResult.data.name,
-                        type: 'message',
+                        body: 'You have been accepted into ' + groupName,
+                        type: 'group_join_accepted',
                         reference_id: groupId
                     });
                     showToast('User added to group', 'success');
                 } else {
+                    // Get group name
+                    var groupResult = await supabaseClient.from('study_groups').select('name').eq('id', groupId).single();
+                    var groupName = groupResult.data.name;
+                    
+                    // Send push notification to the user
+                    try {
+                        await fetch('https://myub-push-notifications.futurifydesigns.workers.dev', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                userId: userId,
+                                title: 'Request Declined',
+                                body: 'Your request to join ' + groupName + ' was declined',
+                                data: {
+                                    type: 'group_join_declined',
+                                    groupId: groupId,
+                                    url: '/study-groups.html'
+                                }
+                            })
+                        });
+                    } catch (error) {
+                        console.error('Push notification error:', error);
+                    }
+                    
+                    // In-app notification
+                    await supabaseClient.from('notifications').insert({
+                        user_id: userId,
+                        title: 'Request Declined',
+                        body: 'Your request to join ' + groupName + ' was declined',
+                        type: 'group_join_declined',
+                        reference_id: groupId
+                    });
                     showToast('Request declined', 'success');
                 }
                 

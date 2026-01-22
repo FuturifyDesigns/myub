@@ -1,42 +1,9 @@
-
-        /* ========== SMOOTH PAGE TRANSITIONS ========== */
-        /* Page fade-in on load */
-        body {
-            animation: fadeIn 0.15s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        /* Smooth transition on navigation */
-        body.page-transitioning {
-            opacity: 0;
-            transition: opacity 0.1s ease-out;
-        }
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content, maximum-scale=1.0, user-scalable=no">
-    <script>
-        // Instant dark mode loading - prevents flash
-        (function() {
-            const darkMode = localStorage.getItem('myub_darkMode') === 'true';
-            if (darkMode) {
-                document.documentElement.classList.add('dark-mode');
-            }
-        })();
-    </script>
     <title>My Profile - MyUB</title>
-    <link rel="icon" type="image/png" sizes="48x48" href="favicon-48x48.png">
-    <link rel="shortcut icon" href="favicon-48x48.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
@@ -1009,7 +976,7 @@
         @keyframes spin { to { transform: rotate(360deg); } }
 
         /* ========== DARK MODE ========== */
-        html.dark-mode {
+        body.dark-mode {
             --gray-50: #1e293b;
             --gray-100: #0f172a;
             --gray-200: #1e293b;
@@ -1021,47 +988,26 @@
             --gray-800: #f1f5f9;
         }
 
-        html.dark-mode .sidebar { background: #0a0f1a; }
-        html.dark-mode .nav-section-title {
-            color: #94a3b8 !important;
-        }
+        body.dark-mode .sidebar { background: #0a0f1a; }
+        body.dark-mode .topbar { background: var(--gray-200); border-bottom-color: var(--gray-300); }
+        body.dark-mode .card { background: var(--gray-200); }
+        body.dark-mode .other-profile-item { background: var(--gray-300); }
+        body.dark-mode .other-profile-label { color: var(--gray-500); }
+        body.dark-mode .other-profile-value { color: var(--white); }
 
-        html.dark-mode .nav-item {
-            color: #cbd5e1 !important;
-        }
-
-        html.dark-mode .nav-item:hover {
-            background: rgba(255,255,255,0.1) !important;
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .nav-item.active {
-            background: rgba(255,255,255,0.15) !important;
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .nav-item svg {
-            color: inherit;
-        }
-        html.dark-mode .topbar { background: var(--gray-200); border-bottom-color: var(--gray-300); }
-        html.dark-mode .card { background: var(--gray-200); }
-        html.dark-mode .other-profile-item { background: var(--gray-300); }
-        html.dark-mode .other-profile-label { color: var(--gray-500); }
-        html.dark-mode .other-profile-value { color: var(--white); }
-
-        html.dark-mode .form-group input,
-        html.dark-mode .form-group select,
-        html.dark-mode .form-group textarea {
+        body.dark-mode .form-group input,
+        body.dark-mode .form-group select,
+        body.dark-mode .form-group textarea {
             background: var(--gray-300);
             border-color: var(--gray-300);
             color: var(--gray-800);
         }
 
-        html.dark-mode .modal { background: var(--gray-200); }
-        html.dark-mode .modal-header { border-bottom-color: var(--gray-300); }
-        html.dark-mode .modal-footer { border-top-color: var(--gray-300); }
+        body.dark-mode .modal { background: var(--gray-200); }
+        body.dark-mode .modal-header { border-bottom-color: var(--gray-300); }
+        body.dark-mode .modal-footer { border-top-color: var(--gray-300); }
 
-        html.dark-mode .danger-zone {
+        body.dark-mode .danger-zone {
             background: rgba(239, 68, 68, 0.1);
             border-color: rgba(239, 68, 68, 0.3);
         }
@@ -1767,7 +1713,7 @@
             }
 
             if (localStorage.getItem('myub_darkMode') === 'true') {
-                document.documentElement.classList.add(\'dark-mode\');
+                document.body.classList.add('dark-mode');
             }
 
             await loadNotifications();
@@ -2383,37 +2329,6 @@
     </script>
 
     <!-- MyUB Heartbeat Script -->
-    <script src="myub-heartbeat.js">
-        // ========== SMOOTH PAGE TRANSITIONS ==========
-        // Intercept navigation clicks for smooth transitions
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get all navigation links
-            const navLinks = document.querySelectorAll('a.nav-item[href], a.quick-action[href], a.card-action[href]');
-            
-            navLinks.forEach(link => {
-                // Skip external links and logout
-                if (link.href && !link.href.includes('javascript:') && !link.onclick) {
-                    link.addEventListener('click', function(e) {
-                        const targetUrl = this.href;
-                        
-                        // Only intercept same-origin links
-                        if (targetUrl && targetUrl.startsWith(window.location.origin)) {
-                            e.preventDefault();
-                            
-                            // Add transition class
-                            document.body.classList.add('page-transitioning');
-                            
-                            // Navigate after brief transition
-                            setTimeout(() => {
-                                window.location.href = targetUrl;
-                            }, 100);
-                        }
-                    });
-                }
-            });
-        });
-
-
-        </script>
+    <script src="myub-heartbeat.js"></script>
 </body>
 </html>

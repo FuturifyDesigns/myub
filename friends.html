@@ -1,39 +1,8 @@
-
-        /* ========== SMOOTH PAGE TRANSITIONS ========== */
-        /* Page fade-in on load */
-        body {
-            animation: fadeIn 0.15s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        /* Smooth transition on navigation */
-        body.page-transitioning {
-            opacity: 0;
-            transition: opacity 0.1s ease-out;
-        }
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content, maximum-scale=1.0, user-scalable=no">
-    <script>
-        // Instant dark mode loading - prevents flash
-        (function() {
-            const darkMode = localStorage.getItem('myub_darkMode') === 'true';
-            if (darkMode) {
-                document.documentElement.classList.add('dark-mode');
-            }
-        })();
-    </script>
     <title>Friends - MyUB</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -343,49 +312,28 @@
         .btn-warning:hover { background: #fde68a; }
 
         /* Dark Mode */
-        html.dark-mode { background: var(--gray-800); }
-        html.dark-mode .sidebar { background: #0a1628; }
-        html.dark-mode .nav-section-title {
-            color: #94a3b8 !important;
-        }
-
-        html.dark-mode .nav-item {
-            color: #cbd5e1 !important;
-        }
-
-        html.dark-mode .nav-item:hover {
-            background: rgba(255,255,255,0.1) !important;
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .nav-item.active {
-            background: rgba(255,255,255,0.15) !important;
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .nav-item svg {
-            color: inherit;
-        }
-        html.dark-mode .topbar { background: var(--gray-700); border-bottom-color: var(--gray-600); }
-        html.dark-mode .page-title { color: var(--white); }
-        html.dark-mode .icon-btn { background: var(--gray-600); }
-        html.dark-mode .icon-btn svg { color: var(--gray-300); }
-        html.dark-mode .notification-dropdown { background: var(--gray-700); }
-        html.dark-mode .notif-dropdown-header { border-bottom-color: var(--gray-600); }
-        html.dark-mode .notif-dropdown-header h3 { color: var(--white); }
-        html.dark-mode .tabs { background: var(--gray-700); }
-        html.dark-mode .tab { color: var(--gray-400); }
-        html.dark-mode .tab.active { background: var(--gray-600); color: var(--white); }
-        html.dark-mode .search-input { background: var(--gray-700); border-color: var(--gray-600); color: var(--white); }
-        html.dark-mode .friend-card, html.dark-mode .request-card, html.dark-mode .stat-card, html.dark-mode .empty-state { background: var(--gray-700); }
-        html.dark-mode .friend-name, html.dark-mode .stat-value { color: var(--white); }
-        html.dark-mode .modal { background: var(--gray-700); }
-        html.dark-mode .modal-header, html.dark-mode .modal-footer { border-color: var(--gray-600); }
-        html.dark-mode .modal-title { color: var(--white); }
-        html.dark-mode .discover-header h3 { color: var(--white); }
-        html.dark-mode .discover-card { background: var(--gray-700); }
-        html.dark-mode .discover-name { color: var(--white); }
-        html.dark-mode .filter-select { background: var(--gray-700); border-color: var(--gray-600); color: var(--white); }
+        body.dark-mode { background: var(--gray-800); }
+        body.dark-mode .sidebar { background: #0a1628; }
+        body.dark-mode .topbar { background: var(--gray-700); border-bottom-color: var(--gray-600); }
+        body.dark-mode .page-title { color: var(--white); }
+        body.dark-mode .icon-btn { background: var(--gray-600); }
+        body.dark-mode .icon-btn svg { color: var(--gray-300); }
+        body.dark-mode .notification-dropdown { background: var(--gray-700); }
+        body.dark-mode .notif-dropdown-header { border-bottom-color: var(--gray-600); }
+        body.dark-mode .notif-dropdown-header h3 { color: var(--white); }
+        body.dark-mode .tabs { background: var(--gray-700); }
+        body.dark-mode .tab { color: var(--gray-400); }
+        body.dark-mode .tab.active { background: var(--gray-600); color: var(--white); }
+        body.dark-mode .search-input { background: var(--gray-700); border-color: var(--gray-600); color: var(--white); }
+        body.dark-mode .friend-card, body.dark-mode .request-card, body.dark-mode .stat-card, body.dark-mode .empty-state { background: var(--gray-700); }
+        body.dark-mode .friend-name, body.dark-mode .stat-value { color: var(--white); }
+        body.dark-mode .modal { background: var(--gray-700); }
+        body.dark-mode .modal-header, body.dark-mode .modal-footer { border-color: var(--gray-600); }
+        body.dark-mode .modal-title { color: var(--white); }
+        body.dark-mode .discover-header h3 { color: var(--white); }
+        body.dark-mode .discover-card { background: var(--gray-700); }
+        body.dark-mode .discover-name { color: var(--white); }
+        body.dark-mode .filter-select { background: var(--gray-700); border-color: var(--gray-600); color: var(--white); }
 
         /* Discovery Tab Styles */
         .discover-header { text-align: center; padding: 24px 0 16px; }
@@ -800,7 +748,7 @@
             }
             
             if (localStorage.getItem('myub_darkMode') === 'true') {
-                document.documentElement.classList.add(\'dark-mode\');
+                document.body.classList.add('dark-mode');
             }
             await updateOnlineStatus(true);
             await Promise.all([loadFriends(), loadRequests(), loadNotifications(), loadBlockedUsers()]);
@@ -1733,38 +1681,7 @@
     </script>
     
     <!-- MyUB Heartbeat Script -->
-    <script src="myub-heartbeat.js">
-        // ========== SMOOTH PAGE TRANSITIONS ==========
-        // Intercept navigation clicks for smooth transitions
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get all navigation links
-            const navLinks = document.querySelectorAll('a.nav-item[href], a.quick-action[href], a.card-action[href]');
-            
-            navLinks.forEach(link => {
-                // Skip external links and logout
-                if (link.href && !link.href.includes('javascript:') && !link.onclick) {
-                    link.addEventListener('click', function(e) {
-                        const targetUrl = this.href;
-                        
-                        // Only intercept same-origin links
-                        if (targetUrl && targetUrl.startsWith(window.location.origin)) {
-                            e.preventDefault();
-                            
-                            // Add transition class
-                            document.body.classList.add('page-transitioning');
-                            
-                            // Navigate after brief transition
-                            setTimeout(() => {
-                                window.location.href = targetUrl;
-                            }, 100);
-                        }
-                    });
-                }
-            });
-        });
-
-
-        </script>
+    <script src="myub-heartbeat.js"></script>
 
     <!-- OneSignal handles service worker registration -->
 

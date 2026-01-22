@@ -621,12 +621,12 @@
             border-color: #334155 !important;
         }
 
-        /* LINKS - BRIGHT BLUE */
-        body.dark-mode a:not(.sidebar-logo) {
+        /* LINKS - BRIGHT BLUE (exclude sidebar elements) */
+        body.dark-mode a:not(.sidebar-logo):not(.nav-item) {
             color: #60a5fa !important;
         }
 
-        body.dark-mode a:hover:not(.sidebar-logo) {
+        body.dark-mode a:hover:not(.sidebar-logo):not(.nav-item) {
             color: #93c5fd !important;
         }
 

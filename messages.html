@@ -217,7 +217,7 @@
         .conversations-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; color: var(--gray-400); text-align: center; }
         .conversations-empty svg { width: 64px; height: 64px; margin-bottom: 16px; opacity: 0.5; }
         .conversations-empty h3 { font-size: 16px; font-weight: 600; color: var(--gray-600); margin-bottom: 8px; }
-        .chat-panel { flex: 1; display: flex; flex-direction: column; background: var(--gray-100); min-width: 0; }
+        .chat-panel { flex: 1; display: flex; flex-direction: column; background: var(--gray-100); min-width: 0; position: relative; }
         .chat-header { padding: 12px 20px; background: var(--white); border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: 12px; }
         .chat-header-back { display: none; width: 36px; height: 36px; border: none; background: var(--gray-100); border-radius: 8px; cursor: pointer; align-items: center; justify-content: center; }
         .chat-header-back svg { width: 20px; height: 20px; color: var(--gray-600); }
@@ -341,7 +341,7 @@
         .emoji-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; }
         .emoji-item { font-size: 20px; cursor: pointer; padding: 6px; border-radius: 8px; text-align: center; transition: all 0.15s; display: flex; align-items: center; justify-content: center; line-height: 1; width: 32px; height: 32px; }
         .emoji-item:hover { background: var(--gray-100); transform: scale(1.2); }
-        .chat-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--gray-100); text-align: center; padding: 40px; }
+        .chat-empty { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--gray-100); text-align: center; padding: 40px; z-index: 5; }
         .chat-empty svg { width: 80px; height: 80px; color: var(--gray-300); margin-bottom: 20px; }
         .chat-empty h3 { font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 700; color: var(--gray-700); margin-bottom: 8px; }
         .chat-empty p { font-size: 14px; color: var(--gray-500); max-width: 300px; }
@@ -356,7 +356,7 @@
         .icon-btn svg { width: 20px; height: 20px; color: var(--gray-600); }
         .notification-badge { position: absolute; top: -4px; right: -4px; background: var(--red); color: var(--white); font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; border-radius: 9px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--white); }
         .notification-wrapper { position: relative; }
-        .notification-dropdown { position: absolute; top: calc(100% + 8px); left: 0; width: 360px; max-height: 480px; background: var(--white); border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.2s; z-index: 2000; overflow: hidden; }
+        .notification-dropdown { position: absolute; top: calc(100% + 8px); right: 0; width: 360px; max-height: 480px; background: var(--white); border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.2s; z-index: 2000; overflow: hidden; }
         .notification-dropdown.show { opacity: 1; visibility: visible; transform: translateY(0); }
         .notif-dropdown-header { padding: 16px 20px; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center; }
         .notif-dropdown-header h3 { font-size: 16px; font-weight: 700; color: var(--gray-800); }
@@ -446,7 +446,7 @@
         body.dark-mode .message-action-btn svg { color: #94a3b8; }
         body.dark-mode .modal { background: #1e293b; }
         body.dark-mode .modal-title { color: #ffffff; }
-        body.dark-mode .chat-empty { background: #0f172a; }
+        body.dark-mode .chat-empty { background: #0f172a; position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         body.dark-mode .chat-empty h3 { color: #e2e8f0; }
         body.dark-mode .chat-empty p { color: #64748b; }
         body.dark-mode .chat-empty svg { color: #475569; }

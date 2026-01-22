@@ -915,6 +915,39 @@
             border-top-color: #475569 !important;
         }
 
+        /* Avatar Upload - Choose Image Button */
+        body.dark-mode .avatar-upload-btn {
+            background: #334155 !important;
+            border-color: #475569 !important;
+            color: #ffffff !important;
+        }
+
+        body.dark-mode .avatar-upload-btn:hover {
+            background: #475569 !important;
+        }
+
+        body.dark-mode .avatar-upload-area {
+            background: #1e293b !important;
+            border-color: #475569 !important;
+        }
+
+        body.dark-mode .avatar-upload-area:hover {
+            background: #334155 !important;
+            border-color: #60a5fa !important;
+        }
+
+        body.dark-mode .avatar-upload-area p {
+            color: #e2e8f0 !important;
+        }
+
+        body.dark-mode .avatar-upload-area span {
+            color: #94a3b8 !important;
+        }
+
+        body.dark-mode .avatar-upload-area svg {
+            color: #64748b !important;
+        }
+
         /* MESSAGES PAGE - FIX WHITE AREA */
         body.dark-mode .chat-container,
         body.dark-mode .messages-container,
@@ -3448,6 +3481,12 @@
                 // Get group info for notification
                 var groupResult = await supabaseClient.from('study_groups').select('name, creator_id').eq('id', groupId).single();
                 var group = groupResult.data;
+                
+                // Delete any old join requests (accepted/declined) before creating new one
+                await supabaseClient.from('group_join_requests')
+                    .delete()
+                    .eq('group_id', groupId)
+                    .eq('user_id', currentUser.id);
                 
                 // Create join request
                 var result = await supabaseClient.from('group_join_requests').insert({

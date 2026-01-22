@@ -2471,10 +2471,8 @@
             // Check for first-time user welcome modal
             checkFirstTimeUser();
             
-            // Initialize OneSignal for push notifications (delayed to ensure SDK loads)
-            setTimeout(() => {
-                initOneSignal();
-            }, 2000);
+            // Initialize OneSignal for push notifications
+            initOneSignal();
             
             // Request notification permission
             requestNotificationPermission();
@@ -3593,78 +3591,23 @@
             try {
                 if (!currentUser || !currentUser.id) return;
                 
-                // Check if service worker is supported
-                if (!('serviceWorker' in navigator)) {
-                    console.log('Service workers not supported, skipping OneSignal');
-                    return;
-                }
-                
-                // Check if we're on HTTPS (required for service workers in production)
-                if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
-                    console.log('OneSignal requires HTTPS, skipping initialization');
-                    return;
-                }
-                
-                // Wait for any existing service worker to be ready
-                try {
-                    await navigator.serviceWorker.ready;
-                } catch (e) {
-                    // No service worker registered yet, that's okay
-                }
-                
-                // Wait for OneSignal SDK to load with timeout
-                if (!window.OneSignal) {
-                    try {
-                        await new Promise((resolve, reject) => {
-                            const timeout = setTimeout(() => {
-                                reject(new Error('OneSignal SDK load timeout'));
-                            }, 5000);
-                            
-                            if (window.OneSignal) {
-                                clearTimeout(timeout);
-                                resolve();
-                            } else {
-                                window.OneSignalDeferred = window.OneSignalDeferred || [];
-                                OneSignalDeferred.push(() => {
-                                    clearTimeout(timeout);
-                                    resolve();
-                                });
-                            }
-                        });
-                    } catch (e) {
-                        console.log('OneSignal SDK did not load, skipping');
-                        return;
-                    }
-                }
-                
-                // Initialize OneSignal
-                await window.OneSignal.init({
-                    appId: "c5e50154-18dd-43ae-a347-220898d8f1e7",
-                    allowLocalhostAsSecureOrigin: true,
-                    serviceWorkerParam: { scope: '/' },
-                    serviceWorkerPath: 'OneSignalSDKWorker.js',
-                    notifyButton: {
-                        enable: false
-                    }
+                window.OneSignalDeferred = window.OneSignalDeferred || [];
+                OneSignalDeferred.push(async function(OneSignal) {
+                    await OneSignal.init({
+                        appId: "c5e50154-18dd-43ae-a347-220898d8f1e7",
+                        allowLocalhostAsSecureOrigin: true,
+                        notifyButton: {
+                            enable: false
+                        }
+                    });
+                    
+                    // Set external user ID
+                    await OneSignal.login(currentUser.id);
+                    console.log('OneSignal initialized for user:', currentUser.id);
                 });
                 
-                // Set external user ID
-                await window.OneSignal.login(currentUser.id);
-                console.log('OneSignal initialized for user:', currentUser.id);
-                
-                // Check subscription status
-                const isSubscribed = await window.OneSignal.User.PushSubscription.optedIn;
-                console.log('OneSignal subscribed:', isSubscribed);
-                
-                if (!isSubscribed && Notification.permission === 'granted') {
-                    setTimeout(() => {
-                        showNotificationPrompt();
-                    }, 3000);
-                }
-                
             } catch (error) {
-                // Silently fail - OneSignal is not critical
-                console.log('OneSignal initialization skipped:', error.message);
+                console.log('OneSignal error:', error.message);
             }
         }
 

@@ -1309,6 +1309,18 @@
             border-bottom-color: #475569 !important;
         }
 
+        body.dark-mode .modal-header h3 {
+            color: #ffffff !important;
+        }
+
+        body.dark-mode .modal-header h3 span {
+            color: #ffffff !important;
+        }
+
+        body.dark-mode .modal-header h3 svg {
+            color: #e2e8f0 !important;
+        }
+
         body.dark-mode .modal-title {
             color: #ffffff !important;
         }
@@ -1318,9 +1330,65 @@
             color: #e2e8f0 !important;
         }
 
+        /* Event View Modal - Fix all inline styled elements */
+        body.dark-mode #viewEventModal .modal-body div {
+            color: #e2e8f0 !important;
+        }
+
+        body.dark-mode #viewEventModal .modal-body svg {
+            color: #94a3b8 !important;
+        }
+
+        body.dark-mode #viewEventTime,
+        body.dark-mode #viewEventLocation,
+        body.dark-mode #viewEventDescription,
+        body.dark-mode #viewEventReminder {
+            color: #e2e8f0 !important;
+        }
+
+        body.dark-mode #viewEventType {
+            color: #ffffff !important;
+        }
+
         body.dark-mode .modal-footer {
             background: #334155 !important;
             border-top-color: #475569 !important;
+        }
+
+        body.dark-mode .modal-footer div {
+            color: #94a3b8 !important;
+        }
+
+        body.dark-mode #viewEventCreated {
+            color: #94a3b8 !important;
+        }
+
+        /* Form inputs in modals - calendar/date picker icons */
+        body.dark-mode input[type="datetime-local"],
+        body.dark-mode input[type="date"],
+        body.dark-mode input[type="time"] {
+            background: #334155 !important;
+            border-color: #475569 !important;
+            color: #ffffff !important;
+            color-scheme: dark !important;
+        }
+
+        body.dark-mode input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+        body.dark-mode input[type="date"]::-webkit-calendar-picker-indicator,
+        body.dark-mode input[type="time"]::-webkit-calendar-picker-indicator {
+            filter: invert(1) !important;
+            cursor: pointer !important;
+        }
+
+        body.dark-mode select {
+            background: #334155 !important;
+            border-color: #475569 !important;
+            color: #ffffff !important;
+        }
+
+        body.dark-mode select option {
+            background: #1e293b !important;
+            color: #ffffff !important;
         }
 
         /* MESSAGES PAGE - FIX WHITE AREA */

@@ -1760,7 +1760,16 @@
         }
     
 
-        /* ========== COMPREHENSIVE DARK MODE ========== */
+        
+
+    
+
+        
+
+    
+
+        /* ========== UNIFIED DARK MODE - SAME EVERYWHERE ========== */
+        /* Base colors - EXACT SAME ON ALL PAGES */
         html.dark-mode {
             --gray-50: #0f172a;
             --gray-100: #1e293b;
@@ -1774,10 +1783,10 @@
             --white: #ffffff;
         }
 
-        /* Background colors - everything dark */
+        /* Universal backgrounds - SAME EVERYWHERE */
         html.dark-mode body {
             background: #0f172a !important;
-            color: #e2e8f0 !important;
+            color: #ffffff !important;
         }
 
         html.dark-mode .sidebar {
@@ -1788,37 +1797,18 @@
             background: #0f172a !important;
         }
 
-        /* Topbar */
         html.dark-mode .topbar {
             background: #1e293b !important;
             border-bottom-color: #334155 !important;
         }
 
-        html.dark-mode .page-title {
-            color: #f1f5f9 !important;
-        }
-
-        /* Search */
-        html.dark-mode .search-box {
-            background: #334155 !important;
-        }
-
-        html.dark-mode .search-box input {
-            color: #f1f5f9 !important;
-            background: transparent !important;
-        }
-
-        html.dark-mode .search-box input::placeholder {
-            color: #94a3b8 !important;
-        }
-
-        /* Sidebar Navigation - BRIGHT TEXT */
+        /* SIDEBAR - WHITE TEXT EVERYWHERE */
         html.dark-mode .nav-section-title {
             color: #94a3b8 !important;
         }
 
         html.dark-mode .nav-item {
-            color: #e2e8f0 !important;
+            color: #ffffff !important;
         }
 
         html.dark-mode .nav-item:hover {
@@ -1832,10 +1822,31 @@
         }
 
         html.dark-mode .nav-item svg {
-            color: inherit !important;
+            color: #ffffff !important;
         }
 
-        /* All Cards - Dark backgrounds */
+        /* TEXT - BRIGHT EVERYWHERE */
+        html.dark-mode h1,
+        html.dark-mode h2,
+        html.dark-mode h3,
+        html.dark-mode h4,
+        html.dark-mode h5,
+        html.dark-mode h6 {
+            color: #ffffff !important;
+        }
+
+        html.dark-mode p,
+        html.dark-mode span:not(.badge),
+        html.dark-mode div,
+        html.dark-mode label {
+            color: #e2e8f0 !important;
+        }
+
+        html.dark-mode .page-title {
+            color: #ffffff !important;
+        }
+
+        /* CARDS - DARK EVERYWHERE */
         html.dark-mode .card,
         html.dark-mode .stat-card,
         html.dark-mode .welcome-banner,
@@ -1844,71 +1855,36 @@
             border-color: #334155 !important;
         }
 
-        html.dark-mode .quick-action:hover {
+        /* LINKS - BRIGHT BLUE */
+        html.dark-mode a {
+            color: #60a5fa !important;
+        }
+
+        html.dark-mode a:hover {
+            color: #93c5fd !important;
+        }
+
+        /* SEARCH */
+        html.dark-mode .search-box {
             background: #334155 !important;
         }
 
-        /* Headers and Text - Bright */
-        html.dark-mode h1,
-        html.dark-mode h2,
-        html.dark-mode h3,
-        html.dark-mode h4,
-        html.dark-mode h5,
-        html.dark-mode h6,
-        html.dark-mode .card-title,
-        html.dark-mode .stat-info h3 {
-            color: #f1f5f9 !important;
+        html.dark-mode .search-box input {
+            color: #ffffff !important;
+            background: transparent !important;
         }
 
-        html.dark-mode p,
-        html.dark-mode span:not(.badge),
-        html.dark-mode .card p,
-        html.dark-mode .stat-info p {
-            color: #cbd5e1 !important;
-        }
-
-        /* User dropdown */
-        html.dark-mode .user-name {
-            color: #f1f5f9 !important;
-        }
-
-        html.dark-mode .user-dropdown {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        html.dark-mode .dropdown-header {
-            background: #334155 !important;
-        }
-
-        html.dark-mode .dropdown-user-name {
-            color: #f1f5f9 !important;
-        }
-
-        html.dark-mode .dropdown-user-email {
+        html.dark-mode .search-box input::placeholder {
             color: #94a3b8 !important;
         }
 
-        html.dark-mode .dropdown-item {
-            color: #cbd5e1 !important;
-        }
-
-        html.dark-mode .dropdown-item:hover {
-            background: #334155 !important;
-            color: #f1f5f9 !important;
-        }
-
-        /* Forms - Dark with bright text */
-        html.dark-mode .form-group label {
-            color: #e2e8f0 !important;
-        }
-
+        /* FORMS */
         html.dark-mode input,
         html.dark-mode textarea,
         html.dark-mode select {
             background: #334155 !important;
             border-color: #475569 !important;
-            color: #f1f5f9 !important;
+            color: #ffffff !important;
         }
 
         html.dark-mode input::placeholder,
@@ -1916,17 +1892,123 @@
             color: #94a3b8 !important;
         }
 
-        html.dark-mode input:focus,
-        html.dark-mode textarea:focus,
-        html.dark-mode select:focus {
-            border-color: #3b82f6 !important;
+        /* MODALS & POPUPS - DARK EVERYWHERE */
+        html.dark-mode .modal,
+        html.dark-mode .modal-content,
+        html.dark-mode .popup,
+        html.dark-mode .user-profile-modal,
+        html.dark-mode .profile-modal {
+            background: #1e293b !important;
+        }
+
+        html.dark-mode .modal-overlay {
+            background: rgba(0, 0, 0, 0.8) !important;
+        }
+
+        html.dark-mode .modal-header {
+            background: #334155 !important;
+            border-bottom-color: #475569 !important;
+        }
+
+        html.dark-mode .modal-title {
+            color: #ffffff !important;
+        }
+
+        html.dark-mode .modal-body {
+            background: #1e293b !important;
+            color: #e2e8f0 !important;
+        }
+
+        html.dark-mode .modal-footer {
+            background: #334155 !important;
+            border-top-color: #475569 !important;
+        }
+
+        /* MESSAGES PAGE - FIX WHITE AREA */
+        html.dark-mode .chat-container,
+        html.dark-mode .messages-container,
+        html.dark-mode .conversation-panel,
+        html.dark-mode .chat-area {
+            background: #0f172a !important;
+        }
+
+        html.dark-mode .conversation-list {
+            background: #1e293b !important;
+        }
+
+        html.dark-mode .conversation-item {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+
+        html.dark-mode .conversation-item:hover {
             background: #334155 !important;
         }
 
-        /* Buttons */
+        html.dark-mode .conversation-name {
+            color: #ffffff !important;
+        }
+
+        html.dark-mode .conversation-last-message {
+            color: #94a3b8 !important;
+        }
+
+        html.dark-mode .message-bubble {
+            background: #334155 !important;
+            color: #ffffff !important;
+        }
+
+        html.dark-mode .message-bubble.sent {
+            background: #2563eb !important;
+            color: #ffffff !important;
+        }
+
+        html.dark-mode .message-input-container {
+            background: #1e293b !important;
+            border-top-color: #334155 !important;
+        }
+
+        html.dark-mode .message-input {
+            background: #334155 !important;
+            border-color: #475569 !important;
+            color: #ffffff !important;
+        }
+
+        html.dark-mode .empty-messages,
+        html.dark-mode .no-conversation-selected {
+            background: #0f172a !important;
+            color: #94a3b8 !important;
+        }
+
+        /* FRIENDS PAGE - PROFILE POPUP */
+        html.dark-mode .friend-profile-popup,
+        html.dark-mode .user-details-modal {
+            background: #1e293b !important;
+        }
+
+        html.dark-mode .profile-popup-header {
+            background: #334155 !important;
+        }
+
+        html.dark-mode .friend-card {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+
+        html.dark-mode .friend-name {
+            color: #ffffff !important;
+        }
+
+        html.dark-mode .friend-major,
+        html.dark-mode .friend-year,
+        html.dark-mode .friend-info {
+            color: #94a3b8 !important;
+        }
+
+        /* BUTTONS */
         html.dark-mode .btn-secondary {
             background: #334155 !important;
-            color: #f1f5f9 !important;
+            color: #ffffff !important;
         }
 
         html.dark-mode .btn-secondary:hover {
@@ -1941,114 +2023,16 @@
             color: #cbd5e1 !important;
         }
 
-        /* Messages Page Specific */
-        html.dark-mode .conversation-item {
+        /* SCHEDULE */
+        html.dark-mode .calendar,
+        html.dark-mode .calendar-container {
             background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        html.dark-mode .conversation-item:hover {
-            background: #334155 !important;
-        }
-
-        html.dark-mode .conversation-name {
-            color: #f1f5f9 !important;
-        }
-
-        html.dark-mode .conversation-last-message {
-            color: #94a3b8 !important;
-        }
-
-        html.dark-mode .message-bubble {
-            background: #334155 !important;
-            color: #f1f5f9 !important;
-        }
-
-        html.dark-mode .message-bubble.sent {
-            background: #2563eb !important;
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .message-input {
-            background: #334155 !important;
-            border-color: #475569 !important;
-            color: #f1f5f9 !important;
-        }
-
-        /* Friends Page Specific */
-        html.dark-mode .friend-card {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        html.dark-mode .friend-name {
-            color: #f1f5f9 !important;
-        }
-
-        html.dark-mode .friend-major,
-        html.dark-mode .friend-year {
-            color: #94a3b8 !important;
-        }
-
-        /* Study Groups Specific */
-        html.dark-mode .group-card {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        html.dark-mode .group-name {
-            color: #f1f5f9 !important;
-        }
-
-        html.dark-mode .group-description {
-            color: #cbd5e1 !important;
-        }
-
-        html.dark-mode .group-members {
-            color: #94a3b8 !important;
-        }
-
-        /* Notes Specific */
-        html.dark-mode .note-item {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        html.dark-mode .note-title {
-            color: #f1f5f9 !important;
-        }
-
-        html.dark-mode .note-preview {
-            color: #cbd5e1 !important;
-        }
-
-        html.dark-mode .note-meta {
-            color: #94a3b8 !important;
-        }
-
-        html.dark-mode .note-editor {
-            background: #1e293b !important;
-            color: #f1f5f9 !important;
-        }
-
-        /* Schedule Specific */
-        html.dark-mode .calendar {
-            background: #1e293b !important;
-        }
-
-        html.dark-mode .calendar-header {
-            background: #334155 !important;
-            color: #f1f5f9 !important;
         }
 
         html.dark-mode .day-cell {
             background: #1e293b !important;
             border-color: #334155 !important;
-            color: #cbd5e1 !important;
-        }
-
-        html.dark-mode .day-cell:hover {
-            background: #334155 !important;
+            color: #ffffff !important;
         }
 
         html.dark-mode .event-item {
@@ -2056,121 +2040,130 @@
             color: #ffffff !important;
         }
 
-        /* Profile Specific */
+        /* STUDY GROUPS */
+        html.dark-mode .group-card {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+
+        html.dark-mode .group-name {
+            color: #ffffff !important;
+        }
+
+        /* NOTES */
+        html.dark-mode .note-item {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+
+        html.dark-mode .note-title {
+            color: #ffffff !important;
+        }
+
+        html.dark-mode .note-editor {
+            background: #1e293b !important;
+            color: #ffffff !important;
+        }
+
+        /* PROFILE */
         html.dark-mode .profile-header {
             background: #1e293b !important;
         }
 
         html.dark-mode .profile-name {
-            color: #f1f5f9 !important;
+            color: #ffffff !important;
         }
 
         html.dark-mode .profile-info-item {
             background: #1e293b !important;
         }
 
-        html.dark-mode .profile-label {
-            color: #94a3b8 !important;
-        }
-
         html.dark-mode .profile-value {
-            color: #f1f5f9 !important;
+            color: #ffffff !important;
         }
 
-        /* GPA Calculator Specific */
+        /* GPA CALCULATOR */
         html.dark-mode .gpa-card {
             background: #1e293b !important;
         }
 
-        html.dark-mode .gpa-value {
-            color: #f1f5f9 !important;
-        }
-
-        html.dark-mode .course-row {
-            background: #1e293b !important;
-            border-color: #334155 !important;
+        html.dark-mode .analysis-insights {
+            background: #334155 !important;
         }
 
         html.dark-mode .semester-card {
             background: #1e293b !important;
         }
 
-        /* Tables */
+        /* TABLES */
         html.dark-mode table {
             background: #1e293b !important;
-            color: #cbd5e1 !important;
         }
 
         html.dark-mode th {
             background: #334155 !important;
-            color: #f1f5f9 !important;
+            color: #ffffff !important;
         }
 
         html.dark-mode td {
             border-color: #334155 !important;
-            color: #cbd5e1 !important;
+            color: #e2e8f0 !important;
         }
 
-        html.dark-mode tr:hover {
-            background: #334155 !important;
+        /* USER DROPDOWN */
+        html.dark-mode .user-name {
+            color: #ffffff !important;
         }
 
-        /* Modals */
-        html.dark-mode .modal {
+        html.dark-mode .user-dropdown {
             background: #1e293b !important;
+            border-color: #334155 !important;
         }
 
-        html.dark-mode .modal-header {
+        html.dark-mode .dropdown-item {
+            color: #e2e8f0 !important;
+        }
+
+        html.dark-mode .dropdown-item:hover {
             background: #334155 !important;
-            border-bottom-color: #475569 !important;
+            color: #ffffff !important;
         }
 
-        html.dark-mode .modal-title {
-            color: #f1f5f9 !important;
-        }
-
-        html.dark-mode .modal-body {
-            color: #cbd5e1 !important;
-        }
-
-        html.dark-mode .modal-footer {
-            background: #334155 !important;
-            border-top-color: #475569 !important;
-        }
-
-        /* Empty states */
+        /* EMPTY STATES */
         html.dark-mode .empty-state {
             color: #94a3b8 !important;
         }
 
-        html.dark-mode .empty-state svg {
-            color: #64748b !important;
+        html.dark-mode .empty-state h3,
+        html.dark-mode .empty-state p {
+            color: #94a3b8 !important;
         }
 
-        /* Tabs */
+        /* TABS */
         html.dark-mode .tab-item {
             color: #94a3b8 !important;
         }
 
-        html.dark-mode .tab-item.active,
-        html.dark-mode .tab-item:hover {
-            color: #f1f5f9 !important;
+        html.dark-mode .tab-item.active {
+            color: #ffffff !important;
         }
 
-        /* Dividers */
+        /* BADGES */
+        html.dark-mode .badge {
+            background: #dc2626 !important;
+            color: #ffffff !important;
+        }
+
+        /* DIVIDERS */
         html.dark-mode .divider,
         html.dark-mode hr {
             border-color: #334155 !important;
         }
 
-        /* Loading states */
+        /* LOADING */
         html.dark-mode .loading {
             background: #0f172a !important;
             color: #94a3b8 !important;
-        }
-
-        html.dark-mode .skeleton {
-            background: #334155 !important;
         }
 
     </style>

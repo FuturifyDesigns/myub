@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content, maximum-scale=1.0, user-scalable=no">
     <title>Dashboard - MyUB</title>
-    <link rel="icon" type="image/png" sizes="48x48" href="favicon-48x48.png">
-    <link rel="shortcut icon" href="favicon-48x48.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
@@ -1239,6 +1237,108 @@
             background: var(--gray-100);
         }
 
+        /* Card Action Links (View Details, View All) */
+        body.dark-mode .card-action {
+            color: #60a5fa !important;
+        }
+
+        body.dark-mode .card-action:hover {
+            color: #93c5fd !important;
+        }
+
+        /* Notification Dropdown */
+        body.dark-mode .notification-dropdown {
+            background: #1e293b !important;
+            border: 1px solid #334155 !important;
+        }
+
+        body.dark-mode .notif-dropdown-header {
+            background: #334155 !important;
+            border-bottom-color: #475569 !important;
+        }
+
+        body.dark-mode .notif-dropdown-header h3 {
+            color: #ffffff !important;
+        }
+
+        body.dark-mode .notif-dropdown-header button {
+            color: #60a5fa !important;
+        }
+
+        body.dark-mode .notif-dropdown-item {
+            border-bottom-color: #334155 !important;
+        }
+
+        body.dark-mode .notif-dropdown-item:hover {
+            background: #334155 !important;
+        }
+
+        body.dark-mode .notif-dropdown-item.unread {
+            background: #1e3a5f !important;
+        }
+
+        body.dark-mode .notif-content h4 {
+            color: #ffffff !important;
+        }
+
+        body.dark-mode .notif-content p {
+            color: #94a3b8 !important;
+        }
+
+        body.dark-mode .notif-content .time {
+            color: #64748b !important;
+        }
+
+        body.dark-mode .notif-dropdown-footer {
+            background: #1e293b !important;
+            border-top-color: #334155 !important;
+        }
+
+        body.dark-mode .notif-dropdown-footer a {
+            color: #60a5fa !important;
+        }
+
+        body.dark-mode .notif-empty {
+            color: #94a3b8 !important;
+        }
+
+        /* GPA Labels */
+        body.dark-mode .gpa-label {
+            color: #94a3b8 !important;
+        }
+
+        body.dark-mode .gpa-status {
+            color: #22c55e !important;
+        }
+
+        /* Stat Info */
+        body.dark-mode .stat-info p {
+            color: #94a3b8 !important;
+        }
+
+        /* Schedule Details */
+        body.dark-mode .schedule-time .period {
+            color: #94a3b8 !important;
+        }
+
+        body.dark-mode .schedule-details p {
+            color: #94a3b8 !important;
+        }
+
+        /* Empty State */
+        body.dark-mode .empty-state {
+            color: #94a3b8 !important;
+        }
+
+        body.dark-mode .empty-state p {
+            color: #94a3b8 !important;
+        }
+
+        /* User Role in header */
+        body.dark-mode .user-role {
+            color: #94a3b8 !important;
+        }
+
         /* Mobile dropdown adjustments */
         @media (max-width: 768px) {
             .user-dropdown {
@@ -1758,1039 +1858,6 @@
             0%, 100% { opacity: 0.5; }
             50% { opacity: 0.8; }
         }
-    
-
-        
-
-    
-
-        
-
-    
-
-        /* ========== UNIFIED DARK MODE - SAME EVERYWHERE ========== */
-        /* Base colors - EXACT SAME ON ALL PAGES */
-        html.dark-mode {
-            --gray-50: #0f172a;
-            --gray-100: #1e293b;
-            --gray-200: #334155;
-            --gray-300: #475569;
-            --gray-400: #64748b;
-            --gray-500: #94a3b8;
-            --gray-600: #cbd5e1;
-            --gray-700: #e2e8f0;
-            --gray-800: #f1f5f9;
-            --white: #ffffff;
-        }
-
-        /* Universal backgrounds - SAME EVERYWHERE */
-        html.dark-mode body {
-            background: #0f172a !important;
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .sidebar {
-            background: #0a0f1a !important;
-        }
-
-        html.dark-mode .main-content {
-            background: #0f172a !important;
-        }
-
-        html.dark-mode .topbar {
-            background: #1e293b !important;
-            border-bottom-color: #334155 !important;
-        }
-
-        /* SIDEBAR - WHITE TEXT EVERYWHERE */
-        html.dark-mode .nav-section-title {
-            color: #94a3b8 !important;
-        }
-
-        html.dark-mode .nav-item {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .nav-item:hover {
-            background: rgba(255,255,255,0.1) !important;
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .nav-item.active {
-            background: rgba(255,255,255,0.15) !important;
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .nav-item svg {
-            color: #ffffff !important;
-        }
-
-        /* TEXT - BRIGHT EVERYWHERE */
-        html.dark-mode h1,
-        html.dark-mode h2,
-        html.dark-mode h3,
-        html.dark-mode h4,
-        html.dark-mode h5,
-        html.dark-mode h6 {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode p,
-        html.dark-mode span:not(.badge),
-        html.dark-mode div,
-        html.dark-mode label {
-            color: #e2e8f0 !important;
-        }
-
-        html.dark-mode .page-title {
-            color: #ffffff !important;
-        }
-
-        /* CARDS - DARK EVERYWHERE */
-        html.dark-mode .card,
-        html.dark-mode .stat-card,
-        html.dark-mode .welcome-banner,
-        html.dark-mode .quick-action {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        /* LINKS - BRIGHT BLUE */
-        html.dark-mode a {
-            color: #60a5fa !important;
-        }
-
-        html.dark-mode a:hover {
-            color: #93c5fd !important;
-        }
-
-        /* SEARCH */
-        html.dark-mode .search-box {
-            background: #334155 !important;
-        }
-
-        html.dark-mode .search-box input {
-            color: #ffffff !important;
-            background: transparent !important;
-        }
-
-        html.dark-mode .search-box input::placeholder {
-            color: #94a3b8 !important;
-        }
-
-        /* FORMS */
-        html.dark-mode input,
-        html.dark-mode textarea,
-        html.dark-mode select {
-            background: #334155 !important;
-            border-color: #475569 !important;
-            color: #ffffff !important;
-        }
-
-        html.dark-mode input::placeholder,
-        html.dark-mode textarea::placeholder {
-            color: #94a3b8 !important;
-        }
-
-        /* MODALS & POPUPS - DARK EVERYWHERE */
-        html.dark-mode .modal,
-        html.dark-mode .modal-content,
-        html.dark-mode .popup,
-        html.dark-mode .user-profile-modal,
-        html.dark-mode .profile-modal {
-            background: #1e293b !important;
-        }
-
-        html.dark-mode .modal-overlay {
-            background: rgba(0, 0, 0, 0.8) !important;
-        }
-
-        html.dark-mode .modal-header {
-            background: #334155 !important;
-            border-bottom-color: #475569 !important;
-        }
-
-        html.dark-mode .modal-title {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .modal-body {
-            background: #1e293b !important;
-            color: #e2e8f0 !important;
-        }
-
-        html.dark-mode .modal-footer {
-            background: #334155 !important;
-            border-top-color: #475569 !important;
-        }
-
-        /* MESSAGES PAGE - FIX WHITE AREA */
-        html.dark-mode .chat-container,
-        html.dark-mode .messages-container,
-        html.dark-mode .conversation-panel,
-        html.dark-mode .chat-area {
-            background: #0f172a !important;
-        }
-
-        html.dark-mode .conversation-list {
-            background: #1e293b !important;
-        }
-
-        html.dark-mode .conversation-item {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        html.dark-mode .conversation-item:hover {
-            background: #334155 !important;
-        }
-
-        html.dark-mode .conversation-name {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .conversation-last-message {
-            color: #94a3b8 !important;
-        }
-
-        html.dark-mode .message-bubble {
-            background: #334155 !important;
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .message-bubble.sent {
-            background: #2563eb !important;
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .message-input-container {
-            background: #1e293b !important;
-            border-top-color: #334155 !important;
-        }
-
-        html.dark-mode .message-input {
-            background: #334155 !important;
-            border-color: #475569 !important;
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .empty-messages,
-        html.dark-mode .no-conversation-selected {
-            background: #0f172a !important;
-            color: #94a3b8 !important;
-        }
-
-        /* FRIENDS PAGE - PROFILE POPUP */
-        html.dark-mode .friend-profile-popup,
-        html.dark-mode .user-details-modal {
-            background: #1e293b !important;
-        }
-
-        html.dark-mode .profile-popup-header {
-            background: #334155 !important;
-        }
-
-        html.dark-mode .friend-card {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        html.dark-mode .friend-name {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .friend-major,
-        html.dark-mode .friend-year,
-        html.dark-mode .friend-info {
-            color: #94a3b8 !important;
-        }
-
-        /* BUTTONS */
-        html.dark-mode .btn-secondary {
-            background: #334155 !important;
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .btn-secondary:hover {
-            background: #475569 !important;
-        }
-
-        html.dark-mode .icon-btn {
-            background: #334155 !important;
-        }
-
-        html.dark-mode .icon-btn svg {
-            color: #cbd5e1 !important;
-        }
-
-        /* SCHEDULE */
-        html.dark-mode .calendar,
-        html.dark-mode .calendar-container {
-            background: #1e293b !important;
-        }
-
-        html.dark-mode .day-cell {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .event-item {
-            background: #2563eb !important;
-            color: #ffffff !important;
-        }
-
-        /* STUDY GROUPS */
-        html.dark-mode .group-card {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        html.dark-mode .group-name {
-            color: #ffffff !important;
-        }
-
-        /* NOTES */
-        html.dark-mode .note-item {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        html.dark-mode .note-title {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .note-editor {
-            background: #1e293b !important;
-            color: #ffffff !important;
-        }
-
-        /* PROFILE */
-        html.dark-mode .profile-header {
-            background: #1e293b !important;
-        }
-
-        html.dark-mode .profile-name {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .profile-info-item {
-            background: #1e293b !important;
-        }
-
-        html.dark-mode .profile-value {
-            color: #ffffff !important;
-        }
-
-        /* GPA CALCULATOR */
-        html.dark-mode .gpa-card {
-            background: #1e293b !important;
-        }
-
-        html.dark-mode .analysis-insights {
-            background: #334155 !important;
-        }
-
-        html.dark-mode .semester-card {
-            background: #1e293b !important;
-        }
-
-        /* TABLES */
-        html.dark-mode table {
-            background: #1e293b !important;
-        }
-
-        html.dark-mode th {
-            background: #334155 !important;
-            color: #ffffff !important;
-        }
-
-        html.dark-mode td {
-            border-color: #334155 !important;
-            color: #e2e8f0 !important;
-        }
-
-        /* USER DROPDOWN */
-        html.dark-mode .user-name {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .user-dropdown {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        html.dark-mode .dropdown-item {
-            color: #e2e8f0 !important;
-        }
-
-        html.dark-mode .dropdown-item:hover {
-            background: #334155 !important;
-            color: #ffffff !important;
-        }
-
-        /* EMPTY STATES */
-        html.dark-mode .empty-state {
-            color: #94a3b8 !important;
-        }
-
-        html.dark-mode .empty-state h3,
-        html.dark-mode .empty-state p {
-            color: #94a3b8 !important;
-        }
-
-        /* TABS */
-        html.dark-mode .tab-item {
-            color: #94a3b8 !important;
-        }
-
-        html.dark-mode .tab-item.active {
-            color: #ffffff !important;
-        }
-
-        /* BADGES */
-        html.dark-mode .badge {
-            background: #dc2626 !important;
-            color: #ffffff !important;
-        }
-
-        /* DIVIDERS */
-        html.dark-mode .divider,
-        html.dark-mode hr {
-            border-color: #334155 !important;
-        }
-
-        /* LOADING */
-        html.dark-mode .loading {
-            background: #0f172a !important;
-            color: #94a3b8 !important;
-        }
-
-    
-        /* ========================================== */
-        /* COMPREHENSIVE DARK MODE FIXES - ALL PAGES */
-        /* ========================================== */
-
-        /* USER DROPDOWN - Missing styles */
-        html.dark-mode .user-role {
-            color: #94a3b8 !important;
-        }
-
-        html.dark-mode .dropdown-user-email {
-            color: #94a3b8 !important;
-        }
-
-        html.dark-mode .dropdown-status {
-            color: #22c55e !important;
-        }
-
-        html.dark-mode .dropdown-section-title {
-            color: #64748b !important;
-        }
-
-        html.dark-mode .dropdown-header {
-            background: #334155 !important;
-            border-bottom-color: #475569 !important;
-        }
-
-        /* STAT CARDS */
-        html.dark-mode .stat-info p {
-            color: #94a3b8 !important;
-        }
-
-        html.dark-mode .card-action {
-            color: #60a5fa !important;
-        }
-
-        html.dark-mode .card-action:hover {
-            color: #93c5fd !important;
-        }
-
-        /* SCHEDULE */
-        html.dark-mode .schedule-item {
-            background: #1e293b !important;
-        }
-
-        html.dark-mode .schedule-time .time {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .schedule-time .period {
-            color: #94a3b8 !important;
-        }
-
-        html.dark-mode .schedule-details h4 {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .schedule-details p {
-            color: #94a3b8 !important;
-        }
-
-        /* GPA */
-        html.dark-mode .gpa-label {
-            color: #94a3b8 !important;
-        }
-
-        html.dark-mode .gpa-status {
-            color: #22c55e !important;
-        }
-
-        html.dark-mode .gpa-value {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .gpa-circle::before {
-            background: #1e293b !important;
-        }
-
-        /* NOTIFICATIONS DROPDOWN */
-        html.dark-mode .notification-dropdown {
-            background: #1e293b !important;
-            border: 1px solid #334155 !important;
-        }
-
-        html.dark-mode .notif-dropdown-header {
-            background: #334155 !important;
-            border-bottom-color: #475569 !important;
-        }
-
-        html.dark-mode .notif-dropdown-header h3 {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .notif-dropdown-header button {
-            color: #60a5fa !important;
-        }
-
-        html.dark-mode .notif-dropdown-item {
-            border-bottom-color: #334155 !important;
-        }
-
-        html.dark-mode .notif-dropdown-item:hover {
-            background: #334155 !important;
-        }
-
-        html.dark-mode .notif-dropdown-item.unread {
-            background: #1e3a5f !important;
-        }
-
-        html.dark-mode .notif-content h4 {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .notif-content p {
-            color: #94a3b8 !important;
-        }
-
-        html.dark-mode .notif-content .time {
-            color: #64748b !important;
-        }
-
-        html.dark-mode .notif-dropdown-footer {
-            background: #1e293b !important;
-            border-top-color: #334155 !important;
-        }
-
-        html.dark-mode .notif-dropdown-footer a {
-            color: #60a5fa !important;
-        }
-
-        html.dark-mode .notif-empty {
-            color: #94a3b8 !important;
-        }
-
-        /* FILTER BUTTONS & VIEW TOGGLES */
-        html.dark-mode .filter-btn,
-        html.dark-mode .view-toggle,
-        html.dark-mode .filter-pill {
-            background: #334155 !important;
-            border-color: #475569 !important;
-            color: #e2e8f0 !important;
-        }
-
-        html.dark-mode .filter-btn:hover,
-        html.dark-mode .view-toggle:hover,
-        html.dark-mode .filter-pill:hover {
-            background: #475569 !important;
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .filter-btn.active,
-        html.dark-mode .view-toggle.active,
-        html.dark-mode .filter-pill.active {
-            background: #2563eb !important;
-            border-color: #2563eb !important;
-            color: #ffffff !important;
-        }
-
-        /* TOOLBAR BUTTONS */
-        html.dark-mode .toolbar-btn {
-            background: #334155 !important;
-            border-color: #475569 !important;
-            color: #e2e8f0 !important;
-        }
-
-        html.dark-mode .toolbar-btn:hover {
-            background: #475569 !important;
-        }
-
-        html.dark-mode .toolbar-select {
-            background: #334155 !important;
-            border-color: #475569 !important;
-            color: #ffffff !important;
-        }
-
-        /* QUICK ACTIONS */
-        html.dark-mode .quick-action {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        html.dark-mode .quick-action:hover {
-            background: #334155 !important;
-            border-color: #60a5fa !important;
-        }
-
-        html.dark-mode .quick-action span {
-            color: #e2e8f0 !important;
-        }
-
-        /* STUDY GROUPS */
-        html.dark-mode .group-card {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        html.dark-mode .group-name,
-        html.dark-mode .group-title {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .group-info,
-        html.dark-mode .group-desc,
-        html.dark-mode .group-description,
-        html.dark-mode .member-count {
-            color: #94a3b8 !important;
-        }
-
-        html.dark-mode .group-meta {
-            color: #64748b !important;
-        }
-
-        /* NOTES */
-        html.dark-mode .note-card,
-        html.dark-mode .note-list-item {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        html.dark-mode .note-title,
-        html.dark-mode .note-list-title {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .note-preview,
-        html.dark-mode .note-date,
-        html.dark-mode .note-course {
-            color: #94a3b8 !important;
-        }
-
-        html.dark-mode .editor-content {
-            background: #0f172a !important;
-            border-color: #334155 !important;
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .editor-toolbar {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        /* GPA CALCULATOR */
-        html.dark-mode .gpa-card,
-        html.dark-mode .semester-card {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        html.dark-mode .semester-header {
-            background: #334155 !important;
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .semester-gpa {
-            color: #22c55e !important;
-        }
-
-        html.dark-mode .course-row {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        html.dark-mode .course-name,
-        html.dark-mode .course-code {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .course-credits,
-        html.dark-mode .course-grade {
-            color: #e2e8f0 !important;
-        }
-
-        html.dark-mode .grade-input,
-        html.dark-mode .credits-input {
-            background: #334155 !important;
-            border-color: #475569 !important;
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .analysis-insights {
-            background: #334155 !important;
-        }
-
-        html.dark-mode .insight-text {
-            color: #e2e8f0 !important;
-        }
-
-        /* PROFILE */
-        html.dark-mode .profile-card,
-        html.dark-mode .profile-section {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        html.dark-mode .profile-name {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .profile-email,
-        html.dark-mode .profile-bio,
-        html.dark-mode .profile-info {
-            color: #94a3b8 !important;
-        }
-
-        html.dark-mode .profile-stat-value {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .profile-stat-label {
-            color: #94a3b8 !important;
-        }
-
-        html.dark-mode .info-label {
-            color: #64748b !important;
-        }
-
-        html.dark-mode .info-value {
-            color: #e2e8f0 !important;
-        }
-
-        /* FRIENDS */
-        html.dark-mode .friend-card {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        html.dark-mode .friend-name {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .friend-major,
-        html.dark-mode .friend-year,
-        html.dark-mode .friend-info,
-        html.dark-mode .friend-status {
-            color: #94a3b8 !important;
-        }
-
-        html.dark-mode .friend-actions button {
-            color: #e2e8f0 !important;
-        }
-
-        html.dark-mode .blocked-user-name {
-            color: #ffffff !important;
-        }
-
-        /* MESSAGES */
-        html.dark-mode .conversations-panel {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        html.dark-mode .conversations-header h2 {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .search-input {
-            background: #334155 !important;
-            border-color: #475569 !important;
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .conv-name {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .conv-preview,
-        html.dark-mode .conv-time {
-            color: #94a3b8 !important;
-        }
-
-        html.dark-mode .chat-panel {
-            background: #0f172a !important;
-        }
-
-        html.dark-mode .chat-header {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        html.dark-mode .chat-user-details h3 {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .chat-user-details span {
-            color: #94a3b8 !important;
-        }
-
-        html.dark-mode .chat-input-area {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        html.dark-mode .chat-input-wrapper {
-            background: #334155 !important;
-        }
-
-        html.dark-mode .chat-input {
-            color: #ffffff !important;
-            background: transparent !important;
-        }
-
-        html.dark-mode .chat-input::placeholder {
-            color: #94a3b8 !important;
-        }
-
-        html.dark-mode .reply-bar {
-            background: #334155 !important;
-            border-color: #475569 !important;
-        }
-
-        html.dark-mode .reply-bar-name {
-            color: #60a5fa !important;
-        }
-
-        html.dark-mode .reply-bar-text {
-            color: #94a3b8 !important;
-        }
-
-        html.dark-mode .message-actions {
-            background: #1e293b !important;
-            border: 1px solid #334155 !important;
-        }
-
-        html.dark-mode .message-action-btn {
-            color: #e2e8f0 !important;
-        }
-
-        html.dark-mode .message-action-btn:hover {
-            background: #334155 !important;
-        }
-
-        /* SCHEDULE PAGE SPECIFIC */
-        html.dark-mode .calendar-header {
-            background: #1e293b !important;
-        }
-
-        html.dark-mode .calendar-title {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .calendar-nav-btn {
-            background: #334155 !important;
-            color: #e2e8f0 !important;
-        }
-
-        html.dark-mode .calendar-nav-btn:hover {
-            background: #475569 !important;
-        }
-
-        html.dark-mode .day-header {
-            background: #334155 !important;
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .time-slot {
-            color: #94a3b8 !important;
-            border-color: #334155 !important;
-        }
-
-        html.dark-mode .calendar-event {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .event-title {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .event-time,
-        html.dark-mode .event-location {
-            color: rgba(255,255,255,0.8) !important;
-        }
-
-        /* TABS */
-        html.dark-mode .tabs-container {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        html.dark-mode .tab-btn {
-            color: #94a3b8 !important;
-        }
-
-        html.dark-mode .tab-btn:hover {
-            color: #e2e8f0 !important;
-        }
-
-        html.dark-mode .tab-btn.active {
-            color: #ffffff !important;
-            border-color: #2563eb !important;
-        }
-
-        /* ANNOUNCEMENTS & POPUPS */
-        html.dark-mode .announcement-popup {
-            background: #1e293b !important;
-        }
-
-        html.dark-mode .announcement-title {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .announcement-body {
-            background: #1e293b !important;
-        }
-
-        html.dark-mode .announcement-message {
-            color: #e2e8f0 !important;
-        }
-
-        html.dark-mode .announcement-time {
-            color: #94a3b8 !important;
-        }
-
-        /* NOTIFICATIONS MODAL */
-        html.dark-mode .notifications-modal {
-            background: #1e293b !important;
-        }
-
-        html.dark-mode .notification-item {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        html.dark-mode .notification-item:hover {
-            background: #334155 !important;
-        }
-
-        html.dark-mode .notification-title {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .notification-body {
-            color: #94a3b8 !important;
-        }
-
-        /* WELCOME MODAL */
-        html.dark-mode .welcome-modal {
-            background: #1e293b !important;
-        }
-
-        html.dark-mode .welcome-title {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .welcome-text {
-            color: #e2e8f0 !important;
-        }
-
-        /* LOADING STATES */
-        html.dark-mode .loading,
-        html.dark-mode .loading-spinner {
-            background: #0f172a !important;
-            color: #94a3b8 !important;
-        }
-
-        html.dark-mode .skeleton {
-            background: #334155 !important;
-        }
-
-        /* TOASTS */
-        html.dark-mode .toast {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-            color: #ffffff !important;
-        }
-
-        /* CONTEXT MENUS */
-        html.dark-mode .context-menu {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        html.dark-mode .context-menu-item {
-            color: #e2e8f0 !important;
-        }
-
-        html.dark-mode .context-menu-item:hover {
-            background: #334155 !important;
-        }
-
-        /* BADGES & PILLS */
-        html.dark-mode .category-badge,
-        html.dark-mode .course-badge,
-        html.dark-mode .tag {
-            background: #334155 !important;
-            color: #e2e8f0 !important;
-        }
-
-        /* FORM LABELS */
-        html.dark-mode .form-label {
-            color: #e2e8f0 !important;
-        }
-
-        html.dark-mode .form-group label {
-            color: #e2e8f0 !important;
-        }
-
-        html.dark-mode .form-hint {
-            color: #94a3b8 !important;
-        }
-
-        /* CARET COLOR */
-        html.dark-mode input,
-        html.dark-mode textarea {
-            caret-color: #60a5fa !important;
-        }
-
-        /* SCROLLBAR STYLING */
-        html.dark-mode ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        html.dark-mode ::-webkit-scrollbar-track {
-            background: #1e293b;
-        }
-
-        html.dark-mode ::-webkit-scrollbar-thumb {
-            background: #475569;
-            border-radius: 4px;
-        }
-
-        html.dark-mode ::-webkit-scrollbar-thumb:hover {
-            background: #64748b;
-        }
-
     </style>
     <!-- Primary Meta Tags -->
     <meta name="title" content="Dashboard - MyUB | University of Botswana Student Portal">
@@ -2829,9 +1896,6 @@
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1a365d">
-    
-    <!-- OneSignal SDK -->
-    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
     
     <!-- Canonical URL -->
     <link rel="canonical" href="https://www.myub.online/">
@@ -2906,12 +1970,12 @@
                     <h4>🐛 Found a Bug? Have Suggestions?</h4>
                     <p>We're constantly improving MyUB. Your feedback helps us make it better for everyone!</p>
                     <div class="contact-links">
-                        <a href="/cdn-cgi/l/email-protection#e583909190978c839c8180968c828b96a58288848c89cb868a88" class="contact-link">
+                        <a href="/cdn-cgi/l/email-protection#caacbfbebfb8a3acb3aeafb9a3ada4b98aada7aba3a6e4a9a5a7" class="contact-link">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
                                 <polyline points="22,6 12,13 2,6"/>
                             </svg>
-                            <span class="__cf_email__" data-cfemail="aaccdfdedfd8c3ccd3cecfd9c3cdc4d9eacdc7cbc3c684c9c5c7">[email&#160;protected]</span>
+                            <span class="__cf_email__" data-cfemail="690f1c1d1c1b000f100d0c1a000e071a290e04080005470a0604">[email&#160;protected]</span>
                         </a>
                         <a href="https://wa.me/26777783823" target="_blank" class="contact-link">
                             <svg viewBox="0 0 24 24" fill="currentColor">
@@ -4504,22 +3568,39 @@
             try {
                 if (!currentUser || !currentUser.id) return;
                 
+                // Check if service worker is supported
+                if (!('serviceWorker' in navigator)) {
+                    console.log('Service workers not supported');
+                    return;
+                }
+                
                 // Wait for OneSignal SDK to load
                 if (!window.OneSignal) {
                     console.log('OneSignal not loaded yet, waiting...');
-                    await new Promise(resolve => {
-                        if (window.OneSignal) resolve();
-                        else {
+                    await new Promise((resolve, reject) => {
+                        const timeout = setTimeout(() => {
+                            reject(new Error('OneSignal SDK load timeout'));
+                        }, 10000);
+                        
+                        if (window.OneSignal) {
+                            clearTimeout(timeout);
+                            resolve();
+                        } else {
                             window.OneSignalDeferred = window.OneSignalDeferred || [];
-                            OneSignalDeferred.push(resolve);
+                            OneSignalDeferred.push(() => {
+                                clearTimeout(timeout);
+                                resolve();
+                            });
                         }
                     });
                 }
                 
-                // Initialize OneSignal without problematic options
+                // Initialize OneSignal with service worker config
                 await window.OneSignal.init({
                     appId: "c5e50154-18dd-43ae-a347-220898d8f1e7",
                     allowLocalhostAsSecureOrigin: true,
+                    serviceWorkerParam: { scope: '/' },
+                    serviceWorkerPath: 'OneSignalSDKWorker.js',
                     notifyButton: {
                         enable: false
                     }

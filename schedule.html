@@ -2571,7 +2571,7 @@
             loadSidebarBadges();
             setupRealtimeSubscriptions(); // Setup real-time subscriptions
             startNotificationPolling(); // Poll for notifications as fallback
-            if (localStorage.getItem('darkMode') === 'true') document.body.classList.add('dark-mode');
+            if (localStorage.getItem('myub_darkMode') === 'true') document.body.classList.add('dark-mode');
             const loadingScreen = document.getElementById('loadingScreen');
             if (loadingScreen) loadingScreen.style.display = 'none';
             
@@ -3069,7 +3069,7 @@
         function showFriendOnlineToast(name) { const t = document.getElementById('friendOnlineToast'); document.getElementById('friendOnlineName').textContent = `${name} is now online`; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 4000); }
         function toggleNotifications(e) { e.stopPropagation(); document.getElementById('notificationDropdown').classList.toggle('show'); }
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
-        function toggleDarkMode() { document.body.classList.toggle('dark-mode'); localStorage.setItem('darkMode', document.body.classList.contains('dark-mode')); }
+        function toggleDarkMode() { document.body.classList.toggle('dark-mode'); localStorage.setItem('myub_darkMode', document.body.classList.contains('dark-mode')); }
         function logout() { supabaseClient.auth.signOut().then(() => location.href = 'index.html'); }
         function showToast(msg, type = '') { const t = document.getElementById('toast'); t.textContent = msg; t.className = 'toast show ' + type; setTimeout(() => t.classList.remove('show'), 3000); }
         function escapeHtml(str) { if (!str) return ''; const div = document.createElement('div'); div.textContent = str; return div.innerHTML; }

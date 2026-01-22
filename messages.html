@@ -127,8 +127,8 @@
         .nav-item .badge { margin-left: auto; background: var(--red); color: var(--white); font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
         .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; }
         .main-content { margin-left: 260px; height: 100vh; display: flex; flex-direction: column; }
-        .messages-container { display: flex; flex: 1; overflow: hidden; position: relative; }
-        .conversations-panel { width: 360px; background: var(--white); border-right: 1px solid var(--gray-200); display: flex; flex-direction: column; flex-shrink: 0; overflow: hidden; }
+        .messages-container { display: flex; flex: 1; overflow: visible; position: relative; }
+        .conversations-panel { width: 360px; background: var(--white); border-right: 1px solid var(--gray-200); display: flex; flex-direction: column; flex-shrink: 0; overflow: visible; }
         .conversations-header { padding: 20px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 50; }
         .conversations-header h2 { font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 700; color: var(--gray-800); }
         .new-chat-btn { width: 36px; height: 36px; border: none; background: var(--navy); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
@@ -356,7 +356,7 @@
         .icon-btn { position: relative; width: 40px; height: 40px; border-radius: 10px; border: none; background: var(--gray-100); cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .icon-btn svg { width: 20px; height: 20px; color: var(--gray-600); }
         .notification-badge { position: absolute; top: -4px; right: -4px; background: var(--red); color: var(--white); font-size: 10px; font-weight: 700; min-width: 18px; height: 18px; border-radius: 9px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--white); }
-        .notification-wrapper { position: relative; }
+        .notification-wrapper { position: relative; z-index: 100; }
         .notification-dropdown { position: absolute; top: calc(100% + 8px); right: 0; width: 360px; max-height: 480px; background: var(--white); border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.2s; z-index: 2000; overflow: hidden; }
         .notification-dropdown.show { opacity: 1; visibility: visible; transform: translateY(0); }
         .notif-dropdown-header { padding: 16px 20px; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center; }

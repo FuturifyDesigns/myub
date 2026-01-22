@@ -1158,6 +1158,40 @@
             background: #0a0f1a !important;
         }
 
+        /* Sidebar Logo - Keep white background like dashboard */
+        html.dark-mode .sidebar .sidebar-logo,
+        html.dark-mode .sidebar-logo {
+            background: #ffffff !important;
+            background-color: #ffffff !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+        }
+
+        html.dark-mode .sidebar-logo .sidebar-logo-m,
+        html.dark-mode .sidebar-logo-m {
+            color: #1a365d !important;
+            -webkit-text-fill-color: #1a365d !important;
+        }
+
+        html.dark-mode .sidebar-logo .sidebar-logo-yub,
+        html.dark-mode .sidebar-logo-yub {
+            color: #1a365d !important;
+            -webkit-text-fill-color: #1a365d !important;
+        }
+
+        html.dark-mode .sidebar-logo-cap polygon,
+        html.dark-mode .sidebar-logo-cap rect {
+            fill: #1a365d !important;
+        }
+
+        html.dark-mode .sidebar-logo-cap .tassel circle,
+        html.dark-mode .sidebar-logo-cap .tassel ellipse {
+            fill: #c41e3a !important;
+        }
+
+        html.dark-mode .sidebar-logo-cap .tassel path {
+            stroke: #c41e3a !important;
+        }
+
         html.dark-mode .main-content {
             background: #0f172a !important;
         }
@@ -1220,12 +1254,12 @@
             border-color: #334155 !important;
         }
 
-        /* LINKS - BRIGHT BLUE */
-        html.dark-mode a {
+        /* LINKS - BRIGHT BLUE (exclude sidebar elements) */
+        html.dark-mode a:not(.sidebar-logo):not(.nav-item) {
             color: #60a5fa !important;
         }
 
-        html.dark-mode a:hover {
+        html.dark-mode a:hover:not(.sidebar-logo):not(.nav-item) {
             color: #93c5fd !important;
         }
 

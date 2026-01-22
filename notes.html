@@ -801,6 +801,116 @@
             border-color: #60a5fa !important;
         }
 
+        /* Edit Note Modal - Fix contenteditable white background */
+        body.dark-mode #editNoteModal .modal {
+            background: #1e293b !important;
+        }
+
+        body.dark-mode #editNoteModal .modal-header {
+            background: #334155 !important;
+        }
+
+        body.dark-mode #editNoteModal .modal-body {
+            background: #1e293b !important;
+        }
+
+        body.dark-mode #editNoteModal label {
+            color: #e2e8f0 !important;
+        }
+
+        body.dark-mode #editNoteTitle {
+            background: #334155 !important;
+            border-color: #475569 !important;
+            color: #ffffff !important;
+            caret-color: #ffffff !important;
+        }
+
+        body.dark-mode #editNoteContent {
+            background: #0f172a !important;
+            border-color: #475569 !important;
+            color: #ffffff !important;
+            caret-color: #ffffff !important;
+        }
+
+        body.dark-mode #editNoteContent:focus {
+            border-color: #60a5fa !important;
+        }
+
+        body.dark-mode #editNoteModal .modal-footer {
+            background: #1e293b !important;
+            border-top-color: #334155 !important;
+        }
+
+        /* View Note Modal */
+        body.dark-mode #viewNoteModal .modal {
+            background: #1e293b !important;
+        }
+
+        body.dark-mode #viewNoteModal .modal-header {
+            background: #334155 !important;
+        }
+
+        body.dark-mode #viewNoteContent {
+            background: #0f172a !important;
+            color: #e2e8f0 !important;
+        }
+
+        body.dark-mode #viewNoteModal .modal-footer {
+            background: #1e293b !important;
+            border-top-color: #334155 !important;
+        }
+
+        body.dark-mode #viewNoteTimestamp {
+            color: #94a3b8 !important;
+        }
+
+        /* Color Picker - Make active border visible in dark mode */
+        body.dark-mode .color-picker {
+            background: transparent !important;
+        }
+
+        body.dark-mode .color-option {
+            border-color: transparent !important;
+        }
+
+        body.dark-mode .color-option.active {
+            border-color: #ffffff !important;
+            box-shadow: 0 0 0 2px #60a5fa !important;
+        }
+
+        body.dark-mode .color-option.default {
+            background: #475569 !important;
+        }
+
+        body.dark-mode .color-option:hover {
+            box-shadow: 0 0 0 2px #94a3b8 !important;
+        }
+
+        /* Note Card Color Borders - Ensure visibility in dark mode */
+        body.dark-mode .note-card.color-blue { border-left-color: #3b82f6 !important; }
+        body.dark-mode .note-card.color-green { border-left-color: #22c55e !important; }
+        body.dark-mode .note-card.color-yellow { border-left-color: #eab308 !important; }
+        body.dark-mode .note-card.color-orange { border-left-color: #f97316 !important; }
+        body.dark-mode .note-card.color-red { border-left-color: #ef4444 !important; }
+        body.dark-mode .note-card.color-purple { border-left-color: #8b5cf6 !important; }
+        body.dark-mode .note-card.color-pink { border-left-color: #ec4899 !important; }
+
+        body.dark-mode .note-list-item.color-blue { border-left-color: #3b82f6 !important; }
+        body.dark-mode .note-list-item.color-green { border-left-color: #22c55e !important; }
+        body.dark-mode .note-list-item.color-yellow { border-left-color: #eab308 !important; }
+        body.dark-mode .note-list-item.color-orange { border-left-color: #f97316 !important; }
+        body.dark-mode .note-list-item.color-red { border-left-color: #ef4444 !important; }
+        body.dark-mode .note-list-item.color-purple { border-left-color: #8b5cf6 !important; }
+        body.dark-mode .note-list-item.color-pink { border-left-color: #ec4899 !important; }
+
+        /* Highlight picker in toolbar */
+        body.dark-mode .highlight-picker {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+            border-color: #60a5fa !important;
+        }
+
         /* View Toggle & Filter */
         body.dark-mode .view-toggle {
             background: #1e293b !important;
@@ -1920,7 +2030,7 @@
                 </div>
                 <div class="form-group" style="margin-top:16px;">
                     <label style="display:block;margin-bottom:8px;font-weight:500;color:var(--gray-700);">Content</label>
-                    <div id="editNoteContent" contenteditable="true" style="width:100%;min-height:300px;padding:16px;border:1px solid var(--gray-300);border-radius:8px;font-size:15px;line-height:1.6;background:white;" data-placeholder="Enter note content..."></div>
+                    <div id="editNoteContent" contenteditable="true" style="width:100%;min-height:300px;padding:16px;border:1px solid var(--gray-300);border-radius:8px;font-size:15px;line-height:1.6;" data-placeholder="Enter note content..."></div>
                 </div>
             </div>
             <div class="modal-footer" style="border-top:1px solid var(--gray-200);padding-top:16px;">

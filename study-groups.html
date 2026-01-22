@@ -1,8 +1,39 @@
+
+        /* ========== SMOOTH PAGE TRANSITIONS ========== */
+        /* Page fade-in on load */
+        body {
+            animation: fadeIn 0.15s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Smooth transition on navigation */
+        body.page-transitioning {
+            opacity: 0;
+            transition: opacity 0.1s ease-out;
+        }
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content, maximum-scale=1.0, user-scalable=no">
+    <script>
+        // Instant dark mode loading - prevents flash
+        (function() {
+            const darkMode = localStorage.getItem('myub_darkMode') === 'true';
+            if (darkMode) {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
     <title>Study Groups - MyUB</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
@@ -1356,7 +1387,7 @@
                 startHeartbeat();
                 startNotificationPolling(); // Poll for notifications as fallback
                 
-                if (localStorage.getItem('myub_darkMode') === 'true') document.body.classList.add('dark-mode');
+                if (localStorage.getItem('myub_darkMode') === 'true') document.documentElement.classList.add(\'dark-mode\');
                 document.addEventListener('click', handleOutsideClick);
                 window.addEventListener('beforeunload', function() { updateOnlineStatus(false); });
                 
@@ -3777,7 +3808,38 @@
         if (window.currentUser && window.supabaseClient && window.MyUBHeartbeat) {
             MyUBHeartbeat.start(supabaseClient, currentUser);
         }
-    </script>
+    
+        // ========== SMOOTH PAGE TRANSITIONS ==========
+        // Intercept navigation clicks for smooth transitions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get all navigation links
+            const navLinks = document.querySelectorAll('a.nav-item[href], a.quick-action[href], a.card-action[href]');
+            
+            navLinks.forEach(link => {
+                // Skip external links and logout
+                if (link.href && !link.href.includes('javascript:') && !link.onclick) {
+                    link.addEventListener('click', function(e) {
+                        const targetUrl = this.href;
+                        
+                        // Only intercept same-origin links
+                        if (targetUrl && targetUrl.startsWith(window.location.origin)) {
+                            e.preventDefault();
+                            
+                            // Add transition class
+                            document.body.classList.add('page-transitioning');
+                            
+                            // Navigate after brief transition
+                            setTimeout(() => {
+                                window.location.href = targetUrl;
+                            }, 100);
+                        }
+                    });
+                }
+            });
+        });
+
+
+        </script>
 
     <!-- PWA Service Worker Registration -->
     <!-- OneSignal handles service worker registration -->

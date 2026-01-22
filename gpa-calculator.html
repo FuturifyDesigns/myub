@@ -1,8 +1,39 @@
+
+        /* ========== SMOOTH PAGE TRANSITIONS ========== */
+        /* Page fade-in on load */
+        body {
+            animation: fadeIn 0.15s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Smooth transition on navigation */
+        body.page-transitioning {
+            opacity: 0;
+            transition: opacity 0.1s ease-out;
+        }
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content, maximum-scale=1.0, user-scalable=no">
+    <script>
+        // Instant dark mode loading - prevents flash
+        (function() {
+            const darkMode = localStorage.getItem('myub_darkMode') === 'true';
+            if (darkMode) {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
     <title>GPA Calculator - MyUB</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -434,15 +465,36 @@
         @keyframes spin { to { transform: rotate(360deg); } }
 
         /* ========== DARK MODE ========== */
-        body.dark-mode { --gray-50: #1e293b; --gray-100: #0f172a; --gray-200: #1e293b; --gray-300: #334155; --gray-400: #64748b; --gray-500: #94a3b8; --gray-600: #cbd5e1; --gray-700: #e2e8f0; --gray-800: #f1f5f9; }
-        body.dark-mode .sidebar { background: #0a0f1a; }
-        body.dark-mode .topbar { background: var(--gray-200); border-bottom-color: var(--gray-300); }
-        body.dark-mode .card, body.dark-mode .summary-card, body.dark-mode .semester-section { background: var(--gray-200); }
-        body.dark-mode .semester-header { background: var(--gray-300); }
-        body.dark-mode .modal { background: var(--gray-200); }
-        body.dark-mode .tabs { background: var(--gray-300); }
-        body.dark-mode .tab.active { background: var(--gray-200); }
-        body.dark-mode .form-group input, body.dark-mode .form-group select { background: var(--gray-300); border-color: var(--gray-300); color: var(--gray-800); }
+        html.dark-mode { --gray-50: #1e293b; --gray-100: #0f172a; --gray-200: #1e293b; --gray-300: #334155; --gray-400: #64748b; --gray-500: #94a3b8; --gray-600: #cbd5e1; --gray-700: #e2e8f0; --gray-800: #f1f5f9; }
+        html.dark-mode .sidebar { background: #0a0f1a; }
+        html.dark-mode .nav-section-title {
+            color: #94a3b8 !important;
+        }
+
+        html.dark-mode .nav-item {
+            color: #cbd5e1 !important;
+        }
+
+        html.dark-mode .nav-item:hover {
+            background: rgba(255,255,255,0.1) !important;
+            color: #ffffff !important;
+        }
+
+        html.dark-mode .nav-item.active {
+            background: rgba(255,255,255,0.15) !important;
+            color: #ffffff !important;
+        }
+
+        html.dark-mode .nav-item svg {
+            color: inherit;
+        }
+        html.dark-mode .topbar { background: var(--gray-200); border-bottom-color: var(--gray-300); }
+        html.dark-mode .card, html.dark-mode .summary-card, html.dark-mode .semester-section { background: var(--gray-200); }
+        html.dark-mode .semester-header { background: var(--gray-300); }
+        html.dark-mode .modal { background: var(--gray-200); }
+        html.dark-mode .tabs { background: var(--gray-300); }
+        html.dark-mode .tab.active { background: var(--gray-200); }
+        html.dark-mode .form-group input, html.dark-mode .form-group select { background: var(--gray-300); border-color: var(--gray-300); color: var(--gray-800); }
         
         /* Admin Announcement Popup */
         .announcement-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 10000; animation: fadeIn 0.3s ease; padding: 20px; }
@@ -1124,7 +1176,7 @@
             subscribeToNotifications(); // Setup real-time subscriptions
             startNotificationPolling(); // Poll for notifications as fallback
             
-            if (localStorage.getItem('myub_darkMode') === 'true') document.body.classList.add('dark-mode');
+            if (localStorage.getItem('myub_darkMode') === 'true') document.documentElement.classList.add(\'dark-mode\');
             document.getElementById('loadingState').style.display = 'none';
             document.getElementById('mainContent').style.display = 'block';
             validateWeights('ca'); // Initialize predictor
@@ -2100,7 +2152,38 @@
         if (window.MyUBCalls) {
             MyUBCalls.init(supabaseClient);
         }
-    </script>
+    
+        // ========== SMOOTH PAGE TRANSITIONS ==========
+        // Intercept navigation clicks for smooth transitions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get all navigation links
+            const navLinks = document.querySelectorAll('a.nav-item[href], a.quick-action[href], a.card-action[href]');
+            
+            navLinks.forEach(link => {
+                // Skip external links and logout
+                if (link.href && !link.href.includes('javascript:') && !link.onclick) {
+                    link.addEventListener('click', function(e) {
+                        const targetUrl = this.href;
+                        
+                        // Only intercept same-origin links
+                        if (targetUrl && targetUrl.startsWith(window.location.origin)) {
+                            e.preventDefault();
+                            
+                            // Add transition class
+                            document.body.classList.add('page-transitioning');
+                            
+                            // Navigate after brief transition
+                            setTimeout(() => {
+                                window.location.href = targetUrl;
+                            }, 100);
+                        }
+                    });
+                }
+            });
+        });
+
+
+        </script>
 
 
 

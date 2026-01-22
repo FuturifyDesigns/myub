@@ -1,8 +1,39 @@
+
+        /* ========== SMOOTH PAGE TRANSITIONS ========== */
+        /* Page fade-in on load */
+        body {
+            animation: fadeIn 0.15s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Smooth transition on navigation */
+        body.page-transitioning {
+            opacity: 0;
+            transition: opacity 0.1s ease-out;
+        }
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content, maximum-scale=1.0, user-scalable=no">
+    <script>
+        // Instant dark mode loading - prevents flash
+        (function() {
+            const darkMode = localStorage.getItem('myub_darkMode') === 'true';
+            if (darkMode) {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
     <title>Dashboard - MyUB</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1113,7 +1144,7 @@
         }
 
         /* ========== DARK MODE ========== */
-        body.dark-mode {
+        html.dark-mode {
             --gray-50: #1e293b;
             --gray-100: #0f172a;
             --gray-200: #1e293b;
@@ -1125,115 +1156,136 @@
             --gray-800: #f1f5f9;
         }
 
-        body.dark-mode .sidebar {
+        html.dark-mode .sidebar {
             background: #0a0f1a;
         }
+        html.dark-mode .nav-section-title {
+            color: #94a3b8 !important;
+        }
 
-        body.dark-mode .main-content {
+        html.dark-mode .nav-item {
+            color: #cbd5e1 !important;
+        }
+
+        html.dark-mode .nav-item:hover {
+            background: rgba(255,255,255,0.1) !important;
+            color: #ffffff !important;
+        }
+
+        html.dark-mode .nav-item.active {
+            background: rgba(255,255,255,0.15) !important;
+            color: #ffffff !important;
+        }
+
+        html.dark-mode .nav-item svg {
+            color: inherit;
+        }
+
+        html.dark-mode .main-content {
             background: var(--gray-100);
         }
 
-        body.dark-mode .topbar {
+        html.dark-mode .topbar {
             background: var(--gray-200);
             border-bottom-color: var(--gray-300);
         }
 
-        body.dark-mode .page-title {
+        html.dark-mode .page-title {
             color: var(--gray-800);
         }
 
-        body.dark-mode .search-box {
+        html.dark-mode .search-box {
             background: var(--gray-300);
         }
 
-        body.dark-mode .search-box input {
+        html.dark-mode .search-box input {
             color: var(--gray-700);
         }
 
-        body.dark-mode .icon-btn {
+        html.dark-mode .icon-btn {
             background: var(--gray-300);
         }
 
-        body.dark-mode .icon-btn svg {
+        html.dark-mode .icon-btn svg {
             color: var(--gray-500);
         }
 
-        body.dark-mode .user-name {
+        html.dark-mode .user-name {
             color: var(--gray-800);
         }
 
-        body.dark-mode .user-dropdown {
+        html.dark-mode .user-dropdown {
             background: var(--gray-200);
             border-color: var(--gray-300);
         }
 
-        body.dark-mode .dropdown-header {
+        html.dark-mode .dropdown-header {
             background: var(--gray-300);
             border-bottom-color: var(--gray-300);
         }
 
-        body.dark-mode .dropdown-user-name {
+        html.dark-mode .dropdown-user-name {
             color: var(--gray-800);
         }
 
-        body.dark-mode .dropdown-item {
+        html.dark-mode .dropdown-item {
             color: var(--gray-600);
         }
 
-        body.dark-mode .dropdown-item:hover {
+        html.dark-mode .dropdown-item:hover {
             background: var(--gray-300);
             color: var(--gray-700);
         }
 
-        body.dark-mode .dropdown-divider {
+        html.dark-mode .dropdown-divider {
             background: var(--gray-300);
         }
 
-        body.dark-mode .card,
-        body.dark-mode .stat-card {
+        html.dark-mode .card,
+        html.dark-mode .stat-card {
             background: var(--gray-200);
         }
 
-        body.dark-mode .card-title,
-        body.dark-mode .stat-info h3 {
+        html.dark-mode .card-title,
+        html.dark-mode .stat-info h3 {
             color: var(--gray-800);
         }
 
-        body.dark-mode .welcome-banner {
+        html.dark-mode .welcome-banner {
             background: linear-gradient(135deg, #0f172a 0%, var(--navy) 100%);
         }
 
-        body.dark-mode .quick-action {
+        html.dark-mode .quick-action {
             background: var(--gray-300);
         }
 
-        body.dark-mode .quick-action:hover {
+        html.dark-mode .quick-action:hover {
             background: var(--gray-200);
             border-color: var(--navy-light);
         }
 
-        body.dark-mode .quick-action span {
+        html.dark-mode .quick-action span {
             color: var(--gray-600);
         }
 
-        body.dark-mode .schedule-item {
+        html.dark-mode .schedule-item {
             background: var(--gray-300);
         }
 
-        body.dark-mode .schedule-time .time,
-        body.dark-mode .schedule-details h4 {
+        html.dark-mode .schedule-time .time,
+        html.dark-mode .schedule-details h4 {
             color: var(--gray-800);
         }
 
-        body.dark-mode .gpa-value {
+        html.dark-mode .gpa-value {
             color: var(--gray-800);
         }
 
-        body.dark-mode .gpa-circle::before {
+        html.dark-mode .gpa-circle::before {
             background: var(--gray-200);
         }
 
-        body.dark-mode .loading {
+        html.dark-mode .loading {
             background: var(--gray-100);
         }
 
@@ -1871,12 +1923,12 @@
                     <h4>🐛 Found a Bug? Have Suggestions?</h4>
                     <p>We're constantly improving MyUB. Your feedback helps us make it better for everyone!</p>
                     <div class="contact-links">
-                        <a href="mailto:futurifydesigns@gmail.com" class="contact-link">
+                        <a href="/cdn-cgi/l/email-protection#9bfdeeefeee9f2fde2fffee8f2fcf5e8dbfcf6faf2f7b5f8f4f6" class="contact-link">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
                                 <polyline points="22,6 12,13 2,6"/>
                             </svg>
-                            futurifydesigns@gmail.com
+                            <span class="__cf_email__" data-cfemail="f89e8d8c8d8a919e819c9d8b919f968bb89f95999194d69b9795">[email&#160;protected]</span>
                         </a>
                         <a href="https://wa.me/26777783823" target="_blank" class="contact-link">
                             <svg viewBox="0 0 24 24" fill="currentColor">
@@ -2274,7 +2326,38 @@
         </div>
     </div>
 
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js">
+        // ========== SMOOTH PAGE TRANSITIONS ==========
+        // Intercept navigation clicks for smooth transitions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get all navigation links
+            const navLinks = document.querySelectorAll('a.nav-item[href], a.quick-action[href], a.card-action[href]');
+            
+            navLinks.forEach(link => {
+                // Skip external links and logout
+                if (link.href && !link.href.includes('javascript:') && !link.onclick) {
+                    link.addEventListener('click', function(e) {
+                        const targetUrl = this.href;
+                        
+                        // Only intercept same-origin links
+                        if (targetUrl && targetUrl.startsWith(window.location.origin)) {
+                            e.preventDefault();
+                            
+                            // Add transition class
+                            document.body.classList.add('page-transitioning');
+                            
+                            // Navigate after brief transition
+                            setTimeout(() => {
+                                window.location.href = targetUrl;
+                            }, 100);
+                        }
+                    });
+                }
+            });
+        });
+
+
+        </script><script>
         // Supabase
         const SUPABASE_URL = 'https://weuxtwmaqmbhskjpjdyi.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndldXh0d21hcW1iaHNranBqZHlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NTYzMTcsImV4cCI6MjA4MDMzMjMxN30.J-0Nd0MY6-g_ltbBNHwOulqZuQfb8mKIRgx0dAaJ76o';
@@ -2527,7 +2610,7 @@
             document.getElementById('soundToggle').classList.toggle('active', sound);
             
             if (darkMode) {
-                document.body.classList.add('dark-mode');
+                document.documentElement.classList.add(\'dark-mode\');
             }
         }
 
@@ -3571,16 +3654,4 @@
         window.manuallyEnableNotifications = async function() {
             try {
                 if (!window.OneSignal) {
-                    console.log('OneSignal not loaded');
-                    return;
-                }
-                await OneSignal.Slidedown.promptPush();
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        };
-        
-    </script>
-
-</body>
-</html>
+                    console.log('OneSignal not

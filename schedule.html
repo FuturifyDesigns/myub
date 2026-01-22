@@ -1,8 +1,39 @@
+
+        /* ========== SMOOTH PAGE TRANSITIONS ========== */
+        /* Page fade-in on load */
+        body {
+            animation: fadeIn 0.15s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Smooth transition on navigation */
+        body.page-transitioning {
+            opacity: 0;
+            transition: opacity 0.1s ease-out;
+        }
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content, maximum-scale=1.0, user-scalable=no">
+    <script>
+        // Instant dark mode loading - prevents flash
+        (function() {
+            const darkMode = localStorage.getItem('myub_darkMode') === 'true';
+            if (darkMode) {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
     <title>Schedule - MyUB</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -318,18 +349,39 @@
         .empty-state h3 { font-size: 18px; font-weight: 600; color: var(--gray-600); margin-bottom: 8px; }
 
         /* Dark Mode */
-        body.dark-mode { background: #0f172a; }
-        body.dark-mode .sidebar { background: #020617; }
-        body.dark-mode .topbar, body.dark-mode .calendar-container, body.dark-mode .upcoming-sidebar, body.dark-mode .modal { background: #1e293b; border-color: #334155; }
-        body.dark-mode .page-title, body.dark-mode .current-date, body.dark-mode .day-number, body.dark-mode .upcoming-item-content h4, body.dark-mode .list-event-details h4 { color: var(--gray-100); }
-        body.dark-mode .calendar-cell { border-color: #334155; }
-        body.dark-mode .calendar-header, body.dark-mode .week-header, body.dark-mode .list-day-header { background: #0f172a; }
-        body.dark-mode .view-toggle, body.dark-mode .date-nav button, body.dark-mode .today-btn { background: #334155; border-color: #475569; color: var(--gray-300); }
-        body.dark-mode .icon-btn { background: #334155; }
-        body.dark-mode .form-group input, body.dark-mode .form-group select, body.dark-mode .form-group textarea { background: #0f172a; border-color: #334155; color: var(--gray-100); }
-        body.dark-mode .notification-dropdown { background: #1e293b; }
-        body.dark-mode .notif-dropdown-header, body.dark-mode .notif-dropdown-footer { border-color: #334155; }
-        body.dark-mode .notif-content h5 { color: var(--gray-100); }
+        html.dark-mode { background: #0f172a; }
+        html.dark-mode .sidebar { background: #020617; }
+        html.dark-mode .nav-section-title {
+            color: #94a3b8 !important;
+        }
+
+        html.dark-mode .nav-item {
+            color: #cbd5e1 !important;
+        }
+
+        html.dark-mode .nav-item:hover {
+            background: rgba(255,255,255,0.1) !important;
+            color: #ffffff !important;
+        }
+
+        html.dark-mode .nav-item.active {
+            background: rgba(255,255,255,0.15) !important;
+            color: #ffffff !important;
+        }
+
+        html.dark-mode .nav-item svg {
+            color: inherit;
+        }
+        html.dark-mode .topbar, html.dark-mode .calendar-container, html.dark-mode .upcoming-sidebar, html.dark-mode .modal { background: #1e293b; border-color: #334155; }
+        html.dark-mode .page-title, html.dark-mode .current-date, html.dark-mode .day-number, html.dark-mode .upcoming-item-content h4, html.dark-mode .list-event-details h4 { color: var(--gray-100); }
+        html.dark-mode .calendar-cell { border-color: #334155; }
+        html.dark-mode .calendar-header, html.dark-mode .week-header, html.dark-mode .list-day-header { background: #0f172a; }
+        html.dark-mode .view-toggle, html.dark-mode .date-nav button, html.dark-mode .today-btn { background: #334155; border-color: #475569; color: var(--gray-300); }
+        html.dark-mode .icon-btn { background: #334155; }
+        html.dark-mode .form-group input, html.dark-mode .form-group select, html.dark-mode .form-group textarea { background: #0f172a; border-color: #334155; color: var(--gray-100); }
+        html.dark-mode .notification-dropdown { background: #1e293b; }
+        html.dark-mode .notif-dropdown-header, html.dark-mode .notif-dropdown-footer { border-color: #334155; }
+        html.dark-mode .notif-content h5 { color: var(--gray-100); }
 
         /* Responsive */
         @media (max-width: 1200px) { 
@@ -962,7 +1014,7 @@
             loadSidebarBadges();
             setupRealtimeSubscriptions(); // Setup real-time subscriptions
             startNotificationPolling(); // Poll for notifications as fallback
-            if (localStorage.getItem('darkMode') === 'true') document.body.classList.add('dark-mode');
+            if (localStorage.getItem('darkMode') === 'true') document.documentElement.classList.add(\'dark-mode\');
             const loadingScreen = document.getElementById('loadingScreen');
             if (loadingScreen) loadingScreen.style.display = 'none';
             
@@ -1460,7 +1512,7 @@
         function showFriendOnlineToast(name) { const t = document.getElementById('friendOnlineToast'); document.getElementById('friendOnlineName').textContent = `${name} is now online`; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 4000); }
         function toggleNotifications(e) { e.stopPropagation(); document.getElementById('notificationDropdown').classList.toggle('show'); }
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
-        function toggleDarkMode() { document.body.classList.toggle('dark-mode'); localStorage.setItem('darkMode', document.body.classList.contains('dark-mode')); }
+        function toggleDarkMode() { document.documentElement.classList.toggle(\'dark-mode\'); localStorage.setItem('darkMode', document.documentElement.classList.contains(\'dark-mode\')); }
         function logout() { supabaseClient.auth.signOut().then(() => location.href = 'index.html'); }
         function showToast(msg, type = '') { const t = document.getElementById('toast'); t.textContent = msg; t.className = 'toast show ' + type; setTimeout(() => t.classList.remove('show'), 3000); }
         function escapeHtml(str) { if (!str) return ''; const div = document.createElement('div'); div.textContent = str; return div.innerHTML; }
@@ -1475,7 +1527,38 @@
         if (window.MyUBCalls) {
             MyUBCalls.init(supabaseClient);
         }
-    </script>
+    
+        // ========== SMOOTH PAGE TRANSITIONS ==========
+        // Intercept navigation clicks for smooth transitions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get all navigation links
+            const navLinks = document.querySelectorAll('a.nav-item[href], a.quick-action[href], a.card-action[href]');
+            
+            navLinks.forEach(link => {
+                // Skip external links and logout
+                if (link.href && !link.href.includes('javascript:') && !link.onclick) {
+                    link.addEventListener('click', function(e) {
+                        const targetUrl = this.href;
+                        
+                        // Only intercept same-origin links
+                        if (targetUrl && targetUrl.startsWith(window.location.origin)) {
+                            e.preventDefault();
+                            
+                            // Add transition class
+                            document.body.classList.add('page-transitioning');
+                            
+                            // Navigate after brief transition
+                            setTimeout(() => {
+                                window.location.href = targetUrl;
+                            }, 100);
+                        }
+                    });
+                }
+            });
+        });
+
+
+        </script>
 
 
 

@@ -622,11 +622,11 @@
         }
 
         /* LINKS - BRIGHT BLUE */
-        body.dark-mode a {
+        body.dark-mode a:not(.sidebar-logo) {
             color: #60a5fa !important;
         }
 
-        body.dark-mode a:hover {
+        body.dark-mode a:hover:not(.sidebar-logo) {
             color: #93c5fd !important;
         }
 
@@ -1574,12 +1574,16 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
         }
 
+        body.dark-mode .sidebar-logo .sidebar-logo-m,
         body.dark-mode .sidebar-logo-m {
             color: #1a365d !important;
+            -webkit-text-fill-color: #1a365d !important;
         }
 
+        body.dark-mode .sidebar-logo .sidebar-logo-yub,
         body.dark-mode .sidebar-logo-yub {
             color: #1a365d !important;
+            -webkit-text-fill-color: #1a365d !important;
         }
 
         body.dark-mode .sidebar-logo-cap polygon,

@@ -3490,13 +3490,20 @@
                 }
                 
                 // Notify group admin (in-app)
-                await supabaseClient.from('notifications').insert({
+                var notifResult = await supabaseClient.from('notifications').insert({
                     user_id: group.creator_id,
                     title: 'Join Request',
+                    body: userName + ' wants to join ' + group.name,
                     message: userName + ' wants to join ' + group.name,
                     type: 'group_join_request',
                     reference_id: groupId + ':' + currentUser.id
                 });
+                
+                if (notifResult.error) {
+                    console.error('Failed to create in-app notification:', notifResult.error);
+                } else {
+                    console.log('In-app notification created successfully for user:', group.creator_id);
+                }
                 
                 showToast('Request sent!', 'success');
                 await loadDiscoverGroups();

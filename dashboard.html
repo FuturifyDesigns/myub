@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content, maximum-scale=1.0, user-scalable=no">
     <title>Dashboard - MyUB</title>
+    <link rel="icon" type="image/png" sizes="48x48" href="favicon-48x48.png">
+    <link rel="shortcut icon" href="favicon-48x48.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
@@ -1756,6 +1758,421 @@
             0%, 100% { opacity: 0.5; }
             50% { opacity: 0.8; }
         }
+    
+
+        /* ========== COMPREHENSIVE DARK MODE ========== */
+        html.dark-mode {
+            --gray-50: #0f172a;
+            --gray-100: #1e293b;
+            --gray-200: #334155;
+            --gray-300: #475569;
+            --gray-400: #64748b;
+            --gray-500: #94a3b8;
+            --gray-600: #cbd5e1;
+            --gray-700: #e2e8f0;
+            --gray-800: #f1f5f9;
+            --white: #ffffff;
+        }
+
+        /* Background colors - everything dark */
+        html.dark-mode body {
+            background: #0f172a !important;
+            color: #e2e8f0 !important;
+        }
+
+        html.dark-mode .sidebar {
+            background: #0a0f1a !important;
+        }
+
+        html.dark-mode .main-content {
+            background: #0f172a !important;
+        }
+
+        /* Topbar */
+        html.dark-mode .topbar {
+            background: #1e293b !important;
+            border-bottom-color: #334155 !important;
+        }
+
+        html.dark-mode .page-title {
+            color: #f1f5f9 !important;
+        }
+
+        /* Search */
+        html.dark-mode .search-box {
+            background: #334155 !important;
+        }
+
+        html.dark-mode .search-box input {
+            color: #f1f5f9 !important;
+            background: transparent !important;
+        }
+
+        html.dark-mode .search-box input::placeholder {
+            color: #94a3b8 !important;
+        }
+
+        /* Sidebar Navigation - BRIGHT TEXT */
+        html.dark-mode .nav-section-title {
+            color: #94a3b8 !important;
+        }
+
+        html.dark-mode .nav-item {
+            color: #e2e8f0 !important;
+        }
+
+        html.dark-mode .nav-item:hover {
+            background: rgba(255,255,255,0.1) !important;
+            color: #ffffff !important;
+        }
+
+        html.dark-mode .nav-item.active {
+            background: rgba(255,255,255,0.15) !important;
+            color: #ffffff !important;
+        }
+
+        html.dark-mode .nav-item svg {
+            color: inherit !important;
+        }
+
+        /* All Cards - Dark backgrounds */
+        html.dark-mode .card,
+        html.dark-mode .stat-card,
+        html.dark-mode .welcome-banner,
+        html.dark-mode .quick-action {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+
+        html.dark-mode .quick-action:hover {
+            background: #334155 !important;
+        }
+
+        /* Headers and Text - Bright */
+        html.dark-mode h1,
+        html.dark-mode h2,
+        html.dark-mode h3,
+        html.dark-mode h4,
+        html.dark-mode h5,
+        html.dark-mode h6,
+        html.dark-mode .card-title,
+        html.dark-mode .stat-info h3 {
+            color: #f1f5f9 !important;
+        }
+
+        html.dark-mode p,
+        html.dark-mode span:not(.badge),
+        html.dark-mode .card p,
+        html.dark-mode .stat-info p {
+            color: #cbd5e1 !important;
+        }
+
+        /* User dropdown */
+        html.dark-mode .user-name {
+            color: #f1f5f9 !important;
+        }
+
+        html.dark-mode .user-dropdown {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+
+        html.dark-mode .dropdown-header {
+            background: #334155 !important;
+        }
+
+        html.dark-mode .dropdown-user-name {
+            color: #f1f5f9 !important;
+        }
+
+        html.dark-mode .dropdown-user-email {
+            color: #94a3b8 !important;
+        }
+
+        html.dark-mode .dropdown-item {
+            color: #cbd5e1 !important;
+        }
+
+        html.dark-mode .dropdown-item:hover {
+            background: #334155 !important;
+            color: #f1f5f9 !important;
+        }
+
+        /* Forms - Dark with bright text */
+        html.dark-mode .form-group label {
+            color: #e2e8f0 !important;
+        }
+
+        html.dark-mode input,
+        html.dark-mode textarea,
+        html.dark-mode select {
+            background: #334155 !important;
+            border-color: #475569 !important;
+            color: #f1f5f9 !important;
+        }
+
+        html.dark-mode input::placeholder,
+        html.dark-mode textarea::placeholder {
+            color: #94a3b8 !important;
+        }
+
+        html.dark-mode input:focus,
+        html.dark-mode textarea:focus,
+        html.dark-mode select:focus {
+            border-color: #3b82f6 !important;
+            background: #334155 !important;
+        }
+
+        /* Buttons */
+        html.dark-mode .btn-secondary {
+            background: #334155 !important;
+            color: #f1f5f9 !important;
+        }
+
+        html.dark-mode .btn-secondary:hover {
+            background: #475569 !important;
+        }
+
+        html.dark-mode .icon-btn {
+            background: #334155 !important;
+        }
+
+        html.dark-mode .icon-btn svg {
+            color: #cbd5e1 !important;
+        }
+
+        /* Messages Page Specific */
+        html.dark-mode .conversation-item {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+
+        html.dark-mode .conversation-item:hover {
+            background: #334155 !important;
+        }
+
+        html.dark-mode .conversation-name {
+            color: #f1f5f9 !important;
+        }
+
+        html.dark-mode .conversation-last-message {
+            color: #94a3b8 !important;
+        }
+
+        html.dark-mode .message-bubble {
+            background: #334155 !important;
+            color: #f1f5f9 !important;
+        }
+
+        html.dark-mode .message-bubble.sent {
+            background: #2563eb !important;
+            color: #ffffff !important;
+        }
+
+        html.dark-mode .message-input {
+            background: #334155 !important;
+            border-color: #475569 !important;
+            color: #f1f5f9 !important;
+        }
+
+        /* Friends Page Specific */
+        html.dark-mode .friend-card {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+
+        html.dark-mode .friend-name {
+            color: #f1f5f9 !important;
+        }
+
+        html.dark-mode .friend-major,
+        html.dark-mode .friend-year {
+            color: #94a3b8 !important;
+        }
+
+        /* Study Groups Specific */
+        html.dark-mode .group-card {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+
+        html.dark-mode .group-name {
+            color: #f1f5f9 !important;
+        }
+
+        html.dark-mode .group-description {
+            color: #cbd5e1 !important;
+        }
+
+        html.dark-mode .group-members {
+            color: #94a3b8 !important;
+        }
+
+        /* Notes Specific */
+        html.dark-mode .note-item {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+
+        html.dark-mode .note-title {
+            color: #f1f5f9 !important;
+        }
+
+        html.dark-mode .note-preview {
+            color: #cbd5e1 !important;
+        }
+
+        html.dark-mode .note-meta {
+            color: #94a3b8 !important;
+        }
+
+        html.dark-mode .note-editor {
+            background: #1e293b !important;
+            color: #f1f5f9 !important;
+        }
+
+        /* Schedule Specific */
+        html.dark-mode .calendar {
+            background: #1e293b !important;
+        }
+
+        html.dark-mode .calendar-header {
+            background: #334155 !important;
+            color: #f1f5f9 !important;
+        }
+
+        html.dark-mode .day-cell {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+            color: #cbd5e1 !important;
+        }
+
+        html.dark-mode .day-cell:hover {
+            background: #334155 !important;
+        }
+
+        html.dark-mode .event-item {
+            background: #2563eb !important;
+            color: #ffffff !important;
+        }
+
+        /* Profile Specific */
+        html.dark-mode .profile-header {
+            background: #1e293b !important;
+        }
+
+        html.dark-mode .profile-name {
+            color: #f1f5f9 !important;
+        }
+
+        html.dark-mode .profile-info-item {
+            background: #1e293b !important;
+        }
+
+        html.dark-mode .profile-label {
+            color: #94a3b8 !important;
+        }
+
+        html.dark-mode .profile-value {
+            color: #f1f5f9 !important;
+        }
+
+        /* GPA Calculator Specific */
+        html.dark-mode .gpa-card {
+            background: #1e293b !important;
+        }
+
+        html.dark-mode .gpa-value {
+            color: #f1f5f9 !important;
+        }
+
+        html.dark-mode .course-row {
+            background: #1e293b !important;
+            border-color: #334155 !important;
+        }
+
+        html.dark-mode .semester-card {
+            background: #1e293b !important;
+        }
+
+        /* Tables */
+        html.dark-mode table {
+            background: #1e293b !important;
+            color: #cbd5e1 !important;
+        }
+
+        html.dark-mode th {
+            background: #334155 !important;
+            color: #f1f5f9 !important;
+        }
+
+        html.dark-mode td {
+            border-color: #334155 !important;
+            color: #cbd5e1 !important;
+        }
+
+        html.dark-mode tr:hover {
+            background: #334155 !important;
+        }
+
+        /* Modals */
+        html.dark-mode .modal {
+            background: #1e293b !important;
+        }
+
+        html.dark-mode .modal-header {
+            background: #334155 !important;
+            border-bottom-color: #475569 !important;
+        }
+
+        html.dark-mode .modal-title {
+            color: #f1f5f9 !important;
+        }
+
+        html.dark-mode .modal-body {
+            color: #cbd5e1 !important;
+        }
+
+        html.dark-mode .modal-footer {
+            background: #334155 !important;
+            border-top-color: #475569 !important;
+        }
+
+        /* Empty states */
+        html.dark-mode .empty-state {
+            color: #94a3b8 !important;
+        }
+
+        html.dark-mode .empty-state svg {
+            color: #64748b !important;
+        }
+
+        /* Tabs */
+        html.dark-mode .tab-item {
+            color: #94a3b8 !important;
+        }
+
+        html.dark-mode .tab-item.active,
+        html.dark-mode .tab-item:hover {
+            color: #f1f5f9 !important;
+        }
+
+        /* Dividers */
+        html.dark-mode .divider,
+        html.dark-mode hr {
+            border-color: #334155 !important;
+        }
+
+        /* Loading states */
+        html.dark-mode .loading {
+            background: #0f172a !important;
+            color: #94a3b8 !important;
+        }
+
+        html.dark-mode .skeleton {
+            background: #334155 !important;
+        }
+
     </style>
     <!-- Primary Meta Tags -->
     <meta name="title" content="Dashboard - MyUB | University of Botswana Student Portal">

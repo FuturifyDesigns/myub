@@ -1331,8 +1331,21 @@
         }
 
         /* Event View Modal - Fix all inline styled elements */
+        body.dark-mode #viewEventModal .modal {
+            background: #1e293b !important;
+        }
+
+        body.dark-mode #viewEventModal .modal-header {
+            background: #334155 !important;
+        }
+
+        body.dark-mode #viewEventModal .modal-body {
+            background: #1e293b !important;
+        }
+
         body.dark-mode #viewEventModal .modal-body div {
             color: #e2e8f0 !important;
+            background: transparent !important;
         }
 
         body.dark-mode #viewEventModal .modal-body svg {
@@ -1344,9 +1357,50 @@
         body.dark-mode #viewEventDescription,
         body.dark-mode #viewEventReminder {
             color: #e2e8f0 !important;
+            background: transparent !important;
         }
 
         body.dark-mode #viewEventType {
+            color: #ffffff !important;
+        }
+
+        /* Event type badges in dark mode */
+        body.dark-mode #viewEventType[style*="dbeafe"] {
+            background: #1e3a5f !important;
+            color: #93c5fd !important;
+        }
+
+        body.dark-mode #viewEventType[style*="fee2e2"] {
+            background: #450a0a !important;
+            color: #fca5a5 !important;
+        }
+
+        body.dark-mode #viewEventType[style*="fef3c7"] {
+            background: #422006 !important;
+            color: #fcd34d !important;
+        }
+
+        body.dark-mode #viewEventType[style*="dcfce7"] {
+            background: #14532d !important;
+            color: #86efac !important;
+        }
+
+        body.dark-mode #viewEventType[style*="f3e8ff"] {
+            background: #2e1065 !important;
+            color: #c4b5fd !important;
+        }
+
+        /* Fix any course code element that might appear */
+        body.dark-mode #viewEventModal .course-code,
+        body.dark-mode #viewEventModal [class*="course"] {
+            background: transparent !important;
+            color: #e2e8f0 !important;
+        }
+
+        /* Fix any stray input or progress elements */
+        body.dark-mode #viewEventModal input,
+        body.dark-mode #viewEventModal progress {
+            background: #334155 !important;
             color: #ffffff !important;
         }
 
@@ -2825,9 +2879,22 @@
             // Set event type badge
             const typeEl = document.getElementById('viewEventType');
             const typeLabels = { class: 'Class', exam: 'Exam', assignment: 'Assignment', study: 'Study Session', other: 'Other' };
-            const typeColors = { class: 'background:#dbeafe;color:#1e40af;', exam: '#fee2e2;color:#991b1b;', assignment: '#fef3c7;color:#92400e;', study: '#dcfce7;color:#166534;', other: '#f3e8ff;color:#6b21a8;' };
+            const isDark = document.body.classList.contains('dark-mode');
+            const typeColors = isDark ? {
+                class: 'background:#1e3a5f;color:#93c5fd;',
+                exam: 'background:#450a0a;color:#fca5a5;',
+                assignment: 'background:#422006;color:#fcd34d;',
+                study: 'background:#14532d;color:#86efac;',
+                other: 'background:#2e1065;color:#c4b5fd;'
+            } : {
+                class: 'background:#dbeafe;color:#1e40af;',
+                exam: 'background:#fee2e2;color:#991b1b;',
+                assignment: 'background:#fef3c7;color:#92400e;',
+                study: 'background:#dcfce7;color:#166534;',
+                other: 'background:#f3e8ff;color:#6b21a8;'
+            };
             typeEl.textContent = typeLabels[event.event_type] || 'Event';
-            typeEl.style = typeColors[event.event_type] || typeColors.other;
+            typeEl.style.cssText = (typeColors[event.event_type] || typeColors.other) + 'display:inline-block;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600;margin-bottom:20px;';
             
             // Set time
             const startDate = new Date(event.start_time);

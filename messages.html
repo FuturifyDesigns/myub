@@ -419,33 +419,41 @@
         .loading { position: fixed; inset: 0; background: var(--white); display: flex; align-items: center; justify-content: center; z-index: 1000; }
         .loading-spinner { width: 40px; height: 40px; border: 3px solid var(--gray-200); border-top-color: var(--navy); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        body.dark-mode { background: var(--gray-800); }
-        body.dark-mode .sidebar { background: #0a1628; }
-        body.dark-mode .conversations-panel { background: var(--gray-700); border-color: var(--gray-600); }
-        body.dark-mode .conversations-header h2 { color: var(--white); }
-        body.dark-mode .search-input { background-color: var(--gray-600); border-color: var(--gray-600); color: var(--white); }
-        body.dark-mode .conversation-item { border-color: var(--gray-600); }
-        body.dark-mode .conv-name { color: var(--white); }
-        body.dark-mode .chat-panel { background: var(--gray-800); }
-        body.dark-mode .chat-header { background: var(--gray-700); border-color: var(--gray-600); }
-        body.dark-mode .chat-user-details h3 { color: var(--white); }
-        body.dark-mode .message-wrapper.received .message-bubble { background: var(--gray-700); color: var(--white); }
-        body.dark-mode .chat-input-area { background: var(--gray-700); border-color: var(--gray-600); }
-        body.dark-mode .chat-input-wrapper { background: var(--gray-600); }
-        body.dark-mode .chat-input { color: var(--white); }
-        body.dark-mode .reply-bar { background: var(--gray-700); border-color: var(--gray-600); }
-        body.dark-mode .reply-bar-name { color: var(--blue); }
-        body.dark-mode .reply-bar-text { color: var(--gray-400); }
-        body.dark-mode .reply-bar-close { background: var(--gray-600); }
-        body.dark-mode .reply-bar-close:hover { background: var(--gray-500); }
-        body.dark-mode .reply-preview { background: var(--gray-600); border-left-color: var(--blue); }
-        body.dark-mode .message-row.received .reply-preview-name { color: var(--blue); }
-        body.dark-mode .message-row.received .reply-preview-text { color: var(--gray-400); }
-        body.dark-mode .message-actions { background: var(--gray-700); }
-        body.dark-mode .message-action-btn:hover { background: var(--gray-600); }
-        body.dark-mode .message-action-btn svg { color: var(--gray-400); }
-        body.dark-mode .modal { background: var(--gray-700); }
-        body.dark-mode .modal-title { color: var(--white); }
+        body.dark-mode { background: #0f172a; }
+        body.dark-mode .sidebar { background: #0a0f1a; }
+        body.dark-mode .conversations-panel { background: #1e293b; border-color: #334155; }
+        body.dark-mode .conversations-header h2 { color: #ffffff; }
+        body.dark-mode .search-input { background-color: #334155; border-color: #475569; color: #ffffff; }
+        body.dark-mode .conversation-item { border-color: #334155; }
+        body.dark-mode .conv-name { color: #ffffff; }
+        body.dark-mode .chat-panel { background: #0f172a; }
+        body.dark-mode .chat-header { background: #1e293b; border-color: #334155; }
+        body.dark-mode .chat-user-details h3 { color: #ffffff; }
+        body.dark-mode .message-wrapper.received .message-bubble { background: #334155; color: #ffffff; }
+        body.dark-mode .chat-input-area { background: #1e293b; border-color: #334155; }
+        body.dark-mode .chat-input-wrapper { background: #334155; }
+        body.dark-mode .chat-input { color: #ffffff; }
+        body.dark-mode .reply-bar { background: #334155; border-color: #475569; }
+        body.dark-mode .reply-bar-name { color: #60a5fa; }
+        body.dark-mode .reply-bar-text { color: #94a3b8; }
+        body.dark-mode .reply-bar-close { background: #475569; }
+        body.dark-mode .reply-bar-close:hover { background: #64748b; }
+        body.dark-mode .reply-preview { background: #1e293b; border-left-color: #60a5fa; }
+        body.dark-mode .message-row.received .reply-preview-name { color: #60a5fa; }
+        body.dark-mode .message-row.received .reply-preview-text { color: #94a3b8; }
+        body.dark-mode .message-actions { background: #334155; }
+        body.dark-mode .message-action-btn:hover { background: #475569; }
+        body.dark-mode .message-action-btn svg { color: #94a3b8; }
+        body.dark-mode .modal { background: #1e293b; }
+        body.dark-mode .modal-title { color: #ffffff; }
+        body.dark-mode .chat-empty { background: #0f172a; }
+        body.dark-mode .chat-empty h3 { color: #e2e8f0; }
+        body.dark-mode .chat-empty p { color: #64748b; }
+        body.dark-mode .chat-empty svg { color: #475569; }
+        body.dark-mode .dropdown-menu { background: #1e293b; border: 1px solid #334155; }
+        body.dark-mode .dropdown-item { color: #e2e8f0; }
+        body.dark-mode .dropdown-item:hover { background: #334155; }
+        body.dark-mode .dropdown-item svg { color: #94a3b8; }
         @media (max-width: 900px) { 
             .conversations-panel { width: 100%; position: absolute; left: 0; top: 0; bottom: 0; z-index: 10; } 
             .conversations-panel.hidden { display: none; } 
@@ -1023,6 +1031,112 @@
 
         body.dark-mode .profile-modal-actions .btn-primary {
             background: var(--navy) !important;
+        }
+
+        /* Dropdown Menu (View Profile, Clear Chat) */
+        body.dark-mode .dropdown-menu {
+            background: #1e293b !important;
+            border: 1px solid #334155 !important;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4) !important;
+        }
+
+        body.dark-mode .dropdown-item {
+            color: #e2e8f0 !important;
+        }
+
+        body.dark-mode .dropdown-item:hover {
+            background: #334155 !important;
+        }
+
+        body.dark-mode .dropdown-item svg {
+            color: #94a3b8 !important;
+        }
+
+        body.dark-mode .dropdown-item.danger {
+            color: #f87171 !important;
+        }
+
+        body.dark-mode .dropdown-item.danger svg {
+            color: #f87171 !important;
+        }
+
+        /* Chat Empty State - Center and style properly */
+        body.dark-mode .chat-empty {
+            background: #0f172a !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            text-align: center !important;
+        }
+
+        body.dark-mode .chat-empty svg {
+            color: #475569 !important;
+        }
+
+        body.dark-mode .chat-empty h3 {
+            color: #e2e8f0 !important;
+        }
+
+        body.dark-mode .chat-empty p {
+            color: #64748b !important;
+        }
+
+        /* FIX COLOR CONSISTENCY - Use same dark blue throughout */
+        body.dark-mode .conversations-panel {
+            background: #1e293b !important;
+            border-right-color: #334155 !important;
+        }
+
+        body.dark-mode .chat-panel {
+            background: #0f172a !important;
+        }
+
+        body.dark-mode .chat-messages {
+            background: #0f172a !important;
+        }
+
+        /* Notification Dropdown - Fix cropping */
+        body.dark-mode .notification-dropdown {
+            background: #1e293b !important;
+            border: 1px solid #334155 !important;
+            max-height: 400px !important;
+            overflow-y: auto !important;
+        }
+
+        body.dark-mode .notif-dropdown-list {
+            max-height: 300px !important;
+            overflow-y: auto !important;
+        }
+
+        /* New Chat Button */
+        body.dark-mode .new-chat-btn {
+            background: #334155 !important;
+            color: #e2e8f0 !important;
+        }
+
+        body.dark-mode .new-chat-btn:hover {
+            background: #475569 !important;
+        }
+
+        body.dark-mode .new-chat-btn svg {
+            color: #e2e8f0 !important;
+        }
+
+        /* Conversation Header */
+        body.dark-mode .conversations-header {
+            background: #1e293b !important;
+            border-bottom-color: #334155 !important;
+        }
+
+        body.dark-mode .conversations-header h2 {
+            color: #ffffff !important;
+        }
+
+        /* Conversations Search */
+        body.dark-mode .conversations-search {
+            background: #1e293b !important;
+            border-bottom-color: #334155 !important;
         }
 
         /* FRIENDS PAGE - PROFILE POPUP */

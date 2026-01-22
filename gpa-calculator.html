@@ -922,629 +922,277 @@
             color: #94a3b8 !important;
         }
 
-    
         /* ========================================== */
-        /* COMPREHENSIVE DARK MODE FIXES - ALL PAGES */
+        /* GPA CALCULATOR SPECIFIC DARK MODE FIXES   */
         /* ========================================== */
 
-        /* USER DROPDOWN - Missing styles */
-        html.dark-mode .user-role {
+        /* Sidebar Navigation - Bright White Text */
+        html.dark-mode .nav-section-title {
             color: #94a3b8 !important;
         }
 
-        html.dark-mode .dropdown-user-email {
+        html.dark-mode .nav-item {
+            color: #ffffff !important;
+        }
+
+        html.dark-mode .nav-item:hover {
+            background: rgba(255,255,255,0.1) !important;
+            color: #ffffff !important;
+        }
+
+        html.dark-mode .nav-item.active {
+            background: rgba(255,255,255,0.15) !important;
+            color: #ffffff !important;
+        }
+
+        html.dark-mode .nav-item svg {
+            color: #ffffff !important;
+        }
+
+        /* Tabs (GPA Calculator / Grade Predictor) */
+        html.dark-mode .tabs {
+            background: #334155 !important;
+        }
+
+        html.dark-mode .tab {
+            color: #94a3b8 !important;
+            background: transparent !important;
+        }
+
+        html.dark-mode .tab:hover {
+            color: #ffffff !important;
+        }
+
+        html.dark-mode .tab.active {
+            background: #1e293b !important;
+            color: #ffffff !important;
+        }
+
+        /* Program Progress Card */
+        html.dark-mode .program-progress,
+        html.dark-mode .progress-card {
+            background: #1e293b !important;
+        }
+
+        html.dark-mode .program-progress h4,
+        html.dark-mode .progress-title {
             color: #94a3b8 !important;
         }
 
-        html.dark-mode .dropdown-status {
-            color: #22c55e !important;
+        html.dark-mode .program-progress h3,
+        html.dark-mode .program-name {
+            color: #ffffff !important;
         }
 
-        html.dark-mode .dropdown-section-title {
+        html.dark-mode .program-progress p,
+        html.dark-mode .degree-type {
+            color: #94a3b8 !important;
+        }
+
+        /* Summary Cards */
+        html.dark-mode .summary-card {
+            background: #1e293b !important;
+        }
+
+        html.dark-mode .summary-card h4,
+        html.dark-mode .summary-label {
+            color: #94a3b8 !important;
+        }
+
+        html.dark-mode .summary-card h2,
+        html.dark-mode .summary-value {
+            color: #ffffff !important;
+        }
+
+        html.dark-mode .summary-card p,
+        html.dark-mode .summary-sub {
             color: #64748b !important;
         }
 
-        html.dark-mode .dropdown-header {
-            background: #334155 !important;
-            border-bottom-color: #475569 !important;
+        /* Semester Analysis Section */
+        html.dark-mode .semester-analysis {
+            background: #1e293b !important;
         }
 
-        /* STAT CARDS */
-        html.dark-mode .stat-info p {
-            color: #94a3b8 !important;
+        html.dark-mode .semester-analysis-header h3 {
+            color: #ffffff !important;
         }
 
-        html.dark-mode .card-action {
+        html.dark-mode .semester-analysis-header svg {
             color: #60a5fa !important;
         }
 
-        html.dark-mode .card-action:hover {
-            color: #93c5fd !important;
-        }
-
-        /* SCHEDULE */
-        html.dark-mode .schedule-item {
-            background: #1e293b !important;
-        }
-
-        html.dark-mode .schedule-time .time {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .schedule-time .period {
-            color: #94a3b8 !important;
-        }
-
-        html.dark-mode .schedule-details h4 {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .schedule-details p {
-            color: #94a3b8 !important;
-        }
-
-        /* GPA */
-        html.dark-mode .gpa-label {
-            color: #94a3b8 !important;
-        }
-
-        html.dark-mode .gpa-status {
-            color: #22c55e !important;
-        }
-
-        html.dark-mode .gpa-value {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .gpa-circle::before {
-            background: #1e293b !important;
-        }
-
-        /* NOTIFICATIONS DROPDOWN */
-        html.dark-mode .notification-dropdown {
-            background: #1e293b !important;
-            border: 1px solid #334155 !important;
-        }
-
-        html.dark-mode .notif-dropdown-header {
-            background: #334155 !important;
-            border-bottom-color: #475569 !important;
-        }
-
-        html.dark-mode .notif-dropdown-header h3 {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .notif-dropdown-header button {
-            color: #60a5fa !important;
-        }
-
-        html.dark-mode .notif-dropdown-item {
-            border-bottom-color: #334155 !important;
-        }
-
-        html.dark-mode .notif-dropdown-item:hover {
+        /* Analysis Cards (Best Semester, etc.) - Keep light backgrounds for contrast */
+        html.dark-mode .analysis-card {
             background: #334155 !important;
         }
 
-        html.dark-mode .notif-dropdown-item.unread {
-            background: #1e3a5f !important;
+        html.dark-mode .analysis-card.best {
+            background: linear-gradient(135deg, #166534 0%, #15803d 100%) !important;
+            border-color: #22c55e !important;
         }
 
-        html.dark-mode .notif-content h4 {
+        html.dark-mode .analysis-card.best .analysis-card-label {
+            color: #bbf7d0 !important;
+        }
+
+        html.dark-mode .analysis-card.best .analysis-card-semester {
             color: #ffffff !important;
         }
 
-        html.dark-mode .notif-content p {
-            color: #94a3b8 !important;
+        html.dark-mode .analysis-card.best .analysis-card-gpa {
+            color: #4ade80 !important;
         }
 
-        html.dark-mode .notif-content .time {
-            color: #64748b !important;
+        html.dark-mode .analysis-card.worst {
+            background: linear-gradient(135deg, #854d0e 0%, #a16207 100%) !important;
+            border-color: #eab308 !important;
         }
 
-        html.dark-mode .notif-dropdown-footer {
-            background: #1e293b !important;
-            border-top-color: #334155 !important;
+        html.dark-mode .analysis-card.worst .analysis-card-label {
+            color: #fef08a !important;
         }
 
-        html.dark-mode .notif-dropdown-footer a {
-            color: #60a5fa !important;
+        html.dark-mode .analysis-card.worst .analysis-card-semester {
+            color: #ffffff !important;
         }
 
-        html.dark-mode .notif-empty {
-            color: #94a3b8 !important;
-        }
-
-        /* FILTER BUTTONS & VIEW TOGGLES */
-        html.dark-mode .filter-btn,
-        html.dark-mode .view-toggle,
-        html.dark-mode .filter-pill {
+        /* Key Insights */
+        html.dark-mode .analysis-insights,
+        html.dark-mode .insights-card {
             background: #334155 !important;
-            border-color: #475569 !important;
+        }
+
+        html.dark-mode .analysis-insights h4,
+        html.dark-mode .insights-title {
+            color: #ffffff !important;
+        }
+
+        html.dark-mode .analysis-insights p,
+        html.dark-mode .insight-item {
             color: #e2e8f0 !important;
         }
 
-        html.dark-mode .filter-btn:hover,
-        html.dark-mode .view-toggle:hover,
-        html.dark-mode .filter-pill:hover {
-            background: #475569 !important;
+        /* My Semesters Section */
+        html.dark-mode .semesters-header h2 {
             color: #ffffff !important;
         }
 
-        html.dark-mode .filter-btn.active,
-        html.dark-mode .view-toggle.active,
-        html.dark-mode .filter-pill.active {
-            background: #2563eb !important;
-            border-color: #2563eb !important;
-            color: #ffffff !important;
-        }
-
-        /* TOOLBAR BUTTONS */
-        html.dark-mode .toolbar-btn {
-            background: #334155 !important;
-            border-color: #475569 !important;
-            color: #e2e8f0 !important;
-        }
-
-        html.dark-mode .toolbar-btn:hover {
-            background: #475569 !important;
-        }
-
-        html.dark-mode .toolbar-select {
-            background: #334155 !important;
-            border-color: #475569 !important;
-            color: #ffffff !important;
-        }
-
-        /* QUICK ACTIONS */
-        html.dark-mode .quick-action {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        html.dark-mode .quick-action:hover {
-            background: #334155 !important;
-            border-color: #60a5fa !important;
-        }
-
-        html.dark-mode .quick-action span {
-            color: #e2e8f0 !important;
-        }
-
-        /* STUDY GROUPS */
-        html.dark-mode .group-card {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        html.dark-mode .group-name,
-        html.dark-mode .group-title {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .group-info,
-        html.dark-mode .group-desc,
-        html.dark-mode .group-description,
-        html.dark-mode .member-count {
+        html.dark-mode .semesters-header p {
             color: #94a3b8 !important;
         }
 
-        html.dark-mode .group-meta {
-            color: #64748b !important;
-        }
-
-        /* NOTES */
-        html.dark-mode .note-card,
-        html.dark-mode .note-list-item {
+        /* Semester Cards */
+        html.dark-mode .semester-section {
             background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        html.dark-mode .note-title,
-        html.dark-mode .note-list-title {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .note-preview,
-        html.dark-mode .note-date,
-        html.dark-mode .note-course {
-            color: #94a3b8 !important;
-        }
-
-        html.dark-mode .editor-content {
-            background: #0f172a !important;
-            border-color: #334155 !important;
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .editor-toolbar {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        /* GPA CALCULATOR */
-        html.dark-mode .gpa-card,
-        html.dark-mode .semester-card {
-            background: #1e293b !important;
-            border-color: #334155 !important;
         }
 
         html.dark-mode .semester-header {
             background: #334155 !important;
-            color: #ffffff !important;
         }
 
-        html.dark-mode .semester-gpa {
-            color: #22c55e !important;
-        }
-
-        html.dark-mode .course-row {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        html.dark-mode .course-name,
-        html.dark-mode .course-code {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .course-credits,
-        html.dark-mode .course-grade {
-            color: #e2e8f0 !important;
-        }
-
-        html.dark-mode .grade-input,
-        html.dark-mode .credits-input {
-            background: #334155 !important;
-            border-color: #475569 !important;
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .analysis-insights {
-            background: #334155 !important;
-        }
-
-        html.dark-mode .insight-text {
-            color: #e2e8f0 !important;
-        }
-
-        /* PROFILE */
-        html.dark-mode .profile-card,
-        html.dark-mode .profile-section {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        html.dark-mode .profile-name {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .profile-email,
-        html.dark-mode .profile-bio,
-        html.dark-mode .profile-info {
-            color: #94a3b8 !important;
-        }
-
-        html.dark-mode .profile-stat-value {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .profile-stat-label {
-            color: #94a3b8 !important;
-        }
-
-        html.dark-mode .info-label {
-            color: #64748b !important;
-        }
-
-        html.dark-mode .info-value {
-            color: #e2e8f0 !important;
-        }
-
-        /* FRIENDS */
-        html.dark-mode .friend-card {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        html.dark-mode .friend-name {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .friend-major,
-        html.dark-mode .friend-year,
-        html.dark-mode .friend-info,
-        html.dark-mode .friend-status {
-            color: #94a3b8 !important;
-        }
-
-        html.dark-mode .friend-actions button {
-            color: #e2e8f0 !important;
-        }
-
-        html.dark-mode .blocked-user-name {
-            color: #ffffff !important;
-        }
-
-        /* MESSAGES */
-        html.dark-mode .conversations-panel {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        html.dark-mode .conversations-header h2 {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .search-input {
-            background: #334155 !important;
-            border-color: #475569 !important;
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .conv-name {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .conv-preview,
-        html.dark-mode .conv-time {
-            color: #94a3b8 !important;
-        }
-
-        html.dark-mode .chat-panel {
-            background: #0f172a !important;
-        }
-
-        html.dark-mode .chat-header {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        html.dark-mode .chat-user-details h3 {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .chat-user-details span {
-            color: #94a3b8 !important;
-        }
-
-        html.dark-mode .chat-input-area {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        html.dark-mode .chat-input-wrapper {
-            background: #334155 !important;
-        }
-
-        html.dark-mode .chat-input {
-            color: #ffffff !important;
-            background: transparent !important;
-        }
-
-        html.dark-mode .chat-input::placeholder {
-            color: #94a3b8 !important;
-        }
-
-        html.dark-mode .reply-bar {
-            background: #334155 !important;
-            border-color: #475569 !important;
-        }
-
-        html.dark-mode .reply-bar-name {
-            color: #60a5fa !important;
-        }
-
-        html.dark-mode .reply-bar-text {
-            color: #94a3b8 !important;
-        }
-
-        html.dark-mode .message-actions {
-            background: #1e293b !important;
-            border: 1px solid #334155 !important;
-        }
-
-        html.dark-mode .message-action-btn {
-            color: #e2e8f0 !important;
-        }
-
-        html.dark-mode .message-action-btn:hover {
-            background: #334155 !important;
-        }
-
-        /* SCHEDULE PAGE SPECIFIC */
-        html.dark-mode .calendar-header {
-            background: #1e293b !important;
-        }
-
-        html.dark-mode .calendar-title {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .calendar-nav-btn {
-            background: #334155 !important;
-            color: #e2e8f0 !important;
-        }
-
-        html.dark-mode .calendar-nav-btn:hover {
+        html.dark-mode .semester-header:hover {
             background: #475569 !important;
         }
 
-        html.dark-mode .day-header {
-            background: #334155 !important;
+        html.dark-mode .semester-title {
             color: #ffffff !important;
         }
 
-        html.dark-mode .time-slot {
+        html.dark-mode .semester-meta {
             color: #94a3b8 !important;
+        }
+
+        html.dark-mode .semester-stat-value {
+            color: #ffffff !important;
+        }
+
+        html.dark-mode .semester-stat-label {
+            color: #94a3b8 !important;
+        }
+
+        html.dark-mode .semester-toggle {
+            background: #1e293b !important;
+        }
+
+        html.dark-mode .semester-toggle svg {
+            color: #94a3b8 !important;
+        }
+
+        /* Semester Content / Course Table */
+        html.dark-mode .semester-content {
+            background: #1e293b !important;
+            border-top-color: #334155 !important;
+        }
+
+        html.dark-mode .course-table th {
+            color: #94a3b8 !important;
+            background: #1e293b !important;
+        }
+
+        html.dark-mode .course-table td {
             border-color: #334155 !important;
         }
 
-        html.dark-mode .calendar-event {
-            color: #ffffff !important;
+        html.dark-mode .course-code {
+            color: #60a5fa !important;
         }
 
-        html.dark-mode .event-title {
-            color: #ffffff !important;
+        html.dark-mode .course-name {
+            color: #e2e8f0 !important;
         }
 
-        html.dark-mode .event-time,
-        html.dark-mode .event-location {
-            color: rgba(255,255,255,0.8) !important;
-        }
-
-        /* TABS */
-        html.dark-mode .tabs-container {
-            background: #1e293b !important;
+        html.dark-mode .course-row {
             border-color: #334155 !important;
         }
 
-        html.dark-mode .tab-btn {
-            color: #94a3b8 !important;
+        html.dark-mode .course-row:hover {
+            background: #334155 !important;
         }
 
-        html.dark-mode .tab-btn:hover {
-            color: #e2e8f0 !important;
-        }
-
-        html.dark-mode .tab-btn.active {
-            color: #ffffff !important;
-            border-color: #2563eb !important;
-        }
-
-        /* ANNOUNCEMENTS & POPUPS */
-        html.dark-mode .announcement-popup {
-            background: #1e293b !important;
-        }
-
-        html.dark-mode .announcement-title {
+        /* Grade Badge */
+        html.dark-mode .grade-badge {
             color: #ffffff !important;
         }
 
-        html.dark-mode .announcement-body {
-            background: #1e293b !important;
-        }
-
-        html.dark-mode .announcement-message {
-            color: #e2e8f0 !important;
-        }
-
-        html.dark-mode .announcement-time {
+        /* Action Buttons */
+        html.dark-mode .action-btn {
             color: #94a3b8 !important;
         }
 
-        /* NOTIFICATIONS MODAL */
-        html.dark-mode .notifications-modal {
-            background: #1e293b !important;
+        html.dark-mode .action-btn:hover {
+            color: #ffffff !important;
+            background: #334155 !important;
         }
 
-        html.dark-mode .notification-item {
-            background: #1e293b !important;
+        /* Add Course Button */
+        html.dark-mode .add-course-btn {
+            color: #60a5fa !important;
             border-color: #334155 !important;
         }
 
-        html.dark-mode .notification-item:hover {
+        html.dark-mode .add-course-btn:hover {
             background: #334155 !important;
         }
 
-        html.dark-mode .notification-title {
-            color: #ffffff !important;
+        /* Delete Semester Button */
+        html.dark-mode .delete-semester-btn {
+            color: #f87171 !important;
         }
 
-        html.dark-mode .notification-body {
-            color: #94a3b8 !important;
-        }
-
-        /* WELCOME MODAL */
-        html.dark-mode .welcome-modal {
-            background: #1e293b !important;
-        }
-
-        html.dark-mode .welcome-title {
-            color: #ffffff !important;
-        }
-
-        html.dark-mode .welcome-text {
+        /* Credits text */
+        html.dark-mode .credits-text {
             color: #e2e8f0 !important;
         }
 
-        /* LOADING STATES */
-        html.dark-mode .loading,
-        html.dark-mode .loading-spinner {
-            background: #0f172a !important;
-            color: #94a3b8 !important;
-        }
-
-        html.dark-mode .skeleton {
-            background: #334155 !important;
-        }
-
-        /* TOASTS */
-        html.dark-mode .toast {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-            color: #ffffff !important;
-        }
-
-        /* CONTEXT MENUS */
-        html.dark-mode .context-menu {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        html.dark-mode .context-menu-item {
+        /* Final % text */
+        html.dark-mode .final-percent {
             color: #e2e8f0 !important;
         }
 
-        html.dark-mode .context-menu-item:hover {
-            background: #334155 !important;
-        }
-
-        /* BADGES & PILLS */
-        html.dark-mode .category-badge,
-        html.dark-mode .course-badge,
-        html.dark-mode .tag {
-            background: #334155 !important;
+        /* Points text */
+        html.dark-mode .points-text {
             color: #e2e8f0 !important;
-        }
-
-        /* FORM LABELS */
-        html.dark-mode .form-label {
-            color: #e2e8f0 !important;
-        }
-
-        html.dark-mode .form-group label {
-            color: #e2e8f0 !important;
-        }
-
-        html.dark-mode .form-hint {
-            color: #94a3b8 !important;
-        }
-
-        /* CARET COLOR */
-        html.dark-mode input,
-        html.dark-mode textarea {
-            caret-color: #60a5fa !important;
-        }
-
-        /* SCROLLBAR STYLING */
-        html.dark-mode ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        html.dark-mode ::-webkit-scrollbar-track {
-            background: #1e293b;
-        }
-
-        html.dark-mode ::-webkit-scrollbar-thumb {
-            background: #475569;
-            border-radius: 4px;
-        }
-
-        html.dark-mode ::-webkit-scrollbar-thumb:hover {
-            background: #64748b;
         }
 
     </style>

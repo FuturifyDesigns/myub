@@ -1601,6 +1601,22 @@
             color: #93c5fd !important;
         }
 
+        /* Cancel/Danger Button */
+        body.dark-mode .btn-danger {
+            background: #dc2626 !important;
+            color: #ffffff !important;
+            border: none !important;
+        }
+
+        body.dark-mode .btn-danger:hover {
+            background: #b91c1c !important;
+        }
+
+        body.dark-mode .btn-danger.btn-sm {
+            padding: 6px 12px !important;
+            font-size: 12px !important;
+        }
+
         /* DIVIDERS */
         body.dark-mode .divider,
         body.dark-mode hr {
@@ -3191,6 +3207,7 @@
                 if (tab === 'my' && g.onlineCount > 0) html += '<div class="group-online">' + g.onlineCount + ' online</div>';
                 if (tab === 'discover' && !g.isPrivate) html += '<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();joinGroup(\'' + g.id + '\')">Join</button>';
                 if (tab === 'discover' && g.isPrivate && !g.hasPendingRequest) html += '<button class="btn btn-outline btn-sm" onclick="event.stopPropagation();askToJoin(\'' + g.id + '\')">Ask to Join</button>';
+                if (tab === 'discover' && g.isPrivate && g.hasPendingRequest) html += '<button class="btn btn-danger btn-sm" onclick="event.stopPropagation();cancelJoinRequest(\'' + g.id + '\')">Cancel</button>';
                 html += '</div></div>';
             }
             container.innerHTML = html;
@@ -3482,6 +3499,36 @@
                 showToast('Request sent!', 'success');
                 await loadDiscoverGroups();
             } catch(e) { showToast('Failed to send request', 'error'); console.error(e); }
+        }
+        
+        async function cancelJoinRequest(groupId) {
+            try {
+                // Delete the join request
+                var result = await supabaseClient
+                    .from('group_join_requests')
+                    .delete()
+                    .eq('group_id', groupId)
+                    .eq('user_id', currentUser.id)
+                    .eq('status', 'pending');
+                
+                if (result.error) {
+                    showToast('Failed to cancel request', 'error');
+                    return;
+                }
+                
+                // Also delete the notification sent to the admin
+                await supabaseClient
+                    .from('notifications')
+                    .delete()
+                    .eq('reference_id', groupId + ':' + currentUser.id)
+                    .eq('type', 'group_join_request');
+                
+                showToast('Request cancelled', 'success');
+                await loadDiscoverGroups();
+            } catch(e) { 
+                showToast('Failed to cancel request', 'error'); 
+                console.error(e); 
+            }
         }
         
         async function handleJoinRequest(refId, notifId, accept) {

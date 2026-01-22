@@ -354,6 +354,16 @@
         .form-group input, .form-group select { padding: 12px 14px; border: 2px solid var(--gray-200); border-radius: 10px; font-family: 'Outfit', sans-serif; font-size: 15px; color: var(--gray-800); transition: all 0.2s; }
         .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--navy); }
 
+        /* Hide number input spinners/arrows globally */
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
         .predictor-result { background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); border-radius: 12px; padding: 20px; color: var(--white); text-align: center; margin-top: 8px; }
         .predictor-result-label { font-size: 13px; opacity: 0.8; margin-bottom: 4px; }
         .predictor-result-value { font-family: 'Sora', sans-serif; font-size: 36px; font-weight: 700; }
@@ -1368,12 +1378,42 @@
             color: #64748b !important;
         }
 
-        /* Classification Badge */
+        /* Classification Badge - All variants */
         body.dark-mode .class-badge,
         body.dark-mode .classification-badge,
         body.dark-mode .classification,
         body.dark-mode #classification {
             color: #ffffff !important;
+        }
+
+        body.dark-mode .class-badge.first {
+            background: #166534 !important;
+            color: #ffffff !important;
+        }
+
+        body.dark-mode .class-badge.upper {
+            background: #1d4ed8 !important;
+            color: #ffffff !important;
+        }
+
+        body.dark-mode .class-badge.lower {
+            background: #a16207 !important;
+            color: #ffffff !important;
+        }
+
+        body.dark-mode .class-badge.pass {
+            background: #c2410c !important;
+            color: #ffffff !important;
+        }
+
+        body.dark-mode .class-badge.fail {
+            background: #dc2626 !important;
+            color: #ffffff !important;
+        }
+
+        body.dark-mode .class-badge.none {
+            background: #334155 !important;
+            color: #94a3b8 !important;
         }
 
         body.dark-mode .summary-card.class .summary-value {
@@ -1402,10 +1442,49 @@
             background: #334155 !important;
             border-color: #475569 !important;
             color: #ffffff !important;
+            caret-color: #ffffff !important;
         }
 
         body.dark-mode .predictor-form input::placeholder {
             color: #64748b !important;
+        }
+
+        /* Hide number input spinners/arrows */
+        body.dark-mode .predictor-form input[type="number"]::-webkit-outer-spin-button,
+        body.dark-mode .predictor-form input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        body.dark-mode .predictor-form input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        /* Form group inputs in predictor */
+        body.dark-mode .form-group input {
+            background: #334155 !important;
+            border-color: #475569 !important;
+            color: #ffffff !important;
+            caret-color: #ffffff !important;
+        }
+
+        body.dark-mode .form-group input::placeholder {
+            color: #64748b !important;
+        }
+
+        body.dark-mode .form-group label {
+            color: #e2e8f0 !important;
+        }
+
+        body.dark-mode .form-group .form-hint {
+            color: #94a3b8 !important;
+        }
+
+        /* Warning message */
+        body.dark-mode .weight-warning {
+            background: #422006 !important;
+            border-color: #854d0e !important;
+            color: #fef3c7 !important;
         }
 
         body.dark-mode .predictor-summary {
@@ -1487,14 +1566,26 @@
             color: #4ade80 !important;
         }
 
-        /* Sidebar Logo - Match Dashboard */
+        /* Sidebar Logo - Match Dashboard - Keep white background */
         body.dark-mode .sidebar-logo {
             background: #ffffff !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
         }
 
-        body.dark-mode .sidebar-logo-m,
+        body.dark-mode .sidebar-logo-m {
+            color: #1a365d !important;
+        }
+
         body.dark-mode .sidebar-logo-yub {
             color: #1a365d !important;
+        }
+
+        body.dark-mode .sidebar-logo-cap path {
+            fill: #1a365d !important;
+        }
+
+        body.dark-mode .sidebar-logo-cap .cap-tassel {
+            stroke: #c41e3a !important;
         }
 
         /* Analysis Card Icons */

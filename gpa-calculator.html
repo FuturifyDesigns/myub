@@ -527,73 +527,51 @@
 
 
         /* ========== DARK MODE ========== */
-        body.dark-mode { 
-            background: #0f172a !important; 
-        }
-        
-        /* Sidebar */
-        body.dark-mode .sidebar { 
-            background: #0a0f1a !important; 
-        }
-
-        /* Sidebar Logo - Keep white background */
-        body.dark-mode .sidebar .sidebar-logo,
-        body.dark-mode .sidebar-logo {
-            background: #ffffff !important;
-            background-color: #ffffff !important;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+        body.dark-mode {
+            --gray-50: #1e293b;
+            --gray-100: #0f172a;
+            --gray-200: #1e293b;
+            --gray-300: #334155;
+            --gray-400: #64748b;
+            --gray-500: #94a3b8;
+            --gray-600: #cbd5e1;
+            --gray-700: #e2e8f0;
+            --gray-800: #f1f5f9;
         }
 
-        body.dark-mode .sidebar-logo .sidebar-logo-m,
-        body.dark-mode .sidebar-logo-m {
-            color: #1a365d !important;
-            -webkit-text-fill-color: #1a365d !important;
+        body.dark-mode .sidebar {
+            background: #0a1628 !important;
+            border-right: 1px solid #1e293b !important;
         }
 
-        body.dark-mode .sidebar-logo .sidebar-logo-yub,
-        body.dark-mode .sidebar-logo-yub {
-            color: #1a365d !important;
-            -webkit-text-fill-color: #1a365d !important;
-        }
-
-        body.dark-mode .sidebar-logo-cap polygon,
-        body.dark-mode .sidebar-logo-cap rect {
-            fill: #1a365d !important;
-        }
-
-        body.dark-mode .sidebar-logo-cap .tassel circle,
-        body.dark-mode .sidebar-logo-cap .tassel ellipse {
-            fill: #c41e3a !important;
-        }
-
-        body.dark-mode .sidebar-logo-cap .tassel path {
-            stroke: #c41e3a !important;
-        }
-
-        /* Navigation */
-        body.dark-mode .nav-section-title {
-            color: #94a3b8 !important;
+        /* Sidebar Navigation */
+        body.dark-mode .nav-section-title,
+        body.dark-mode .nav-section {
+            color: #64748b !important;
         }
 
         body.dark-mode .nav-item {
-            color: #ffffff !important;
+            color: #94a3b8 !important;
         }
 
         body.dark-mode .nav-item:hover {
-            background: rgba(255,255,255,0.1) !important;
+            background: #1e293b !important;
             color: #ffffff !important;
         }
 
         body.dark-mode .nav-item.active {
-            background: rgba(255,255,255,0.15) !important;
+            background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%) !important;
             color: #ffffff !important;
         }
 
         body.dark-mode .nav-item svg {
-            color: #ffffff !important;
+            color: inherit !important;
         }
 
-        /* Topbar */
+        body.dark-mode .main-content {
+            background: #0f172a !important;
+        }
+
         body.dark-mode .topbar {
             background: #1e293b !important;
             border-bottom-color: #334155 !important;
@@ -603,8 +581,12 @@
             color: #ffffff !important;
         }
 
-        body.dark-mode .main-content {
-            background: #0f172a !important;
+        body.dark-mode .search-box {
+            background: #334155 !important;
+        }
+
+        body.dark-mode .search-box input {
+            color: #ffffff !important;
         }
 
         body.dark-mode .icon-btn {
@@ -612,7 +594,42 @@
         }
 
         body.dark-mode .icon-btn svg {
-            color: #e2e8f0 !important;
+            color: var(--gray-500);
+        }
+
+        body.dark-mode .user-name {
+            color: var(--gray-800);
+        }
+
+        body.dark-mode .user-role {
+            color: #94a3b8 !important;
+        }
+
+        body.dark-mode .user-dropdown {
+            background: var(--gray-200);
+            border-color: var(--gray-300);
+        }
+
+        body.dark-mode .dropdown-header {
+            background: var(--gray-300);
+            border-bottom-color: var(--gray-300);
+        }
+
+        body.dark-mode .dropdown-user-name {
+            color: var(--gray-800);
+        }
+
+        body.dark-mode .dropdown-item {
+            color: var(--gray-600);
+        }
+
+        body.dark-mode .dropdown-item:hover {
+            background: var(--gray-300);
+            color: var(--gray-700);
+        }
+
+        body.dark-mode .dropdown-divider {
+            background: var(--gray-300);
         }
 
         /* TEXT */
@@ -631,21 +648,64 @@
             color: #e2e8f0 !important;
         }
 
-        /* CARDS */
         body.dark-mode .card,
         body.dark-mode .stat-card,
         body.dark-mode .summary-card,
         body.dark-mode .semester-section {
-            background: #1e293b !important;
-            border: 1px solid #334155 !important;
+            background: var(--gray-200);
+            border: 1px solid var(--gray-300) !important;
         }
 
-        body.dark-mode .semester-header {
-            background: #334155 !important;
+        body.dark-mode .card-title,
+        body.dark-mode .stat-info h3 {
+            color: var(--gray-800);
         }
 
-        body.dark-mode .semester-header:hover {
-            background: #475569 !important;
+        body.dark-mode .welcome-banner {
+            background: linear-gradient(135deg, #0f172a 0%, var(--navy) 100%);
+        }
+
+        body.dark-mode .quick-action {
+            background: var(--gray-300);
+        }
+
+        body.dark-mode .quick-action:hover {
+            background: var(--gray-200);
+            border-color: var(--navy-light);
+        }
+
+        body.dark-mode .quick-action span {
+            color: var(--gray-600);
+        }
+
+        body.dark-mode .schedule-item {
+            background: var(--gray-300);
+        }
+
+        body.dark-mode .schedule-time .time,
+        body.dark-mode .schedule-details h4 {
+            color: var(--gray-800);
+        }
+
+        body.dark-mode .gpa-value {
+            color: var(--gray-800);
+        }
+
+        body.dark-mode .gpa-circle::before {
+            background: var(--gray-200);
+        }
+
+        body.dark-mode .loading {
+            background: var(--gray-100);
+        }
+
+        /* Card Action Links */
+        body.dark-mode .card-action {
+            color: #60a5fa !important;
+        }
+
+        body.dark-mode .card-action:hover {
+            color: #93c5fd !important;
         }
 
         /* Forms */
@@ -714,26 +774,84 @@
         }
 
         body.dark-mode .notif-dropdown-header {
-            border-bottom: 1px solid #334155 !important;
+            background: #334155 !important;
+            border-bottom-color: #475569 !important;
         }
 
         body.dark-mode .notif-dropdown-header h3 {
             color: #ffffff !important;
         }
 
+        body.dark-mode .notif-dropdown-header button {
+            color: #60a5fa !important;
+        }
+
         body.dark-mode .notif-dropdown-item {
-            border-bottom: 1px solid #334155 !important;
+            border-bottom-color: #334155 !important;
         }
 
         body.dark-mode .notif-dropdown-item:hover {
             background: #334155 !important;
         }
 
-        body.dark-mode .notif-dropdown-item h4 {
+        body.dark-mode .notif-dropdown-item.unread {
+            background: #1e3a5f !important;
+        }
+
+        body.dark-mode .notif-content h4 {
             color: #ffffff !important;
         }
 
-        body.dark-mode .notif-dropdown-item p {
+        body.dark-mode .notif-content p {
+            color: #94a3b8 !important;
+        }
+
+        body.dark-mode .notif-content .time {
+            color: #64748b !important;
+        }
+
+        body.dark-mode .notif-dropdown-footer {
+            background: #1e293b !important;
+            border-top-color: #334155 !important;
+        }
+
+        body.dark-mode .notif-dropdown-footer a {
+            color: #60a5fa !important;
+        }
+
+        body.dark-mode .notif-empty {
+            color: #94a3b8 !important;
+        }
+
+        /* GPA Labels */
+        body.dark-mode .gpa-label {
+            color: #94a3b8 !important;
+        }
+
+        body.dark-mode .gpa-status {
+            color: #22c55e !important;
+        }
+
+        /* Stat Info */
+        body.dark-mode .stat-info p {
+            color: #94a3b8 !important;
+        }
+
+        /* Schedule Details */
+        body.dark-mode .schedule-time .period {
+            color: #94a3b8 !important;
+        }
+
+        body.dark-mode .schedule-details p {
+            color: #94a3b8 !important;
+        }
+
+        /* Empty State */
+        body.dark-mode .empty-state {
+            color: #94a3b8 !important;
+        }
+
+        body.dark-mode .empty-state p {
             color: #94a3b8 !important;
         }
 
@@ -824,15 +942,10 @@
 
         /* ========================================== */
 
-        /* Sidebar Navigation - Bright White Text */
-        body.dark-mode .nav-section-title {
-            color: #94a3b8 !important;
-        }
-
         /* Tabs (GPA Calculator / Grade Predictor) */
         body.dark-mode .tabs {
-            background: #1e293b !important;
-            border: 1px solid #334155 !important;
+            background: var(--gray-200) !important;
+            border: 1px solid var(--gray-300) !important;
         }
 
         body.dark-mode .tab {
@@ -842,7 +955,7 @@
 
         body.dark-mode .tab:hover {
             color: #ffffff !important;
-            background: #334155 !important;
+            background: var(--gray-300) !important;
         }
 
         body.dark-mode .tab.active {
@@ -853,7 +966,7 @@
         /* Program Progress Card */
         body.dark-mode .program-progress,
         body.dark-mode .progress-card {
-            background: #1e293b !important;
+            background: var(--gray-200) !important;
         }
 
         body.dark-mode .program-progress h4,
@@ -863,7 +976,7 @@
 
         body.dark-mode .program-progress h3,
         body.dark-mode .program-name {
-            color: #ffffff !important;
+            color: var(--gray-800) !important;
         }
 
         body.dark-mode .program-progress p,
@@ -873,7 +986,7 @@
 
         /* Summary Cards */
         body.dark-mode .summary-card {
-            background: #1e293b !important;
+            background: var(--gray-200) !important;
         }
 
         body.dark-mode .summary-card h4,
@@ -883,7 +996,7 @@
 
         body.dark-mode .summary-card h2,
         body.dark-mode .summary-value {
-            color: #ffffff !important;
+            color: var(--gray-800) !important;
         }
 
         body.dark-mode .summary-card p,
@@ -893,20 +1006,20 @@
 
         /* Semester Analysis Section */
         body.dark-mode .semester-analysis {
-            background: #1e293b !important;
+            background: var(--gray-200) !important;
         }
 
         body.dark-mode .semester-analysis-header h3 {
-            color: #ffffff !important;
+            color: var(--gray-800) !important;
         }
 
         body.dark-mode .semester-analysis-header svg {
             color: #60a5fa !important;
         }
 
-        /* Analysis Cards (Best Semester, etc.) - Keep light backgrounds for contrast */
+        /* Analysis Cards (Best Semester, etc.) */
         body.dark-mode .analysis-card {
-            background: #334155 !important;
+            background: var(--gray-300) !important;
         }
 
         body.dark-mode .analysis-card.best {
@@ -942,27 +1055,27 @@
         /* Key Insights */
         body.dark-mode .analysis-insights,
         body.dark-mode .insights-card {
-            background: #334155 !important;
+            background: var(--gray-300) !important;
         }
 
         body.dark-mode .analysis-insights h4,
         body.dark-mode .insights-title,
         body.dark-mode .analysis-insights-title {
-            color: #ffffff !important;
+            color: var(--gray-800) !important;
         }
 
         body.dark-mode .analysis-insights p,
         body.dark-mode .insight-item {
-            color: #e2e8f0 !important;
+            color: var(--gray-700) !important;
             border-bottom-color: #475569 !important;
         }
 
         body.dark-mode .insight-text {
-            color: #e2e8f0 !important;
+            color: var(--gray-700) !important;
         }
 
         body.dark-mode .insight-text strong {
-            color: #ffffff !important;
+            color: var(--gray-800) !important;
         }
 
         body.dark-mode .insight-icon {
@@ -995,7 +1108,7 @@
 
         /* My Semesters Section */
         body.dark-mode .semesters-header h2 {
-            color: #ffffff !important;
+            color: var(--gray-800) !important;
         }
 
         body.dark-mode .semesters-header p {
@@ -1004,11 +1117,11 @@
 
         /* Semester Cards */
         body.dark-mode .semester-section {
-            background: #1e293b !important;
+            background: var(--gray-200) !important;
         }
 
         body.dark-mode .semester-header {
-            background: #334155 !important;
+            background: var(--gray-300) !important;
         }
 
         body.dark-mode .semester-header:hover {
@@ -1016,7 +1129,7 @@
         }
 
         body.dark-mode .semester-title {
-            color: #ffffff !important;
+            color: var(--gray-800) !important;
         }
 
         body.dark-mode .semester-meta {
@@ -1024,7 +1137,7 @@
         }
 
         body.dark-mode .semester-stat-value {
-            color: #ffffff !important;
+            color: var(--gray-800) !important;
         }
 
         body.dark-mode .semester-stat-label {
@@ -1032,7 +1145,7 @@
         }
 
         body.dark-mode .semester-toggle {
-            background: #1e293b !important;
+            background: var(--gray-200) !important;
         }
 
         body.dark-mode .semester-toggle svg {
@@ -1041,17 +1154,17 @@
 
         /* Semester Content / Course Table */
         body.dark-mode .semester-content {
-            background: #1e293b !important;
-            border-top-color: #334155 !important;
+            background: var(--gray-200) !important;
+            border-top-color: var(--gray-300) !important;
         }
 
         body.dark-mode .course-table th {
             color: #94a3b8 !important;
-            background: #1e293b !important;
+            background: var(--gray-200) !important;
         }
 
         body.dark-mode .course-table td {
-            border-color: #334155 !important;
+            border-color: var(--gray-300) !important;
         }
 
         body.dark-mode .course-code {
@@ -1059,15 +1172,15 @@
         }
 
         body.dark-mode .course-name {
-            color: #e2e8f0 !important;
+            color: var(--gray-700) !important;
         }
 
         body.dark-mode .course-row {
-            border-color: #334155 !important;
+            border-color: var(--gray-300) !important;
         }
 
         body.dark-mode .course-row:hover {
-            background: #334155 !important;
+            background: var(--gray-300) !important;
         }
 
         /* Grade Badge - Make text visible */

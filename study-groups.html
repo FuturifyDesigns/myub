@@ -4528,6 +4528,10 @@
                         await supabaseClient.from('study_group_members').update({ role: 'admin' }).eq('group_id', currentGroup.id).eq('user_id', random.user_id);
                     }
                     await supabaseClient.from('study_group_members').delete().eq('group_id', currentGroup.id).eq('user_id', currentUser.id);
+                    
+                    // Delete any join request record so user can request again
+                    await supabaseClient.from('group_join_requests').delete().eq('group_id', currentGroup.id).eq('user_id', currentUser.id);
+                    
                     closeConfirmModal(); closeGroupInfoModal(); closeChatMenu();
                     currentGroup = null;
                     document.getElementById('chatEmpty').style.display = 'flex';

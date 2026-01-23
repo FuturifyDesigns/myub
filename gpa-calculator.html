@@ -525,42 +525,53 @@
 
     
 
-        /* ========== UNIFIED DARK MODE - SAME EVERYWHERE ========== */
-        /* Base colors - EXACT SAME ON ALL PAGES */
-        body.dark-mode {
-            --gray-50: #0f172a;
-            --gray-100: #1e293b;
-            --gray-200: #334155;
-            --gray-300: #475569;
-            --gray-400: #64748b;
-            --gray-500: #94a3b8;
-            --gray-600: #cbd5e1;
-            --gray-700: #e2e8f0;
-            --gray-800: #f1f5f9;
-            --white: #ffffff;
-        }
 
-        /* Universal backgrounds - SAME EVERYWHERE */
-        body.dark-mode body {
-            background: #0f172a !important;
-            color: #ffffff !important;
+        /* ========== DARK MODE ========== */
+        body.dark-mode { 
+            background: #0f172a !important; 
         }
-
-        body.dark-mode .sidebar {
-            background: #0a0f1a !important;
+        
+        /* Sidebar */
+        body.dark-mode .sidebar { 
+            background: #0a0f1a !important; 
             border-right: 1px solid #1e293b !important;
         }
 
-        body.dark-mode .main-content {
-            background: #0f172a !important;
+        /* Sidebar Logo - Keep white background */
+        body.dark-mode .sidebar .sidebar-logo,
+        body.dark-mode .sidebar-logo {
+            background: #ffffff !important;
+            background-color: #ffffff !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
         }
 
-        body.dark-mode .topbar {
-            background: #1e293b !important;
-            border-bottom-color: #334155 !important;
+        body.dark-mode .sidebar-logo .sidebar-logo-m,
+        body.dark-mode .sidebar-logo-m {
+            color: #1a365d !important;
+            -webkit-text-fill-color: #1a365d !important;
         }
 
-        /* SIDEBAR */
+        body.dark-mode .sidebar-logo .sidebar-logo-yub,
+        body.dark-mode .sidebar-logo-yub {
+            color: #1a365d !important;
+            -webkit-text-fill-color: #1a365d !important;
+        }
+
+        body.dark-mode .sidebar-logo-cap polygon,
+        body.dark-mode .sidebar-logo-cap rect {
+            fill: #1a365d !important;
+        }
+
+        body.dark-mode .sidebar-logo-cap .tassel circle,
+        body.dark-mode .sidebar-logo-cap .tassel ellipse {
+            fill: #c41e3a !important;
+        }
+
+        body.dark-mode .sidebar-logo-cap .tassel path {
+            stroke: #c41e3a !important;
+        }
+
+        /* Navigation */
         body.dark-mode .nav-section-title,
         body.dark-mode .nav-section {
             color: #64748b !important;
@@ -584,7 +595,29 @@
             color: inherit !important;
         }
 
-        /* TEXT - BRIGHT EVERYWHERE */
+        /* Topbar */
+        body.dark-mode .topbar {
+            background: #1e293b !important;
+            border-bottom-color: #334155 !important;
+        }
+
+        body.dark-mode .page-title {
+            color: #ffffff !important;
+        }
+
+        body.dark-mode .main-content {
+            background: #0f172a !important;
+        }
+
+        body.dark-mode .icon-btn {
+            background: #334155 !important;
+        }
+
+        body.dark-mode .icon-btn svg {
+            color: #e2e8f0 !important;
+        }
+
+        /* TEXT */
         body.dark-mode h1,
         body.dark-mode h2,
         body.dark-mode h3,
@@ -595,49 +628,29 @@
         }
 
         body.dark-mode p,
-        body.dark-mode span:not(.badge),
-        body.dark-mode div,
+        body.dark-mode span:not(.badge):not(.summary-sub),
         body.dark-mode label {
             color: #e2e8f0 !important;
         }
 
-        body.dark-mode .page-title {
-            color: #ffffff !important;
-        }
-
-        /* CARDS - DARK EVERYWHERE */
+        /* CARDS */
         body.dark-mode .card,
         body.dark-mode .stat-card,
-        body.dark-mode .welcome-banner,
-        body.dark-mode .quick-action {
+        body.dark-mode .summary-card,
+        body.dark-mode .semester-section {
             background: #1e293b !important;
-            border-color: #334155 !important;
+            border: 1px solid #334155 !important;
         }
 
-        /* LINKS - BRIGHT BLUE (exclude sidebar elements) */
-        body.dark-mode a:not(.sidebar-logo):not(.nav-item) {
-            color: #60a5fa !important;
-        }
-
-        body.dark-mode a:hover:not(.sidebar-logo):not(.nav-item) {
-            color: #93c5fd !important;
-        }
-
-        /* SEARCH */
-        body.dark-mode .search-box {
+        body.dark-mode .semester-header {
             background: #334155 !important;
         }
 
-        body.dark-mode .search-box input {
-            color: #ffffff !important;
-            background: transparent !important;
+        body.dark-mode .semester-header:hover {
+            background: #475569 !important;
         }
 
-        body.dark-mode .search-box input::placeholder {
-            color: #94a3b8 !important;
-        }
-
-        /* FORMS */
+        /* Forms */
         body.dark-mode input,
         body.dark-mode textarea,
         body.dark-mode select {
@@ -651,17 +664,10 @@
             color: #94a3b8 !important;
         }
 
-        /* MODALS & POPUPS - DARK EVERYWHERE */
-        body.dark-mode .modal,
-        body.dark-mode .modal-content,
-        body.dark-mode .popup,
-        body.dark-mode .user-profile-modal,
-        body.dark-mode .profile-modal {
+        /* Modal */
+        body.dark-mode .modal {
             background: #1e293b !important;
-        }
-
-        body.dark-mode .modal-overlay {
-            background: rgba(0, 0, 0, 0.8) !important;
+            border: 1px solid #334155 !important;
         }
 
         body.dark-mode .modal-header {
@@ -693,88 +699,7 @@
             border-top: 1px solid #334155 !important;
         }
 
-        /* MESSAGES PAGE - FIX WHITE AREA */
-        body.dark-mode .chat-container,
-        body.dark-mode .messages-container,
-        body.dark-mode .conversation-panel,
-        body.dark-mode .chat-area {
-            background: #0f172a !important;
-        }
-
-        body.dark-mode .conversation-list {
-            background: #1e293b !important;
-        }
-
-        body.dark-mode .conversation-item {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        body.dark-mode .conversation-item:hover {
-            background: #334155 !important;
-        }
-
-        body.dark-mode .conversation-name {
-            color: #ffffff !important;
-        }
-
-        body.dark-mode .conversation-last-message {
-            color: #94a3b8 !important;
-        }
-
-        body.dark-mode .message-bubble {
-            background: #334155 !important;
-            color: #ffffff !important;
-        }
-
-        body.dark-mode .message-bubble.sent {
-            background: #2563eb !important;
-            color: #ffffff !important;
-        }
-
-        body.dark-mode .message-input-container {
-            background: #1e293b !important;
-            border-top-color: #334155 !important;
-        }
-
-        body.dark-mode .message-input {
-            background: #334155 !important;
-            border-color: #475569 !important;
-            color: #ffffff !important;
-        }
-
-        body.dark-mode .empty-messages,
-        body.dark-mode .no-conversation-selected {
-            background: #0f172a !important;
-            color: #94a3b8 !important;
-        }
-
-        /* FRIENDS PAGE - PROFILE POPUP */
-        body.dark-mode .friend-profile-popup,
-        body.dark-mode .user-details-modal {
-            background: #1e293b !important;
-        }
-
-        body.dark-mode .profile-popup-header {
-            background: #334155 !important;
-        }
-
-        body.dark-mode .friend-card {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        body.dark-mode .friend-name {
-            color: #ffffff !important;
-        }
-
-        body.dark-mode .friend-major,
-        body.dark-mode .friend-year,
-        body.dark-mode .friend-info {
-            color: #94a3b8 !important;
-        }
-
-        /* BUTTONS */
+        /* Buttons */
         body.dark-mode .btn-secondary {
             background: #334155 !important;
             color: #ffffff !important;
@@ -784,159 +709,121 @@
             background: #475569 !important;
         }
 
-        body.dark-mode .icon-btn {
+        /* Notification Dropdown */
+        body.dark-mode .notification-dropdown {
+            background: #1e293b !important;
+            border: 1px solid #334155 !important;
+        }
+
+        body.dark-mode .notif-dropdown-header {
+            border-bottom: 1px solid #334155 !important;
+        }
+
+        body.dark-mode .notif-dropdown-header h3 {
+            color: #ffffff !important;
+        }
+
+        body.dark-mode .notif-dropdown-item {
+            border-bottom: 1px solid #334155 !important;
+        }
+
+        body.dark-mode .notif-dropdown-item:hover {
             background: #334155 !important;
         }
 
-        body.dark-mode .icon-btn svg {
-            color: #cbd5e1 !important;
+        body.dark-mode .notif-dropdown-item h4 {
+            color: #ffffff !important;
         }
 
-        /* SCHEDULE */
-        body.dark-mode .calendar,
-        body.dark-mode .calendar-container {
+        body.dark-mode .notif-dropdown-item p {
+            color: #94a3b8 !important;
+        }
+
+        /* Program Progress Card - Keep gradient */
+        body.dark-mode .program-progress {
+            background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%) !important;
+        }
+
+        /* Summary Cards */
+        body.dark-mode .summary-card h4,
+        body.dark-mode .summary-label {
+            color: #94a3b8 !important;
+        }
+
+        body.dark-mode .summary-card h2,
+        body.dark-mode .summary-value {
+            color: #ffffff !important;
+        }
+
+        body.dark-mode .summary-card p,
+        body.dark-mode .summary-sub {
+            color: #64748b !important;
+        }
+
+        /* Semester Analysis */
+        body.dark-mode .semester-analysis {
             background: #1e293b !important;
         }
 
-        body.dark-mode .day-cell {
+        body.dark-mode .semester-title {
+            color: #ffffff !important;
+        }
+
+        body.dark-mode .semester-meta {
+            color: #94a3b8 !important;
+        }
+
+        body.dark-mode .semester-stat-value {
+            color: #ffffff !important;
+        }
+
+        body.dark-mode .semester-stat-label {
+            color: #94a3b8 !important;
+        }
+
+        body.dark-mode .semester-toggle {
             background: #1e293b !important;
+        }
+
+        body.dark-mode .semester-toggle svg {
+            color: #94a3b8 !important;
+        }
+
+        body.dark-mode .semester-content {
+            background: #1e293b !important;
+            border-top: 1px solid #334155 !important;
+        }
+
+        body.dark-mode .course-table th {
+            color: #94a3b8 !important;
+            background: #1e293b !important;
+        }
+
+        body.dark-mode .course-table td {
             border-color: #334155 !important;
-            color: #ffffff !important;
         }
 
-        body.dark-mode .event-item {
-            background: #2563eb !important;
-            color: #ffffff !important;
+        body.dark-mode .course-code {
+            color: #60a5fa !important;
         }
 
-        /* STUDY GROUPS */
-        body.dark-mode .group-card {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        body.dark-mode .group-name {
-            color: #ffffff !important;
-        }
-
-        /* NOTES */
-        body.dark-mode .note-item {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        body.dark-mode .note-title {
-            color: #ffffff !important;
-        }
-
-        body.dark-mode .note-editor {
-            background: #1e293b !important;
-            color: #ffffff !important;
-        }
-
-        /* PROFILE */
-        body.dark-mode .profile-header {
-            background: #1e293b !important;
-        }
-
-        body.dark-mode .profile-name {
-            color: #ffffff !important;
-        }
-
-        body.dark-mode .profile-info-item {
-            background: #1e293b !important;
-        }
-
-        body.dark-mode .profile-value {
-            color: #ffffff !important;
-        }
-
-        /* GPA CALCULATOR */
-        body.dark-mode .gpa-card {
-            background: #1e293b !important;
-        }
-
-        body.dark-mode .analysis-insights {
-            background: #334155 !important;
-        }
-
-        body.dark-mode .semester-card {
-            background: #1e293b !important;
-        }
-
-        /* TABLES */
-        body.dark-mode table {
-            background: #1e293b !important;
-        }
-
-        body.dark-mode th {
-            background: #334155 !important;
-            color: #ffffff !important;
-        }
-
-        body.dark-mode td {
-            border-color: #334155 !important;
+        body.dark-mode .course-name {
             color: #e2e8f0 !important;
         }
 
-        /* USER DROPDOWN */
-        body.dark-mode .user-name {
-            color: #ffffff !important;
-        }
-
-        body.dark-mode .user-dropdown {
-            background: #1e293b !important;
+        body.dark-mode .course-row {
             border-color: #334155 !important;
         }
 
-        body.dark-mode .dropdown-item {
-            color: #e2e8f0 !important;
-        }
-
-        body.dark-mode .dropdown-item:hover {
+        body.dark-mode .course-row:hover {
             background: #334155 !important;
+        }
+
+        /* Grade Badge */
+        body.dark-mode .grade-badge {
             color: #ffffff !important;
         }
 
-        /* EMPTY STATES */
-        body.dark-mode .empty-state {
-            color: #94a3b8 !important;
-        }
-
-        body.dark-mode .empty-state h3,
-        body.dark-mode .empty-state p {
-            color: #94a3b8 !important;
-        }
-
-        /* TABS */
-        body.dark-mode .tab-item {
-            color: #94a3b8 !important;
-        }
-
-        body.dark-mode .tab-item.active {
-            color: #ffffff !important;
-        }
-
-        /* BADGES */
-        body.dark-mode .badge {
-            background: #dc2626 !important;
-            color: #ffffff !important;
-        }
-
-        /* DIVIDERS */
-        body.dark-mode .divider,
-        body.dark-mode hr {
-            border-color: #334155 !important;
-        }
-
-        /* LOADING */
-        body.dark-mode .loading {
-            background: #0f172a !important;
-            color: #94a3b8 !important;
-        }
-
-        /* ========================================== */
-        /* GPA CALCULATOR SPECIFIC DARK MODE FIXES   */
         /* ========================================== */
 
         /* Sidebar Navigation - Bright White Text */

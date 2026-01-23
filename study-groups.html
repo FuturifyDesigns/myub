@@ -3534,8 +3534,8 @@
                     html += '<div class="notif-icon ' + iconClass + '"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">' + iconSvg + '</svg></div>';
                     html += '<div class="notif-content"><h4>' + escapeHtml(n.title || 'Notification') + '</h4><p>' + escapeHtml(n.body || '') + '</p><div class="time">' + formatTimeAgo(n.created_at) + '</div>';
                     
-                    // Action buttons for join requests (for admins)
-                    if (n.type === 'group_join_request' && !n.is_read && n.reference_id) {
+                    // Action buttons for join requests (for admins only - not for accepted/declined notifications)
+                    if (n.type === 'group_join_request' && !n.is_read && n.reference_id && !n.reference_id.startsWith('accepted:') && !n.reference_id.startsWith('declined:')) {
                         html += '<div class="notif-actions"><button class="accept" onclick="event.stopPropagation();handleJoinRequest(\'' + n.reference_id + '\',\'' + n.id + '\',true)">Accept</button><button class="decline" onclick="event.stopPropagation();handleJoinRequest(\'' + n.reference_id + '\',\'' + n.id + '\',false)">Decline</button></div>';
                     }
                     html += '</div></div>';

@@ -3019,8 +3019,17 @@
             var notifId = params.get('notif_id');
             var groupParam = params.get('group');
             
-            // Handle join request popup
+            // Handle join request popup (only for admin accepting/declining)
             if (joinRequest && notifId) {
+                // Check if this is an accepted/declined notification (for the requester)
+                // These should NOT show popup - just informational
+                if (joinRequest.startsWith('accepted:') || joinRequest.startsWith('declined:')) {
+                    // Clear URL params and do nothing - the group param handler or page will handle it
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                    return;
+                }
+                
+                // This is a real join request for admin to accept/decline
                 var parts = joinRequest.split(':');
                 if (parts.length === 2) {
                     var groupId = parts[0];
@@ -3030,12 +3039,16 @@
                 // Clear URL params
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
-            // Handle opening a specific group
+            // Handle opening a specific group (for accepted users)
             else if (groupParam) {
                 // Wait a bit for groups to load then open
-                setTimeout(function() {
+                setTimeout(async function() {
+                    // Reload my groups first in case they just got accepted
+                    await loadMyGroups();
                     if (myGroups.some(function(g) { return g.id === groupParam; })) {
                         openGroup(groupParam);
+                    } else {
+                        showToast('Welcome to the group!', 'success');
                     }
                 }, 500);
                 window.history.replaceState({}, document.title, window.location.pathname);

@@ -313,29 +313,367 @@
         .btn-warning { background: #fef3c7; color: #b45309; }
         .btn-warning:hover { background: #fde68a; }
 
-        /* Dark Mode */
-        body.dark-mode { background: var(--gray-800); }
-        body.dark-mode .sidebar { background: #0a1628; }
-        body.dark-mode .topbar { background: var(--gray-700); border-bottom-color: var(--gray-600); }
-        body.dark-mode .page-title { color: var(--white); }
-        body.dark-mode .icon-btn { background: var(--gray-600); }
-        body.dark-mode .icon-btn svg { color: var(--gray-300); }
-        body.dark-mode .notification-dropdown { background: var(--gray-700); }
-        body.dark-mode .notif-dropdown-header { border-bottom-color: var(--gray-600); }
-        body.dark-mode .notif-dropdown-header h3 { color: var(--white); }
-        body.dark-mode .tabs { background: var(--gray-700); }
-        body.dark-mode .tab { color: var(--gray-400); }
-        body.dark-mode .tab.active { background: var(--gray-600); color: var(--white); }
-        body.dark-mode .search-input { background: var(--gray-700); border-color: var(--gray-600); color: var(--white); }
-        body.dark-mode .friend-card, body.dark-mode .request-card, body.dark-mode .stat-card, body.dark-mode .empty-state { background: var(--gray-700); }
-        body.dark-mode .friend-name, body.dark-mode .stat-value { color: var(--white); }
-        body.dark-mode .modal { background: var(--gray-700); }
-        body.dark-mode .modal-header, body.dark-mode .modal-footer { border-color: var(--gray-600); }
-        body.dark-mode .modal-title { color: var(--white); }
-        body.dark-mode .discover-header h3 { color: var(--white); }
-        body.dark-mode .discover-card { background: var(--gray-700); }
-        body.dark-mode .discover-name { color: var(--white); }
-        body.dark-mode .filter-select { background: var(--gray-700); border-color: var(--gray-600); color: var(--white); }
+        /* Dark Mode - Comprehensive */
+        body.dark-mode { 
+            background: #0f172a !important; 
+            color: #e2e8f0 !important;
+        }
+        
+        /* Sidebar */
+        body.dark-mode .sidebar { 
+            background: #0a1628 !important; 
+            border-right: 1px solid #1e293b !important;
+        }
+        body.dark-mode .sidebar-logo {
+            background: #ffffff !important;
+        }
+        body.dark-mode .sidebar-logo span {
+            color: #1a365d !important;
+        }
+        body.dark-mode .nav-item { 
+            color: #94a3b8 !important; 
+        }
+        body.dark-mode .nav-item:hover { 
+            background: #1e293b !important; 
+            color: #ffffff !important; 
+        }
+        body.dark-mode .nav-item.active { 
+            background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%) !important; 
+            color: #ffffff !important; 
+        }
+        body.dark-mode .nav-section { 
+            color: #64748b !important; 
+        }
+        
+        /* Topbar */
+        body.dark-mode .topbar { 
+            background: #1e293b !important; 
+            border-bottom: 1px solid #334155 !important; 
+        }
+        body.dark-mode .page-title { 
+            color: #ffffff !important; 
+        }
+        body.dark-mode .icon-btn { 
+            background: #334155 !important; 
+        }
+        body.dark-mode .icon-btn:hover { 
+            background: #475569 !important; 
+        }
+        body.dark-mode .icon-btn svg { 
+            color: #e2e8f0 !important; 
+        }
+        
+        /* Notification Dropdown */
+        body.dark-mode .notification-dropdown { 
+            background: #1e293b !important; 
+            border: 1px solid #334155 !important;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5) !important;
+        }
+        body.dark-mode .notif-dropdown-header { 
+            border-bottom-color: #334155 !important; 
+        }
+        body.dark-mode .notif-dropdown-header h3 { 
+            color: #ffffff !important; 
+        }
+        body.dark-mode .notif-dropdown-header span { 
+            color: #60a5fa !important; 
+        }
+        body.dark-mode .notif-dropdown-item { 
+            border-bottom: 1px solid #334155 !important; 
+        }
+        body.dark-mode .notif-dropdown-item:hover { 
+            background: #334155 !important; 
+        }
+        body.dark-mode .notif-dropdown-item.unread { 
+            background: rgba(59, 130, 246, 0.1) !important; 
+        }
+        body.dark-mode .notif-dropdown-item h4 { 
+            color: #ffffff !important; 
+        }
+        body.dark-mode .notif-dropdown-item p { 
+            color: #94a3b8 !important; 
+        }
+        body.dark-mode .notif-dropdown-item .time { 
+            color: #64748b !important; 
+        }
+        body.dark-mode .notif-empty { 
+            color: #64748b !important; 
+        }
+        body.dark-mode .notif-footer { 
+            border-top: 1px solid #334155 !important; 
+        }
+        body.dark-mode .notif-footer a { 
+            color: #60a5fa !important; 
+        }
+        
+        /* Tabs */
+        body.dark-mode .tabs { 
+            background: #1e293b !important; 
+            border: 1px solid #334155 !important;
+        }
+        body.dark-mode .tab { 
+            color: #94a3b8 !important; 
+        }
+        body.dark-mode .tab:hover { 
+            color: #e2e8f0 !important;
+            background: #334155 !important;
+        }
+        body.dark-mode .tab.active { 
+            background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%) !important; 
+            color: #ffffff !important; 
+        }
+        
+        /* Search Input */
+        body.dark-mode .search-input { 
+            background: #1e293b !important; 
+            border: 2px solid #334155 !important; 
+            color: #ffffff !important; 
+        }
+        body.dark-mode .search-input:focus { 
+            border-color: #3b82f6 !important; 
+        }
+        body.dark-mode .search-input::placeholder { 
+            color: #64748b !important; 
+        }
+        
+        /* Cards */
+        body.dark-mode .friend-card,
+        body.dark-mode .request-card,
+        body.dark-mode .stat-card,
+        body.dark-mode .discover-card { 
+            background: #1e293b !important; 
+            border: 1px solid #334155 !important;
+        }
+        body.dark-mode .friend-card:hover,
+        body.dark-mode .request-card:hover,
+        body.dark-mode .discover-card:hover { 
+            border-color: #475569 !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
+        }
+        body.dark-mode .friend-name,
+        body.dark-mode .request-name,
+        body.dark-mode .discover-name { 
+            color: #ffffff !important; 
+        }
+        body.dark-mode .friend-program,
+        body.dark-mode .request-info,
+        body.dark-mode .discover-program { 
+            color: #94a3b8 !important; 
+        }
+        body.dark-mode .stat-value { 
+            color: #ffffff !important; 
+        }
+        body.dark-mode .stat-label { 
+            color: #94a3b8 !important; 
+        }
+        
+        /* Buttons */
+        body.dark-mode .btn-primary { 
+            background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%) !important; 
+            color: #ffffff !important; 
+        }
+        body.dark-mode .btn-primary:hover { 
+            background: linear-gradient(135deg, #2c5282 0%, #3b82f6 100%) !important; 
+        }
+        body.dark-mode .btn-outline { 
+            background: transparent !important;
+            border: 2px solid #334155 !important; 
+            color: #e2e8f0 !important; 
+        }
+        body.dark-mode .btn-outline:hover { 
+            background: #334155 !important;
+            border-color: #475569 !important;
+        }
+        body.dark-mode .btn-danger { 
+            background: #dc2626 !important; 
+            color: #ffffff !important; 
+        }
+        body.dark-mode .btn-danger:hover { 
+            background: #b91c1c !important; 
+        }
+        body.dark-mode .btn-success { 
+            background: #16a34a !important; 
+            color: #ffffff !important; 
+        }
+        body.dark-mode .btn-success:hover { 
+            background: #15803d !important; 
+        }
+        
+        /* Empty State */
+        body.dark-mode .empty-state { 
+            background: #1e293b !important;
+            border: 1px solid #334155 !important;
+        }
+        body.dark-mode .empty-state h3 { 
+            color: #ffffff !important; 
+        }
+        body.dark-mode .empty-state p { 
+            color: #94a3b8 !important; 
+        }
+        body.dark-mode .empty-state svg { 
+            color: #475569 !important; 
+        }
+        
+        /* Modal */
+        body.dark-mode .modal-overlay { 
+            background: rgba(0, 0, 0, 0.7) !important; 
+        }
+        body.dark-mode .modal { 
+            background: #1e293b !important; 
+            border: 1px solid #334155 !important;
+        }
+        body.dark-mode .modal-header { 
+            border-bottom: 1px solid #334155 !important; 
+        }
+        body.dark-mode .modal-title { 
+            color: #ffffff !important; 
+        }
+        body.dark-mode .modal-close { 
+            color: #94a3b8 !important; 
+        }
+        body.dark-mode .modal-close:hover { 
+            color: #ffffff !important;
+            background: #334155 !important;
+        }
+        body.dark-mode .modal-body { 
+            color: #e2e8f0 !important; 
+        }
+        body.dark-mode .modal-footer { 
+            border-top: 1px solid #334155 !important; 
+        }
+        
+        /* Profile Modal */
+        body.dark-mode .profile-modal-content {
+            background: #1e293b !important;
+        }
+        body.dark-mode .profile-modal-name {
+            color: #ffffff !important;
+        }
+        body.dark-mode .profile-modal-program {
+            color: #94a3b8 !important;
+        }
+        body.dark-mode .profile-modal-stats {
+            background: #0f172a !important;
+            border: 1px solid #334155 !important;
+        }
+        body.dark-mode .profile-stat-value {
+            color: #ffffff !important;
+        }
+        body.dark-mode .profile-stat-label {
+            color: #94a3b8 !important;
+        }
+        
+        /* Discover Section */
+        body.dark-mode .discover-header h3 { 
+            color: #ffffff !important; 
+        }
+        body.dark-mode .discover-header p { 
+            color: #94a3b8 !important; 
+        }
+        body.dark-mode .filter-select { 
+            background: #1e293b !important; 
+            border: 2px solid #334155 !important; 
+            color: #ffffff !important; 
+        }
+        body.dark-mode .filter-select:focus {
+            border-color: #3b82f6 !important;
+        }
+        
+        /* Dropdown Menus */
+        body.dark-mode .friend-menu {
+            background: #1e293b !important;
+            border: 1px solid #334155 !important;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5) !important;
+        }
+        body.dark-mode .friend-menu-item {
+            color: #e2e8f0 !important;
+        }
+        body.dark-mode .friend-menu-item:hover {
+            background: #334155 !important;
+        }
+        body.dark-mode .friend-menu-item.danger {
+            color: #f87171 !important;
+        }
+        body.dark-mode .friend-menu-item.danger:hover {
+            background: rgba(239, 68, 68, 0.1) !important;
+        }
+        
+        /* Toast */
+        body.dark-mode .toast {
+            background: #334155 !important;
+            color: #ffffff !important;
+        }
+        
+        /* Scrollbar */
+        body.dark-mode ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        body.dark-mode ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        body.dark-mode ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+        body.dark-mode ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+        
+        /* Online Status Badge */
+        body.dark-mode .online-badge {
+            box-shadow: 0 0 0 2px #1e293b !important;
+        }
+        
+        /* Friend Actions */
+        body.dark-mode .friend-actions .btn {
+            background: #334155 !important;
+            color: #e2e8f0 !important;
+        }
+        body.dark-mode .friend-actions .btn:hover {
+            background: #475569 !important;
+        }
+        
+        /* Request Card Actions */
+        body.dark-mode .request-actions .btn-accept {
+            background: #16a34a !important;
+            color: #ffffff !important;
+        }
+        body.dark-mode .request-actions .btn-decline {
+            background: #334155 !important;
+            color: #e2e8f0 !important;
+        }
+        body.dark-mode .request-actions .btn-decline:hover {
+            background: #475569 !important;
+        }
+
+        /* Notifications Modal */
+        body.dark-mode .notifications-modal {
+            background: #1e293b !important;
+        }
+        body.dark-mode .notifications-modal-header {
+            border-bottom: 1px solid #334155 !important;
+        }
+        body.dark-mode .notifications-modal-header h2 {
+            color: #ffffff !important;
+        }
+        body.dark-mode .notifications-modal-body {
+            background: #0f172a !important;
+        }
+        body.dark-mode .notifications-list-item {
+            background: #1e293b !important;
+            border-bottom: 1px solid #334155 !important;
+        }
+        body.dark-mode .notifications-list-item:hover {
+            background: #334155 !important;
+        }
+        body.dark-mode .notifications-list-item h4 {
+            color: #ffffff !important;
+        }
+        body.dark-mode .notifications-list-item p {
+            color: #94a3b8 !important;
+        }
+
 
         /* Discovery Tab Styles */
         .discover-header { text-align: center; padding: 24px 0 16px; }

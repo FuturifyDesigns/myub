@@ -3788,7 +3788,7 @@
                                 title: 'Request Accepted! 🎉',
                                 body: 'You have been accepted into ' + groupName,
                                 data: {
-                                    type: 'study_group',
+                                    type: 'message',
                                     groupId: groupId,
                                     url: '/study-groups.html?group=' + groupId
                                 }
@@ -3803,7 +3803,7 @@
                         user_id: odaUserId,
                         title: 'Request Accepted! 🎉',
                         body: 'You have been accepted into ' + groupName,
-                        type: 'study_group',
+                        type: 'message',
                         reference_id: groupId,
                         is_read: false
                     });
@@ -3822,7 +3822,7 @@
                                 title: 'Request Declined',
                                 body: 'Your request to join ' + groupName + ' was declined',
                                 data: {
-                                    type: 'study_group',
+                                    type: 'message',
                                     groupId: groupId,
                                     url: '/study-groups.html'
                                 }
@@ -3837,7 +3837,7 @@
                         user_id: odaUserId,
                         title: 'Request Declined',
                         body: 'Your request to join ' + groupName + ' was declined',
-                        type: 'study_group',
+                        type: 'message',
                         reference_id: groupId,
                         is_read: false
                     });

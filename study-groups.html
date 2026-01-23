@@ -196,6 +196,8 @@
         .group-badge { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 600; }
         .group-badge.private { background: #fef3c7; color: #92400e; }
         .group-badge.pending { background: #dbeafe; color: #1d4ed8; }
+        .group-badge.accepted { background: #dcfce7; color: #166534; }
+        .group-badge.declined { background: #fee2e2; color: #991b1b; }
         .groups-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; color: var(--gray-400); text-align: center; }
         .groups-empty svg { width: 64px; height: 64px; margin-bottom: 16px; opacity: 0.5; }
         .groups-empty h3 { font-size: 16px; font-weight: 600; color: var(--gray-600); margin-bottom: 8px; }
@@ -1618,6 +1620,16 @@
         body.dark-mode .group-badge.request {
             background: #1e3a5f !important;
             color: #93c5fd !important;
+        }
+
+        body.dark-mode .group-badge.accepted {
+            background: #14532d !important;
+            color: #86efac !important;
+        }
+
+        body.dark-mode .group-badge.declined {
+            background: #7f1d1d !important;
+            color: #fca5a5 !important;
         }
 
         /* Notification Actions - Accept/Decline buttons */
@@ -3178,9 +3190,10 @@
                     pg.membersCount = countResult.count || 0;
                     pg.isPrivate = true;
                     
-                    // Check if user has pending request
-                    var reqResult = await supabaseClient.from('group_join_requests').select('status').eq('group_id', pg.id).eq('user_id', currentUser.id).eq('status', 'pending').maybeSingle();
-                    pg.hasPendingRequest = !!reqResult.data;
+                    // Check if user has any request (pending, accepted, or declined)
+                    var reqResult = await supabaseClient.from('group_join_requests').select('status').eq('group_id', pg.id).eq('user_id', currentUser.id).maybeSingle();
+                    pg.requestStatus = reqResult.data ? reqResult.data.status : null;
+                    pg.hasPendingRequest = pg.requestStatus === 'pending';
                     discoverGroups.push(pg);
                 }
                 
@@ -3377,18 +3390,40 @@
                 var time = g.lastMessage ? formatTimeAgo(g.lastMessage.created_at) : '';
                 var avatarHtml = hasValidAvatar(g.avatar_url) ? '<img src="' + escapeHtml(g.avatar_url) + '">' : initials;
                 
-                html += '<div class="group-item' + (isActive ? ' active' : '') + '" onclick="' + (tab === 'my' ? "openGroup('" + g.id + "')" : (g.isPrivate ? (g.hasPendingRequest ? '' : "askToJoin('" + g.id + "')") : "joinGroup('" + g.id + "')")) + '">';
+                // Determine click action based on request status
+                var clickAction = '';
+                if (tab === 'my') {
+                    clickAction = "openGroup('" + g.id + "')";
+                } else if (g.isPrivate) {
+                    if (g.requestStatus === 'accepted') {
+                        clickAction = "joinGroup('" + g.id + "')"; // They can now join
+                    } else if (g.requestStatus === 'pending') {
+                        clickAction = ''; // No click action while pending
+                    } else if (g.requestStatus === 'declined') {
+                        clickAction = ''; // No click action if declined
+                    } else {
+                        clickAction = "askToJoin('" + g.id + "')";
+                    }
+                } else {
+                    clickAction = "joinGroup('" + g.id + "')";
+                }
+                
+                html += '<div class="group-item' + (isActive ? ' active' : '') + '" onclick="' + clickAction + '">';
                 html += '<div class="group-avatar">' + avatarHtml + '</div>';
                 html += '<div class="group-info"><div class="group-name">' + escapeHtml(g.name);
                 if (g.isPrivate) html += ' <span class="group-badge private">Private</span>';
-                if (g.hasPendingRequest) html += ' <span class="group-badge pending">Pending</span>';
+                if (g.requestStatus === 'pending') html += ' <span class="group-badge pending">Pending</span>';
+                if (g.requestStatus === 'accepted') html += ' <span class="group-badge accepted">Accepted</span>';
+                if (g.requestStatus === 'declined') html += ' <span class="group-badge declined">Declined</span>';
                 html += '</div><div class="group-preview">' + (tab === 'my' ? preview : g.membersCount + ' members') + '</div></div>';
                 html += '<div class="group-meta">';
                 if (time) html += '<div class="group-time">' + time + '</div>';
                 if (tab === 'my' && g.onlineCount > 0) html += '<div class="group-online">' + g.onlineCount + ' online</div>';
                 if (tab === 'discover' && !g.isPrivate) html += '<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();joinGroup(\'' + g.id + '\')">Join</button>';
-                if (tab === 'discover' && g.isPrivate && !g.hasPendingRequest) html += '<button class="btn btn-outline btn-sm" onclick="event.stopPropagation();askToJoin(\'' + g.id + '\')">Ask to Join</button>';
-                if (tab === 'discover' && g.isPrivate && g.hasPendingRequest) html += '<button class="btn btn-danger btn-sm" onclick="event.stopPropagation();cancelJoinRequest(\'' + g.id + '\')">Cancel</button>';
+                if (tab === 'discover' && g.isPrivate && !g.requestStatus) html += '<button class="btn btn-outline btn-sm" onclick="event.stopPropagation();askToJoin(\'' + g.id + '\')">Ask to Join</button>';
+                if (tab === 'discover' && g.isPrivate && g.requestStatus === 'pending') html += '<button class="btn btn-danger btn-sm" onclick="event.stopPropagation();cancelJoinRequest(\'' + g.id + '\')">Cancel</button>';
+                if (tab === 'discover' && g.isPrivate && g.requestStatus === 'accepted') html += '<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();joinGroup(\'' + g.id + '\')">Join Now</button>';
+                if (tab === 'discover' && g.isPrivate && g.requestStatus === 'declined') html += '<button class="btn btn-outline btn-sm" onclick="event.stopPropagation();askToJoin(\'' + g.id + '\')">Request Again</button>';
                 html += '</div></div>';
             }
             container.innerHTML = html;
@@ -3728,15 +3763,20 @@
             try {
                 var parts = refId.split(':');
                 var groupId = parts[0];
-                var userId = parts[1];
+                var odaUserId = parts[1];
+                
+                // Get group name first
+                var groupResult = await supabaseClient.from('study_groups').select('name').eq('id', groupId).single();
+                var groupName = groupResult.data ? groupResult.data.name : 'the group';
                 
                 if (accept) {
                     // Add user to group
-                    await supabaseClient.from('study_group_members').insert({ group_id: groupId, user_id: userId, role: 'member' });
-                    
-                    // Get group name
-                    var groupResult = await supabaseClient.from('study_groups').select('name').eq('id', groupId).single();
-                    var groupName = groupResult.data.name;
+                    var insertResult = await supabaseClient.from('study_group_members').insert({ group_id: groupId, user_id: odaUserId, role: 'member' });
+                    if (insertResult.error) {
+                        console.error('Error adding member:', insertResult.error);
+                        showToast('Failed to add user', 'error');
+                        return;
+                    }
                     
                     // Send push notification to the user
                     try {
@@ -3744,7 +3784,7 @@
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
-                                userId: userId,
+                                userId: odaUserId,
                                 title: 'Request Accepted! 🎉',
                                 body: 'You have been accepted into ' + groupName,
                                 data: {
@@ -3759,26 +3799,26 @@
                     }
                     
                     // In-app notification
-                    await supabaseClient.from('notifications').insert({
-                        user_id: userId,
-                        title: 'Request Accepted',
+                    var notifResult = await supabaseClient.from('notifications').insert({
+                        user_id: odaUserId,
+                        title: 'Request Accepted! 🎉',
                         body: 'You have been accepted into ' + groupName,
                         type: 'group_join_accepted',
-                        reference_id: groupId
+                        reference_id: groupId,
+                        is_read: false
                     });
+                    if (notifResult.error) {
+                        console.error('Notification insert error:', notifResult.error);
+                    }
                     showToast('User added to group', 'success');
                 } else {
-                    // Get group name
-                    var groupResult = await supabaseClient.from('study_groups').select('name').eq('id', groupId).single();
-                    var groupName = groupResult.data.name;
-                    
                     // Send push notification to the user
                     try {
                         await fetch('https://myub-push-notifications.futurifydesigns.workers.dev', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
-                                userId: userId,
+                                userId: odaUserId,
                                 title: 'Request Declined',
                                 body: 'Your request to join ' + groupName + ' was declined',
                                 data: {
@@ -3793,24 +3833,41 @@
                     }
                     
                     // In-app notification
-                    await supabaseClient.from('notifications').insert({
-                        user_id: userId,
+                    var notifResult = await supabaseClient.from('notifications').insert({
+                        user_id: odaUserId,
                         title: 'Request Declined',
                         body: 'Your request to join ' + groupName + ' was declined',
                         type: 'group_join_declined',
-                        reference_id: groupId
+                        reference_id: groupId,
+                        is_read: false
                     });
+                    if (notifResult.error) {
+                        console.error('Notification insert error:', notifResult.error);
+                    }
                     showToast('Request declined', 'success');
                 }
                 
                 // Update request status
-                await supabaseClient.from('group_join_requests').update({ status: accept ? 'accepted' : 'declined' }).eq('group_id', groupId).eq('user_id', userId);
+                await supabaseClient.from('group_join_requests').update({ status: accept ? 'accepted' : 'declined' }).eq('group_id', groupId).eq('user_id', odaUserId);
                 
-                // Mark notification as read
+                // Mark admin's notification as read
                 await supabaseClient.from('notifications').update({ is_read: true }).eq('id', notifId);
+                
+                // Refresh notifications
                 await loadNotifications();
-                if (currentGroup && currentGroup.id === groupId) await loadGroupMembers();
-            } catch(e) { showToast('Failed', 'error'); console.error(e); }
+                
+                // Refresh group members if viewing this group
+                if (currentGroup && currentGroup.id === groupId) {
+                    await loadGroupMembers();
+                }
+                
+                // Refresh discover groups for the requester (they need to see updated status)
+                // This happens automatically when they reload the page
+                
+            } catch(e) { 
+                showToast('Failed to process request', 'error'); 
+                console.error('handleJoinRequest error:', e); 
+            }
         }
         
         async function sendMessage() {

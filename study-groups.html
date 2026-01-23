@@ -658,6 +658,29 @@
         .toast.error { background: var(--red); }
         .toast.success { background: var(--green); }
         
+        /* Join Request Popup */
+        .join-request-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 3000; opacity: 0; transition: opacity 0.3s ease; }
+        .join-request-overlay.show { opacity: 1; }
+        .join-request-popup { background: var(--white); border-radius: 20px; width: 90%; max-width: 400px; overflow: hidden; transform: scale(0.9); transition: transform 0.3s ease; box-shadow: 0 25px 50px rgba(0,0,0,0.25); }
+        .join-request-overlay.show .join-request-popup { transform: scale(1); }
+        .join-request-header { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 24px; text-align: center; color: white; }
+        .join-request-icon { width: 60px; height: 60px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
+        .join-request-icon svg { width: 30px; height: 30px; color: white; }
+        .join-request-header h3 { font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 700; margin: 0; }
+        .join-request-body { padding: 24px; }
+        .join-request-user { display: flex; align-items: center; gap: 16px; }
+        .join-request-avatar { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 18px; flex-shrink: 0; overflow: hidden; }
+        .join-request-info { flex: 1; }
+        .join-request-name { font-size: 18px; font-weight: 600; color: var(--gray-800); margin-bottom: 4px; }
+        .join-request-message { font-size: 14px; color: var(--gray-600); }
+        .join-request-message strong { color: var(--navy); }
+        .join-request-actions { display: flex; gap: 12px; padding: 0 24px 24px; }
+        .join-request-actions .btn { flex: 1; padding: 14px 20px; font-size: 15px; font-weight: 600; border-radius: 12px; cursor: pointer; border: none; transition: all 0.2s; }
+        .join-request-actions .btn-decline { background: var(--gray-100); color: var(--gray-700); }
+        .join-request-actions .btn-decline:hover { background: var(--gray-200); }
+        .join-request-actions .btn-accept { background: var(--green); color: white; }
+        .join-request-actions .btn-accept:hover { background: #16a34a; }
+        
         /* Loading */
         .loading { position: fixed; inset: 0; background: var(--white); display: flex; align-items: center; justify-content: center; z-index: 9999; }
         .loading-spinner { width: 40px; height: 40px; border: 3px solid var(--gray-200); border-top-color: var(--navy); border-radius: 50%; animation: spin 1s linear infinite; }
@@ -1650,6 +1673,36 @@
         body.dark-mode .btn-danger.btn-sm {
             padding: 6px 12px !important;
             font-size: 12px !important;
+        }
+
+        /* Join Request Popup - Dark Mode */
+        body.dark-mode .join-request-popup {
+            background: #1e293b !important;
+        }
+
+        body.dark-mode .join-request-body {
+            background: #1e293b !important;
+        }
+
+        body.dark-mode .join-request-name {
+            color: #ffffff !important;
+        }
+
+        body.dark-mode .join-request-message {
+            color: #94a3b8 !important;
+        }
+
+        body.dark-mode .join-request-message strong {
+            color: #60a5fa !important;
+        }
+
+        body.dark-mode .join-request-actions .btn-decline {
+            background: #334155 !important;
+            color: #e2e8f0 !important;
+        }
+
+        body.dark-mode .join-request-actions .btn-decline:hover {
+            background: #475569 !important;
         }
 
         /* DIVIDERS */
@@ -2939,10 +2992,103 @@
                 window.addEventListener('beforeunload', function() { updateOnlineStatus(false); });
                 
                 document.getElementById('loadingScreen').style.display = 'none';
+                
+                // Check URL parameters for join request popup
+                checkUrlParams();
             } catch (err) {
                 console.error('Init error:', err);
                 document.getElementById('loadingScreen').style.display = 'none';
             }
+        }
+        
+        async function checkUrlParams() {
+            var params = new URLSearchParams(window.location.search);
+            var joinRequest = params.get('join_request');
+            var notifId = params.get('notif_id');
+            var groupParam = params.get('group');
+            
+            // Handle join request popup
+            if (joinRequest && notifId) {
+                var parts = joinRequest.split(':');
+                if (parts.length === 2) {
+                    var groupId = parts[0];
+                    var odaUserId = parts[1];
+                    showJoinRequestPopup(groupId, odaUserId, notifId);
+                }
+                // Clear URL params
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+            // Handle opening a specific group
+            else if (groupParam) {
+                // Wait a bit for groups to load then open
+                setTimeout(function() {
+                    if (myGroups.some(function(g) { return g.id === groupParam; })) {
+                        openGroup(groupParam);
+                    }
+                }, 500);
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+        
+        async function showJoinRequestPopup(groupId, odaUserId, notifId) {
+            try {
+                // Get group info
+                var groupResult = await supabaseClient.from('study_groups').select('name, avatar_url').eq('id', groupId).single();
+                var group = groupResult.data;
+                if (!group) { showToast('Group not found', 'error'); return; }
+                
+                // Get requester info
+                var userResult = await supabaseClient.from('profiles').select('first_name, last_name, full_name, avatar_url').eq('id', odaUserId).single();
+                var user = userResult.data;
+                if (!user) { showToast('User not found', 'error'); return; }
+                var userName = user.full_name || ((user.first_name || '') + ' ' + (user.last_name || '')).trim() || 'Someone';
+                var userInitials = getInitials(userName);
+                var userAvatarHtml = hasValidAvatar(user.avatar_url) ? '<img src="' + escapeHtml(user.avatar_url) + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">' : userInitials;
+                
+                // Create popup overlay
+                var overlay = document.createElement('div');
+                overlay.className = 'join-request-overlay';
+                overlay.id = 'joinRequestOverlay';
+                overlay.innerHTML = '<div class="join-request-popup">' +
+                    '<div class="join-request-header">' +
+                        '<div class="join-request-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg></div>' +
+                        '<h3>Join Request</h3>' +
+                    '</div>' +
+                    '<div class="join-request-body">' +
+                        '<div class="join-request-user">' +
+                            '<div class="join-request-avatar" style="background:' + getColorFromId(odaUserId) + ';">' + userAvatarHtml + '</div>' +
+                            '<div class="join-request-info">' +
+                                '<div class="join-request-name">' + escapeHtml(userName) + '</div>' +
+                                '<div class="join-request-message">wants to join <strong>' + escapeHtml(group.name) + '</strong></div>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="join-request-actions">' +
+                        '<button class="btn btn-decline" onclick="handleJoinRequestPopup(\'' + groupId + ':' + odaUserId + '\', \'' + notifId + '\', false)">Decline</button>' +
+                        '<button class="btn btn-accept" onclick="handleJoinRequestPopup(\'' + groupId + ':' + odaUserId + '\', \'' + notifId + '\', true)">Accept</button>' +
+                    '</div>' +
+                '</div>';
+                
+                document.body.appendChild(overlay);
+                
+                // Animate in
+                setTimeout(function() { overlay.classList.add('show'); }, 10);
+            } catch (e) {
+                console.error('Error showing join request popup:', e);
+                showToast('Failed to load join request', 'error');
+            }
+        }
+        
+        async function handleJoinRequestPopup(refId, notifId, accept) {
+            // Close popup
+            var overlay = document.getElementById('joinRequestOverlay');
+            if (overlay) {
+                overlay.classList.remove('show');
+                setTimeout(function() { overlay.remove(); }, 300);
+            }
+            
+            // Handle the request using existing function
+            await handleJoinRequest(refId, notifId, accept);
         }
         
         function startNotificationPolling() {

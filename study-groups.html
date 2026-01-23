@@ -3788,7 +3788,7 @@
                                 title: 'Request Accepted! 🎉',
                                 body: 'You have been accepted into ' + groupName,
                                 data: {
-                                    type: 'message',
+                                    type: 'group_join_request',
                                     groupId: groupId,
                                     url: '/study-groups.html?group=' + groupId
                                 }
@@ -3798,13 +3798,13 @@
                         console.error('Push notification error:', error);
                     }
                     
-                    // In-app notification
+                    // In-app notification - use group_join_request type with reference_id as just groupId
                     var notifResult = await supabaseClient.from('notifications').insert({
                         user_id: odaUserId,
                         title: 'Request Accepted! 🎉',
                         body: 'You have been accepted into ' + groupName,
-                        type: 'message',
-                        reference_id: groupId,
+                        type: 'group_join_request',
+                        reference_id: 'accepted:' + groupId,
                         is_read: false
                     });
                     if (notifResult.error) {
@@ -3822,7 +3822,7 @@
                                 title: 'Request Declined',
                                 body: 'Your request to join ' + groupName + ' was declined',
                                 data: {
-                                    type: 'message',
+                                    type: 'group_join_request',
                                     groupId: groupId,
                                     url: '/study-groups.html'
                                 }
@@ -3837,8 +3837,8 @@
                         user_id: odaUserId,
                         title: 'Request Declined',
                         body: 'Your request to join ' + groupName + ' was declined',
-                        type: 'message',
-                        reference_id: groupId,
+                        type: 'group_join_request',
+                        reference_id: 'declined:' + groupId,
                         is_read: false
                     });
                     if (notifResult.error) {
@@ -4578,6 +4578,30 @@
         // ============================================
         async function handleNotifClick(id, type, refId) {
             try { await supabaseClient.from('notifications').update({ is_read: true }).eq('id', id); } catch(e) {}
+            
+            // Check if this is an accepted/declined notification
+            if (type === 'group_join_request' && refId) {
+                if (refId.startsWith('accepted:')) {
+                    var groupId = refId.replace('accepted:', '');
+                    await loadMyGroups();
+                    openGroup(groupId);
+                    toggleNotifications();
+                    return;
+                } else if (refId.startsWith('declined:')) {
+                    // Just go to study groups discover tab
+                    switchGroupTab('discover');
+                    toggleNotifications();
+                    return;
+                } else if (refId.includes(':')) {
+                    // This is a join request for admin - show popup
+                    var n = notifications.find(function(x) { return x.id === id; });
+                    if (n) {
+                        showJoinRequestPopup(refId.split(':')[0], refId.split(':')[1], id);
+                    }
+                    toggleNotifications();
+                    return;
+                }
+            }
             
             // Check if this is a group notification by reference_id
             if (refId && refId.startsWith('group:')) {
@@ -5361,6 +5385,23 @@
         async function handleNotifClickModal(id, type, refId) {
             await supabaseClient.from('notifications').update({ is_read: true }).eq('id', id);
             closeNotificationsModal();
+            
+            // Check if this is an accepted/declined notification
+            if (type === 'group_join_request' && refId) {
+                if (refId.startsWith('accepted:')) {
+                    var groupId = refId.replace('accepted:', '');
+                    await loadMyGroups();
+                    openGroup(groupId);
+                    return;
+                } else if (refId.startsWith('declined:')) {
+                    switchGroupTab('discover');
+                    return;
+                } else if (refId.includes(':')) {
+                    // This is a join request for admin - show popup
+                    showJoinRequestPopup(refId.split(':')[0], refId.split(':')[1], id);
+                    return;
+                }
+            }
             
             // Check if this is a group notification by reference_id
             if (refId && refId.startsWith('group:')) {

@@ -2313,18 +2313,7 @@
                 return '<div class="notif-dropdown-item ' + (n.is_read ? '' : 'unread') + '" onclick="handleNotifClick(\'' + n.id + '\',\'' + type + '\',\'' + refId + '\')"><div class="notif-icon ' + iconClass + '"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">' + iconSvg + '</svg></div><div class="notif-content"><h4>' + escapeHtml(n.title || 'Notification') + '</h4><p>' + escapeHtml(n.body || '') + '</p><div class="time">' + formatTimeAgo(n.created_at) + '</div></div></div>';
             }).join('');
         }
-        async function handleNotifClick(id, type, refId) { 
-            await supabaseClient.from('notifications').update({ is_read: true }).eq('id', id); 
-            const n = notifications.find(x => x.id === id); if (n) n.is_read = true; 
-            renderNotifications(); 
-            document.getElementById('notifDropdown').classList.remove('show'); 
-            if (type === 'group_join_request' && n && n.reference_id) { window.location.href = 'study-groups.html?join_request=' + encodeURIComponent(n.reference_id) + '&notif_id=' + id; return; }
-            if (type === 'group_join_accepted' && n && n.reference_id) { window.location.href = 'study-groups.html?group=' + n.reference_id; return; }
-            if (refId && refId.startsWith('group:')) { window.location.href = 'study-groups.html?id=' + refId.replace('group:', ''); return; } 
-            if (type.includes('friend')) window.location.href = 'friends.html'; 
-            else if (type.includes('message')) window.location.href = 'messages.html'; 
-            else if (type.includes('group')) window.location.href = 'study-groups.html'; 
-        }
+        async function handleNotifClick(id, type, refId) { const n = notifications.find(x => x.id === id); await supabaseClient.from('notifications').update({ is_read: true }).eq('id', id); if (n) n.is_read = true; renderNotifications(); document.getElementById('notifDropdown').classList.remove('show'); if (type === 'group_join_request' && n && n.reference_id) { if (n.reference_id.startsWith('accepted:')) { window.location.href = 'study-groups.html?group=' + n.reference_id.replace('accepted:', ''); return; } if (n.reference_id.startsWith('declined:')) { window.location.href = 'study-groups.html'; return; } window.location.href = 'study-groups.html?join_request=' + encodeURIComponent(n.reference_id) + '&notif_id=' + id; return; } if (refId && refId.startsWith('group:')) { window.location.href = 'study-groups.html?id=' + refId.replace('group:', ''); return; } if (type.includes('friend')) window.location.href = 'friends.html'; else if (type.includes('message')) window.location.href = 'messages.html'; else if (type.includes('group')) window.location.href = 'study-groups.html'; }
         async function markAllRead() { await supabaseClient.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id); notifications.forEach(n => n.is_read = true); renderNotifications(); showToast('Marked all as read'); }
         function toggleNotifications(e) { e.stopPropagation(); document.getElementById('notifDropdown').classList.toggle('show'); }
 
@@ -2420,8 +2409,11 @@
             const n = notifications.find(x => x.id === id);
             await supabaseClient.from('notifications').update({ is_read: true }).eq('id', id);
             closeNotificationsModal();
-            if (type === 'group_join_request' && n && n.reference_id) { window.location.href = 'study-groups.html?join_request=' + encodeURIComponent(n.reference_id) + '&notif_id=' + id; return; }
-            if (type === 'group_join_accepted' && n && n.reference_id) { window.location.href = 'study-groups.html?group=' + n.reference_id; return; }
+            if (type === 'group_join_request' && n && n.reference_id) {
+                if (n.reference_id.startsWith('accepted:')) { window.location.href = 'study-groups.html?group=' + n.reference_id.replace('accepted:', ''); return; }
+                if (n.reference_id.startsWith('declined:')) { window.location.href = 'study-groups.html'; return; }
+                window.location.href = 'study-groups.html?join_request=' + encodeURIComponent(n.reference_id) + '&notif_id=' + id; return;
+            }
             if (refId && refId.startsWith('group:')) { window.location.href = 'study-groups.html?id=' + refId.replace('group:', ''); return; }
             if (type.includes('friend')) window.location.href = 'friends.html';
             else if (type.includes('message')) window.location.href = 'messages.html';

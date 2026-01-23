@@ -3145,8 +3145,12 @@
             const n = notifications.find(x => x.id === id);
             await supabaseClient.from('notifications').update({ is_read: true }).eq('id', id);
             document.getElementById('notificationDropdown').classList.remove('show');
-            if (type === 'group_join_request' && n && n.reference_id) { location.href = 'study-groups.html?join_request=' + encodeURIComponent(n.reference_id) + '&notif_id=' + id; return; }
-            if (type === 'group_join_accepted' && n && n.reference_id) { location.href = 'study-groups.html?group=' + n.reference_id; return; }
+            // Handle group join request notifications
+            if (type === 'group_join_request' && n && n.reference_id) {
+                if (n.reference_id.startsWith('accepted:')) { location.href = 'study-groups.html?group=' + n.reference_id.replace('accepted:', ''); return; }
+                if (n.reference_id.startsWith('declined:')) { location.href = 'study-groups.html'; return; }
+                location.href = 'study-groups.html?join_request=' + encodeURIComponent(n.reference_id) + '&notif_id=' + id; return;
+            }
             if (refId && refId.startsWith('group:')) { location.href = 'study-groups.html?id=' + refId.replace('group:', ''); return; }
             if (type.includes('friend')) location.href = 'friends.html';
             else if (type.includes('message')) location.href = 'messages.html';
@@ -3175,17 +3179,7 @@
             }).join('');
         }
 
-        async function handleNotifClickModal(id, type, refId) { 
-            const n = notifications.find(x => x.id === id);
-            await supabaseClient.from('notifications').update({ is_read: true }).eq('id', id); 
-            closeNotificationsModal(); 
-            if (type === 'group_join_request' && n && n.reference_id) { location.href = 'study-groups.html?join_request=' + encodeURIComponent(n.reference_id) + '&notif_id=' + id; return; }
-            if (type === 'group_join_accepted' && n && n.reference_id) { location.href = 'study-groups.html?group=' + n.reference_id; return; }
-            if (refId && refId.startsWith('group:')) { location.href = 'study-groups.html?id=' + refId.replace('group:', ''); return; } 
-            if (type.includes('friend')) location.href = 'friends.html'; 
-            else if (type.includes('message')) location.href = 'messages.html'; 
-            else if (type.includes('group')) location.href = 'study-groups.html'; 
-        }
+        async function handleNotifClickModal(id, type, refId) { const n = notifications.find(x => x.id === id); await supabaseClient.from('notifications').update({ is_read: true }).eq('id', id); closeNotificationsModal(); if (type === 'group_join_request' && n && n.reference_id) { if (n.reference_id.startsWith('accepted:')) { location.href = 'study-groups.html?group=' + n.reference_id.replace('accepted:', ''); return; } if (n.reference_id.startsWith('declined:')) { location.href = 'study-groups.html'; return; } location.href = 'study-groups.html?join_request=' + encodeURIComponent(n.reference_id) + '&notif_id=' + id; return; } if (refId && refId.startsWith('group:')) { location.href = 'study-groups.html?id=' + refId.replace('group:', ''); return; } if (type.includes('friend')) location.href = 'friends.html'; else if (type.includes('message')) location.href = 'messages.html'; else if (type.includes('group')) location.href = 'study-groups.html'; }
         async function markAllNotificationsReadModal() { await supabaseClient.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id); notifications.forEach(n => n.is_read = true); renderNotifications(); loadAllNotifications(); }
         async function clearAllNotifications() { if (!confirm('Clear all notifications?')) return; const { error } = await supabaseClient.from('notifications').delete().eq('user_id', currentUser.id); if (error) { showToast('Failed to clear. Check database permissions.', 'error'); return; } notifications = []; renderNotifications(); loadAllNotifications(); closeNotificationsModal(); showToast('Notifications cleared', 'success'); }
 

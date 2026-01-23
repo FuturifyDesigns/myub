@@ -3067,13 +3067,16 @@
             
             // Check if this is a group join request notification
             if (type === 'group_join_request' && n && n.reference_id) {
+                // Check for accepted/declined prefix
+                if (n.reference_id.startsWith('accepted:')) {
+                    window.location.href = 'study-groups.html?group=' + n.reference_id.replace('accepted:', '');
+                    return;
+                } else if (n.reference_id.startsWith('declined:')) {
+                    window.location.href = 'study-groups.html';
+                    return;
+                }
+                // Regular join request - show popup
                 window.location.href = 'study-groups.html?join_request=' + encodeURIComponent(n.reference_id) + '&notif_id=' + id;
-                return;
-            }
-            
-            // Check if this is a group join accepted notification
-            if (type === 'group_join_accepted' && n && n.reference_id) {
-                window.location.href = 'study-groups.html?group=' + n.reference_id;
                 return;
             }
             
@@ -3478,8 +3481,11 @@
             const n = notifications.find(x => x.id === id);
             await supabaseClient.from('notifications').update({ is_read: true }).eq('id', id);
             closeNotificationsModal();
-            if (type === 'group_join_request' && n && n.reference_id) { window.location.href = 'study-groups.html?join_request=' + encodeURIComponent(n.reference_id) + '&notif_id=' + id; return; }
-            if (type === 'group_join_accepted' && n && n.reference_id) { window.location.href = 'study-groups.html?group=' + n.reference_id; return; }
+            if (type === 'group_join_request' && n && n.reference_id) { 
+                if (n.reference_id.startsWith('accepted:')) { window.location.href = 'study-groups.html?group=' + n.reference_id.replace('accepted:', ''); return; }
+                if (n.reference_id.startsWith('declined:')) { window.location.href = 'study-groups.html'; return; }
+                window.location.href = 'study-groups.html?join_request=' + encodeURIComponent(n.reference_id) + '&notif_id=' + id; return; 
+            }
             if (type === 'friend_request' || type === 'friend_accept') window.location.href = 'friends.html';
             else if (type === 'message') window.location.href = 'messages.html';
             else if (type === 'study_group') window.location.href = 'study-groups.html';

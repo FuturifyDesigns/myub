@@ -1993,12 +1993,12 @@
                     <h4>🐛 Found a Bug? Have Suggestions?</h4>
                     <p>We're constantly improving MyUB. Your feedback helps us make it better for everyone!</p>
                     <div class="contact-links">
-                        <a href="mailto:futurifydesigns@gmail.com" class="contact-link">
+                        <a href="/cdn-cgi/l/email-protection#dbbdaeafaea9b2bda2bfbea8b2bcb5a89bbcb6bab2b7f5b8b4b6" class="contact-link">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
                                 <polyline points="22,6 12,13 2,6"/>
                             </svg>
-                            futurifydesigns@gmail.com
+                            <span class="__cf_email__" data-cfemail="593f2c2d2c2b303f203d3c2a303e372a193e34383035773a3634">[email&#160;protected]</span>
                         </a>
                         <a href="https://wa.me/26777783823" target="_blank" class="contact-link">
                             <svg viewBox="0 0 24 24" fill="currentColor">
@@ -2396,7 +2396,7 @@
         </div>
     </div>
 
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         // Supabase
         const SUPABASE_URL = 'https://weuxtwmaqmbhskjpjdyi.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndldXh0d21hcW1iaHNranBqZHlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NTYzMTcsImV4cCI6MjA4MDMzMjMxN30.J-0Nd0MY6-g_ltbBNHwOulqZuQfb8mKIRgx0dAaJ76o';
@@ -3065,6 +3065,18 @@
             const unreadCount = notifications.filter(n => !n.is_read).length;
             updateAppBadge(unreadCount);
             
+            // Check if this is a group join request notification
+            if (type === 'group_join_request' && n && n.reference_id) {
+                window.location.href = 'study-groups.html?join_request=' + encodeURIComponent(n.reference_id) + '&notif_id=' + id;
+                return;
+            }
+            
+            // Check if this is a group join accepted notification
+            if (type === 'group_join_accepted' && n && n.reference_id) {
+                window.location.href = 'study-groups.html?group=' + n.reference_id;
+                return;
+            }
+            
             // Check if this is a group notification
             if (refId && refId.startsWith('group:')) {
                 window.location.href = 'study-groups.html?id=' + refId.replace('group:', '');
@@ -3463,8 +3475,11 @@
         }
         
         async function handleNotifClickModal(id, type) {
+            const n = notifications.find(x => x.id === id);
             await supabaseClient.from('notifications').update({ is_read: true }).eq('id', id);
             closeNotificationsModal();
+            if (type === 'group_join_request' && n && n.reference_id) { window.location.href = 'study-groups.html?join_request=' + encodeURIComponent(n.reference_id) + '&notif_id=' + id; return; }
+            if (type === 'group_join_accepted' && n && n.reference_id) { window.location.href = 'study-groups.html?group=' + n.reference_id; return; }
             if (type === 'friend_request' || type === 'friend_accept') window.location.href = 'friends.html';
             else if (type === 'message') window.location.href = 'messages.html';
             else if (type === 'study_group') window.location.href = 'study-groups.html';
@@ -3674,13 +3689,4 @@
                     console.log('OneSignal not loaded. Please include OneSignal script in the page.');
                     return;
                 }
-                await OneSignal.Slidedown.promptPush();
-                console.log('Push notification prompt shown');
-            } catch (error) {
-                console.error('Error enabling notifications manually:', error);
-            }
-        };
-    </script>
-
-</body>
-</html>
+                await OneSigna

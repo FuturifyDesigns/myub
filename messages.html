@@ -233,7 +233,7 @@
         .chat-action-btn { width: 36px; height: 36px; border: none; background: var(--gray-100); border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
         .chat-action-btn:hover { background: var(--gray-200); }
         .chat-action-btn svg { width: 18px; height: 18px; color: var(--gray-600); }
-        .selection-header { padding: 12px 20px; background: var(--navy); display: none; align-items: center; gap: 12px; }
+        .selection-header { padding: 12px 20px; background: var(--navy); display: none; align-items: center; gap: 12px; position: relative; z-index: 100; }
         .selection-header.show { display: flex; }
         .selection-count { color: var(--white); font-size: 15px; font-weight: 600; flex: 1; }
         .selection-actions { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -1035,6 +1035,120 @@
 
         body.dark-mode .profile-modal-actions .btn-primary {
             background: var(--navy) !important;
+        }
+
+        /* Profile Modal Content - Dark Mode Fix */
+        body.dark-mode .profile-modal-content {
+            background: transparent !important;
+        }
+
+        body.dark-mode .profile-modal-avatar {
+            border-color: #334155 !important;
+        }
+
+        body.dark-mode .profile-modal-program {
+            color: #94a3b8 !important;
+        }
+
+        body.dark-mode .profile-modal-status {
+            color: #64748b !important;
+        }
+
+        body.dark-mode .profile-modal-status.online {
+            color: #22c55e !important;
+        }
+
+        body.dark-mode .profile-modal-bio {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+            color: #e2e8f0 !important;
+        }
+
+        body.dark-mode .profile-modal-meta {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+        }
+
+        body.dark-mode .profile-modal-meta .label {
+            color: #64748b !important;
+        }
+
+        body.dark-mode .profile-modal-meta .value {
+            color: #ffffff !important;
+        }
+
+        body.dark-mode .profile-blocked-notice {
+            background: rgba(239, 68, 68, 0.15) !important;
+            color: #f87171 !important;
+        }
+
+        /* Profile Modal Footer Buttons - Dark Mode */
+        body.dark-mode #profileModalFooter {
+            background: #1e293b !important;
+        }
+
+        body.dark-mode .profile-modal-actions .btn-success {
+            background: #22c55e !important;
+            color: #ffffff !important;
+        }
+
+        body.dark-mode .profile-modal-actions .btn-danger {
+            background: #dc2626 !important;
+            color: #ffffff !important;
+        }
+
+        body.dark-mode .profile-modal-actions .btn-outline-danger {
+            background: transparent !important;
+            border: 2px solid #dc2626 !important;
+            color: #f87171 !important;
+        }
+
+        body.dark-mode .profile-modal-actions .btn-outline-danger:hover {
+            background: rgba(220, 38, 38, 0.1) !important;
+        }
+
+        body.dark-mode .profile-modal-actions .btn-warning {
+            background: #f97316 !important;
+            border: none !important;
+            color: #ffffff !important;
+        }
+
+        body.dark-mode .profile-modal-actions .btn-warning:hover {
+            background: #ea580c !important;
+        }
+
+        body.dark-mode .profile-modal-actions .btn-secondary {
+            background: #334155 !important;
+            border: 2px solid #475569 !important;
+            color: #e2e8f0 !important;
+        }
+
+        body.dark-mode .profile-modal-actions .btn-secondary:hover {
+            background: #475569 !important;
+        }
+
+        body.dark-mode .profile-modal-link-container {
+            border-top-color: #334155 !important;
+        }
+
+        body.dark-mode .profile-modal-link {
+            background: #0f172a !important;
+            border-color: #334155 !important;
+            color: #60a5fa !important;
+        }
+
+        body.dark-mode .profile-modal-link:hover {
+            background: #1e293b !important;
+            border-color: var(--navy) !important;
+        }
+
+        body.dark-mode .profile-modal-link svg {
+            color: #60a5fa !important;
+        }
+
+        /* Button Row (Block/Report) - Dark Mode */
+        body.dark-mode .btn-row {
+            background: transparent !important;
         }
 
         /* Dropdown Menu (View Profile, Clear Chat) */

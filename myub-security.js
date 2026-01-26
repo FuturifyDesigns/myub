@@ -1,10 +1,63 @@
 /**
  * MyUB Security Enhancement Module
- * Version: 1.0.0
+ * Version: 1.1.0
  * 
  * This script adds essential security layers to MyUB application.
  * Include this script in all HTML pages BEFORE other scripts.
  */
+
+// =============================================
+// CONSOLE PROTECTION (Must run first!)
+// =============================================
+(function() {
+    'use strict';
+    
+    // Disable verbose logging in production
+    if (window.location.hostname !== 'localhost' && 
+        window.location.hostname !== '127.0.0.1' &&
+        window.location.hostname !== '192.168.') {
+        
+        const noop = function() {};
+        
+        // Store original for security warnings only
+        const originalWarn = console.warn;
+        const originalError = console.error;
+        
+        // Silence non-critical logs
+        console.log = noop;
+        console.debug = noop;
+        console.info = noop;
+        console.table = noop;
+        console.trace = noop;
+        console.dir = noop;
+        console.dirxml = noop;
+        console.group = noop;
+        console.groupCollapsed = noop;
+        console.groupEnd = noop;
+        console.time = noop;
+        console.timeEnd = noop;
+        console.timeLog = noop;
+        console.count = noop;
+        console.countReset = noop;
+        
+        // Keep warnings and errors but filter stack traces
+        console.warn = function(...args) {
+            // Only show security-related warnings
+            const msg = args.join(' ');
+            if (msg.includes('Security:')) {
+                originalWarn.apply(console, args);
+            }
+        };
+        
+        console.error = function(...args) {
+            // Show errors but without full stack traces in production
+            originalError.apply(console, ['MyUB Error:', args[0]]);
+        };
+        
+        // Indicate production mode silently
+        window.__MYUB_PROD__ = true;
+    }
+})();
 
 (function() {
     'use strict';

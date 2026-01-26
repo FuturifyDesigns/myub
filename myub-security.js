@@ -459,11 +459,11 @@
             csp.httpEquiv = 'Content-Security-Policy';
             csp.content = [
                 "default-src 'self'",
-                "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://cdn.onesignal.com https://cdnjs.cloudflare.com",
+                "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://cdn.onesignal.com https://*.onesignal.com https://api.onesignal.com https://cdnjs.cloudflare.com",
                 "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com",
                 "font-src 'self' https://fonts.gstatic.com",
                 "img-src 'self' data: https: blob:",
-                "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.onesignal.com",
+                "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.onesignal.com https://api.onesignal.com wss://*.peerjs.com https://*.peerjs.com",
                 "frame-src 'none'",
                 "object-src 'none'",
                 "base-uri 'self'"

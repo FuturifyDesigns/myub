@@ -6,7 +6,7 @@
     <title>Dashboard - MyUB</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -71,7 +71,11 @@
             --sidebar-w: 260px;
         }
 
-        html { height: 100%; scroll-behavior: smooth; }
+        html {
+            height: 100%;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
 
         body {
             font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -81,7 +85,6 @@
             color: var(--text);
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            overflow-x: hidden;
         }
         button, input, select, textarea { font-family: inherit; }
         input[type="text"], input[type="email"], input[type="password"], input[type="search"], textarea {
@@ -125,7 +128,7 @@
             display: inline-flex;
             align-items: flex-end;
             gap: calc(var(--logo-size) * 0.06);
-            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-family: 'Sora', 'Outfit', sans-serif;
             line-height: 1;
             user-select: none;
         }
@@ -212,12 +215,13 @@
         .sidebar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 3px; }
 
         .sidebar-header {
-            padding: 14px 14px 22px;
+            padding: 26px 14px 22px;
             margin-bottom: 14px;
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: flex-start;
+            position: relative;
         }
         .sidebar-logo {
             display: inline-flex;
@@ -311,6 +315,7 @@
             min-height: 100vh;
             padding: 18px 28px 40px;
             position: relative;
+            /* No overflow here — keeps .topbar sticky working */
         }
 
         /* ========== TOPBAR ========== */
@@ -353,12 +358,11 @@
         .menu-toggle svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; }
         .menu-toggle:hover { background: var(--surface-3); }
         .page-title {
-            font-family: 'Cormorant Garamond', serif;
+            font-family: 'Sora', 'Outfit', sans-serif;
             font-size: 22px;
-            font-weight: 600;
-            font-style: italic;
+            font-weight: 700;
             color: var(--white);
-            letter-spacing: 0.3px;
+            letter-spacing: -0.3px;
             white-space: nowrap;
         }
         .topbar-right {
@@ -857,14 +861,13 @@
         }
         .welcome-text { position: relative; z-index: 2; flex: 1; min-width: 0; }
         .welcome-text h2 {
-            font-family: 'Cormorant Garamond', serif;
+            font-family: 'Sora', 'Outfit', sans-serif;
             font-size: clamp(24px, 3.2vw, 34px);
-            font-weight: 600;
-            font-style: italic;
+            font-weight: 800;
             color: var(--white);
-            line-height: 1.15;
-            margin-bottom: 4px;
-            letter-spacing: 0.3px;
+            line-height: 1.1;
+            margin-bottom: 6px;
+            letter-spacing: -0.5px;
         }
         .welcome-text p { font-size: 13.5px; color: var(--text-soft); }
         .welcome-date {
@@ -880,11 +883,12 @@
             z-index: 2;
         }
         .welcome-date .day {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 38px;
-            font-weight: 700;
+            font-family: 'Sora', 'Outfit', sans-serif;
+            font-size: 36px;
+            font-weight: 800;
             color: var(--white);
             line-height: 1;
+            letter-spacing: -1.5px;
         }
         .welcome-date > div:last-child {
             font-size: 11px;
@@ -952,12 +956,13 @@
         .stat-icon.orange { background: rgba(251, 146, 60, 0.15); border-color: rgba(251, 146, 60, 0.3); }
         .stat-icon.orange svg { stroke: var(--orange); }
         .stat-info h3 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 30px;
-            font-weight: 700;
+            font-family: 'Sora', 'Outfit', sans-serif;
+            font-size: 32px;
+            font-weight: 800;
             color: var(--white);
             line-height: 1;
             margin-bottom: 2px;
+            letter-spacing: -1px;
         }
         .stat-info p { font-size: 12px; color: var(--text-muted); font-weight: 500; }
 
@@ -986,12 +991,11 @@
             margin-bottom: 16px;
         }
         .card-title {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 20px;
-            font-weight: 600;
-            font-style: italic;
+            font-family: 'Sora', 'Outfit', sans-serif;
+            font-size: 19px;
+            font-weight: 700;
             color: var(--white);
-            letter-spacing: 0.2px;
+            letter-spacing: -0.2px;
         }
         .card-action {
             font-size: 12px;
@@ -1100,11 +1104,11 @@
         .gpa-value {
             position: relative;
             z-index: 2;
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 40px;
-            font-weight: 700;
+            font-family: 'Sora', 'Outfit', sans-serif;
+            font-size: 42px;
+            font-weight: 800;
             color: var(--white);
-            letter-spacing: -1px;
+            letter-spacing: -2px;
         }
         .gpa-label {
             font-size: 12px;
@@ -1158,7 +1162,7 @@
             min-width: 64px;
         }
         .schedule-time .time {
-            font-family: 'Cormorant Garamond', serif;
+            font-family: 'Sora', 'Outfit', sans-serif;
             font-size: 18px;
             font-weight: 700;
             color: var(--white);
@@ -1259,10 +1263,9 @@
         /* Hide the original SVG in welcome-modal-logo if present (we'll replace it) */
         .welcome-modal-logo > svg { display: none; }
         .welcome-modal-header h1 {
-            font-family: 'Cormorant Garamond', serif;
+            font-family: 'Sora', 'Outfit', sans-serif;
             font-size: 28px;
             font-weight: 600;
-            font-style: italic;
             color: var(--white);
             margin-bottom: 6px;
             position: relative;
@@ -1277,10 +1280,9 @@
         .welcome-modal-body { padding: 24px 32px; }
         .welcome-intro { margin-bottom: 22px; text-align: center; }
         .welcome-intro h2 {
-            font-family: 'Cormorant Garamond', serif;
+            font-family: 'Sora', 'Outfit', sans-serif;
             font-size: 22px;
             font-weight: 600;
-            font-style: italic;
             color: var(--white);
             margin-bottom: 6px;
         }
@@ -1487,10 +1489,9 @@
             margin-bottom: 4px;
         }
         .announcement-title {
-            font-family: 'Cormorant Garamond', serif;
+            font-family: 'Sora', 'Outfit', sans-serif;
             font-size: 22px;
             font-weight: 600;
-            font-style: italic;
             color: var(--white);
             line-height: 1.2;
         }
@@ -1636,10 +1637,9 @@
             border-bottom: 1px solid var(--border);
         }
         .notif-modal-header h3 {
-            font-family: 'Cormorant Garamond', serif;
+            font-family: 'Sora', 'Outfit', sans-serif;
             font-size: 22px;
             font-weight: 600;
-            font-style: italic;
             color: var(--white);
             letter-spacing: 0.3px;
         }
@@ -1797,11 +1797,7 @@
             filter: drop-shadow(0 0 24px rgba(196, 30, 58, 0.3));
         }
 
-        /* Welcome banner — italic accent */
-        .welcome-text h2::first-letter {
-            color: var(--red-light);
-            font-size: 1.2em;
-        }
+
 
         /* Decorative vertical rule on left of welcome banner */
         .welcome-banner::after {
@@ -1816,16 +1812,20 @@
             box-shadow: 0 0 16px rgba(196, 30, 58, 0.5);
         }
 
-        /* Sidebar: decorative label above menu */
-        .sidebar-header::after {
+        /* Sidebar header: subtle eyebrow label ABOVE the logo */
+        .sidebar-header {
+            position: relative;
+        }
+        .sidebar-header::before {
             content: 'STUDENT PORTAL';
-            display: block;
+            position: absolute;
+            top: 0;
+            left: 18px;
             font-size: 9px;
             letter-spacing: 2.5px;
             color: var(--text-dim);
-            font-weight: 600;
-            margin-top: 10px;
-            padding-left: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
         }
 
         /* Page title gets a small red dot */

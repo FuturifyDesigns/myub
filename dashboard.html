@@ -1416,15 +1416,6 @@
             box-shadow: 0 10px 30px -10px rgba(44, 82, 130, 0.8);
             transition: all 0.4s var(--ease-out-expo);
         }
-        .welcome-start-btn::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-        .welcome-start-btn > * { position: relative; z-index: 1; }
         .welcome-start-btn svg {
             width: 18px;
             height: 18px;
@@ -1437,10 +1428,10 @@
             margin: 0 !important;
         }
         .welcome-start-btn:hover {
+            background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
             transform: translateY(-2px);
             box-shadow: 0 16px 40px -10px rgba(196, 30, 58, 0.5);
         }
-        .welcome-start-btn:hover::before { opacity: 1; }
 
         /* ========== ANNOUNCEMENTS (keep legacy inline styles working) ========== */
         .announcement-overlay {

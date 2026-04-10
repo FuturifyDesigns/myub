@@ -1829,6 +1829,334 @@
                 transition-duration: 0.01ms !important;
             }
         }
+
+        /* ==========================================================
+           LUSION INTERACTIVITY LAYER
+           ========================================================== */
+
+        /* Number flash when value updates */
+        @keyframes flashPulse {
+            0% { text-shadow: 0 0 0 rgba(196, 30, 58, 0); }
+            30% { text-shadow: 0 0 24px rgba(196, 30, 58, 0.7), 0 0 40px rgba(230, 57, 86, 0.4); color: var(--white); }
+            100% { text-shadow: 0 0 0 rgba(196, 30, 58, 0); }
+        }
+        .flash-pulse { animation: flashPulse 0.9s ease-out; }
+
+        /* Progression card pulse-glow burst */
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 0 0 rgba(196, 30, 58, 0); }
+            30% { box-shadow: 0 0 60px 4px rgba(196, 30, 58, 0.35), inset 0 0 40px rgba(196, 30, 58, 0.08); }
+            100% { box-shadow: 0 0 0 0 rgba(196, 30, 58, 0); }
+        }
+        .pulse-glow { animation: pulseGlow 1.4s ease-out; }
+
+        /* Traveling spark along progression bar */
+        .prog-spark {
+            position: absolute;
+            top: 0;
+            left: -8px;
+            width: 24px;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent);
+            filter: blur(2px);
+            pointer-events: none;
+            animation: sparkRun 1.5s ease-out forwards;
+        }
+        @keyframes sparkRun {
+            from { left: -8px; }
+            to { left: calc(100% - 16px); }
+        }
+
+        /* Tab sliding indicator */
+        .tabs { position: relative; }
+        .tab-indicator {
+            position: absolute;
+            top: 6px;
+            bottom: 6px;
+            left: 6px;
+            background: linear-gradient(135deg, var(--navy-light), var(--navy));
+            border: 1px solid rgba(58, 111, 168, 0.45);
+            border-radius: 10px;
+            box-shadow: 0 8px 20px -8px rgba(44, 82, 130, 0.8);
+            transition: transform 0.55s var(--ease-out-expo), width 0.55s var(--ease-out-expo);
+            pointer-events: none;
+            z-index: 0;
+            width: 0;
+        }
+        .tabs .tab {
+            position: relative;
+            z-index: 1;
+            background: transparent !important;
+            border-color: transparent !important;
+            box-shadow: none !important;
+        }
+        .tabs .tab.active {
+            background: transparent !important;
+            border-color: transparent !important;
+        }
+        .tabs .tab:hover:not(.active) {
+            background: var(--surface-2) !important;
+        }
+
+        /* Predictor summary pulse on CA input change */
+        @keyframes inputPulse {
+            0% { border-color: var(--border); }
+            30% { border-color: rgba(196, 30, 58, 0.5); box-shadow: 0 0 0 4px rgba(196, 30, 58, 0.1); }
+            100% { border-color: var(--border); box-shadow: none; }
+        }
+        .input-pulse { animation: inputPulse 0.8s ease-out; }
+
+        /* ==========================================================
+           BACKGROUND FLOATING ORBS (parallax mesh)
+           ========================================================== */
+        .bg-orbs {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.55;
+            mix-blend-mode: screen;
+        }
+        .orb-1 {
+            width: 520px;
+            height: 520px;
+            top: -120px;
+            left: -120px;
+            background: radial-gradient(circle, rgba(58, 111, 168, 0.65) 0%, transparent 60%);
+            animation: orbFloat1 22s ease-in-out infinite;
+        }
+        .orb-2 {
+            width: 440px;
+            height: 440px;
+            bottom: -100px;
+            right: -80px;
+            background: radial-gradient(circle, rgba(196, 30, 58, 0.55) 0%, transparent 60%);
+            animation: orbFloat2 28s ease-in-out infinite;
+        }
+        .orb-3 {
+            width: 360px;
+            height: 360px;
+            top: 40%;
+            left: 40%;
+            background: radial-gradient(circle, rgba(44, 82, 130, 0.45) 0%, transparent 60%);
+            animation: orbFloat3 32s ease-in-out infinite;
+        }
+        @keyframes orbFloat1 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(60px, 80px) scale(1.1); }
+            50% { transform: translate(100px, 20px) scale(0.95); }
+            75% { transform: translate(20px, 120px) scale(1.05); }
+        }
+        @keyframes orbFloat2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(-80px, -40px) scale(1.08); }
+            50% { transform: translate(-30px, -100px) scale(0.9); }
+            75% { transform: translate(-120px, 20px) scale(1.12); }
+        }
+        @keyframes orbFloat3 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(-100px, 60px) scale(1.1); }
+            66% { transform: translate(80px, -60px) scale(0.95); }
+        }
+
+        /* ==========================================================
+           SCROLL REVEAL
+           ========================================================== */
+        .reveal-init {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.7s var(--ease-out-expo), transform 0.7s var(--ease-out-expo);
+        }
+        .reveal-init.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ==========================================================
+           ENHANCED HOVERS — more life on existing elements
+           ========================================================== */
+
+        /* Summary cards: more aggressive 3d-ish hover */
+        .summary-card {
+            transition: transform 0.45s var(--ease-out-expo), border-color 0.4s ease, background 0.4s ease, box-shadow 0.4s ease !important;
+        }
+        .summary-card:hover {
+            transform: translateY(-6px) scale(1.02) !important;
+            box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.8), 0 0 0 1px var(--border-strong) !important;
+        }
+
+        /* Summary value gets a subtle scale on card hover */
+        .summary-card:hover .summary-value {
+            background: linear-gradient(180deg, #ffffff 0%, #ffb4c0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            transition: background 0.4s ease;
+        }
+
+        /* Progression bar shine is more dramatic */
+        .progression-bar::after {
+            background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.6) 50%, transparent 100%) !important;
+            animation: shine 2s ease-in-out infinite !important;
+        }
+
+        /* Progression bar gets a pulse ring around it when card animates */
+        .pulse-glow .progression-bar {
+            filter: drop-shadow(0 0 20px rgba(196, 30, 58, 0.7));
+        }
+
+        /* Grade badge on hover = slightly bigger + glow */
+        .grade-badge {
+            transition: transform 0.35s var(--ease-out-back), box-shadow 0.35s ease;
+            cursor: default;
+        }
+        .grade-badge:hover {
+            transform: scale(1.12) rotate(-2deg);
+            box-shadow: 0 8px 20px -6px rgba(196, 30, 58, 0.4);
+        }
+
+        /* Semester header: chevron rotates smoother + adds subtle color shift */
+        .semester-section {
+            transition: transform 0.4s var(--ease-out-expo), border-color 0.4s ease, box-shadow 0.4s ease;
+        }
+        .semester-section:hover {
+            transform: translateX(4px);
+            border-color: var(--border-strong);
+            box-shadow: 0 16px 40px -18px rgba(0, 0, 0, 0.5);
+        }
+        .semester-section.open {
+            transform: translateX(0);
+            box-shadow: 0 12px 32px -16px rgba(196, 30, 58, 0.25);
+        }
+
+        /* Semester header gets a small red glow line when open */
+        .semester-section.open .semester-header {
+            background: linear-gradient(90deg, rgba(196, 30, 58, 0.08), transparent);
+        }
+
+        /* Analysis cards — subtle float */
+        .analysis-card {
+            transition: all 0.45s var(--ease-out-expo);
+        }
+        .analysis-card:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 20px 40px -18px rgba(0, 0, 0, 0.6);
+        }
+        .analysis-card:hover .analysis-card-gpa {
+            background: linear-gradient(180deg, #ffffff 0%, #ffb4c0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Grade item hover — lift and color accent */
+        .grade-item {
+            transition: all 0.4s var(--ease-out-back);
+        }
+        .grade-item:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 16px 32px -14px rgba(196, 30, 58, 0.35);
+        }
+        .grade-item:hover .letter {
+            transform: scale(1.1);
+            transition: transform 0.3s ease;
+            display: inline-block;
+        }
+
+        /* Course table row slide effect on hover */
+        .courses-table tbody tr {
+            transition: background 0.3s ease, transform 0.35s var(--ease-out-expo);
+        }
+        .courses-table tbody tr:hover {
+            transform: translateX(4px);
+            background: var(--surface-3) !important;
+        }
+
+        /* Grade result card — pop on hover */
+        .grade-result-card {
+            transition: transform 0.4s var(--ease-out-back), box-shadow 0.4s ease, border-color 0.35s ease !important;
+        }
+        .grade-result-card:hover {
+            transform: translateY(-5px) scale(1.02) !important;
+            box-shadow: 0 24px 48px -20px rgba(0, 0, 0, 0.7) !important;
+        }
+        .grade-result-card:hover .grade-result-score {
+            background: linear-gradient(180deg, #ffffff 0%, #ffb4c0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Card spotlight — intensify */
+        .summary-card::after,
+        .card::after,
+        .analysis-card::after,
+        .grade-result-card::after,
+        .progression-card::after,
+        .semester-section::after,
+        .predictor-card::after,
+        .grade-item::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: radial-gradient(
+                circle 220px at var(--mx, 50%) var(--my, 50%),
+                rgba(255, 255, 255, 0.1) 0%,
+                transparent 65%
+            );
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .summary-card:hover::after,
+        .card:hover::after,
+        .analysis-card:hover::after,
+        .grade-result-card:hover::after,
+        .progression-card:hover::after,
+        .semester-section:hover::after,
+        .predictor-card:hover::after,
+        .grade-item:hover::after { opacity: 1; }
+        .summary-card, .card, .analysis-card, .grade-result-card, .progression-card, .semester-section, .predictor-card, .grade-item { position: relative; }
+        .summary-card > *, .card > *, .analysis-card > *, .grade-result-card > *, .progression-card > *, .semester-section > *, .predictor-card > *, .grade-item > * { position: relative; z-index: 2; }
+
+        /* Buttons — add a ripple/shimmer on hover */
+        .btn-primary, .btn-danger {
+            transition: transform 0.35s var(--ease-out-expo), box-shadow 0.35s ease !important;
+        }
+
+        /* Input focus — brighter */
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            box-shadow: 0 0 0 3px rgba(58, 111, 168, 0.25), 0 0 20px rgba(196, 30, 58, 0.12) !important;
+        }
+
+        /* Progression header stats — animated count */
+        .progression-credits span:first-child {
+            display: inline-block;
+        }
+
+        /* Fade in content swap when tab switches */
+        .tab-content { transition: opacity 0.3s ease; }
+
+        /* Reduce motion */
+        @media (prefers-reduced-motion: reduce) {
+            .orb, .prog-spark, .progression-bar::after {
+                animation: none !important;
+            }
+            .flash-pulse, .pulse-glow, .input-pulse {
+                animation: none !important;
+            }
+        }
+
     </style>
     <!-- Primary Meta Tags -->
     <meta name="title" content="GPA Calculator - MyUB | University of Botswana">
@@ -3518,5 +3846,361 @@
             }, 1000);
         })();
     </script>
+
+    <script>
+        // ==========================================================
+        // GPA CALCULATOR — FULL LUSION-STYLE INTERACTIVITY
+        // ==========================================================
+        (function() {
+            // ============================================================
+            // 1. NUMBER COUNT-UP for summary cards
+            // ============================================================
+            function animateNumber(el, from, to, duration = 1200, decimals = 0) {
+                if (!el) return;
+                const g = window.gsap;
+                const obj = { v: from };
+                const update = () => {
+                    el.textContent = decimals ? obj.v.toFixed(decimals) : Math.round(obj.v).toLocaleString();
+                };
+                if (g) {
+                    g.to(obj, { v: to, duration: duration / 1000, ease: 'power2.out', onUpdate: update });
+                } else {
+                    const start = performance.now();
+                    function tick(now) {
+                        const t = Math.min(1, (now - start) / duration);
+                        const eased = 1 - Math.pow(1 - t, 3);
+                        obj.v = from + (to - from) * eased;
+                        update();
+                        if (t < 1) requestAnimationFrame(tick);
+                    }
+                    requestAnimationFrame(tick);
+                }
+            }
+
+            // Watch summary card values and animate them whenever they change
+            function wireCountUp() {
+                const targets = [
+                    { id: 'cumulativeGPA', decimals: 2 },
+                    { id: 'totalCredits',  decimals: 0 },
+                    { id: 'totalCourses',  decimals: 0 },
+                    { id: 'earnedCredits', decimals: 0 },
+                    { id: 'requiredCredits', decimals: 0 },
+                    { id: 'remainingCredits', decimals: 0 },
+                    { id: 'progressPercent', decimals: 0 }
+                ];
+                targets.forEach(t => {
+                    const el = document.getElementById(t.id);
+                    if (!el) return;
+                    let last = parseFloat(el.textContent) || 0;
+                    const obs = new MutationObserver(() => {
+                        const cur = parseFloat(el.textContent) || 0;
+                        if (cur === last) return;
+                        // Flash effect
+                        el.classList.remove('flash-pulse');
+                        void el.offsetWidth;
+                        el.classList.add('flash-pulse');
+                        // Animate from last to cur
+                        animateNumber(el, last, cur, 900, t.decimals);
+                        last = cur;
+                    });
+                    obs.observe(el, { childList: true, characterData: true, subtree: true });
+                });
+            }
+
+            // ============================================================
+            // 2. PROGRESSION BAR — dramatic fill + particle burst
+            // ============================================================
+            function wireProgressionDrama() {
+                const bar = document.getElementById('progressionBar');
+                if (!bar) return;
+                let lastWidth = 0;
+                const obs = new MutationObserver(() => {
+                    const w = parseFloat(bar.style.width) || 0;
+                    if (w === lastWidth) return;
+                    if (w > lastWidth) {
+                        // Burst effect — add a brief glow class
+                        const card = document.getElementById('progressionCard');
+                        if (card) {
+                            card.classList.remove('pulse-glow');
+                            void card.offsetWidth;
+                            card.classList.add('pulse-glow');
+                        }
+                        // Add a traveling spark along the bar
+                        const spark = document.createElement('div');
+                        spark.className = 'prog-spark';
+                        bar.parentElement.appendChild(spark);
+                        setTimeout(() => spark.remove(), 1600);
+                    }
+                    lastWidth = w;
+                });
+                obs.observe(bar, { attributes: true, attributeFilter: ['style'] });
+            }
+
+            // ============================================================
+            // 3. SEMESTER COLLAPSE — stagger course reveal when opening
+            // ============================================================
+            function wireSemesterStagger() {
+                const container = document.getElementById('semestersContainer');
+                if (!container) return;
+                // Observe new .semester-section being added, and also observe their class changes
+                const mo = new MutationObserver((muts) => {
+                    muts.forEach(m => {
+                        if (m.type === 'attributes' && m.attributeName === 'class') {
+                            const el = m.target;
+                            if (el.classList.contains('semester-section') && el.classList.contains('open')) {
+                                animateCoursesIn(el);
+                            }
+                        }
+                        if (m.type === 'childList') {
+                            m.addedNodes.forEach(n => {
+                                if (n.nodeType === 1 && n.classList && n.classList.contains('semester-section')) {
+                                    // Watch this one for open/close
+                                    mo.observe(n, { attributes: true, attributeFilter: ['class'] });
+                                }
+                            });
+                        }
+                    });
+                });
+                mo.observe(container, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+            }
+            function animateCoursesIn(semesterSection) {
+                const g = window.gsap;
+                if (!g) return;
+                const rows = semesterSection.querySelectorAll('.courses-table tbody tr, .add-course-btn');
+                if (!rows.length) return;
+                g.fromTo(rows,
+                    { x: -18, opacity: 0 },
+                    { x: 0, opacity: 1, duration: 0.45, stagger: 0.05, ease: 'power3.out', clearProps: 'all' }
+                );
+            }
+
+            // ============================================================
+            // 4. TAB SWITCHING — sliding indicator + page transition
+            // ============================================================
+            function wireTabs() {
+                const tabs = document.querySelectorAll('.tabs .tab');
+                if (!tabs.length) return;
+                // Add a background indicator element
+                const tabsWrap = tabs[0].parentElement;
+                if (!tabsWrap.querySelector('.tab-indicator')) {
+                    const ind = document.createElement('span');
+                    ind.className = 'tab-indicator';
+                    tabsWrap.insertBefore(ind, tabsWrap.firstChild);
+                }
+                const indicator = tabsWrap.querySelector('.tab-indicator');
+                function moveIndicator(activeTab) {
+                    if (!activeTab) return;
+                    const r = activeTab.getBoundingClientRect();
+                    const pr = tabsWrap.getBoundingClientRect();
+                    indicator.style.width = r.width + 'px';
+                    indicator.style.transform = `translateX(${r.left - pr.left - 6}px)`;
+                }
+                const initial = tabsWrap.querySelector('.tab.active');
+                setTimeout(() => moveIndicator(initial), 50);
+
+                // Intercept clicks — page transition animation
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        setTimeout(() => moveIndicator(tabsWrap.querySelector('.tab.active')), 10);
+                        // Animate the newly active tab content
+                        const g = window.gsap;
+                        if (g) {
+                            setTimeout(() => {
+                                const active = document.querySelector('.tab-content.active');
+                                if (active) {
+                                    const children = active.querySelectorAll('.card, .progression-card, .summary-card, .semester-analysis, .predictor-card > *');
+                                    g.fromTo(children,
+                                        { y: 16, opacity: 0 },
+                                        { y: 0, opacity: 1, duration: 0.55, stagger: 0.06, ease: 'power3.out', clearProps: 'all' }
+                                    );
+                                }
+                            }, 20);
+                        }
+                    });
+                });
+                window.addEventListener('resize', () => moveIndicator(tabsWrap.querySelector('.tab.active')));
+            }
+
+            // ============================================================
+            // 5. GRADE BADGES — hover pop + color flash on render
+            // ============================================================
+            function wireGradeBadges() {
+                document.addEventListener('mouseenter', (e) => {
+                    if (e.target.classList && e.target.classList.contains && e.target.classList.contains('grade-badge')) {
+                        const g = window.gsap;
+                        if (g) {
+                            g.fromTo(e.target,
+                                { scale: 1 },
+                                { scale: 1.15, duration: 0.2, yoyo: true, repeat: 1, ease: 'power2.out' }
+                            );
+                        }
+                    }
+                }, true);
+            }
+
+            // ============================================================
+            // 6. PREDICTOR RESULTS — animate grade result cards in as they appear
+            // ============================================================
+            function wirePredictorAnimation() {
+                const results = document.getElementById('gradeResults');
+                if (!results) return;
+                const obs = new MutationObserver(() => {
+                    const g = window.gsap;
+                    if (!g) return;
+                    const cards = results.querySelectorAll('.grade-result-card');
+                    if (!cards.length) return;
+                    g.fromTo(cards,
+                        { y: 20, opacity: 0, scale: 0.95 },
+                        { y: 0, opacity: 1, scale: 1, duration: 0.5, stagger: 0.06, ease: 'back.out(1.4)', clearProps: 'all' }
+                    );
+                });
+                obs.observe(results, { childList: true });
+
+                // Also watch CA input for live feedback
+                const caInput = document.getElementById('predCAMark');
+                if (caInput) {
+                    caInput.addEventListener('input', () => {
+                        // small pulse on the summary block
+                        const summary = document.querySelector('.predictor-summary');
+                        if (summary) {
+                            summary.classList.remove('input-pulse');
+                            void summary.offsetWidth;
+                            summary.classList.add('input-pulse');
+                        }
+                    });
+                }
+            }
+
+            // ============================================================
+            // 7. BACKGROUND — floating orbs
+            // ============================================================
+            function wireBackgroundOrbs() {
+                if (document.querySelector('.bg-orbs')) return;
+                const wrap = document.createElement('div');
+                wrap.className = 'bg-orbs';
+                wrap.setAttribute('aria-hidden', 'true');
+                wrap.innerHTML = `
+                    <div class="orb orb-1"></div>
+                    <div class="orb orb-2"></div>
+                    <div class="orb orb-3"></div>
+                `;
+                document.body.appendChild(wrap);
+            }
+
+            // ============================================================
+            // 8. SCROLL-TRIGGERED entrance — fade things in as you scroll
+            // ============================================================
+            function wireScrollReveal() {
+                const io = new IntersectionObserver((entries) => {
+                    entries.forEach(e => {
+                        if (e.isIntersecting) {
+                            e.target.classList.add('revealed');
+                            io.unobserve(e.target);
+                        }
+                    });
+                }, { threshold: 0.1, rootMargin: '0px 0px -80px 0px' });
+                // Observe dynamically added cards
+                const tryObserve = () => {
+                    document.querySelectorAll('.semester-section:not(.reveal-init), .analysis-card:not(.reveal-init), .grade-result-card:not(.reveal-init)').forEach(el => {
+                        el.classList.add('reveal-init');
+                        io.observe(el);
+                    });
+                };
+                setTimeout(tryObserve, 500);
+                const mo = new MutationObserver(tryObserve);
+                setTimeout(() => {
+                    const main = document.getElementById('mainContent');
+                    if (main) mo.observe(main, { childList: true, subtree: true });
+                }, 800);
+            }
+
+            // ============================================================
+            // 9. CURSOR-FOLLOWING GLOW on all major cards (already partial)
+            // ============================================================
+            function wireCursorGlow() {
+                const apply = () => {
+                    const cards = document.querySelectorAll('.summary-card, .card, .analysis-card, .grade-result-card, .progression-card, .semester-section, .predictor-card, .grade-item');
+                    cards.forEach(card => {
+                        if (card.dataset.glow) return;
+                        card.dataset.glow = '1';
+                        card.addEventListener('mousemove', (e) => {
+                            const rect = card.getBoundingClientRect();
+                            card.style.setProperty('--mx', (e.clientX - rect.left) + 'px');
+                            card.style.setProperty('--my', (e.clientY - rect.top) + 'px');
+                        });
+                        card.addEventListener('mouseleave', () => {
+                            card.style.setProperty('--mx', '50%');
+                            card.style.setProperty('--my', '50%');
+                        });
+                    });
+                };
+                setTimeout(apply, 500);
+                setTimeout(apply, 1500);
+                const mo = new MutationObserver(apply);
+                setTimeout(() => {
+                    const main = document.getElementById('mainContent');
+                    if (main) mo.observe(main, { childList: true, subtree: true });
+                }, 1000);
+            }
+
+            // ============================================================
+            // 10. MAGNETIC HOVER on buttons
+            // ============================================================
+            function wireMagnetic() {
+                const apply = () => {
+                    document.querySelectorAll('.btn-primary, .btn-danger, .summary-card').forEach(el => {
+                        if (el.dataset.mag) return;
+                        el.dataset.mag = '1';
+                        el.addEventListener('mousemove', (e) => {
+                            const r = el.getBoundingClientRect();
+                            const x = e.clientX - r.left - r.width / 2;
+                            const y = e.clientY - r.top - r.height / 2;
+                            el.style.transform = `translate(${x * 0.08}px, ${y * 0.08 - 2}px)`;
+                        });
+                        el.addEventListener('mouseleave', () => {
+                            el.style.transform = '';
+                        });
+                    });
+                };
+                setTimeout(apply, 600);
+                setTimeout(apply, 1500);
+                const mo = new MutationObserver(apply);
+                setTimeout(() => {
+                    const main = document.getElementById('mainContent');
+                    if (main) mo.observe(main, { childList: true, subtree: true });
+                }, 1000);
+            }
+
+            // ============================================================
+            // BOOT — run everything after page is ready
+            // ============================================================
+            function boot() {
+                wireBackgroundOrbs();
+                wireCountUp();
+                wireProgressionDrama();
+                wireSemesterStagger();
+                wireTabs();
+                wireGradeBadges();
+                wirePredictorAnimation();
+                wireScrollReveal();
+                wireCursorGlow();
+                wireMagnetic();
+            }
+            // Fire when main content becomes visible
+            let attempts = 0;
+            const checkReady = setInterval(() => {
+                attempts++;
+                const main = document.getElementById('mainContent');
+                if (main && main.style.display !== 'none') {
+                    clearInterval(checkReady);
+                    boot();
+                } else if (attempts > 60) {
+                    clearInterval(checkReady);
+                    boot();
+                }
+            }, 100);
+        })();
+    </script>
+
 </body>
 </html>

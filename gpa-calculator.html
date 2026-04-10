@@ -1522,7 +1522,7 @@
 
         .grade-results {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
             gap: 14px;
         }
         .grade-result-card {
@@ -1536,7 +1536,7 @@
             transition: all 0.4s var(--ease-out-expo);
             overflow: hidden;
             position: relative;
-            min-height: 180px;
+            min-height: 240px;
         }
         .grade-result-card::before {
             content: '';
@@ -1597,12 +1597,60 @@
             background: var(--border);
             margin: 0 0 12px;
         }
-        .grade-result-bottom {
+        .grade-result-middle {
             display: flex;
             flex-direction: column;
             gap: 4px;
-            margin-top: auto;
+            margin-bottom: 14px;
         }
+        .grade-result-advice {
+            display: flex;
+            gap: 8px;
+            padding: 12px 14px;
+            margin-top: auto;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 11.5px;
+            line-height: 1.55;
+            color: var(--text-soft);
+        }
+        .grade-result-advice .advice-icon {
+            width: 14px;
+            height: 14px;
+            stroke: var(--navy-lighter);
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        .grade-result-advice span {
+            flex: 1;
+            min-width: 0;
+        }
+        .grade-result-card.status-guaranteed .grade-result-advice {
+            background: rgba(74, 222, 128, 0.06);
+            border-color: rgba(74, 222, 128, 0.2);
+        }
+        .grade-result-card.status-guaranteed .advice-icon { stroke: #86efac; }
+        .grade-result-card.status-achievable .grade-result-advice {
+            background: rgba(96, 165, 250, 0.06);
+            border-color: rgba(96, 165, 250, 0.2);
+        }
+        .grade-result-card.status-achievable .advice-icon { stroke: #93c5fd; }
+        .grade-result-card.status-challenging .grade-result-advice {
+            background: rgba(251, 191, 36, 0.06);
+            border-color: rgba(251, 191, 36, 0.2);
+        }
+        .grade-result-card.status-challenging .advice-icon { stroke: #fde047; }
+        .grade-result-card.status-hard .grade-result-advice {
+            background: rgba(251, 146, 60, 0.06);
+            border-color: rgba(251, 146, 60, 0.25);
+        }
+        .grade-result-card.status-hard .advice-icon { stroke: #fdba74; }
+        .grade-result-card.status-impossible .grade-result-advice {
+            background: rgba(196, 30, 58, 0.06);
+            border-color: rgba(196, 30, 58, 0.2);
+        }
+        .grade-result-card.status-impossible .advice-icon { stroke: #fca5a5; }
         .grade-result-score {
             font-family: 'Sora', sans-serif;
             font-size: 28px;
@@ -3711,28 +3759,59 @@
                 const neededExamContribution = minFinalScore - caContribution;
                 const requiredExamPercent = examWeight > 0 ? (neededExamContribution / examWeight) * 100 : 0;
                 
-                let status, scoreDisplay, statusLabel;
+                let status, scoreDisplay, statusLabel, advice;
                 
+                // Per-grade encouragement based on both the letter grade and how hard the required score is
+                const gradeEncouragement = {
+                    'A':  ['Distinction territory', 'Review past papers and master every topic', 'Focus on exam technique and timing'],
+                    'B+': ['Excellent range', 'Deep understanding of core topics needed', 'Practice application questions'],
+                    'B':  ['Strong pass', 'Solid grasp of fundamentals will get you here', 'Focus on weaker topics first'],
+                    'B-': ['Very good mark', 'Consistent revision over last two weeks', 'Drill the high-weight topics'],
+                    'C+': ['Satisfactory mark', 'Cover all lecture notes and key examples', 'Time yourself on past questions'],
+                    'C':  ['Clean pass', 'Know the basics cold and nail easy marks', 'Do at least 3 past papers under timed conditions'],
+                    'C-': ['Marginal pass', 'Focus on the easiest marks first', 'Don\'t skip any section in the exam'],
+                    'D+': ['Below pass — may need to resit', 'Prioritise any questions you can attempt', 'Talk to your lecturer about support'],
+                    'D':  ['Fail grade', 'Aim higher if you can — look at C- and above', 'Consider academic support services'],
+                    'D-': ['Fail grade', 'Target higher grades on this list instead', 'Seek help from a tutor or study group'],
+                    'E':  ['Fail grade', 'Focus on passing — aim for C- or higher', 'Consider repeating if this is your best case']
+                };
+                const tips = gradeEncouragement[grade] || ['', '', ''];
+
                 if (requiredExamPercent <= 0) {
                     status = 'guaranteed';
                     scoreDisplay = 'Guaranteed';
-                    statusLabel = 'CA alone secures this';
+                    statusLabel = 'Your CA alone secures this grade';
+                    advice = 'You already have enough from CA. Walk in confident and focus on maximising the exam to push your final higher.';
                 } else if (requiredExamPercent > 100) {
                     status = 'impossible';
                     scoreDisplay = 'Not possible';
-                    statusLabel = `Would need ${requiredExamPercent.toFixed(0)}% in exam`;
+                    statusLabel = `Would need ${requiredExamPercent.toFixed(0)}% in the exam`;
+                    advice = 'Your CA mark can\'t reach this grade mathematically. Look at the grades below this one and target the highest one you can realistically hit.';
                 } else if (requiredExamPercent <= 40) {
                     status = 'achievable';
                     scoreDisplay = `${Math.ceil(requiredExamPercent)}%`;
                     statusLabel = 'Very achievable';
-                } else if (requiredExamPercent <= 70) {
+                    advice = `Only ${Math.ceil(requiredExamPercent)}% needed in the exam. ${tips[1]}. You\'ve got this.`;
+                } else if (requiredExamPercent <= 60) {
+                    status = 'achievable';
+                    scoreDisplay = `${Math.ceil(requiredExamPercent)}%`;
+                    statusLabel = 'Within reach';
+                    advice = `${Math.ceil(requiredExamPercent)}% is a pass-level exam mark. ${tips[1]}. Stay consistent with revision and you\'ll get there.`;
+                } else if (requiredExamPercent <= 75) {
                     status = 'challenging';
                     scoreDisplay = `${Math.ceil(requiredExamPercent)}%`;
                     statusLabel = 'Achievable with effort';
+                    advice = `${Math.ceil(requiredExamPercent)}% needed — solid but doable. ${tips[1]}. ${tips[2]}.`;
+                } else if (requiredExamPercent <= 89) {
+                    status = 'hard';
+                    scoreDisplay = `${Math.ceil(requiredExamPercent)}%`;
+                    statusLabel = 'Challenging — push hard';
+                    advice = `You need ${Math.ceil(requiredExamPercent)}% which is a distinction-level exam mark. ${tips[1]}. Make a revision schedule now.`;
                 } else {
                     status = 'hard';
                     scoreDisplay = `${Math.ceil(requiredExamPercent)}%`;
-                    statusLabel = 'Study hard';
+                    statusLabel = 'Very steep climb';
+                    advice = `${Math.ceil(requiredExamPercent)}% is near-perfect territory. ${tips[0]}. Realistic only if you\'re already strong in this course.`;
                 }
                 
                 const badgeClass = grade.replace('+', '-plus').replace('-', '-minus');
@@ -3747,9 +3826,17 @@
                             </div>
                         </div>
                         <div class="grade-result-divider"></div>
-                        <div class="grade-result-bottom">
+                        <div class="grade-result-middle">
                             <div class="grade-result-score status-${status}">${scoreDisplay}</div>
                             <div class="grade-result-label">${statusLabel}</div>
+                        </div>
+                        <div class="grade-result-advice">
+                            <svg class="advice-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="12" y1="16" x2="12" y2="12"/>
+                                <line x1="12" y1="8" x2="12.01" y2="8"/>
+                            </svg>
+                            <span>${advice}</span>
                         </div>
                     </div>
                 `;

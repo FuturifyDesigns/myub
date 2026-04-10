@@ -87,10 +87,16 @@
             --note-pink-border: rgba(244, 114, 182, 0.35);
         }
 
+        /* Remove default blue tap highlight on mobile everywhere */
+        *, *::before, *::after { -webkit-tap-highlight-color: transparent; }
+
         html {
             height: 100%;
             scroll-behavior: smooth;
             overflow-x: hidden;
+        
+            overscroll-behavior-y: none;
+            background: var(--navy-deepest);
         }
         body {
             font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -100,6 +106,8 @@
             color: var(--text);
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+        
+            overscroll-behavior-y: none;
         }
         button, input, select, textarea { font-family: inherit; }
         input[type="text"], input[type="email"], input[type="password"], input[type="number"], input[type="search"], textarea, [contenteditable="true"] {

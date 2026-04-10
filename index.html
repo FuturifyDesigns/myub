@@ -55,6 +55,8 @@
         html {
             height: 100%;
             scroll-behavior: smooth;
+            background: var(--navy-darker);
+            overscroll-behavior-y: none;
         }
 
         body {
@@ -63,8 +65,14 @@
             background: var(--navy-darker);
             color: var(--white);
             overflow-x: hidden;
+            overscroll-behavior-y: none;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Remove default blue tap highlight on mobile everywhere */
+        *, *::before, *::after {
+            -webkit-tap-highlight-color: transparent;
         }
 
         input[type="text"],
@@ -341,9 +349,11 @@
                 linear-gradient(0deg, #0c2440 0%, #122e50 60%, #193b62 100%);
         }
 
-        /* Hover expands the hovered half */
-        .auth-landing.hover-signup { --split: 65%; }
-        .auth-landing.hover-login { --split: 35%; }
+        /* Hover expands the hovered half. .selected mirrors this for click-to-select. */
+        .auth-landing.hover-signup,
+        .auth-landing.selected-signup { --split: 68%; }
+        .auth-landing.hover-login,
+        .auth-landing.selected-login { --split: 32%; }
 
         /* Divider with "or" sits at the split point */
         .half-divider {
@@ -373,7 +383,9 @@
             font-weight: 500;
         }
         .auth-landing.hover-signup .half-divider,
-        .auth-landing.hover-login .half-divider {
+        .auth-landing.hover-login .half-divider,
+        .auth-landing.selected-signup .half-divider,
+        .auth-landing.selected-login .half-divider {
             opacity: 0.35;
         }
 
@@ -395,11 +407,13 @@
             line-height: 0.85;
             transition: -webkit-text-stroke-color 0.6s ease, transform 0.8s var(--ease-out-expo);
         }
-        .half-signup:hover .half-bgword {
+        .half-signup:hover .half-bgword,
+        .half-signup.selected .half-bgword {
             -webkit-text-stroke-color: rgba(255, 255, 255, 0.14);
             transform: translate(-50%, -50%) scale(1.04);
         }
-        .half-login:hover .half-bgword {
+        .half-login:hover .half-bgword,
+        .half-login.selected .half-bgword {
             -webkit-text-stroke-color: rgba(255, 255, 255, 0.14);
             transform: translate(-50%, -50%) scale(1.04);
         }
@@ -449,7 +463,8 @@
             transition: stroke 0.3s ease;
         }
         .half-signup:hover .half-icon,
-        .half-login:hover .half-icon {
+        .half-login:hover .half-icon,
+        .half.selected .half-icon {
             transform: scale(1.1);
             background: var(--red);
             border-color: var(--red);
@@ -467,7 +482,8 @@
             transition: color 0.3s ease, font-size 0.4s ease;
         }
         .half-signup:hover .half-title,
-        .half-login:hover .half-title {
+        .half-login:hover .half-title,
+        .half.selected .half-title {
             color: var(--white);
         }
 
@@ -487,8 +503,9 @@
             transition: max-height 0.55s var(--ease-out-expo), opacity 0.45s ease 0.1s, margin-top 0.55s var(--ease-out-expo);
         }
         .half-signup:hover .half-preview,
-        .half-login:hover .half-preview {
-            max-height: 220px;
+        .half-login:hover .half-preview,
+        .half.selected .half-preview {
+            max-height: 260px;
             opacity: 1;
             margin-top: 18px;
         }
@@ -537,7 +554,9 @@
             50% { transform: translateY(-5px); }
         }
         .half-signup .half-icon, .half-login .half-icon { animation: iconFloat 3.8s ease-in-out infinite; }
-        .half-signup:hover .half-icon, .half-login:hover .half-icon { animation: none; }
+        .half-signup:hover .half-icon,
+        .half-login:hover .half-icon,
+        .half.selected .half-icon { animation: none; }
 
         /* ========== AUTH CARD (forms) ========== */
         .portal-card {
@@ -964,26 +983,36 @@
 
         /* ========== RESPONSIVE ========== */
         @media (max-width: 768px) {
-            .auth-landing { aspect-ratio: 9 / 14; max-height: 78vh; border-radius: 20px; }
-            .half-signup .half-content { transform: translate(10%, -14%); }
-            .half-login .half-content { transform: translate(-10%, 14%); }
-            .half-bgword { font-size: clamp(70px, 28vw, 140px); }
+            .portal-container { padding: 14px 14px 22px; }
+            .auth-landing { aspect-ratio: auto; height: auto; min-height: 580px; max-height: none; border-radius: 20px; margin-top: 10px; }
+            .half-bgword { font-size: clamp(68px, 26vw, 130px); }
             .half-title { font-size: clamp(26px, 7vw, 40px); }
-            .half-content { padding: 18px; }
-            .half-desc { font-size: 12.5px; }
+            .half-content { padding: 16px; max-width: 100%; transform: none !important; }
+            .half-icon { width: 52px; height: 52px; margin-bottom: 10px; }
+            .half-icon svg { width: 22px; height: 22px; }
+            .half-desc { font-size: 12.5px; margin-bottom: 12px; max-width: 320px; }
+            .half-preview { margin-top: 0 !important; }
+            .half-signup:hover .half-preview,
+            .half-login:hover .half-preview,
+            .half.selected .half-preview {
+                max-height: 220px;
+                margin-top: 14px !important;
+            }
             .portal-card { padding: 22px 20px 18px; border-radius: 18px; }
             .portal-title h1 { font-size: 22px; }
             .form-row { grid-template-columns: 1fr; gap: 0; }
+            .landing-header { padding: 12px 0 4px; }
         }
         @media (max-width: 420px) {
-            .portal-container { padding: 16px 12px; }
-            .auth-landing { max-height: 74vh; }
-            .half-bgword { font-size: 26vw; }
-            .half-signup .half-content { transform: translate(8%, -10%); }
-            .half-login .half-content { transform: translate(-8%, 10%); }
-            .half-icon { width: 44px; height: 44px; margin-bottom: 10px; }
+            .portal-container { padding: 12px 12px 18px; }
+            .auth-landing { min-height: 540px; border-radius: 18px; }
+            .half-bgword { font-size: 24vw; }
+            .half-content { padding: 14px; transform: none !important; }
+            .half-icon { width: 48px; height: 48px; margin-bottom: 10px; }
+            .half-icon svg { width: 20px; height: 20px; }
             .half-title { font-size: 28px; }
-            .half-desc { font-size: 12px; max-width: 260px; }
+            .half-tag { font-size: 10px; letter-spacing: 2.4px; }
+            .half-desc { font-size: 12px; max-width: 280px; margin-bottom: 10px; }
             .half-cta { padding: 10px 20px; font-size: 11.5px; }
             .portal-card { padding: 20px 16px 16px; }
             .logo { font-size: 19px; }
@@ -1318,7 +1347,7 @@
                 </div>
 
                 <!-- TOP HALF: Create One -->
-                <div class="half half-signup" id="halfSignup" data-choice="signup" role="button" tabindex="0" aria-label="Register as a new student" onclick="if(!event.target.closest('.half-cta'))enterForm('signup')" onmouseenter="document.getElementById('authLanding').classList.remove('hover-login');document.getElementById('authLanding').classList.add('hover-signup')" onmouseleave="document.getElementById('authLanding').classList.remove('hover-signup')">
+                <div class="half half-signup" id="halfSignup" data-choice="signup" role="button" tabindex="0" aria-label="Register as a new student">
                     <span class="half-bgword">REGISTER</span>
                     <div class="half-content">
                         <div class="half-icon">
@@ -1331,7 +1360,7 @@
                         <div class="half-preview">
                             <p class="half-desc">Join the MyUB community. Track your GPA, manage your schedule, and connect with classmates across the University of Botswana.</p>
                             <button type="button" class="half-cta" data-choice="signup">
-                                Get Started
+                                Continue
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                             </button>
                         </div>
@@ -1346,7 +1375,7 @@
                 </div>
 
                 <!-- BOTTOM HALF: Sign In -->
-                <div class="half half-login" id="halfLogin" data-choice="login" role="button" tabindex="0" aria-label="Sign in to your account" onclick="if(!event.target.closest('.half-cta'))enterForm('login')" onmouseenter="document.getElementById('authLanding').classList.remove('hover-signup');document.getElementById('authLanding').classList.add('hover-login')" onmouseleave="document.getElementById('authLanding').classList.remove('hover-login')">
+                <div class="half half-login" id="halfLogin" data-choice="login" role="button" tabindex="0" aria-label="Sign in to your account">
                     <span class="half-bgword">LOGIN</span>
                     <div class="half-content">
                         <div class="half-icon">
@@ -1998,7 +2027,23 @@
         const halfSignup = document.getElementById('halfSignup');
         const halfLogin = document.getElementById('halfLogin');
 
+        // CLICK-TO-SELECT flow: first tap selects the half (shows preview + Continue).
+        // Only the Continue button (.half-cta) actually opens the form.
+        function selectHalf(choice) {
+            authLanding.classList.remove('hover-signup', 'hover-login', 'selected-signup', 'selected-login');
+            halfSignup.classList.remove('selected');
+            halfLogin.classList.remove('selected');
+            if (choice === 'signup') {
+                halfSignup.classList.add('selected');
+                authLanding.classList.add('selected-signup');
+            } else if (choice === 'login') {
+                halfLogin.classList.add('selected');
+                authLanding.classList.add('selected-login');
+            }
+        }
+
         halfSignup.addEventListener('mouseenter', () => {
+            if (halfLogin.classList.contains('selected')) return;
             authLanding.classList.remove('hover-login');
             authLanding.classList.add('hover-signup');
         });
@@ -2007,13 +2052,21 @@
         });
         halfSignup.addEventListener('click', (e) => {
             if (e.target.closest('.half-cta')) return;
-            enterForm('signup');
+            selectHalf('signup');
         });
         halfSignup.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); enterForm('signup'); }
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                if (halfSignup.classList.contains('selected')) {
+                    enterForm('signup');
+                } else {
+                    selectHalf('signup');
+                }
+            }
         });
 
         halfLogin.addEventListener('mouseenter', () => {
+            if (halfSignup.classList.contains('selected')) return;
             authLanding.classList.remove('hover-signup');
             authLanding.classList.add('hover-login');
         });
@@ -2022,13 +2075,20 @@
         });
         halfLogin.addEventListener('click', (e) => {
             if (e.target.closest('.half-cta')) return;
-            enterForm('login');
+            selectHalf('login');
         });
         halfLogin.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); enterForm('login'); }
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                if (halfLogin.classList.contains('selected')) {
+                    enterForm('login');
+                } else {
+                    selectHalf('login');
+                }
+            }
         });
 
-        // CTA buttons inside halves
+        // Continue buttons inside halves — the only path that opens the form
         document.querySelectorAll('.half-cta').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();

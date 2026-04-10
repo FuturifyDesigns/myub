@@ -74,6 +74,9 @@
             height: 100%;
             scroll-behavior: smooth;
             overflow-x: hidden;
+        
+            overscroll-behavior-y: none;
+            background: var(--navy-deepest);
         }
         body {
             font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -83,6 +86,8 @@
             color: var(--text);
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+        
+            overscroll-behavior-y: none;
         }
         button, input, select, textarea { font-family: inherit; }
         input[type="text"], input[type="email"], input[type="password"], input[type="number"], input[type="search"], textarea, [contenteditable="true"] {
@@ -890,6 +895,92 @@
             margin-bottom: 18px;
         }
 
+        /* ========== VIEW OTHER USER'S PROFILE ========== */
+        /* These rules style the cards injected by loadOtherProfile() */
+        .other-profile-body {
+            padding: 22px 26px;
+        }
+        .other-profile-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+        }
+        .other-profile-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 14px 16px;
+            background: rgba(0, 0, 0, 0.22);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            transition: all 0.35s var(--ease-out-expo);
+        }
+        .other-profile-item:hover {
+            background: rgba(0, 0, 0, 0.3);
+            border-color: var(--border-strong);
+            transform: translateY(-2px);
+        }
+        .other-profile-item.full-width {
+            grid-column: 1 / -1;
+        }
+        .other-profile-label {
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-dim);
+        }
+        .other-profile-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--white);
+            word-break: break-word;
+            line-height: 1.4;
+        }
+        .other-profile-bio {
+            margin-top: 16px;
+            padding: 16px 18px;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--red);
+            border-radius: 12px;
+        }
+        .other-profile-bio-label {
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-dim);
+            margin-bottom: 6px;
+        }
+        .other-profile-bio-text {
+            font-size: 13.5px;
+            color: var(--text-soft);
+            line-height: 1.6;
+            font-style: italic;
+            word-break: break-word;
+        }
+        .other-profile-actions {
+            padding: 22px 26px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .other-profile-actions .btn {
+            width: 100%;
+            justify-content: center;
+            padding: 13px 18px;
+            font-size: 13.5px;
+        }
+        .other-profile-actions-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .other-profile-actions-row .btn {
+            width: 100%;
+        }
+
         /* ========== BUTTONS ========== */
         .btn {
             display: inline-flex;
@@ -1528,6 +1619,8 @@
             .card { padding: 22px 20px; }
             .info-grid { grid-template-columns: 1fr; gap: 12px; }
             .profile-form { grid-template-columns: 1fr; }
+            .other-profile-grid { grid-template-columns: 1fr; gap: 12px; }
+            .other-profile-actions-row { grid-template-columns: 1fr; }
             .crop-layout { grid-template-columns: 1fr; }
             .crop-sidebar { flex-direction: row; justify-content: center; }
             .crop-preview { width: 100px; height: 100px; }
@@ -2354,11 +2447,12 @@
             const memberSince = document.getElementById('memberSince');
             if (memberSince) memberSince.textContent = `Member since ${new Date(user.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`;
 
-            // HIDE ALL .card elements (Profile Information, Account Settings, etc.)
-            // The profile header is .profile-header-card, not .card, so it won't be hidden
-            const allCards = document.querySelectorAll('.card');
+            // REMOVE the own-profile cards entirely from the DOM so the
+            // entrance animation (which calls clearProps) can't un-hide them,
+            // and so edit/danger UI cannot exist when viewing another user.
+            const allCards = document.querySelectorAll('main .card');
             allCards.forEach((card) => {
-                card.style.display = 'none';
+                card.remove();
             });
 
             // Insert new cards for viewing other user's profile AFTER the profile header
@@ -2372,7 +2466,7 @@
                                 <p class="card-subtitle">Profile information</p>
                             </div>
                         </div>
-                        <div style="padding:20px;overflow-x:hidden;">
+                        <div class="other-profile-body">
                             <div class="other-profile-grid">
                                 <div class="other-profile-item">
                                     <div class="other-profile-label">First Name</div>
@@ -2382,15 +2476,7 @@
                                     <div class="other-profile-label">Last Name</div>
                                     <div class="other-profile-value">${escapeHtml(user.last_name || 'Not specified')}</div>
                                 </div>
-                                <div class="other-profile-item">
-                                    <div class="other-profile-label">Email</div>
-                                    <div class="other-profile-value" style="font-size:13px;">${escapeHtml(user.email || 'Not specified')}</div>
-                                </div>
-                                <div class="other-profile-item">
-                                    <div class="other-profile-label">Student ID</div>
-                                    <div class="other-profile-value">${escapeHtml(user.student_id || 'Not specified')}</div>
-                                </div>
-                                <div class="other-profile-item">
+                                <div class="other-profile-item full-width">
                                     <div class="other-profile-label">Program</div>
                                     <div class="other-profile-value">${escapeHtml(user.program_name || 'Not specified')}</div>
                                 </div>
@@ -2398,11 +2484,15 @@
                                     <div class="other-profile-label">Year of Study</div>
                                     <div class="other-profile-value">${user.year_of_study ? 'Year ' + user.year_of_study : 'Not specified'}</div>
                                 </div>
+                                <div class="other-profile-item">
+                                    <div class="other-profile-label">Status</div>
+                                    <div class="other-profile-value">${user.is_online ? '<span style="color:var(--green);">● Online</span>' : '<span style="color:var(--text-dim);">● Offline</span>'}</div>
+                                </div>
                             </div>
                             ${user.bio ? `
-                            <div style="margin-top:16px;padding:16px;background:var(--gray-50);border-radius:10px;">
-                                <div style="color:var(--gray-500);font-size:13px;margin-bottom:6px;">Bio</div>
-                                <div style="color:var(--gray-900);line-height:1.6;">${escapeHtml(user.bio)}</div>
+                            <div class="other-profile-bio">
+                                <div class="other-profile-bio-label">Bio</div>
+                                <div class="other-profile-bio-text">${escapeHtml(user.bio)}</div>
                             </div>` : ''}
                         </div>
                     </div>
@@ -2413,15 +2503,21 @@
                                 <p class="card-subtitle">Connect with ${escapeHtml(user.first_name || 'this user')}</p>
                             </div>
                         </div>
-                        <div style="padding:20px;display:flex;flex-direction:column;gap:12px;">
-                            <button onclick="window.location.href='messages.html?user=${userId}'" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:10px;border:none;cursor:pointer;font-weight:600;background:var(--navy);color:white;">
-                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:18px;height:18px;"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                        <div class="other-profile-actions">
+                            <button type="button" class="btn btn-primary" onclick="window.location.href='messages.html?user=${userId}'">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
                                 Send Message
                             </button>
-                            <button onclick="window.history.back()" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:10px;border:2px solid var(--gray-200);cursor:pointer;font-weight:600;background:white;color:var(--gray-700);">
-                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:18px;height:18px;"><path d="M15 19l-7-7 7-7"/></svg>
-                                Go Back
-                            </button>
+                            <div class="other-profile-actions-row">
+                                <button type="button" class="btn btn-outline" onclick="window.location.href='friends.html'">
+                                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+                                    Friends
+                                </button>
+                                <button type="button" class="btn btn-secondary" onclick="window.history.length > 1 ? window.history.back() : (window.location.href = 'dashboard.html')">
+                                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
+                                    Go Back
+                                </button>
+                            </div>
                         </div>
                     </div>
                 `;

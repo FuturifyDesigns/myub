@@ -1754,12 +1754,14 @@
             .page-title { font-size: 19px; }
             .notes-grid.active { grid-template-columns: 1fr; }
             .topbar-right .btn-primary { padding: 9px 14px; font-size: 12.5px; }
-            /* Notification dropdown: constrain to viewport on tablets/mobile */
+            /* Notification dropdown: pin to viewport edge on mobile */
             .notif-dropdown {
-                width: calc(100vw - 32px);
-                max-width: 360px;
-                right: 0;
-                left: auto;
+                position: fixed;
+                top: 70px;
+                right: 16px;
+                left: 16px;
+                width: auto;
+                max-width: none;
             }
         }
         @media (max-width: 640px) {
@@ -1772,7 +1774,6 @@
             .toolbar-group { padding-right: 4px; }
             .toolbar-btn { width: 30px; height: 30px; }
             .color-option { width: 32px; height: 32px; }
-            .notif-dropdown { width: calc(100vw - 32px); max-width: 340px; right: 0; }
             .notes-list.active .note-card {
                 flex-direction: column;
                 align-items: stretch;

@@ -1148,17 +1148,17 @@
             font-weight: 800;
             letter-spacing: -0.3px;
         }
-        .grade-badge.A { background: rgba(74, 222, 128, 0.2); color: #86efac; border: 1px solid rgba(74, 222, 128, 0.5); }
-        .grade-badge.B\+, .grade-badge.Bplus { background: rgba(34, 197, 94, 0.18); color: #6ee7b7; border: 1px solid rgba(34, 197, 94, 0.45); }
-        .grade-badge.B { background: rgba(96, 165, 250, 0.2); color: #93c5fd; border: 1px solid rgba(96, 165, 250, 0.5); }
-        .grade-badge.B\-, .grade-badge.Bminus { background: rgba(59, 130, 246, 0.18); color: #7dd3fc; border: 1px solid rgba(59, 130, 246, 0.45); }
-        .grade-badge.C\+, .grade-badge.Cplus { background: rgba(251, 191, 36, 0.18); color: #fde047; border: 1px solid rgba(251, 191, 36, 0.45); }
-        .grade-badge.C { background: rgba(251, 146, 60, 0.18); color: #fdba74; border: 1px solid rgba(251, 146, 60, 0.45); }
-        .grade-badge.C\-, .grade-badge.Cminus { background: rgba(234, 88, 12, 0.2); color: #fdba74; border: 1px solid rgba(234, 88, 12, 0.5); }
-        .grade-badge.D\+, .grade-badge.Dplus { background: rgba(220, 38, 38, 0.15); color: #fca5a5; border: 1px solid rgba(220, 38, 38, 0.4); }
-        .grade-badge.D { background: rgba(185, 28, 28, 0.2); color: #fca5a5; border: 1px solid rgba(185, 28, 28, 0.5); }
-        .grade-badge.D\-, .grade-badge.Dminus { background: rgba(153, 27, 27, 0.22); color: #fca5a5; border: 1px solid rgba(153, 27, 27, 0.5); }
-        .grade-badge.E { background: rgba(127, 29, 29, 0.3); color: #f87171; border: 1px solid rgba(127, 29, 29, 0.5); }
+        .grade-badge.A       { background: rgba(74, 222, 128, 0.2);  color: #86efac; border: 1px solid rgba(74, 222, 128, 0.5); }
+        .grade-badge.B-plus  { background: rgba(34, 197, 94, 0.18);  color: #6ee7b7; border: 1px solid rgba(34, 197, 94, 0.45); }
+        .grade-badge.B       { background: rgba(96, 165, 250, 0.2);  color: #93c5fd; border: 1px solid rgba(96, 165, 250, 0.5); }
+        .grade-badge.B-minus { background: rgba(59, 130, 246, 0.18); color: #7dd3fc; border: 1px solid rgba(59, 130, 246, 0.45); }
+        .grade-badge.C-plus  { background: rgba(251, 191, 36, 0.18); color: #fde047; border: 1px solid rgba(251, 191, 36, 0.45); }
+        .grade-badge.C       { background: rgba(251, 146, 60, 0.18); color: #fdba74; border: 1px solid rgba(251, 146, 60, 0.45); }
+        .grade-badge.C-minus { background: rgba(234, 88, 12, 0.2);   color: #fdba74; border: 1px solid rgba(234, 88, 12, 0.5); }
+        .grade-badge.D-plus  { background: rgba(220, 38, 38, 0.15);  color: #fca5a5; border: 1px solid rgba(220, 38, 38, 0.4); }
+        .grade-badge.D       { background: rgba(185, 28, 28, 0.2);   color: #fca5a5; border: 1px solid rgba(185, 28, 28, 0.5); }
+        .grade-badge.D-minus { background: rgba(153, 27, 27, 0.22);  color: #fca5a5; border: 1px solid rgba(153, 27, 27, 0.5); }
+        .grade-badge.E       { background: rgba(127, 29, 29, 0.3);   color: #f87171; border: 1px solid rgba(127, 29, 29, 0.5); }
 
         /* Action buttons in rows */
         .action-btns {
@@ -1522,44 +1522,105 @@
 
         .grade-results {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 12px;
+            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+            gap: 14px;
         }
         .grade-result-card {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            padding: 14px 16px;
+            flex-direction: column;
+            gap: 0;
+            padding: 18px 18px 16px;
             background: var(--surface-2);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            transition: all 0.35s var(--ease-out-expo);
+            border-radius: 14px;
+            transition: all 0.4s var(--ease-out-expo);
+            overflow: hidden;
+            position: relative;
+            min-height: 180px;
         }
-        .grade-result-card:hover {
-            background: var(--surface-3);
-            border-color: var(--border-strong);
-            transform: translateY(-2px);
+        .grade-result-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--navy-lighter), var(--red));
+            opacity: 0.6;
         }
-        .grade-result-left { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
-        .grade-result-info { min-width: 0; }
-        .grade-result-label {
+        .grade-result-card.status-guaranteed::before { background: linear-gradient(90deg, #4ade80, #22c55e); }
+        .grade-result-card.status-achievable::before { background: linear-gradient(90deg, #4ade80, #60a5fa); }
+        .grade-result-card.status-challenging::before { background: linear-gradient(90deg, #fbbf24, #fb923c); }
+        .grade-result-card.status-hard::before { background: linear-gradient(90deg, #fb923c, #ef4444); }
+        .grade-result-card.status-impossible::before { background: linear-gradient(90deg, #ef4444, #9a1730); }
+        .grade-result-card.status-impossible { opacity: 0.55; }
+
+        .grade-result-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .grade-result-top .grade-badge {
+            flex-shrink: 0;
+            min-width: 44px;
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+        .grade-result-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .grade-result-desc {
             font-family: 'Sora', sans-serif;
-            font-size: 12px;
+            font-size: 13.5px;
             font-weight: 700;
             color: var(--white);
-            letter-spacing: -0.1px;
+            letter-spacing: -0.2px;
+            line-height: 1.2;
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
-        .grade-result-right {
-            text-align: right;
-            flex-shrink: 0;
+        .grade-result-points {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 500;
+            letter-spacing: 0.2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .grade-result-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 0 0 12px;
+        }
+        .grade-result-bottom {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-top: auto;
         }
         .grade-result-score {
             font-family: 'Sora', sans-serif;
-            font-size: 16px;
+            font-size: 28px;
             font-weight: 800;
             color: var(--white);
-            letter-spacing: -0.5px;
+            letter-spacing: -1px;
+            line-height: 1.05;
+        }
+        .grade-result-score.status-guaranteed { color: #86efac; }
+        .grade-result-score.status-achievable { color: #86efac; }
+        .grade-result-score.status-challenging { color: #fde047; }
+        .grade-result-score.status-hard { color: #fdba74; }
+        .grade-result-score.status-impossible { color: #fca5a5; font-size: 18px; }
+        .grade-result-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 500;
+            letter-spacing: 0.3px;
         }
 
         .predictor-empty {
@@ -2080,17 +2141,13 @@
 
         /* Grade result card — pop on hover */
         .grade-result-card {
-            transition: transform 0.4s var(--ease-out-back), box-shadow 0.4s ease, border-color 0.35s ease !important;
+            transition: transform 0.4s var(--ease-out-back), box-shadow 0.4s ease, border-color 0.35s ease, background 0.35s ease !important;
         }
         .grade-result-card:hover {
             transform: translateY(-5px) scale(1.02) !important;
+            background: var(--surface-3) !important;
+            border-color: var(--border-strong) !important;
             box-shadow: 0 24px 48px -20px rgba(0, 0, 0, 0.7) !important;
-        }
-        .grade-result-card:hover .grade-result-score {
-            background: linear-gradient(180deg, #ffffff 0%, #ffb4c0 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
 
         /* Card spotlight — intensify */
@@ -3658,8 +3715,8 @@
                 
                 if (requiredExamPercent <= 0) {
                     status = 'guaranteed';
-                    scoreDisplay = '✓ Guaranteed';
-                    statusLabel = 'Your CA alone secures this!';
+                    scoreDisplay = 'Guaranteed';
+                    statusLabel = 'CA alone secures this';
                 } else if (requiredExamPercent > 100) {
                     status = 'impossible';
                     scoreDisplay = 'Not possible';
@@ -3667,30 +3724,31 @@
                 } else if (requiredExamPercent <= 40) {
                     status = 'achievable';
                     scoreDisplay = `${Math.ceil(requiredExamPercent)}%`;
-                    statusLabel = 'Very achievable 🎉';
+                    statusLabel = 'Very achievable';
                 } else if (requiredExamPercent <= 70) {
                     status = 'challenging';
                     scoreDisplay = `${Math.ceil(requiredExamPercent)}%`;
-                    statusLabel = 'Achievable with effort 💪';
+                    statusLabel = 'Achievable with effort';
                 } else {
                     status = 'hard';
                     scoreDisplay = `${Math.ceil(requiredExamPercent)}%`;
-                    statusLabel = 'Challenging - study hard! 📚';
+                    statusLabel = 'Study hard';
                 }
                 
                 const badgeClass = grade.replace('+', '-plus').replace('-', '-minus');
                 
                 html += `
-                    <div class="grade-result-card ${status}">
-                        <div class="grade-result-left">
-                            <span class="grade-badge ${badgeClass}" style="font-size: 18px; padding: 8px 16px;">${grade}</span>
+                    <div class="grade-result-card status-${status}">
+                        <div class="grade-result-top">
+                            <span class="grade-badge ${badgeClass}">${grade}</span>
                             <div class="grade-result-info">
-                                <h4>${description} (${points.toFixed(1)} pts)</h4>
-                                <p>Final score: ${minFinalScore}% or higher</p>
+                                <h4 class="grade-result-desc">${description}</h4>
+                                <p class="grade-result-points">${points.toFixed(1)} pts · ${minFinalScore}%+ final</p>
                             </div>
                         </div>
-                        <div class="grade-result-right">
-                            <div class="grade-result-score ${status}">${scoreDisplay}</div>
+                        <div class="grade-result-divider"></div>
+                        <div class="grade-result-bottom">
+                            <div class="grade-result-score status-${status}">${scoreDisplay}</div>
                             <div class="grade-result-label">${statusLabel}</div>
                         </div>
                     </div>

@@ -8,7 +8,7 @@
     <link rel="shortcut icon" href="favicon-48x48.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="myub-security.js"></script>
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
@@ -125,7 +125,7 @@
             display: inline-flex;
             align-items: flex-end;
             gap: calc(var(--logo-size) * 0.06);
-            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-family: 'Sora', 'Outfit', sans-serif;
             line-height: 1;
             user-select: none;
         }
@@ -136,6 +136,7 @@
             color: var(--logo-m-color);
             letter-spacing: -0.03em;
             display: inline-block;
+            font-family: 'Cormorant Garamond', Georgia, serif;
         }
         .myub-logo .ml-cap {
             position: absolute;
@@ -154,6 +155,7 @@
             letter-spacing: 0.01em;
             display: inline-block;
             line-height: 0.85;
+            font-family: 'Cormorant Garamond', Georgia, serif;
         }
 
         /* ========== SIDEBAR ========== */
@@ -1682,21 +1684,23 @@
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-                                    <a href="dashboard.html" class="sidebar-logo">
-                <div class="sidebar-logo-m-wrapper">
-                    <svg class="sidebar-logo-cap" viewBox="0 0 100 70">
-                        <polygon points="50,8 95,25 50,42 5,25" fill="#1a365d"/>
-                        <circle cx="50" cy="25" r="5" fill="#ffffff" stroke="#1a365d" stroke-width="2"/>
-                        <rect x="32" y="38" width="36" height="18" rx="3" fill="#1a365d"/>
-                        <g class="tassel">
-                            <circle cx="78" cy="25" r="4" fill="#c41e3a"/>
-                            <path d="M78 29 Q82 45 80 55" stroke="#c41e3a" stroke-width="3" fill="none"/>
-                            <ellipse cx="80" cy="58" rx="5" ry="8" fill="#c41e3a"/>
-                        </g>
-                    </svg>
-                    <span class="sidebar-logo-m">M</span>
+            <a href="dashboard.html" class="sidebar-logo">
+                <div class="myub-logo">
+                    <div class="ml-m-wrap">
+                        <div class="ml-cap">
+                            <svg viewBox="0 0 100 70">
+                                <polygon points="50,6 95,24 50,42 5,24" fill="#ffffff"/>
+                                <circle cx="50" cy="24" r="4.5" fill="#1a365d" stroke="#ffffff" stroke-width="1.5"/>
+                                <rect x="32" y="38" width="36" height="18" rx="2.5" fill="#ffffff"/>
+                                <circle cx="78" cy="24" r="4" fill="#c41e3a"/>
+                                <path d="M78 28 Q82 44 80 54" stroke="#c41e3a" stroke-width="3" fill="none" stroke-linecap="round"/>
+                                <ellipse cx="80" cy="57" rx="5" ry="8" fill="#c41e3a"/>
+                            </svg>
+                        </div>
+                        <span class="ml-m">M</span>
+                    </div>
+                    <span class="ml-ub">yUB</span>
                 </div>
-                <span class="sidebar-logo-yub">yUB</span>
             </a>
         </div>
         <nav>

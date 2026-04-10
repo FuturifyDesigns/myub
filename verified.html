@@ -6,9 +6,10 @@
     <title>Email Verified - MyUB</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
     <style>
-        * {
+        *, *::before, *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -17,195 +18,278 @@
         :root {
             --navy: #1a365d;
             --navy-light: #2c5282;
+            --navy-lighter: #3a6fa8;
+            --navy-dark: #0f2744;
+            --navy-darker: #081726;
             --red: #c41e3a;
+            --red-light: #e63956;
+            --red-dark: #9a1730;
             --white: #ffffff;
-            --gray-500: #64748b;
-            --gray-400: #94a3b8;
-            --gray-200: #e2e8f0;
-            --gray-100: #f1f5f9;
+            --green: #22c55e;
+            --green-dark: #16a34a;
+            --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+            --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
+        html { height: 100%; }
         body {
             font-family: 'Outfit', sans-serif;
             min-height: 100vh;
+            min-height: 100dvh;
+            color: var(--white);
+            background: var(--navy-darker);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #1a365d 0%, #234e7a 50%, #2c5282 100%);
-            padding: 20px;
+            padding: 24px 20px;
         }
 
+        /* Background */
+        .page-bg {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background:
+                radial-gradient(circle at 20% 10%, rgba(58, 111, 168, 0.25) 0%, transparent 45%),
+                radial-gradient(circle at 85% 85%, rgba(34, 197, 94, 0.15) 0%, transparent 50%),
+                linear-gradient(160deg, #0f2744 0%, #1a365d 45%, #0f2744 100%);
+        }
+        .page-bg::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+            background-size: 48px 48px;
+            mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.8), transparent 75%);
+            -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.8), transparent 75%);
+        }
+
+        /* ========== REAL MyUB LOGO COMPONENT ========== */
+        .myub-logo {
+            --logo-size: 46px;
+            --logo-m-color: #1a365d;
+            --logo-ub-color: #1a365d;
+            position: relative;
+            display: inline-flex;
+            align-items: flex-end;
+            gap: calc(var(--logo-size) * 0.06);
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            line-height: 1;
+            user-select: none;
+        }
+        .myub-logo .ml-m-wrap {
+            position: relative;
+            display: inline-block;
+            line-height: 0.82;
+        }
+        .myub-logo .ml-m {
+            font-size: var(--logo-size);
+            font-weight: 700;
+            color: var(--logo-m-color);
+            letter-spacing: -0.02em;
+            display: inline-block;
+        }
+        .myub-logo .ml-cap {
+            position: absolute;
+            top: calc(var(--logo-size) * -0.34);
+            left: 50%;
+            transform: translateX(-50%) rotate(-6deg);
+            width: calc(var(--logo-size) * 0.78);
+            height: calc(var(--logo-size) * 0.55);
+            pointer-events: none;
+        }
+        .myub-logo .ml-cap svg { width: 100%; height: 100%; overflow: visible; }
+        .myub-logo .ml-ub {
+            font-size: calc(var(--logo-size) * 0.38);
+            font-weight: 700;
+            color: var(--logo-ub-color);
+            letter-spacing: 0.01em;
+            display: inline-block;
+            line-height: 0.85;
+        }
+        .myub-logo.on-dark { --logo-m-color: #ffffff; --logo-ub-color: #ffffff; }
+
+        /* Card */
         .card {
-            background: white;
+            position: relative;
+            width: min(420px, 100%);
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(20px) saturate(140%);
+            -webkit-backdrop-filter: blur(20px) saturate(140%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
-            padding: 50px 40px;
-            max-width: 420px;
-            width: 100%;
+            padding: 44px 28px 26px;
             text-align: center;
-            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+            box-shadow:
+                0 30px 80px -20px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            opacity: 0;
+            transform: translateY(20px) scale(0.98);
         }
 
-        .success-icon {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        /* Logo floats above card top edge */
+        .card-logo {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 12px 22px 12px 14px;
+            background: var(--navy-dark);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-radius: 999px;
+            box-shadow: 0 14px 34px rgba(0,0,0,0.45), 0 0 0 4px rgba(15, 39, 68, 0.5);
+            display: inline-flex;
+            align-items: center;
+        }
+
+        /* Success check icon */
+        .success-ring {
+            width: 88px;
+            height: 88px;
+            margin: 8px auto 20px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 24px;
-            animation: scaleIn 0.5s ease-out;
-        }
-
-        @keyframes scaleIn {
-            0% {
-                transform: scale(0);
-                opacity: 0;
-            }
-            50% {
-                transform: scale(1.1);
-            }
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-
-        .success-icon svg {
-            width: 40px;
-            height: 40px;
-            color: white;
-            animation: checkmark 0.4s ease-out 0.3s both;
-        }
-
-        @keyframes checkmark {
-            0% {
-                stroke-dashoffset: 100;
-                opacity: 0;
-            }
-            100% {
-                stroke-dashoffset: 0;
-                opacity: 1;
-            }
-        }
-
-        /* Logo - matching signup.html design */
-        .logo {
-            display: inline-flex;
-            align-items: baseline;
-            justify-content: center;
-            margin-bottom: 24px;
-            padding-top: 25px;
-        }
-
-        .logo-m-wrapper {
+            background: radial-gradient(circle, rgba(34, 197, 94, 0.22) 0%, rgba(34, 197, 94, 0.05) 60%, transparent 100%);
             position: relative;
-            display: inline-block;
         }
-
-        .graduation-cap {
-            width: 45px;
-            height: 26px;
+        .success-ring::before {
+            content: '';
             position: absolute;
-            top: -22px;
-            left: 50%;
-            transform: translateX(-50%);
+            inset: 10px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(34, 197, 94, 0.35);
         }
-
-        .logo-m {
-            font-family: 'Times New Roman', Georgia, serif;
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--navy);
-            line-height: 1;
+        .success-circle {
+            width: 62px;
+            height: 62px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px -6px rgba(34, 197, 94, 0.55);
+            position: relative;
+            z-index: 2;
         }
-
-        .logo-yub {
-            font-family: 'Times New Roman', Georgia, serif;
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: var(--navy);
-            margin-left: -2px;
+        .success-circle svg {
+            width: 34px;
+            height: 34px;
+            stroke: var(--white);
+            fill: none;
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-dasharray: 48;
+            stroke-dashoffset: 48;
         }
 
         h1 {
-            font-family: 'Sora', sans-serif;
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--navy);
-            margin-bottom: 12px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 30px;
+            font-weight: 600;
+            font-style: italic;
+            color: var(--white);
+            line-height: 1.15;
+            margin-bottom: 10px;
+            letter-spacing: 0.3px;
         }
 
-        p {
-            color: var(--gray-500);
-            font-size: 15px;
+        p.lead {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
             line-height: 1.6;
-            margin-bottom: 32px;
+            margin-bottom: 24px;
+            max-width: 320px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .btn {
-            display: inline-block;
-            padding: 14px 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 13px 18px;
             border-radius: 12px;
             font-family: 'Outfit', sans-serif;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
-            text-decoration: none;
+            letter-spacing: 0.4px;
             cursor: pointer;
-            transition: all 0.2s;
+            text-decoration: none;
             border: none;
+            transition: all 0.4s var(--ease-out-expo);
+            position: relative;
+            overflow: hidden;
         }
-
-        .btn-secondary {
-            background: var(--gray-100);
-            color: var(--gray-500);
-            width: 100%;
+        .btn-primary {
+            background: linear-gradient(135deg, var(--navy-light) 0%, var(--navy) 100%);
+            color: var(--white);
+            box-shadow: 0 10px 30px -10px rgba(26, 54, 93, 0.8);
         }
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        .btn-primary span, .btn-primary svg { position: relative; z-index: 1; }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 40px -10px rgba(196, 30, 58, 0.5);
+        }
+        .btn-primary:hover::before { opacity: 1; }
+        .btn-primary svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.3s ease; }
+        .btn-primary:hover svg { transform: translateX(3px); }
 
-        .btn-secondary:hover {
-            background: var(--gray-200);
-            color: #475569;
+        .btn-ghost {
+            background: transparent;
+            color: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            margin-top: 10px;
+        }
+        .btn-ghost:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--white);
+            border-color: rgba(255, 255, 255, 0.25);
         }
 
         .footer {
-            margin-top: 32px;
-            padding-top: 20px;
-            border-top: 1px solid var(--gray-100);
-            font-size: 12px;
-            color: var(--gray-400);
+            margin-top: 22px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 0.3px;
         }
+        .footer a { color: rgba(255, 255, 255, 0.6); text-decoration: none; transition: color 0.3s ease; }
+        .footer a:hover { color: var(--white); }
 
         @media (max-width: 480px) {
-            .card {
-                padding: 40px 24px;
-            }
+            .card { padding: 40px 22px 22px; border-radius: 18px; }
+            h1 { font-size: 26px; }
+            p.lead { font-size: 13px; }
+            .success-ring { width: 76px; height: 76px; }
+            .success-circle { width: 54px; height: 54px; }
+            .success-circle svg { width: 28px; height: 28px; }
+            .card-logo { padding: 10px 18px 10px 12px; }
+            .card-logo .myub-logo { --logo-size: 32px; }
+        }
 
-            h1 {
-                font-size: 20px;
-            }
-
-            .success-icon {
-                width: 70px;
-                height: 70px;
-            }
-
-            .success-icon svg {
-                width: 35px;
-                height: 35px;
-            }
-
-            .graduation-cap {
-                width: 38px;
-                height: 22px;
-                top: -18px;
-            }
-
-            .logo-m {
-                font-size: 2rem;
-            }
-
-            .logo-yub {
-                font-size: 1.3rem;
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
             }
         }
     </style>
@@ -216,7 +300,7 @@
     <meta name="author" content="Futurify Designs">
     <meta name="robots" content="index, follow">
     <meta name="language" content="English">
-    
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://www.myub.online/">
@@ -227,14 +311,14 @@
     <meta property="og:image:height" content="1200">
     <meta property="og:site_name" content="MyUB">
     <meta property="og:locale" content="en_US">
-    
+
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://www.myub.online/">
     <meta name="twitter:title" content="Email Verified - MyUB | University of Botswana">
     <meta name="twitter:description" content="Your email has been verified. Welcome to MyUB!">
     <meta name="twitter:image" content="https://www.myub.online/icons/og-image.jpg">
-    
+
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
@@ -242,7 +326,7 @@
     <link rel="mask-icon" href="icons/favicon-32x32.png" color="#1a365d">
     <meta name="msapplication-TileColor" content="#1a365d">
     <meta name="msapplication-TileImage" content="icons/icon-144x144.png">
-    
+
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1a365d">
@@ -250,45 +334,80 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="MyUB">
-    
+
     <!-- Canonical URL -->
     <link rel="canonical" href="https://www.myub.online/">
-
 </head>
 <body>
-    <div class="card">
-        <div class="success-icon">
-            <svg fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-            </svg>
-        </div>
+    <div class="page-bg"></div>
 
-        <div class="logo">
-            <div class="logo-m-wrapper">
-                <svg class="graduation-cap" viewBox="0 0 100 70">
-                    <polygon points="50,8 95,25 50,42 5,25" fill="#1a365d"/>
-                    <circle cx="50" cy="25" r="5" fill="#ffffff" stroke="#1a365d" stroke-width="2"/>
-                    <rect x="32" y="38" width="36" height="18" rx="3" fill="#1a365d"/>
-                    <g class="tassel">
-                        <circle cx="78" cy="25" r="4" fill="#c41e3a"/>
-                        <path d="M78 29 Q82 45 80 55" stroke="#c41e3a" stroke-width="3" fill="none"/>
-                        <ellipse cx="80" cy="58" rx="5" ry="8" fill="#c41e3a"/>
-                    </g>
-                </svg>
-                <span class="logo-m">M</span>
+    <div class="card" id="card">
+        <div class="card-logo">
+            <div class="myub-logo on-dark">
+                <div class="ml-m-wrap">
+                    <div class="ml-cap">
+                        <svg viewBox="0 0 100 70">
+                            <polygon points="50,6 95,24 50,42 5,24" fill="#ffffff"/>
+                            <circle cx="50" cy="24" r="4.5" fill="#1a365d" stroke="#ffffff" stroke-width="1.5"/>
+                            <rect x="32" y="38" width="36" height="18" rx="2.5" fill="#ffffff"/>
+                            <circle cx="78" cy="24" r="4" fill="#c41e3a"/>
+                            <path d="M78 28 Q82 44 80 54" stroke="#c41e3a" stroke-width="3" fill="none" stroke-linecap="round"/>
+                            <ellipse cx="80" cy="57" rx="5" ry="8" fill="#c41e3a"/>
+                        </svg>
+                    </div>
+                    <span class="ml-m">M</span>
+                </div>
+                <span class="ml-ub">yUB</span>
             </div>
-            <span class="logo-yub">yUB</span>
         </div>
 
-        <h1>Email Verified! 🎉</h1>
-        <p>Your email has been successfully verified. You can now sign in to your MyUB account and start exploring.</p>
+        <div class="success-ring" id="successRing">
+            <div class="success-circle">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M5 13l4 4L19 7" id="checkPath"/>
+                </svg>
+            </div>
+        </div>
 
-        <button class="btn btn-secondary" onclick="window.close()">Close This Tab</button>
+        <h1>Email Verified</h1>
+        <p class="lead">Your email has been successfully verified. You can now sign in to your MyUB account and start exploring.</p>
+
+        <button class="btn btn-primary" onclick="window.close()">
+            <span>Close This Tab</span>
+        </button>
 
         <div class="footer">
-            © 2026 Futurify Designs
+            © 2026 <a href="https://futurifydesigns.github.io" target="_blank" rel="noopener">Futurify Designs</a>
         </div>
     </div>
+
+    <script>
+        // Entrance animation
+        window.addEventListener('load', () => {
+            const g = window.gsap;
+            const card = document.getElementById('card');
+            const ring = document.getElementById('successRing');
+            const check = document.getElementById('checkPath');
+
+            if (g) {
+                const tl = g.timeline();
+                tl.to(card, { opacity: 1, y: 0, scale: 1, duration: 0.9, ease: 'power3.out' })
+                  .fromTo(ring,
+                      { scale: 0, rotate: -15 },
+                      { scale: 1, rotate: 0, duration: 0.8, ease: 'back.out(1.7)' }, '-=0.5')
+                  .to(check,
+                      { strokeDashoffset: 0, duration: 0.5, ease: 'power2.out' }, '-=0.2')
+                  .fromTo(['h1', 'p.lead', '.btn-primary', '.footer'],
+                      { opacity: 0, y: 14 },
+                      { opacity: 1, y: 0, duration: 0.5, stagger: 0.08, ease: 'power2.out' }, '-=0.3');
+            } else {
+                // Fallback: no GSAP
+                card.style.opacity = '1';
+                card.style.transform = 'none';
+                check.style.strokeDashoffset = '0';
+            }
+        });
+    </script>
 
     <!-- PWA Service Worker Registration -->
     <script>
@@ -300,6 +419,5 @@
             });
         }
     </script>
-
 </body>
 </html>

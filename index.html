@@ -18,7 +18,11 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="myub-security.js"></script>
     <style>
-        * {
+        /* ==========================================================
+           MyUB — Auth Page Redesign
+           Pass 1: auth only | colors + functionality preserved
+           ========================================================== */
+        *, *::before, *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -27,20 +31,42 @@
         :root {
             --navy: #1a365d;
             --navy-light: #2c5282;
+            --navy-lighter: #3a6fa8;
             --navy-dark: #0f2744;
+            --navy-darker: #081726;
             --red: #c41e3a;
+            --red-light: #e63956;
+            --red-dark: #9a1730;
             --white: #ffffff;
             --gray-100: #edf2f7;
             --gray-200: #e2e8f0;
+            --gray-300: #cbd5e0;
             --gray-400: #a0aec0;
             --gray-500: #718096;
             --gray-600: #4a5568;
             --gray-700: #2d3748;
             --gray-800: #1a202c;
             --green: #38a169;
+            --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+            --ease-in-out-expo: cubic-bezier(0.87, 0, 0.13, 1);
+            --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        /* Global input cursor fix */
+        html {
+            height: 100%;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            min-height: 100%;
+            background: var(--navy-darker);
+            color: var(--white);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
         input[type="text"],
         input[type="email"],
         input[type="password"],
@@ -49,7 +75,7 @@
         input[type="search"],
         textarea {
             cursor: text !important;
-            caret-color: var(--navy);
+            caret-color: var(--white);
         }
 
         input[type="checkbox"],
@@ -57,17 +83,23 @@
             cursor: pointer !important;
         }
 
-        html {
-            height: auto;
-            min-height: 100%;
-        }
+        button { font-family: inherit; }
 
-        body {
-            font-family: 'Outfit', sans-serif;
-            min-height: 100%;
-            overflow-x: hidden;
-            -webkit-overflow-scrolling: touch;
+        /* ========== PAGE TRANSITION OVERLAY ========== */
+        .page-transition {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            pointer-events: none;
+            display: flex;
         }
+        .page-transition .pt-panel {
+            flex: 1;
+            background: var(--navy-dark);
+            transform: translateY(100%);
+            will-change: transform;
+        }
+        .page-transition.active { pointer-events: auto; }
 
         /* ========== INTRO SCREEN ========== */
         .intro-screen {
@@ -78,14 +110,18 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            transition: opacity 1s ease, visibility 1s ease;
+            transition: opacity 0.7s ease;
             overflow: hidden;
         }
 
         .intro-screen.hide {
             opacity: 0;
             visibility: hidden;
+            pointer-events: none;
         }
+        /* Also kill pointer events the instant transition starts — don't wait for visibility */
+        .intro-screen { transition: opacity 0.7s ease; }
+        .intro-screen.hide { pointer-events: none !important; }
 
         .intro-bg {
             position: absolute;
@@ -104,9 +140,9 @@
         .intro-rays {
             position: absolute;
             inset: 0;
-            background: 
-                radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.03) 0%, transparent 50%),
-                radial-gradient(ellipse at 70% 80%, rgba(255,255,255,0.02) 0%, transparent 50%);
+            background:
+                radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 80%, rgba(196,30,58,0.06) 0%, transparent 50%);
             animation: raysPulse 6s ease-in-out infinite;
         }
 
@@ -142,7 +178,7 @@
             font-weight: 400;
             letter-spacing: 6px;
             text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.4);
+            color: rgba(255, 255, 255, 0.45);
             margin-top: 20px;
             opacity: 0;
             animation: introFadeIn 1s ease 1.2s forwards;
@@ -162,23 +198,28 @@
             bottom: 24px;
             right: 24px;
             background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: rgba(255, 255, 255, 0.7);
-            padding: 8px 16px;
-            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: rgba(255, 255, 255, 0.75);
+            padding: 10px 18px;
+            border-radius: 999px;
             font-family: 'Outfit', sans-serif;
             font-size: 12px;
             font-weight: 500;
+            letter-spacing: 0.5px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.4s var(--ease-out-expo);
             opacity: 0;
             animation: introFadeIn 0.5s ease 2s forwards;
             z-index: 20;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
 
         .skip-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.16);
             color: var(--white);
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.3);
         }
 
         @keyframes introFadeUp {
@@ -189,12 +230,31 @@
             to { opacity: 1; }
         }
 
-        /* ========== MAIN PORTAL ========== */
+        /* ========== PORTAL SHELL ========== */
         .portal-wrapper {
+            position: relative;
             min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
             flex-direction: column;
-            background: linear-gradient(135deg, #1a365d 0%, #234e7a 50%, #2d5a87 100%);
+            background:
+                radial-gradient(circle at 20% 10%, rgba(58, 111, 168, 0.25) 0%, transparent 45%),
+                radial-gradient(circle at 85% 85%, rgba(196, 30, 58, 0.18) 0%, transparent 50%),
+                linear-gradient(160deg, #0f2744 0%, #1a365d 45%, #0f2744 100%);
+            overflow: hidden;
+        }
+
+        .portal-wrapper::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+            background-size: 48px 48px;
+            mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.8), transparent 75%);
+            -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.8), transparent 75%);
+            pointer-events: none;
         }
 
         .portal-container {
@@ -202,190 +262,422 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 16px;
-        }
-
-        .portal-card {
-            background: rgba(255, 255, 255, 0.97);
-            border-radius: 20px;
-            width: 100%;
-            max-width: 380px;
-            box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.5);
-            overflow: hidden;
-        }
-
-        .portal-header {
-            padding: 24px 24px 20px;
-            text-align: center;
-        }
-
-        /* LOGO */
-        .logo {
-            display: inline-flex;
-            align-items: baseline;
-            padding-top: 25px;
-        }
-
-        .logo-m-wrapper {
+            padding: 24px 20px;
             position: relative;
-            display: inline-block;
+            z-index: 2;
         }
 
-        .graduation-cap {
-            width: 45px;
-            height: 26px;
+        /* ========== HORIZONTAL-SPLIT LANDING ========== */
+        .auth-landing {
+            position: relative;
+            width: min(980px, 100%);
+            height: min(600px, 82vh);
+            margin-top: 22px;
+            border-radius: 24px;
+            overflow: visible;
+            box-shadow:
+                0 30px 80px -20px rgba(0, 0, 0, 0.6),
+                0 0 0 1px rgba(255, 255, 255, 0.08);
+            background: var(--navy-darker);
+            opacity: 0;
+            transform: translateY(24px) scale(0.98);
+            transition: opacity 0.8s var(--ease-out-expo), transform 0.8s var(--ease-out-expo);
+            --split: 50%;
+        }
+        .auth-landing.ready { opacity: 1; transform: translateY(0) scale(1); }
+        .auth-landing.hidden { display: none; }
+
+        /* Top half = Create One (Sign Up) */
+        .half-signup {
             position: absolute;
-            top: -22px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .logo-m {
-            font-family: 'Times New Roman', Georgia, serif;
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--navy);
-            line-height: 1;
-        }
-
-        .logo-yub {
-            font-family: 'Times New Roman', Georgia, serif;
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: var(--navy);
-            margin-left: -2px;
-        }
-
-        .portal-title {
-            margin-top: 16px;
-        }
-
-        .portal-title h1 {
-            font-family: 'Sora', sans-serif;
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--gray-800);
-            margin-bottom: 4px;
-        }
-
-        .portal-title p {
-            font-size: 13px;
-            color: var(--gray-500);
-        }
-
-        /* Tabs */
-        .tabs {
-            display: flex;
-            margin: 0 20px;
-            background: var(--gray-100);
-            border-radius: 10px;
-            padding: 3px;
-        }
-
-        .tab {
-            flex: 1;
-            padding: 10px 14px;
-            border: none;
-            background: transparent;
-            font-family: 'Outfit', sans-serif;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--gray-500);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--split);
+            overflow: hidden;
+            border-top-left-radius: 24px;
+            border-top-right-radius: 24px;
             cursor: pointer;
-            border-radius: 8px;
-            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: auto;
+            z-index: 3;
+            background:
+                radial-gradient(circle at 70% 30%, rgba(196, 30, 58, 0.28) 0%, transparent 55%),
+                linear-gradient(180deg, #0f2744 0%, #1a365d 60%, #234e7a 100%);
+            transition: height 0.6s var(--ease-out-expo), background 0.4s ease;
+        }
+        .half-signup:hover {
+            background:
+                radial-gradient(circle at 70% 30%, rgba(196, 30, 58, 0.4) 0%, transparent 55%),
+                linear-gradient(180deg, #12304f 0%, #1d3d68 60%, #28588a 100%);
         }
 
-        .tab:hover { color: var(--gray-700); }
+        /* Bottom half = Sign In */
+        .half-login {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            top: var(--split);
+            height: calc(100% - var(--split));
+            overflow: hidden;
+            border-bottom-left-radius: 24px;
+            border-bottom-right-radius: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: auto;
+            z-index: 3;
+            background:
+                radial-gradient(circle at 30% 70%, rgba(58, 111, 168, 0.3) 0%, transparent 55%),
+                linear-gradient(0deg, #0a1e35 0%, #0f2744 60%, #142f4f 100%);
+            transition: top 0.6s var(--ease-out-expo), height 0.6s var(--ease-out-expo), background 0.4s ease;
+        }
+        .half-login:hover {
+            background:
+                radial-gradient(circle at 30% 70%, rgba(58, 111, 168, 0.42) 0%, transparent 55%),
+                linear-gradient(0deg, #0c2440 0%, #122e50 60%, #193b62 100%);
+        }
 
-        .tab.active {
+        /* Hover expands the hovered half */
+        .auth-landing.hover-signup { --split: 65%; }
+        .auth-landing.hover-login { --split: 35%; }
+
+        /* Divider with "or" sits at the split point */
+        .half-divider {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: var(--split);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            transform: translateY(-50%);
+            transition: top 0.6s var(--ease-out-expo), opacity 0.4s ease;
+            pointer-events: none;
+        }
+        .divider-line {
+            width: 60px;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.25);
+        }
+        .divider-or {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 15px;
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.55);
+            font-weight: 500;
+        }
+        .auth-landing.hover-signup .half-divider,
+        .auth-landing.hover-login .half-divider {
+            opacity: 0.35;
+        }
+
+        /* Ghost background word — HUGE outlined text behind content */
+        .half-bgword {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Sora', 'Outfit', sans-serif;
+            font-size: clamp(120px, 18vw, 240px);
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            color: transparent;
+            -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.06);
+            white-space: nowrap;
+            pointer-events: none;
+            user-select: none;
+            line-height: 0.85;
+            transition: -webkit-text-stroke-color 0.6s ease, transform 0.8s var(--ease-out-expo);
+        }
+        .half-signup:hover .half-bgword {
+            -webkit-text-stroke-color: rgba(255, 255, 255, 0.14);
+            transform: translate(-50%, -50%) scale(1.04);
+        }
+        .half-login:hover .half-bgword {
+            -webkit-text-stroke-color: rgba(255, 255, 255, 0.14);
+            transform: translate(-50%, -50%) scale(1.04);
+        }
+
+        /* Content (icon + labels + preview) */
+        .half-content {
+            position: relative;
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 24px;
+            color: var(--white);
+            max-width: 480px;
+        }
+
+        .half-labels {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .half-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            margin-bottom: 14px;
+            transition: all 0.45s var(--ease-out-back);
+        }
+        .half-icon svg {
+            width: 24px;
+            height: 24px;
+            stroke: var(--white);
+            fill: none;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: stroke 0.3s ease;
+        }
+        .half-signup:hover .half-icon,
+        .half-login:hover .half-icon {
+            transform: scale(1.1);
+            background: var(--red);
+            border-color: var(--red);
+            box-shadow: 0 10px 30px -6px rgba(196, 30, 58, 0.45);
+        }
+
+        .half-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(32px, 4.5vw, 52px);
+            font-weight: 600;
+            font-style: italic;
+            line-height: 1;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.92);
+            transition: color 0.3s ease, font-size 0.4s ease;
+        }
+        .half-signup:hover .half-title,
+        .half-login:hover .half-title {
+            color: var(--white);
+        }
+
+        .half-tag {
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .half-preview {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            margin-top: 0;
+            transition: max-height 0.55s var(--ease-out-expo), opacity 0.45s ease 0.1s, margin-top 0.55s var(--ease-out-expo);
+        }
+        .half-signup:hover .half-preview,
+        .half-login:hover .half-preview {
+            max-height: 220px;
+            opacity: 1;
+            margin-top: 18px;
+        }
+
+        .half-desc {
+            font-size: 13.5px;
+            line-height: 1.55;
+            color: rgba(255, 255, 255, 0.72);
+            max-width: 360px;
+            margin: 0 auto 16px;
+        }
+
+        .half-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 28px;
             background: var(--white);
             color: var(--navy);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            border: none;
+            border-radius: 999px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 12.5px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: background 0.3s ease, transform 0.3s ease, color 0.3s ease, gap 0.3s ease;
+        }
+        .half-cta svg {
+            width: 16px;
+            height: 16px;
+            transition: transform 0.3s ease;
+        }
+        .half-cta:hover {
+            background: var(--red);
+            color: var(--white);
+            transform: translateY(-2px);
+            gap: 14px;
+        }
+        .half-cta:hover svg { transform: translateX(2px); }
+
+        /* Floating idle animation for the icons */
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        .half-signup .half-icon, .half-login .half-icon { animation: iconFloat 3.8s ease-in-out infinite; }
+        .half-signup:hover .half-icon, .half-login:hover .half-icon { animation: none; }
+
+        /* ========== AUTH CARD (forms) ========== */
+        .portal-card {
+            width: min(420px, 100%);
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(20px) saturate(140%);
+            -webkit-backdrop-filter: blur(20px) saturate(140%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 18px;
+            padding: 22px 24px 18px;
+            box-shadow:
+                0 30px 80px -20px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            display: none;
+            opacity: 0;
+            transform: translateY(20px) scale(0.98);
+            transition: opacity 0.7s var(--ease-out-expo), transform 0.7s var(--ease-out-expo);
+        }
+        .portal-card.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .card-back {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.35s var(--ease-out-expo);
+            z-index: 5;
+        }
+        .card-back svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+        .card-back:hover {
+            background: var(--red);
+            border-color: var(--red);
+            transform: translateX(-3px);
+        }
+
+        .portal-card-inner { position: relative; }
+
+        .portal-header {
+            text-align: center;
+            margin-bottom: 14px;
+            padding-top: 2px;
+        }
+        .portal-header .logo-above-card { margin-bottom: 10px; }
+        .portal-header .logo-above-card .myub-logo { --logo-size: 46px; }
+
+        /* Old hand-drawn .logo CSS removed (replaced by .myub-logo component) */
+
+        .portal-title h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 22px;
+            font-weight: 600;
+            font-style: italic;
+            color: var(--white);
+            line-height: 1.15;
+        }
+        .portal-title p {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.55);
+            margin-top: 3px;
+            letter-spacing: 0.3px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 5px;
+            padding: 4px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 11px;
+            margin-bottom: 12px;
+        }
+        .tab {
+            flex: 1;
+            padding: 8px 10px;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.55);
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.4s var(--ease-out-expo);
+            position: relative;
+        }
+        .tab:hover { color: rgba(255, 255, 255, 0.9); }
+        .tab.active {
+            background: linear-gradient(135deg, var(--navy-light), var(--navy));
+            color: var(--white);
+            box-shadow: 0 6px 20px -6px rgba(44, 82, 130, 0.7);
         }
 
         /* Alert */
         .alert {
-            margin: 14px 20px 0;
-            padding: 10px 12px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 500;
             display: none;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 12.5px;
+            margin-bottom: 14px;
+            border: 1px solid transparent;
+            line-height: 1.4;
         }
-
-        .alert.show { display: block; }
-        .alert-error { background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; }
-        .alert-success { background: #f0fff4; color: #276749; border: 1px solid #9ae6b4; }
-        .alert-warning { background: #fffbeb; color: #b45309; border: 1px solid #fcd34d; }
+        .alert.show { display: block; animation: alertIn 0.4s var(--ease-out-expo); }
+        .alert-error {
+            background: rgba(196, 30, 58, 0.12);
+            border-color: rgba(196, 30, 58, 0.35);
+            color: #ffb4c0;
+        }
+        .alert-success {
+            background: rgba(56, 161, 105, 0.12);
+            border-color: rgba(56, 161, 105, 0.35);
+            color: #9ae6b4;
+        }
+        .alert-warning {
+            background: rgba(214, 158, 46, 0.12);
+            border-color: rgba(214, 158, 46, 0.4);
+            color: #f6e05e;
+        }
+        @keyframes alertIn {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
         /* Form */
         .form {
-            padding: 18px 20px 20px;
-        }
-
-        .form-group {
-            margin-bottom: 14px;
-        }
-
-        .form-group label {
             display: block;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--gray-700);
-            margin-bottom: 6px;
         }
-
-        .form-group label .required { color: var(--red); }
-
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 10px 12px;
-            border: 2px solid var(--gray-200);
-            border-radius: 10px;
-            font-family: 'Outfit', sans-serif;
-            font-size: 14px;
-            background: var(--white);
-            color: var(--gray-800);
-            cursor: text;
-            caret-color: var(--navy);
-            transition: all 0.2s;
-        }
-
-        .form-group select {
-            cursor: pointer;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: var(--navy);
-            box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
-            cursor: text;
-        }
-
-        .form-group select:focus {
-            cursor: pointer;
-        }
-
-        .form-group input::placeholder { color: var(--gray-400); }
-        .form-group input.error { border-color: var(--red); }
-
-        .form-group .hint {
-            font-size: 11px;
-            color: var(--gray-500);
-            margin-top: 4px;
-        }
-
-        .form-group .error-msg {
-            font-size: 11px;
-            color: var(--red);
-            margin-top: 4px;
-            display: none;
-        }
-
-        .form-group .error-msg.show { display: block; }
 
         .form-row {
             display: grid;
@@ -393,332 +685,515 @@
             gap: 10px;
         }
 
-        .pw-wrapper { position: relative; }
-        .pw-wrapper input { 
-            padding-right: 40px; 
-            cursor: text !important;
+        .form-group {
+            margin-bottom: 10px;
+            position: relative;
         }
 
+        .form-group label {
+            display: block;
+            font-size: 10.5px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.65);
+            letter-spacing: 0.7px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .required { color: var(--red-light); }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 9px 12px;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 9px;
+            color: var(--white);
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            font-weight: 400;
+            transition: all 0.35s var(--ease-out-expo);
+            outline: none;
+        }
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--navy-lighter);
+            background: rgba(0, 0, 0, 0.35);
+            box-shadow: 0 0 0 3px rgba(58, 111, 168, 0.18);
+        }
+        .form-group input.error {
+            border-color: var(--red);
+            box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.18);
+        }
+
+        .form-group select option {
+            background: var(--navy-dark);
+            color: var(--white);
+        }
+
+        .pw-wrapper {
+            position: relative;
+        }
+        .pw-wrapper input {
+            padding-right: 42px;
+        }
         .pw-toggle {
             position: absolute;
-            right: 10px;
+            right: 8px;
             top: 50%;
             transform: translateY(-50%);
-            background: none;
+            background: transparent;
             border: none;
+            color: rgba(255, 255, 255, 0.45);
             cursor: pointer;
-            color: var(--gray-400);
-            font-size: 16px;
-            z-index: 2;
-            padding: 4px;
+            padding: 6px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.3s ease;
         }
+        .pw-toggle:hover { color: var(--white); }
+        .pw-toggle svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+        .pw-toggle .eye-off { display: none; }
+        .pw-toggle.visible .eye-on { display: none; }
+        .pw-toggle.visible .eye-off { display: block; }
 
-        .pw-toggle:hover {
-            color: var(--gray-600);
+        .hint {
+            font-size: 10.5px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 4px;
+            letter-spacing: 0.2px;
+        }
+        .error-msg {
+            font-size: 11px;
+            color: var(--red-light);
+            margin-top: 4px;
+            display: none;
+        }
+        .error-msg.show { display: block; }
+
+        .strength-bar {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 999px;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+        .strength-fill {
+            height: 100%;
+            width: 0;
+            border-radius: 999px;
+            transition: width 0.4s ease, background 0.4s ease;
+        }
+        .strength-fill.weak { width: 25%; background: #e53e3e; }
+        .strength-fill.fair { width: 50%; background: #dd6b20; }
+        .strength-fill.good { width: 75%; background: #3182ce; }
+        .strength-fill.strong { width: 100%; background: #38a169; }
+        .strength-text {
+            font-size: 10.5px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 3px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .form-footer {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
-            font-size: 13px;
+            margin-bottom: 14px;
+            font-size: 12px;
+            flex-wrap: wrap;
+            gap: 6px;
         }
-
         .remember {
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 6px;
-            color: var(--gray-600);
+            color: rgba(255, 255, 255, 0.65);
             cursor: pointer;
-            font-weight: 500;
         }
-
         .remember input {
-            width: 16px;
-            height: 16px;
-            accent-color: var(--navy);
+            width: 14px;
+            height: 14px;
+            accent-color: var(--navy-lighter);
         }
-
         .forgot {
-            color: var(--navy);
+            color: var(--navy-lighter);
             text-decoration: none;
-            font-weight: 600;
-            font-size: 12px;
+            font-weight: 500;
+            transition: color 0.3s ease;
         }
-
-        .forgot:hover { text-decoration: underline; }
+        .forgot:hover { color: #8ab4e8; }
 
         .submit-btn {
             width: 100%;
-            padding: 12px 20px;
-            background: var(--navy);
+            padding: 11px 14px;
+            background: linear-gradient(135deg, var(--navy-light) 0%, var(--navy) 100%);
             color: var(--white);
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             font-family: 'Outfit', sans-serif;
             font-size: 14px;
             font-weight: 600;
+            letter-spacing: 0.5px;
             cursor: pointer;
-            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s var(--ease-out-expo);
+            box-shadow: 0 10px 30px -10px rgba(26, 54, 93, 0.8);
         }
-
-        .submit-btn:hover {
-            background: var(--navy-light);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(26, 54, 93, 0.3);
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
         }
-
-        .submit-btn:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-            transform: none;
+        .submit-btn span, .submit-btn .spinner { position: relative; z-index: 1; }
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 40px -10px rgba(196, 30, 58, 0.5);
         }
+        .submit-btn:hover:not(:disabled)::before { opacity: 1; }
+        .submit-btn:disabled { opacity: 0.7; cursor: not-allowed; }
 
         .spinner {
+            display: inline-block;
             width: 18px;
             height: 18px;
-            border: 2px solid rgba(255,255,255,0.3);
+            border: 2px solid rgba(255, 255, 255, 0.3);
             border-top-color: var(--white);
             border-radius: 50%;
-            animation: spin 0.6s linear infinite;
-            margin: 0 auto;
+            animation: spin 0.7s linear infinite;
         }
-
         @keyframes spin { to { transform: rotate(360deg); } }
-
-        .strength-bar {
-            height: 3px;
-            background: var(--gray-200);
-            border-radius: 2px;
-            margin-top: 8px;
-            overflow: hidden;
-        }
-
-        .strength-fill {
-            height: 100%;
-            width: 0;
-            border-radius: 2px;
-            transition: all 0.3s;
-        }
-
-        .strength-fill.weak { width: 25%; background: #fc8181; }
-        .strength-fill.fair { width: 50%; background: #f6ad55; }
-        .strength-fill.good { width: 75%; background: #68d391; }
-        .strength-fill.strong { width: 100%; background: #38a169; }
-
-        .strength-text {
-            font-size: 11px;
-            color: var(--gray-500);
-            margin-top: 4px;
-        }
 
         /* ========== VERIFICATION SCREEN ========== */
         .verification-screen {
             display: none;
-            padding: 30px 24px;
             text-align: center;
+            padding: 14px 4px;
         }
-
-        .verification-screen.show {
-            display: block;
-        }
-
+        .verification-screen.show { display: block; animation: alertIn 0.5s var(--ease-out-expo); }
         .verification-icon {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            width: 68px;
+            height: 68px;
+            margin: 0 auto 14px;
             border-radius: 50%;
+            background: rgba(58, 111, 168, 0.18);
+            border: 1px solid rgba(58, 111, 168, 0.45);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 20px;
-            font-size: 32px;
         }
-
+        .verification-icon svg {
+            width: 30px;
+            height: 30px;
+            stroke: var(--white);
+            fill: none;
+            stroke-width: 1.6;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
         .verification-screen h2 {
-            font-family: 'Sora', sans-serif;
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--gray-800);
-            margin-bottom: 10px;
-        }
-
-        .verification-screen p {
-            font-size: 13px;
-            color: var(--gray-500);
-            line-height: 1.6;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 26px;
+            font-style: italic;
+            font-weight: 600;
             margin-bottom: 8px;
         }
-
-        .verification-email {
-            font-weight: 600;
-            color: var(--navy);
-            word-break: break-all;
+        .verification-screen p {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.65);
+            line-height: 1.5;
+            margin-bottom: 4px;
         }
-
+        .verification-email {
+            color: var(--white) !important;
+            font-weight: 600;
+            margin: 8px 0 12px !important;
+        }
         .verification-actions {
-            margin-top: 24px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
+            margin-top: 18px;
         }
-
+        .resend-btn, .back-btn {
+            padding: 11px 16px;
+            border-radius: 10px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.35s var(--ease-out-expo);
+            border: 1px solid transparent;
+        }
         .resend-btn {
-            padding: 12px 20px;
-            background: var(--gray-100);
-            color: var(--gray-700);
-            border: none;
-            border-radius: 10px;
-            font-family: 'Outfit', sans-serif;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .resend-btn:hover {
-            background: var(--gray-200);
-        }
-
-        .resend-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .back-btn {
-            padding: 12px 20px;
-            background: transparent;
-            color: var(--navy);
-            border: 2px solid var(--navy);
-            border-radius: 10px;
-            font-family: 'Outfit', sans-serif;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .back-btn:hover {
-            background: var(--navy);
+            background: linear-gradient(135deg, var(--navy-light), var(--navy));
             color: var(--white);
         }
-
+        .resend-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 30px -10px rgba(44, 82, 130, 0.7); }
+        .resend-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .back-btn {
+            background: transparent;
+            color: rgba(255, 255, 255, 0.7);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+        .back-btn:hover { background: rgba(255, 255, 255, 0.06); color: var(--white); }
         .countdown {
-            font-size: 12px;
-            color: var(--gray-400);
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.45);
             margin-top: 8px;
         }
 
-        /* Footer */
+        /* ========== FOOTER ========== */
         .page-footer {
             text-align: center;
             padding: 16px;
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.6);
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.35);
+            letter-spacing: 0.3px;
+            position: relative;
+            z-index: 2;
         }
-
         .page-footer a {
-            color: rgba(255, 255, 255, 0.8);
+            color: rgba(255, 255, 255, 0.6);
             text-decoration: none;
-            font-weight: 500;
+            transition: color 0.3s ease;
         }
+        .page-footer a:hover { color: var(--white); }
 
-        /* ========== MOBILE RESPONSIVE ========== */
-        /* Remove tap highlight on mobile */
-        * {
-            -webkit-tap-highlight-color: transparent;
-            -webkit-touch-callout: none;
-        }
-
+        /* ========== RESPONSIVE ========== */
         @media (max-width: 768px) {
-            .portal-container {
-                padding: 16px;
-                align-items: center;
-                justify-content: center;
+            .auth-landing { aspect-ratio: 9 / 14; max-height: 78vh; border-radius: 20px; }
+            .half-signup .half-content { transform: translate(10%, -14%); }
+            .half-login .half-content { transform: translate(-10%, 14%); }
+            .half-bgword { font-size: clamp(70px, 28vw, 140px); }
+            .half-title { font-size: clamp(26px, 7vw, 40px); }
+            .half-content { padding: 18px; }
+            .half-desc { font-size: 12.5px; }
+            .portal-card { padding: 22px 20px 18px; border-radius: 18px; }
+            .portal-title h1 { font-size: 22px; }
+            .form-row { grid-template-columns: 1fr; gap: 0; }
+        }
+        @media (max-width: 420px) {
+            .portal-container { padding: 16px 12px; }
+            .auth-landing { max-height: 74vh; }
+            .half-bgword { font-size: 26vw; }
+            .half-signup .half-content { transform: translate(8%, -10%); }
+            .half-login .half-content { transform: translate(-8%, 10%); }
+            .half-icon { width: 44px; height: 44px; margin-bottom: 10px; }
+            .half-title { font-size: 28px; }
+            .half-desc { font-size: 12px; max-width: 260px; }
+            .half-cta { padding: 10px 20px; font-size: 11.5px; }
+            .portal-card { padding: 20px 16px 16px; }
+            .logo { font-size: 19px; }
+            .portal-title h1 { font-size: 20px; }
+            .form-group input, .form-group select { padding: 10px 12px; font-size: 13px; }
+            .submit-btn { padding: 12px 14px; font-size: 13px; }
+        }
+        @media (max-height: 720px) and (min-width: 769px) {
+            .auth-landing { max-height: 88vh; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
             }
-
-            .portal-card {
-                max-width: 100%;
-            }
-
-            .graduation-cap { width: 42px; height: 24px; top: -20px; }
-            .logo-m { font-size: 2.3rem; }
-            .logo-yub { font-size: 1.5rem; }
         }
 
-        @media (max-width: 480px) {
-            .portal-container {
-                padding: 12px;
-                align-items: center;
-                justify-content: center;
-                min-height: 100vh;
-                padding-top: 12px;
-                padding-bottom: 12px;
-            }
+        /* ========== INTRO STAGE 2 — MyUB REVEAL ========== */
+        .intro-stage { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        .intro-stage-2 {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.7s ease, visibility 0.7s ease;
+        }
+        .intro-stage-2.show { opacity: 1; visibility: visible; }
+        .intro-stage-1 { transition: opacity 0.7s ease, visibility 0.7s ease; }
+        .intro-stage-1.hide-stage { opacity: 0; visibility: hidden; }
 
-            .portal-card {
-                border-radius: 16px;
-                max-width: 100%;
-                max-height: 95vh;
-                overflow-y: auto;
-            }
-
-            .portal-header {
-                padding: 16px 16px 12px;
-            }
-
-            .graduation-cap { width: 38px; height: 22px; top: -18px; }
-            .logo-m { font-size: 2rem; }
-            .logo-yub { font-size: 1.3rem; }
-
-            .portal-title h1 { font-size: 16px; }
-            .portal-title p { font-size: 11px; }
-
-            .tabs { margin: 0 12px; }
-            .tab { padding: 8px 12px; font-size: 12px; }
-
-            .alert { margin: 10px 12px 0; padding: 8px 10px; font-size: 11px; }
-
-            .form { padding: 12px 14px 14px; }
-            .form-group { margin-bottom: 10px; }
-            .form-group label { font-size: 11px; margin-bottom: 3px; }
-            .form-group input, .form-group select { padding: 8px 10px; font-size: 13px; border-radius: 8px; }
-
-            .form-row { grid-template-columns: 1fr; gap: 10px; }
-
-            .form-footer { font-size: 11px; margin-bottom: 12px; }
-            .remember { font-size: 11px; }
-            .forgot { font-size: 10px; }
-
-            .submit-btn { padding: 10px 14px; font-size: 13px; border-radius: 8px; }
-
-            .page-footer { padding: 10px; font-size: 10px; }
-
-            .skip-btn { bottom: 16px; right: 16px; padding: 6px 12px; font-size: 11px; }
-
-            .intro-title { font-size: clamp(28px, 10vw, 48px); }
-            .intro-subtitle { font-size: 11px; letter-spacing: 4px; margin-top: 16px; }
-
-            .verification-screen { padding: 20px 14px; }
-            .verification-icon { width: 56px; height: 56px; font-size: 26px; }
-            .verification-screen h2 { font-size: 16px; }
-
-            /* Reduce strength bar spacing */
-            .strength-bar { margin-top: 6px; }
-            .strength-text { font-size: 10px; margin-top: 4px; }
+        .myub-reveal {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            position: relative;
+            z-index: 10;
+        }
+        .myub-reveal-slot {
+            position: relative;
+            min-height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 10px;
+        }
+        /* flying-letters phase removed; only real-logo reveal remains */
+        .myub-reveal-real {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            filter: drop-shadow(0 20px 40px rgba(196, 30, 58, 0.3)) drop-shadow(0 8px 20px rgba(0,0,0,0.4));
+        }
+        .myub-reveal-tagline {
+            font-size: 12px;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 500;
+            opacity: 0;
+            transform: translateY(8px);
+            margin-top: 4px;
+        }
+        .myub-reveal-line {
+            width: 0;
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.5), transparent);
+            margin-top: 6px;
         }
 
-        @media (max-width: 360px) {
-            .portal-container { padding: 8px; }
-            .portal-header { padding: 12px 10px 10px; }
-            .tabs { margin: 0 10px; }
-            .form { padding: 10px; }
-            .alert { margin: 8px 10px 0; }
-            .form-group { margin-bottom: 8px; }
-            .form-group input, .form-group select { padding: 7px 8px; font-size: 12px; }
-            .submit-btn { padding: 9px 12px; font-size: 12px; }
+        /* ========== LANDING LOGO HEADER ========== */
+        .landing-header {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 12;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 22px 10px 14px;
+            background: var(--navy-dark);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-radius: 999px;
+            color: var(--white);
+            pointer-events: none;
+            box-shadow: 0 14px 34px rgba(0,0,0,0.45), 0 0 0 4px rgba(15, 39, 68, 0.5);
         }
+        .landing-header-logo {
+            width: 34px;
+            height: 34px;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 6px rgba(0,0,0,0.3));
+        }
+        .landing-header-text {
+            display: inline-block;
+            line-height: 1;
+        }
+
+        /* ========== MOBILE RESPONSIVE for horizontal-split landing ========== */
+        @media (max-width: 768px) {
+            .auth-landing {
+                height: min(640px, 86vh);
+            }
+            .half-bgword { font-size: clamp(100px, 26vw, 180px); }
+            .half-title { font-size: clamp(28px, 7vw, 42px); }
+            .half-content { padding: 18px; }
+            .half-desc { font-size: 12.5px; max-width: 300px; }
+            .half-preview .half-cta { padding: 11px 22px; font-size: 11.5px; }
+            .half-signup:hover .half-preview,
+            .half-login:hover .half-preview { max-height: 260px; }
+            .landing-header { top: 14px; padding: 7px 14px; font-size: 15px; }
+            .landing-header-logo { width: 28px; height: 28px; }
+            .myub-reveal-logo { width: 90px; height: 90px; }
+        }
+        @media (max-width: 420px) {
+            .auth-landing { height: min(600px, 82vh); border-radius: 18px; }
+            .half-icon { width: 48px; height: 48px; margin-bottom: 10px; }
+            .half-title { font-size: 26px; }
+            .half-tag { font-size: 10px; letter-spacing: 2px; }
+            .half-desc { font-size: 12px; max-width: 260px; }
+            .half-cta { padding: 10px 20px; font-size: 11px; }
+        }
+
+
+        /* ========== REAL MyUB LOGO COMPONENT ========== */
+        .myub-logo {
+            --logo-size: 80px;
+            --logo-m-color: #1a365d;
+            --logo-ub-color: #1a365d;
+            position: relative;
+            display: inline-flex;
+            align-items: flex-end;
+            gap: calc(var(--logo-size) * 0.06);
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            line-height: 1;
+            user-select: none;
+        }
+        .myub-logo .ml-m-wrap {
+            position: relative;
+            display: inline-block;
+            line-height: 0.82;
+        }
+        .myub-logo .ml-m {
+            font-size: var(--logo-size);
+            font-weight: 700;
+            color: var(--logo-m-color);
+            font-style: normal;
+            letter-spacing: -0.02em;
+            display: inline-block;
+        }
+        .myub-logo .ml-cap {
+            position: absolute;
+            top: calc(var(--logo-size) * -0.34);
+            left: 50%;
+            transform: translateX(-50%) rotate(-6deg);
+            width: calc(var(--logo-size) * 0.78);
+            height: calc(var(--logo-size) * 0.55);
+            pointer-events: none;
+        }
+        .myub-logo .ml-cap svg { width: 100%; height: 100%; overflow: visible; }
+        .myub-logo .ml-ub {
+            font-size: calc(var(--logo-size) * 0.38);
+            font-weight: 700;
+            color: var(--logo-ub-color);
+            font-style: normal;
+            letter-spacing: 0.01em;
+            padding-bottom: 0;
+            display: inline-block;
+            line-height: 0.85;
+        }
+        .myub-logo.on-dark { --logo-m-color: #ffffff; --logo-ub-color: #ffffff; }
+        .logo-above-card {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 18px;
+        }
+        .logo-above-card .myub-logo { --logo-size: 64px; }
+
+
+        /* ========== MOBILE POLISH for logo + form card ========== */
+        @media (max-width: 768px) {
+            .portal-header .logo-above-card .myub-logo { --logo-size: 50px; }
+            .portal-card { padding: 22px 20px 18px; }
+            .landing-header { padding: 6px 12px 6px 8px; gap: 7px; }
+            .landing-header .myub-logo { --logo-size: 26px !important; }
+        }
+        @media (max-width: 420px) {
+            .auth-landing { height: min(580px, 80vh); }
+            .portal-header .logo-above-card .myub-logo { --logo-size: 46px; }
+            .portal-header .logo-above-card { margin-bottom: 10px; }
+            .portal-title h1 { font-size: 19px; }
+            .portal-title p { font-size: 11.5px; }
+            .landing-header { top: 12px; font-size: 13px; padding: 5px 11px 5px 7px; }
+            .landing-header .myub-logo { --logo-size: 24px !important; }
+            .myub-reveal-letters { font-size: clamp(54px, 16vw, 96px); }
+            .myub-reveal-real .myub-logo { --logo-size: 80px !important; }
+            .myub-reveal-slot { min-height: 120px; }
+        }
+
     </style>
     <!-- Primary Meta Tags -->
     <meta name="title" content="MyUB - Login | University of Botswana Student Portal">
@@ -765,45 +1240,167 @@
     <!-- Canonical URL -->
     <link rel="canonical" href="https://www.myub.online/">
 
+    <!-- GSAP for page animations (Pass 1: auth redesign) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 </head>
 <body>
-    <!-- Intro Screen -->
+    <!-- Page transition overlay -->
+    <div class="page-transition" id="pageTransition" aria-hidden="true">
+        <div class="pt-panel"></div>
+        <div class="pt-panel"></div>
+        <div class="pt-panel"></div>
+        <div class="pt-panel"></div>
+        <div class="pt-panel"></div>
+    </div>
+
+    <!-- Intro Screen (2 stages: Futurify Designs -> MyUB reveal) -->
     <div class="intro-screen" id="introScreen">
         <div class="intro-bg"></div>
         <div class="intro-rays"></div>
-        <div class="intro-content">
-            <h1 class="intro-title">
-                <span>Futurify</span>
-                <span>Designs</span>
-            </h1>
-            <p class="intro-subtitle">presents</p>
-            <div class="intro-line"></div>
+
+        <!-- Stage 1: Futurify Designs presents -->
+        <div class="intro-stage intro-stage-1" id="introStage1">
+            <div class="intro-content">
+                <h1 class="intro-title">
+                    <span>Futurify</span>
+                    <span>Designs</span>
+                </h1>
+                <p class="intro-subtitle">presents</p>
+                <div class="intro-line"></div>
+            </div>
         </div>
+
+        <!-- Stage 2: MyUB reveal (letters fly in, then morph into real logo) -->
+        <div class="intro-stage intro-stage-2" id="introStage2">
+            <div class="myub-reveal">
+                <div class="myub-reveal-slot">
+                    <div class="myub-reveal-real" id="myubRevealReal" aria-hidden="true">
+                        <div class="myub-logo on-dark" style="--logo-size: 110px;">
+                            <div class="ml-m-wrap">
+                                <div class="ml-cap">
+                                    <svg viewBox="0 0 100 70">
+                                        <polygon points="50,6 95,24 50,42 5,24" fill="#ffffff"/>
+                                        <circle cx="50" cy="24" r="4.5" fill="#1a365d" stroke="#ffffff" stroke-width="1.5"/>
+                                        <rect x="32" y="38" width="36" height="18" rx="2.5" fill="#ffffff"/>
+                                        <circle cx="78" cy="24" r="4" fill="#c41e3a"/>
+                                        <path d="M78 28 Q82 44 80 54" stroke="#c41e3a" stroke-width="3" fill="none" stroke-linecap="round"/>
+                                        <ellipse cx="80" cy="57" rx="5" ry="8" fill="#c41e3a"/>
+                                    </svg>
+                                </div>
+                                <span class="ml-m">M</span>
+                            </div>
+                            <span class="ml-ub">yUB</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="myub-reveal-line" id="myubRevealLine"></div>
+                <p class="myub-reveal-tagline" id="myubRevealTagline">Your Student Companion</p>
+            </div>
+        </div>
+
         <button class="skip-btn" onclick="skipIntro()">Skip Intro</button>
     </div>
 
     <!-- Main Portal -->
     <div class="portal-wrapper">
         <div class="portal-container">
-            <div class="portal-card">
+            <!-- Horizontal-split landing (Create One on top, Sign In on bottom) -->
+            <div class="auth-landing" id="authLanding" role="region" aria-label="Choose sign in or sign up">
+                <!-- Persistent MyUB logo header -->
+                <div class="landing-header" aria-hidden="true">
+                    <div class="myub-logo on-dark" style="--logo-size: 36px;">
+                        <div class="ml-m-wrap">
+                            <div class="ml-cap">
+                                <svg viewBox="0 0 100 70">
+                                    <polygon points="50,6 95,24 50,42 5,24" fill="#ffffff"/>
+                                    <circle cx="50" cy="24" r="4.5" fill="#1a365d" stroke="#ffffff" stroke-width="1.5"/>
+                                    <rect x="32" y="38" width="36" height="18" rx="2.5" fill="#ffffff"/>
+                                    <circle cx="78" cy="24" r="4" fill="#c41e3a"/>
+                                    <path d="M78 28 Q82 44 80 54" stroke="#c41e3a" stroke-width="3" fill="none" stroke-linecap="round"/>
+                                    <ellipse cx="80" cy="57" rx="5" ry="8" fill="#c41e3a"/>
+                                </svg>
+                            </div>
+                            <span class="ml-m">M</span>
+                        </div>
+                        <span class="ml-ub">yUB</span>
+                    </div>
+                </div>
+
+                <!-- TOP HALF: Create One -->
+                <div class="half half-signup" id="halfSignup" data-choice="signup" role="button" tabindex="0" aria-label="Register as a new student" onclick="if(!event.target.closest('.half-cta'))enterForm('signup')" onmouseenter="document.getElementById('authLanding').classList.remove('hover-login');document.getElementById('authLanding').classList.add('hover-signup')" onmouseleave="document.getElementById('authLanding').classList.remove('hover-signup')">
+                    <span class="half-bgword">REGISTER</span>
+                    <div class="half-content">
+                        <div class="half-icon">
+                            <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                        </div>
+                        <div class="half-labels">
+                            <h2 class="half-title">Create One</h2>
+                            <div class="half-tag">New to MyUB</div>
+                        </div>
+                        <div class="half-preview">
+                            <p class="half-desc">Join the MyUB community. Track your GPA, manage your schedule, and connect with classmates across the University of Botswana.</p>
+                            <button type="button" class="half-cta" data-choice="signup">
+                                Get Started
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Divider with "or" -->
+                <div class="half-divider" id="halfDivider" aria-hidden="true">
+                    <span class="divider-line"></span>
+                    <span class="divider-or">or</span>
+                    <span class="divider-line"></span>
+                </div>
+
+                <!-- BOTTOM HALF: Sign In -->
+                <div class="half half-login" id="halfLogin" data-choice="login" role="button" tabindex="0" aria-label="Sign in to your account" onclick="if(!event.target.closest('.half-cta'))enterForm('login')" onmouseenter="document.getElementById('authLanding').classList.remove('hover-signup');document.getElementById('authLanding').classList.add('hover-login')" onmouseleave="document.getElementById('authLanding').classList.remove('hover-login')">
+                    <span class="half-bgword">LOGIN</span>
+                    <div class="half-content">
+                        <div class="half-icon">
+                            <svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                        </div>
+                        <div class="half-labels">
+                            <h2 class="half-title">Sign In</h2>
+                            <div class="half-tag">Welcome back</div>
+                        </div>
+                        <div class="half-preview">
+                            <p class="half-desc">Already have an account? Sign in to access your dashboard, check your schedule, and pick up right where you left off.</p>
+                            <button type="button" class="half-cta" data-choice="login">
+                                Continue
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="portal-card" id="portalCard">
+                <button type="button" class="card-back" id="cardBack" aria-label="Back to chooser">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                <div class="portal-card-inner">
                 <!-- Auth Forms Container -->
                 <div id="authForms">
                     <div class="portal-header">
-                        <div class="logo">
-                            <div class="logo-m-wrapper">
-                                <svg class="graduation-cap" viewBox="0 0 100 70">
-                                    <polygon points="50,8 95,25 50,42 5,25" fill="#1a365d"/>
-                                    <circle cx="50" cy="25" r="5" fill="#ffffff" stroke="#1a365d" stroke-width="2"/>
-                                    <rect x="32" y="38" width="36" height="18" rx="3" fill="#1a365d"/>
-                                    <g class="tassel">
-                                        <circle cx="78" cy="25" r="4" fill="#c41e3a"/>
-                                        <path d="M78 29 Q82 45 80 55" stroke="#c41e3a" stroke-width="3" fill="none"/>
-                                        <ellipse cx="80" cy="58" rx="5" ry="8" fill="#c41e3a"/>
-                                    </g>
-                                </svg>
-                                <span class="logo-m">M</span>
+                        <div class="logo-above-card">
+                            <div class="myub-logo on-dark">
+                                <div class="ml-m-wrap">
+                                    <div class="ml-cap">
+                                        <svg viewBox="0 0 100 70">
+                                            <polygon points="50,6 95,24 50,42 5,24" fill="#ffffff"/>
+                                            <circle cx="50" cy="24" r="4.5" fill="#1a365d" stroke="#ffffff" stroke-width="1.5"/>
+                                            <rect x="32" y="38" width="36" height="18" rx="2.5" fill="#ffffff"/>
+                                            <circle cx="78" cy="24" r="4" fill="#c41e3a"/>
+                                            <path d="M78 28 Q82 44 80 54" stroke="#c41e3a" stroke-width="3" fill="none" stroke-linecap="round"/>
+                                            <ellipse cx="80" cy="57" rx="5" ry="8" fill="#c41e3a"/>
+                                        </svg>
+                                    </div>
+                                    <span class="ml-m">M</span>
+                                </div>
+                                <span class="ml-ub">yUB</span>
                             </div>
-                            <span class="logo-yub">yUB</span>
                         </div>
                         <div class="portal-title">
                             <h1 id="headerTitle">Welcome back</h1>
@@ -828,7 +1425,7 @@
                             <label>Password <span class="required">*</span></label>
                             <div class="pw-wrapper">
                                 <input type="password" id="loginPassword" placeholder="Enter password" required>
-                                <button type="button" class="pw-toggle" onclick="togglePw('loginPassword', this)">👁</button>
+                                <button type="button" class="pw-toggle" onclick="togglePw('loginPassword', this)" aria-label="Show password"><svg class="eye-on" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-off" viewBox="0 0 24 24"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-6.5 0-10-7-10-7a19.8 19.8 0 0 1 4.22-5.58M9.9 4.24A10.94 10.94 0 0 1 12 4c6.5 0 10 7 10 7a19.8 19.8 0 0 1-2.17 3.19M1 1l22 22M14.12 14.12A3 3 0 1 1 9.88 9.88"/></svg></button>
                             </div>
                         </div>
                         <div class="form-footer">
@@ -895,7 +1492,7 @@
                             <label>Password <span class="required">*</span></label>
                             <div class="pw-wrapper">
                                 <input type="password" id="signupPassword" placeholder="Min 8 characters" required oninput="checkStrength(this.value)">
-                                <button type="button" class="pw-toggle" onclick="togglePw('signupPassword', this)">👁</button>
+                                <button type="button" class="pw-toggle" onclick="togglePw('signupPassword', this)" aria-label="Show password"><svg class="eye-on" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-off" viewBox="0 0 24 24"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-6.5 0-10-7-10-7a19.8 19.8 0 0 1 4.22-5.58M9.9 4.24A10.94 10.94 0 0 1 12 4c6.5 0 10 7 10 7a19.8 19.8 0 0 1-2.17 3.19M1 1l22 22M14.12 14.12A3 3 0 1 1 9.88 9.88"/></svg></button>
                             </div>
                             <div class="strength-bar">
                                 <div class="strength-fill" id="strengthFill"></div>
@@ -906,7 +1503,7 @@
                             <label>Confirm Password <span class="required">*</span></label>
                             <div class="pw-wrapper">
                                 <input type="password" id="confirmPassword" placeholder="Confirm password" required>
-                                <button type="button" class="pw-toggle" onclick="togglePw('confirmPassword', this)">👁</button>
+                                <button type="button" class="pw-toggle" onclick="togglePw('confirmPassword', this)" aria-label="Show password"><svg class="eye-on" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-off" viewBox="0 0 24 24"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-6.5 0-10-7-10-7a19.8 19.8 0 0 1 4.22-5.58M9.9 4.24A10.94 10.94 0 0 1 12 4c6.5 0 10 7 10 7a19.8 19.8 0 0 1-2.17 3.19M1 1l22 22M14.12 14.12A3 3 0 1 1 9.88 9.88"/></svg></button>
                             </div>
                         </div>
                         <button type="submit" class="submit-btn" id="signupBtn">Create Account</button>
@@ -915,7 +1512,7 @@
 
                 <!-- Email Verification Screen -->
                 <div class="verification-screen" id="verificationScreen">
-                    <div class="verification-icon">✉️</div>
+                    <div class="verification-icon"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
                     <h2>Check Your Email</h2>
                     <p>We've sent a verification link to:</p>
                     <p class="verification-email" id="verificationEmail"></p>
@@ -931,6 +1528,7 @@
                     </div>
                     <p class="countdown" id="resendCountdown"></p>
                 </div>
+                </div><!-- /portal-card-inner -->
             </div>
         </div>
 
@@ -940,14 +1538,59 @@
     </div>
 
     <script>
-        // Intro
-        setTimeout(() => {
-            document.getElementById('introScreen').classList.add('hide');
-        }, 4000);
+        // Intro — 2-stage sequence: Futurify Designs -> MyUB reveal -> landing
+        let introSkipped = false;
+        function runIntroSequence() {
+            const stage1 = document.getElementById('introStage1');
+            const stage2 = document.getElementById('introStage2');
+            const screen = document.getElementById('introScreen');
+
+            // Stage 1 shows from load (CSS animations already running). Hold 3.2s.
+            setTimeout(() => {
+                if (introSkipped) return;
+                stage1.classList.add('hide-stage');
+                setTimeout(() => {
+                    if (introSkipped) return;
+                    stage2.classList.add('show');
+                    playMyubReveal();
+                }, 550);
+            }, 3200);
+
+            // Total timing: 3200 (stage1) + 550 (cross) + ~2700 (stage2) = ~6450ms
+            setTimeout(() => {
+                if (introSkipped) return;
+                screen.classList.add('hide');
+                setTimeout(() => { screen.style.display = 'none'; }, 750);
+            }, 6300);
+        }
+
+        function playMyubReveal() {
+            const g = window.gsap;
+            if (!g) return;
+            const real = document.getElementById('myubRevealReal');
+            const line = document.getElementById('myubRevealLine');
+            const tag = document.getElementById('myubRevealTagline');
+            const tl = g.timeline();
+            tl.fromTo(real,
+                { opacity: 0, scale: 0.7, rotate: -8 },
+                { opacity: 1, scale: 1, rotate: 0, duration: 1.1, ease: 'back.out(1.6)' })
+              .to(line, { width: 150, duration: 0.55, ease: 'power2.out' }, '-=0.3')
+              .to(tag, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, '-=0.35');
+        }
 
         function skipIntro() {
-            document.getElementById('introScreen').classList.add('hide');
+            introSkipped = true;
+            const s = document.getElementById('introScreen');
+            s.classList.add('hide');
+            setTimeout(() => { s.style.display = 'none'; }, 750);
         }
+
+        runIntroSequence();
+        // Force-hide intro after 7.5s no matter what, so it cannot block clicks
+        setTimeout(() => {
+            const s = document.getElementById('introScreen');
+            if (s) { s.classList.add('hide'); s.style.display = 'none'; }
+        }, 7500);
 
         // Supabase
         const SUPABASE_URL = 'https://weuxtwmaqmbhskjpjdyi.supabase.co';
@@ -972,7 +1615,7 @@
         function togglePw(id, btn) {
             const input = document.getElementById(id);
             input.type = input.type === 'password' ? 'text' : 'password';
-            btn.textContent = input.type === 'password' ? '👁' : '🙈';
+            btn.classList.toggle('visible', input.type === 'text');
         }
 
         function validateStudentId(input) {
@@ -1194,7 +1837,7 @@
                 }
                 
                 showAlert('Success! Redirecting...', 'success');
-                setTimeout(() => window.location.href = 'dashboard.html', 1000);
+                setTimeout(() => navigateWithTransition('dashboard.html'), 900);
             } catch (err) {
                 showAlert(err.message);
             } finally {
@@ -1351,6 +1994,162 @@
             if (rememberedEmail && rememberMe === 'true') {
                 document.getElementById('loginEmail').value = rememberedEmail;
                 document.getElementById('rememberMe').checked = true;
+            }
+        }
+
+        // ========== DIAGONAL LANDING + TRANSITIONS (Pass 1) ==========
+        const authLanding = document.getElementById('authLanding');
+        const portalCard = document.getElementById('portalCard');
+        const cardBack = document.getElementById('cardBack');
+        const pageTransition = document.getElementById('pageTransition');
+
+        // Simple hover/click on the two rectangular halves
+        const halfSignup = document.getElementById('halfSignup');
+        const halfLogin = document.getElementById('halfLogin');
+
+        halfSignup.addEventListener('mouseenter', () => {
+            authLanding.classList.remove('hover-login');
+            authLanding.classList.add('hover-signup');
+        });
+        halfSignup.addEventListener('mouseleave', () => {
+            authLanding.classList.remove('hover-signup');
+        });
+        halfSignup.addEventListener('click', (e) => {
+            if (e.target.closest('.half-cta')) return;
+            enterForm('signup');
+        });
+        halfSignup.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); enterForm('signup'); }
+        });
+
+        halfLogin.addEventListener('mouseenter', () => {
+            authLanding.classList.remove('hover-signup');
+            authLanding.classList.add('hover-login');
+        });
+        halfLogin.addEventListener('mouseleave', () => {
+            authLanding.classList.remove('hover-login');
+        });
+        halfLogin.addEventListener('click', (e) => {
+            if (e.target.closest('.half-cta')) return;
+            enterForm('login');
+        });
+        halfLogin.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); enterForm('login'); }
+        });
+
+        // CTA buttons inside halves
+        document.querySelectorAll('.half-cta').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                enterForm(btn.dataset.choice);
+            });
+        });
+
+        function enterForm(choice) {
+            switchTab(choice);
+            const g = window.gsap;
+            if (g) {
+                g.to(authLanding, {
+                    opacity: 0,
+                    scale: 0.96,
+                    y: -10,
+                    duration: 0.5,
+                    ease: 'power3.inOut',
+                    onComplete: () => {
+                        authLanding.classList.add('hidden');
+                        portalCard.classList.add('active');
+                        g.fromTo(portalCard,
+                            { opacity: 0, y: 24, scale: 0.97 },
+                            { opacity: 1, y: 0, scale: 1, duration: 0.7, ease: 'power3.out' }
+                        );
+                        g.fromTo('#portalCard .portal-header, #portalCard .tabs, #portalCard .form, #portalCard .submit-btn',
+                            { opacity: 0, y: 14 },
+                            { opacity: 1, y: 0, duration: 0.5, stagger: 0.06, ease: 'power2.out', delay: 0.15 }
+                        );
+                    }
+                });
+            } else {
+                authLanding.classList.add('hidden');
+                portalCard.classList.add('active');
+            }
+        }
+
+        function backToLanding() {
+            const g = window.gsap;
+            if (g) {
+                g.to(portalCard, {
+                    opacity: 0,
+                    y: 20,
+                    scale: 0.97,
+                    duration: 0.45,
+                    ease: 'power3.inOut',
+                    onComplete: () => {
+                        portalCard.classList.remove('active');
+                        portalCard.style.opacity = '';
+                        portalCard.style.transform = '';
+                        authLanding.classList.remove('hidden');
+                        g.fromTo(authLanding,
+                            { opacity: 0, y: 20, scale: 0.97 },
+                            { opacity: 1, y: 0, scale: 1, duration: 0.7, ease: 'power3.out' }
+                        );
+                    }
+                });
+            } else {
+                portalCard.classList.remove('active');
+                authLanding.classList.remove('hidden');
+            }
+            hideAlert();
+        }
+        cardBack.addEventListener('click', backToLanding);
+
+        // Entrance animation for the landing after intro finishes
+        function revealLanding() {
+            authLanding.classList.add('ready');
+            const g = window.gsap;
+            if (g) {
+                g.fromTo('.half-signup .half-content',
+                    { opacity: 0, y: -16 },
+                    { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', delay: 0.1 }
+                );
+                g.fromTo('.half-login .half-content',
+                    { opacity: 0, y: 16 },
+                    { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', delay: 0.2 }
+                );
+                g.fromTo('.half-divider',
+                    { opacity: 0, scaleX: 0.6 },
+                    { opacity: 1, scaleX: 1, duration: 0.7, ease: 'power3.out', delay: 0.35 }
+                );
+            }
+        }
+        // Reveal landing after intro auto-hides (4s) or skip
+        const introEl = document.getElementById('introScreen');
+        const revealWhenIntroGone = () => {
+            if (introEl.classList.contains('hide')) {
+                revealLanding();
+            } else {
+                setTimeout(revealWhenIntroGone, 150);
+            }
+        };
+        setTimeout(revealWhenIntroGone, 200);
+
+        // ========== PAGE TRANSITION ==========
+        function navigateWithTransition(url) {
+            const g = window.gsap;
+            const panels = pageTransition.querySelectorAll('.pt-panel');
+            pageTransition.classList.add('active');
+            if (g && panels.length) {
+                g.fromTo(panels,
+                    { yPercent: 100 },
+                    {
+                        yPercent: 0,
+                        duration: 0.7,
+                        ease: 'power4.inOut',
+                        stagger: 0.06,
+                        onComplete: () => { window.location.href = url; }
+                    }
+                );
+            } else {
+                window.location.href = url;
             }
         }
 

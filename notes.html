@@ -1754,6 +1754,13 @@
             .page-title { font-size: 19px; }
             .notes-grid.active { grid-template-columns: 1fr; }
             .topbar-right .btn-primary { padding: 9px 14px; font-size: 12.5px; }
+            /* Notification dropdown: constrain to viewport on tablets/mobile */
+            .notif-dropdown {
+                width: calc(100vw - 32px);
+                max-width: 360px;
+                right: 0;
+                left: auto;
+            }
         }
         @media (max-width: 640px) {
             .main-content { padding: 12px; }

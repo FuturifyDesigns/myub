@@ -1559,7 +1559,14 @@
             .search-box { width: 170px; }
             .user-info { display: none; }
             .search-results-dropdown { right: 0; width: calc(100vw - 32px); max-width: 340px; }
-        }
+                    /* Notification dropdown: constrain to viewport on tablets/mobile */
+            .notification-dropdown {
+                width: calc(100vw - 32px);
+                max-width: 360px;
+                right: 0;
+                left: auto;
+            }
+}
         @media (max-width: 640px) {
             .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
             .stat-card { padding: 14px; gap: 12px; }

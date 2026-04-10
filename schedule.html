@@ -1693,7 +1693,14 @@
             .calendar-event { font-size: 9px; padding: 2px 5px; }
             .week-body { max-height: 500px; }
             .current-date { min-width: 140px; font-size: 14px; }
-        }
+                    /* Notification dropdown: constrain to viewport on tablets/mobile */
+            .notification-dropdown {
+                width: calc(100vw - 32px);
+                max-width: 360px;
+                right: 0;
+                left: auto;
+            }
+}
         @media (max-width: 640px) {
             .main-content { padding: 12px; }
             .schedule-header { padding: 12px; }

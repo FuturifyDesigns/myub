@@ -2075,6 +2075,73 @@
         .member-action-btn.danger:hover { background: rgba(196, 30, 58, 0.15); color: var(--red-light); }
 
         /* ========== AVATAR CROPPER MODAL ========== */
+        .avatar-upload {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+        .avatar-preview {
+            width: 96px;
+            height: 96px;
+            min-width: 96px;
+            min-height: 96px;
+            max-width: 96px;
+            max-height: 96px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--navy-light), var(--navy));
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden;
+            border: 2px solid var(--border-strong);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s var(--ease-out-expo);
+            flex-shrink: 0;
+        }
+        .avatar-preview:hover {
+            transform: scale(1.04);
+            border-color: var(--navy-lighter);
+            box-shadow: 0 14px 40px -10px rgba(58, 111, 168, 0.5);
+        }
+        .avatar-preview svg {
+            width: 40px !important;
+            height: 40px !important;
+            max-width: 40px !important;
+            max-height: 40px !important;
+            stroke: var(--white);
+            fill: none;
+            stroke-width: 2;
+            opacity: 0.7;
+        }
+        .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        .avatar-upload-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-soft);
+            font-family: 'Outfit', sans-serif;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .avatar-upload-btn:hover {
+            background: var(--surface-3);
+            color: var(--white);
+            border-color: var(--border-strong);
+        }
         .avatar-choice {
             display: flex;
             flex-direction: column;
@@ -5156,25 +5223,22 @@
         
         function toggleNotifications(e) { 
             if (e) e.stopPropagation(); 
+            // Toggle the topbar notification dropdown (the only one remaining)
+            var dd = document.getElementById('notificationDropdown');
+            if (dd) {
+                dd.classList.toggle('show');
+            }
+            // Legacy: also toggle the secondary dropdown if it still exists (null-safe)
             var dd2 = document.getElementById('notificationDropdown2');
             if (dd2) {
                 dd2.classList.toggle('show');
-                // Position the dropdown
                 if (dd2.classList.contains('show')) {
-                    var btn = e.currentTarget;
-                    var rect = btn.getBoundingClientRect();
-                    dd2.style.top = (rect.bottom + 8) + 'px';
-                    dd2.style.right = (window.innerWidth - rect.right) + 'px';
-                }
-            }
-            // Also toggle mobile topbar dropdown if visible
-            var dd1 = document.getElementById('notificationDropdown');
-            if (dd1 && window.innerWidth <= 900) {
-                dd1.classList.toggle('show');
-                if (dd1.classList.contains('show')) {
-                    var btn2 = e.currentTarget;
-                    var rect2 = btn2.getBoundingClientRect();
-                    dd1.style.top = (rect2.bottom + 8) + 'px';
+                    var btn = e && e.currentTarget;
+                    if (btn) {
+                        var rect = btn.getBoundingClientRect();
+                        dd2.style.top = (rect.bottom + 8) + 'px';
+                        dd2.style.right = (window.innerWidth - rect.right) + 'px';
+                    }
                 }
             }
         }

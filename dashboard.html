@@ -212,16 +212,21 @@
         .sidebar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 3px; }
 
         .sidebar-header {
-            padding: 4px 8px 22px;
+            padding: 14px 14px 22px;
             margin-bottom: 14px;
             border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
         }
         .sidebar-logo {
             display: inline-flex;
-            align-items: center;
-            padding-top: 12px;
+            align-items: flex-end;
+            padding-top: 18px;
+            padding-left: 4px;
+            position: relative;
         }
-        .sidebar-logo .myub-logo { --logo-size: 38px; }
+        .sidebar-logo .myub-logo { --logo-size: 36px; }
 
         /* legacy sidebar logo (hide the old markup if still present) */
         .sidebar-logo-m-wrapper,
@@ -1691,6 +1696,211 @@
         .notif-modal-list::-webkit-scrollbar { width: 6px; }
         .notif-modal-list::-webkit-scrollbar-track { background: transparent; }
         .notif-modal-list::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 3px; }
+
+
+        /* ========== LUSION-STYLE ENHANCEMENTS ========== */
+
+        /* Subtle noise overlay for texture */
+        body::before {
+            background:
+                radial-gradient(circle at 15% 10%, rgba(58, 111, 168, 0.22) 0%, transparent 45%),
+                radial-gradient(circle at 88% 85%, rgba(196, 30, 58, 0.14) 0%, transparent 50%),
+                linear-gradient(160deg, #0a1929 0%, #0f2744 50%, #050f1c 100%);
+        }
+
+        /* Cursor spotlight on cards */
+        .stat-card, .card, .quick-action, .feature-item {
+            position: relative;
+        }
+        .stat-card::after,
+        .card::after,
+        .quick-action::after,
+        .feature-item::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: radial-gradient(
+                circle 180px at var(--mx, 50%) var(--my, 50%),
+                rgba(255, 255, 255, 0.08) 0%,
+                transparent 70%
+            );
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .stat-card:hover::after,
+        .card:hover::after,
+        .quick-action:hover::after,
+        .feature-item:hover::after { opacity: 1; }
+        .stat-card > *, .card > *, .quick-action > *, .feature-item > * { position: relative; z-index: 2; }
+
+        /* Welcome banner parallax glow that follows the cursor */
+        .welcome-banner {
+            --px: 0px;
+            --py: 0px;
+            transition: background 0.4s ease;
+        }
+        .welcome-banner::before {
+            transform: translate(var(--px, 0px), var(--py, 0px));
+            transition: transform 0.4s var(--ease-out-expo);
+        }
+
+        /* Add a red accent underline to card titles on hover */
+        .card-header { position: relative; }
+        .card-title {
+            position: relative;
+            display: inline-block;
+        }
+        .card-title::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -4px;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--red), var(--red-light));
+            border-radius: 2px;
+            transition: width 0.6s var(--ease-out-expo);
+        }
+        .card:hover .card-title::after { width: 40px; }
+
+        /* Stat cards — add a number count-up feel with larger display */
+        .stat-info h3 {
+            background: linear-gradient(180deg, #ffffff 0%, rgba(255, 255, 255, 0.7) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            transition: transform 0.4s var(--ease-out-back);
+        }
+        .stat-card:hover .stat-info h3 { transform: scale(1.05); }
+
+        /* Stat icon rotates slightly on hover */
+        .stat-card .stat-icon { transition: transform 0.5s var(--ease-out-back), background 0.4s ease; }
+        .stat-card:hover .stat-icon { transform: rotate(-6deg) scale(1.08); }
+
+        /* Quick action — smoother, punchier interaction */
+        .quick-action {
+            transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.4s ease;
+        }
+        .quick-action span { transition: color 0.3s ease; }
+        .quick-action:hover span { color: var(--white); }
+
+        /* GPA circle — glow on hover */
+        .gpa-circle {
+            cursor: default;
+            transition: transform 0.6s var(--ease-out-back), filter 0.4s ease;
+        }
+        .card:hover .gpa-circle {
+            transform: scale(1.03) rotate(3deg);
+            filter: drop-shadow(0 0 24px rgba(196, 30, 58, 0.3));
+        }
+
+        /* Welcome banner — italic accent */
+        .welcome-text h2::first-letter {
+            color: var(--red-light);
+            font-size: 1.2em;
+        }
+
+        /* Decorative vertical rule on left of welcome banner */
+        .welcome-banner::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 20%;
+            bottom: 20%;
+            width: 3px;
+            background: linear-gradient(180deg, transparent, var(--red), transparent);
+            border-radius: 0 3px 3px 0;
+            box-shadow: 0 0 16px rgba(196, 30, 58, 0.5);
+        }
+
+        /* Sidebar: decorative label above menu */
+        .sidebar-header::after {
+            content: 'STUDENT PORTAL';
+            display: block;
+            font-size: 9px;
+            letter-spacing: 2.5px;
+            color: var(--text-dim);
+            font-weight: 600;
+            margin-top: 10px;
+            padding-left: 4px;
+        }
+
+        /* Page title gets a small red dot */
+        .page-title::after {
+            content: '';
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: var(--red);
+            border-radius: 50%;
+            margin-left: 10px;
+            vertical-align: middle;
+            box-shadow: 0 0 10px rgba(196, 30, 58, 0.8);
+            animation: dotPulse 2.5s ease-in-out infinite;
+        }
+        @keyframes dotPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.6; }
+        }
+
+        /* Nav item — smoother sliding underline effect */
+        .nav-item {
+            overflow: hidden;
+        }
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.04), transparent);
+            transition: left 0.6s var(--ease-out-expo);
+            pointer-events: none;
+        }
+        .nav-item:hover::after { left: 100%; }
+
+        /* Topbar decorative edge */
+        .topbar {
+            position: sticky;
+        }
+        .topbar::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 24px;
+            background: var(--red);
+            border-radius: 0 3px 3px 0;
+            box-shadow: 0 0 12px rgba(196, 30, 58, 0.6);
+        }
+
+        /* Schedule items — leftmost timeline dot */
+        .schedule-item { position: relative; padding-left: 20px; }
+        .schedule-item::before {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--navy-lighter);
+            box-shadow: 0 0 0 3px rgba(58, 111, 168, 0.2);
+            transition: all 0.4s ease;
+        }
+        .schedule-item:hover::before {
+            background: var(--red);
+            box-shadow: 0 0 0 4px rgba(196, 30, 58, 0.25);
+        }
+        .schedule-item.exam::before { background: var(--red); box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.25); }
+        .schedule-item.assignment::before { background: var(--orange); box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.25); }
 
     </style>
     <!-- Primary Meta Tags -->
@@ -3520,31 +3730,133 @@
 
 
     <script>
-        // Dashboard entrance animations via GSAP (Lusion-style)
-        window.addEventListener('load', () => {
-            const g = window.gsap;
-            if (!g) return;
+        // Dashboard entrance animations + Lusion-style interactivity
+        (function() {
+            // SAFETY NET — force everything visible after 3s no matter what
+            function forceVisible() {
+                const els = document.querySelectorAll(
+                    '.topbar, .sidebar, .welcome-banner, .stat-card, .main-grid > .card, ' +
+                    '.quick-action, .dashboard > .card, .schedule-item, .nav-item'
+                );
+                els.forEach(el => {
+                    el.style.opacity = '';
+                    el.style.transform = '';
+                    el.style.visibility = '';
+                });
+            }
 
-            // Wait for main content to be visible (init() flips display)
+            function runEntrance() {
+                const g = window.gsap;
+                if (!g) { forceVisible(); return; }
+
+                try {
+                    const tl = g.timeline({ defaults: { ease: 'power3.out' } });
+                    tl.fromTo('.topbar',
+                        { y: -18, opacity: 0 },
+                        { y: 0, opacity: 1, duration: 0.7, clearProps: 'all' })
+                    .fromTo('.welcome-banner',
+                        { y: 22, opacity: 0 },
+                        { y: 0, opacity: 1, duration: 0.8, clearProps: 'all' }, '-=0.45')
+                    .fromTo('.stat-card',
+                        { y: 26, opacity: 0 },
+                        { y: 0, opacity: 1, duration: 0.6, stagger: 0.09, clearProps: 'all' }, '-=0.55')
+                    .fromTo('.main-grid > .card',
+                        { y: 26, opacity: 0 },
+                        { y: 0, opacity: 1, duration: 0.7, stagger: 0.12, clearProps: 'all' }, '-=0.35')
+                    .fromTo('.quick-action',
+                        { y: 14, opacity: 0, scale: 0.95 },
+                        { y: 0, opacity: 1, scale: 1, duration: 0.5, stagger: 0.06, clearProps: 'all', ease: 'back.out(1.4)' }, '-=0.5')
+                    .fromTo('.dashboard > .card:last-child',
+                        { y: 26, opacity: 0 },
+                        { y: 0, opacity: 1, duration: 0.7, clearProps: 'all' }, '-=0.3')
+                    .fromTo('.sidebar .nav-item',
+                        { x: -16, opacity: 0 },
+                        { x: 0, opacity: 1, duration: 0.45, stagger: 0.05, clearProps: 'all' }, '-=1.2')
+                    .fromTo('.gpa-value',
+                        { scale: 0.6, opacity: 0 },
+                        { scale: 1, opacity: 1, duration: 0.6, ease: 'back.out(1.8)', clearProps: 'all' }, '-=0.4');
+                } catch (e) {
+                    console.warn('GSAP entrance failed, forcing visible:', e);
+                    forceVisible();
+                }
+            }
+
+            // Wait for main content to appear (init() flips display)
+            let attempts = 0;
             const checkReady = setInterval(() => {
+                attempts++;
                 const main = document.getElementById('mainContent');
                 if (main && main.style.display !== 'none') {
                     clearInterval(checkReady);
                     runEntrance();
+                } else if (attempts > 60) {
+                    // 6 seconds — give up and force visible
+                    clearInterval(checkReady);
+                    forceVisible();
                 }
             }, 100);
 
-            function runEntrance() {
-                const tl = g.timeline({ defaults: { ease: 'power3.out' } });
-                tl.from('.topbar', { y: -20, opacity: 0, duration: 0.7 })
-                  .from('.sidebar', { x: -30, opacity: 0, duration: 0.7 }, '-=0.55')
-                  .from('.welcome-banner', { y: 20, opacity: 0, duration: 0.7 }, '-=0.5')
-                  .from('.stat-card', { y: 24, opacity: 0, duration: 0.55, stagger: 0.08 }, '-=0.45')
-                  .from('.main-grid > .card', { y: 24, opacity: 0, duration: 0.6, stagger: 0.1 }, '-=0.3')
-                  .from('.quick-action', { y: 14, opacity: 0, duration: 0.45, stagger: 0.04 }, '-=0.35')
-                  .from('.dashboard > .card:last-child', { y: 24, opacity: 0, duration: 0.6 }, '-=0.3');
+            // Final safety net: after 8s, force everything visible
+            setTimeout(forceVisible, 8000);
+
+            // ============================================================
+            // Lusion-style cursor spotlight on cards
+            // ============================================================
+            function setupCardSpotlight() {
+                const cards = document.querySelectorAll('.stat-card, .card, .quick-action, .feature-item');
+                cards.forEach(card => {
+                    card.addEventListener('mousemove', (e) => {
+                        const rect = card.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        const y = e.clientY - rect.top;
+                        card.style.setProperty('--mx', x + 'px');
+                        card.style.setProperty('--my', y + 'px');
+                    });
+                });
             }
-        });
+            // Re-run after content loads
+            setTimeout(setupCardSpotlight, 500);
+            setTimeout(setupCardSpotlight, 1500);
+
+            // ============================================================
+            // Magnetic hover for quick actions
+            // ============================================================
+            function setupMagneticHover() {
+                const els = document.querySelectorAll('.quick-action, .stat-card');
+                els.forEach(el => {
+                    el.addEventListener('mousemove', (e) => {
+                        const rect = el.getBoundingClientRect();
+                        const x = e.clientX - rect.left - rect.width / 2;
+                        const y = e.clientY - rect.top - rect.height / 2;
+                        el.style.transform = `translate(${x * 0.06}px, ${y * 0.06 - 4}px)`;
+                    });
+                    el.addEventListener('mouseleave', () => {
+                        el.style.transform = '';
+                    });
+                });
+            }
+            setTimeout(setupMagneticHover, 1500);
+
+            // ============================================================
+            // Parallax on welcome banner
+            // ============================================================
+            function setupParallax() {
+                const banner = document.querySelector('.welcome-banner');
+                if (!banner) return;
+                banner.addEventListener('mousemove', (e) => {
+                    const rect = banner.getBoundingClientRect();
+                    const x = (e.clientX - rect.left) / rect.width - 0.5;
+                    const y = (e.clientY - rect.top) / rect.height - 0.5;
+                    banner.style.setProperty('--px', (x * 18) + 'px');
+                    banner.style.setProperty('--py', (y * 10) + 'px');
+                });
+                banner.addEventListener('mouseleave', () => {
+                    banner.style.setProperty('--px', '0px');
+                    banner.style.setProperty('--py', '0px');
+                });
+            }
+            setTimeout(setupParallax, 1500);
+        })();
     </script>
 </body>
 </html>

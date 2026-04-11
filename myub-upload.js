@@ -90,12 +90,27 @@
     return row;
   }
 
-  async function pickAndUpload(opts) {
-    const file = await pickFile();
-    const title = opts.title || prompt('Title for this upload:', file.name.replace(/\.[^.]+$/, ''));
-    if (!title) throw new Error('cancelled');
-    return uploadFile({ ...opts, file, title });
+  // Must be called synchronously from a click handler — no awaits before this!
+  function openPicker(opts) {
+    return new Promise((resolve, reject) => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = Object.values(ALLOWED).join(',');
+      input.onchange = async () => {
+        const file = input.files[0];
+        if (!file) return reject(new Error('no file'));
+        try {
+          const title = opts.title || prompt('Title for this upload:', file.name.replace(/\.[^.]+$/, ''));
+          if (!title) return reject(new Error('cancelled'));
+          const row = await uploadFile({ ...opts, file, title });
+          resolve(row);
+        } catch (e) { reject(e); }
+      };
+      input.click();
+    });
   }
+  // Back-compat alias
+  const pickAndUpload = openPicker;
 
   async function reportNote(noteId, reason) {
     const { error } = await supabaseClient

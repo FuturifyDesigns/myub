@@ -1796,6 +1796,56 @@
             }
             .orb { animation: none !important; }
         }
+        /* ===== Mobile fixes for topbar + file cards ===== */
+        @media (max-width: 720px) {
+            .topbar {
+                flex-wrap: wrap;
+                row-gap: 10px;
+                padding: 12px 14px;
+            }
+            .topbar-left {
+                flex: 1 1 auto;
+                min-width: 0;
+                gap: 10px;
+            }
+            .topbar-left .page-title {
+                font-size: 18px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                min-width: 0;
+                flex: 1;
+            }
+            .topbar-right {
+                flex: 0 0 auto;
+                gap: 8px;
+            }
+            .topbar-right:has(.btn-primary + .btn-primary) {
+                flex: 1 0 100%;
+                justify-content: flex-end;
+                flex-wrap: wrap;
+            }
+            .topbar-right .btn-primary {
+                font-size: 13px;
+                padding: 8px 12px;
+            }
+            .topbar-right .btn-primary svg {
+                width: 16px;
+                height: 16px;
+            }
+            .upload-hint-line {
+                display: none !important;
+            }
+            #filesGrid, #papersGrid {
+                grid-template-columns: 1fr !important;
+            }
+            .notif-wrapper { position: relative; }
+            .notif-wrapper .badge {
+                position: absolute;
+                top: -2px;
+                right: -2px;
+            }
+        }
     </style>
     <!-- Primary Meta Tags -->
     <meta name="title" content="Notes - MyUB | University of Botswana">
@@ -1905,7 +1955,7 @@
                 <button class="btn-primary" id="uploadFileBtn"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5-5m0 0l5 5m-5-5v12"/></svg>Upload Past Paper</button>
             </div>
         </div>
-        <div style="padding:0 28px;margin-top:-4px;font-size:12px;color:var(--text-muted,rgba(255,255,255,.5));">
+        <div class="upload-hint-line" style="padding:0 28px;margin-top:-4px;font-size:12px;color:var(--text-muted,rgba(255,255,255,.5));">
             Accepted: PDF, JPG, PNG, DOCX · Max 10&nbsp;MB per file
         </div>
         <div class="content-area">

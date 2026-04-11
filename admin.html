@@ -10,6 +10,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="myub-security.js"></script>
+    <script src="myub-upload.js" defer></script>
     <style>
         /* ==========================================================
            MyUB Admin Panel — dark navy/red theme
@@ -1634,6 +1635,7 @@
                 <button class="admin-tab" onclick="switchTab('reports')">Reports <span id="reportsTabBadge" class="nav-badge" style="display:none;">0</span></button>
                 <button class="admin-tab" onclick="switchTab('groups')">Study Groups</button>
                 <button class="admin-tab" onclick="switchTab('content')">Content</button>
+                <button class="admin-tab" onclick="switchTab('papers')">Past Papers <span id="papersTabBadge" class="nav-badge" style="display:none;">0</span></button>
                 <button class="admin-tab" onclick="switchTab('announcements')">Announcements</button>
                 <button class="admin-tab" onclick="switchTab('settings')">Settings</button>
             </div>
@@ -1819,6 +1821,19 @@
                                 <tbody id="notesTableBody">
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Past Papers Moderation Tab -->
+                <div id="tab-papers" class="tab-panel">
+                    <div class="admin-card">
+                        <div class="card-header">
+                            <span class="card-title">Pending Review (deleted by uploaders)</span>
+                            <button class="btn btn-secondary" onclick="loadPendingPapers()" style="font-size:12px;padding:6px 12px;">Refresh</button>
+                        </div>
+                        <div class="card-body" id="pendingPapersBody">
+                            <div class="empty-state"><h3>Loading…</h3></div>
                         </div>
                     </div>
                 </div>
@@ -2150,6 +2165,81 @@
             document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
             document.querySelector(`[onclick="switchTab('${tabId}')"]`).classList.add('active');
             document.getElementById(`tab-${tabId}`).classList.add('active');
+            if (tabId === 'papers') loadPendingPapers();
+        }
+
+        // ===== Past papers moderation =====
+        let pendingPapers = [];
+        function escHtml(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+        async function loadPendingPapers() {
+            const body = document.getElementById('pendingPapersBody');
+            body.innerHTML = '<div class="empty-state"><h3>Loading…</h3></div>';
+            try {
+                const { data, error } = await supabaseClient
+                    .from('note_files')
+                    .select('id,title,description,course_code,kind,file_name,file_size,mime_type,r2_key,created_at,deleted_at,deleted_by,uploader_id')
+                    .eq('status', 'pending_review')
+                    .order('deleted_at', { ascending: false })
+                    .limit(200);
+                if (error) throw error;
+                pendingPapers = data || [];
+                // Update sidebar/tab badge
+                const badge = document.getElementById('papersTabBadge');
+                if (badge) {
+                    if (pendingPapers.length) { badge.style.display = 'inline'; badge.textContent = pendingPapers.length; }
+                    else badge.style.display = 'none';
+                }
+                renderPendingPapers();
+            } catch (e) {
+                body.innerHTML = `<div class="empty-state"><h3>Failed to load</h3><p>${escHtml(e.message || e)}</p></div>`;
+            }
+        }
+        function renderPendingPapers() {
+            const body = document.getElementById('pendingPapersBody');
+            if (!pendingPapers.length) {
+                body.innerHTML = '<div class="empty-state"><h3>Nothing pending</h3><p>No past papers awaiting review.</p></div>';
+                return;
+            }
+            body.innerHTML = `
+                <div style="overflow-x:auto;">
+                <table class="data-table">
+                    <thead><tr><th>Title</th><th>Course</th><th>Kind</th><th>Size</th><th>Deleted</th><th>Actions</th></tr></thead>
+                    <tbody>
+                    ${pendingPapers.map(r => {
+                        const url = window.MyUBUpload ? MyUBUpload.publicUrl(r.r2_key) : '#';
+                        const sizeKb = (r.file_size/1024).toFixed(0);
+                        const when = r.deleted_at ? new Date(r.deleted_at).toLocaleString() : '—';
+                        return `<tr>
+                            <td><a href="${url}" target="_blank" rel="noopener">${escHtml(r.title)}</a></td>
+                            <td>${escHtml(r.course_code || '—')}</td>
+                            <td>${escHtml(r.kind)}</td>
+                            <td>${sizeKb} KB</td>
+                            <td>${escHtml(when)}</td>
+                            <td>
+                                <button class="btn btn-secondary" style="font-size:11px;padding:4px 10px;" onclick="adminRestorePaper('${r.id}')">Restore</button>
+                                <button class="btn btn-secondary" style="font-size:11px;padding:4px 10px;background:#fee2e2;color:#991b1b;" onclick="adminPurgePaper('${r.id}')">Permanently delete</button>
+                            </td>
+                        </tr>`;
+                    }).join('')}
+                    </tbody>
+                </table>
+                </div>`;
+        }
+        async function adminRestorePaper(id) {
+            if (!confirm('Restore this past paper to the public list?')) return;
+            try {
+                await MyUBUpload.adminRestore(id);
+                pendingPapers = pendingPapers.filter(p => p.id !== id);
+                renderPendingPapers();
+            } catch (e) { alert('Restore failed: ' + (e.message || e)); }
+        }
+        async function adminPurgePaper(id) {
+            if (!confirm('PERMANENTLY delete this file from storage? This cannot be undone.')) return;
+            try {
+                await MyUBUpload.hardDelete(id);
+                pendingPapers = pendingPapers.filter(p => p.id !== id);
+                renderPendingPapers();
+            } catch (e) { alert('Purge failed: ' + (e.message || e)); }
         }
 
         // Analytics

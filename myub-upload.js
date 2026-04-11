@@ -100,9 +100,18 @@
         const file = input.files[0];
         if (!file) return reject(new Error('no file'));
         try {
-          const title = opts.title || prompt('Title for this upload:', file.name.replace(/\.[^.]+$/, ''));
+          // If caller provided an afterPick hook, run it now (file pick is a fresh user activation,
+          // so prompts/dialogs are allowed here). It can return extra fields or false to cancel.
+          let extra = {};
+          if (typeof opts.afterPick === 'function') {
+            const r = await opts.afterPick(file);
+            if (r === false) return reject(new Error('cancelled'));
+            if (r && typeof r === 'object') extra = r;
+          }
+          const merged = { ...opts, ...extra };
+          const title = merged.title || prompt('Title for this upload:', file.name.replace(/\.[^.]+$/, ''));
           if (!title) return reject(new Error('cancelled'));
-          const row = await uploadFile({ ...opts, file, title });
+          const row = await uploadFile({ ...merged, file, title });
           resolve(row);
         } catch (e) { reject(e); }
       };
@@ -119,11 +128,58 @@
     if (error) throw error;
   }
 
+  // Hard delete: removes the R2 object AND the DB row. Used for personal notes
+  // and for admin "permanently delete" actions. Calls the worker DELETE endpoint
+  // because browsers can't delete from R2 directly.
+  async function hardDelete(noteFileId) {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    const res = await fetch(`${WORKER_URL}/delete`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({ noteFileId }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || `Delete failed (${res.status})`);
+    }
+    return true;
+  }
+
+  // Soft delete: marks status as 'pending_review' so the row leaves the public
+  // feed but the file stays in R2 and the row stays in DB for admin review.
+  // RLS only lets the uploader run this on their own rows.
+  async function softDelete(noteFileId) {
+    const { error } = await supabaseClient
+      .from('note_files')
+      .update({
+        status: 'pending_review',
+        deleted_at: new Date().toISOString(),
+        deleted_by: currentUser.id,
+      })
+      .eq('id', noteFileId)
+      .eq('uploader_id', currentUser.id);
+    if (error) throw error;
+    return true;
+  }
+
+  // Admin only: restore a soft-deleted row back to active.
+  async function adminRestore(noteFileId) {
+    const { error } = await supabaseClient
+      .from('note_files')
+      .update({ status: 'active', deleted_at: null, deleted_by: null })
+      .eq('id', noteFileId);
+    if (error) throw error;
+    return true;
+  }
+
   // Public download URL — assumes R2 bucket is fronted by a public custom domain
   // (e.g. files.myub.app). Configure in Cloudflare R2 settings.
   function publicUrl(r2Key) {
     return `https://files.myub.online/${r2Key}`;
   }
 
-  window.MyUBUpload = { pickAndUpload, uploadFile, reportNote, publicUrl, MAX_BYTES, ALLOWED };
+  window.MyUBUpload = { pickAndUpload, uploadFile, reportNote, hardDelete, softDelete, adminRestore, publicUrl, MAX_BYTES, ALLOWED };
 })();

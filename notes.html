@@ -15,6 +15,7 @@
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
     <script src="myub-calls.js"></script>
     <script src="myub-utils.js"></script>
+    <script src="myub-upload.js" defer></script>
     <style>
         /* ==========================================================
            MyUB Notes — dark navy/red theme
@@ -1871,6 +1872,12 @@
                 <a href="dashboard.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Dashboard</a>
                 <a href="gpa-calculator.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>GPA Calculator</a>
                 <a href="notes.html" class="nav-item active"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>Notes</a>
+                <a href="past-papers.html" class="nav-item">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    Past Papers
+                </a>
                 <a href="schedule.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>Schedule</a>
             </div>
             <div class="nav-section"><div class="nav-section-title">Social</div>
@@ -1896,6 +1903,7 @@
                     <div class="notif-dropdown" id="notifDropdown"><div class="notif-header"><h3>Notifications</h3><button onclick="markAllRead()">Mark all read</button></div><div class="notif-list" id="notifList"></div><div class="notif-footer"><a onclick="openNotificationsModal()">View All Notifications</a></div></div>
                 </div>
                 <button class="btn-primary" onclick="openNoteModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>New Note</button>
+                <button class="btn-primary" id="uploadFileBtn" style="background:var(--surface-2,#f3f4f6);color:var(--text,#111);border:1px solid var(--gray-300,#d1d5db);"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5-5m0 0l5 5m-5-5v12"/></svg>Upload File</button>
             </div>
         </div>
         <div class="content-area">
@@ -1910,6 +1918,16 @@
             <div class="notes-grid active" id="notesGrid"></div>
             <div class="notes-list" id="notesList"></div>
             <div class="empty-state" id="emptyState" style="display:none;"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg><h3>No notes yet</h3><p>Click "New Note" to create your first note</p></div>
+
+            <!-- Uploaded files section -->
+            <div id="filesSection" style="margin-top:32px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+                    <h2 style="font-size:18px;font-weight:600;color:var(--text,#111);margin:0;">Your Files</h2>
+                    <span id="filesCount" style="font-size:13px;color:var(--text-soft,#6b7280);"></span>
+                </div>
+                <div id="filesGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;"></div>
+                <div id="filesEmpty" style="display:none;padding:24px;text-align:center;color:var(--text-soft,#6b7280);font-size:14px;border:1px dashed var(--gray-300,#d1d5db);border-radius:10px;">No uploaded files yet. Click "Upload File" to add one.</div>
+            </div>
         </div>
     </main>
 
@@ -2109,7 +2127,7 @@
                 }
                 
                 await updateOnlineStatus(true);
-                await Promise.all([loadNotes(), loadNotifications(), loadSidebarBadges()]);
+                await Promise.all([loadNotes(), loadFiles(), loadNotifications(), loadSidebarBadges()]);
                 setupRealtime(); // Setup real-time subscriptions
                 startNotificationPolling(); // Poll for notifications as fallback
                 setupEditor();
@@ -2234,6 +2252,91 @@
         function openDeleteConfirm(noteId) { deleteNoteId = noteId; document.getElementById('confirmModal').classList.add('show'); }
         function closeConfirmModal() { document.getElementById('confirmModal').classList.remove('show'); deleteNoteId = null; }
         async function confirmDelete() { if (!deleteNoteId) return; try { await supabaseClient.from('notes').delete().eq('id', deleteNoteId); showToast('Deleted', 'success'); closeConfirmModal(); await loadNotes(); } catch (e) { showToast('Failed', 'error'); } }
+
+        // ===== Uploaded files (note_files table via myub-upload.js) =====
+        let userFiles = [];
+        function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+        function formatBytes(b){ if(!b) return '0 B'; const u=['B','KB','MB','GB']; let i=0; while(b>=1024&&i<u.length-1){b/=1024;i++;} return b.toFixed(b<10&&i>0?1:0)+' '+u[i]; }
+        function fileIcon(mime){
+            if(mime==='application/pdf') return '#ef4444';
+            if(mime&&mime.startsWith('image/')) return '#10b981';
+            return '#3b82f6';
+        }
+        async function loadFiles() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('note_files')
+                    .select('*')
+                    .eq('uploader_id', currentUser.id)
+                    .eq('kind', 'note')
+                    .eq('status', 'active')
+                    .order('created_at', { ascending: false });
+                if (error) throw error;
+                userFiles = data || [];
+                renderFiles();
+            } catch (e) {
+                console.error('loadFiles failed:', e);
+                document.getElementById('filesEmpty').style.display = 'block';
+                document.getElementById('filesEmpty').textContent = 'Failed to load files: ' + (e.message || e);
+            }
+        }
+        function renderFiles() {
+            const grid = document.getElementById('filesGrid');
+            const empty = document.getElementById('filesEmpty');
+            const count = document.getElementById('filesCount');
+            count.textContent = userFiles.length ? `${userFiles.length} file${userFiles.length===1?'':'s'}` : '';
+            if (!userFiles.length) { grid.innerHTML = ''; empty.style.display = 'block'; return; }
+            empty.style.display = 'none';
+            grid.innerHTML = userFiles.map(f => {
+                const url = window.MyUBUpload ? MyUBUpload.publicUrl(f.r2_key) : '#';
+                const color = fileIcon(f.mime_type);
+                const date = new Date(f.created_at).toLocaleDateString();
+                return `
+                <div style="background:var(--surface-1,#fff);border:1px solid var(--gray-200,#e5e7eb);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;">
+                    <div style="display:flex;align-items:flex-start;gap:10px;">
+                        <div style="width:40px;height:40px;border-radius:8px;background:${color}1a;color:${color};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        </div>
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-weight:600;font-size:14px;color:var(--text,#111);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escapeHtml(f.title)}">${escapeHtml(f.title)}</div>
+                            <div style="font-size:12px;color:var(--text-soft,#6b7280);margin-top:2px;">${formatBytes(f.file_size)} · ${escapeHtml(date)}</div>
+                            ${f.course_code ? `<div style="font-size:11px;color:var(--text-soft,#6b7280);margin-top:2px;">${escapeHtml(f.course_code)}</div>` : ''}
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:6px;">
+                        <a href="${url}" target="_blank" rel="noopener" style="flex:1;text-align:center;padding:6px 10px;background:var(--primary,#3b82f6);color:#fff;border-radius:6px;text-decoration:none;font-size:12px;font-weight:500;">Download</a>
+                        <button onclick="deleteFile('${f.id}')" style="padding:6px 10px;background:transparent;border:1px solid var(--gray-300,#d1d5db);color:var(--text-soft,#6b7280);border-radius:6px;font-size:12px;cursor:pointer;">Delete</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+        async function deleteFile(id) {
+            if (!confirm('Delete this file? It will be removed from storage and cannot be recovered.')) return;
+            try {
+                await MyUBUpload.hardDelete(id);
+                userFiles = userFiles.filter(f => f.id !== id);
+                renderFiles();
+                showToast('File deleted', 'success');
+            } catch (e) { showToast('Delete failed: ' + e.message, 'error'); }
+        }
+        // Wire upload button — synchronous click handler, no await before pickAndUpload
+        document.addEventListener('DOMContentLoaded', () => {
+            const btn = document.getElementById('uploadFileBtn');
+            if (!btn) return;
+            btn.addEventListener('click', () => {
+                if (!window.MyUBUpload) { alert('Upload module not loaded yet. Refresh and try again.'); return; }
+                if (!currentUser) { alert('Please wait for sign-in to finish.'); return; }
+                MyUBUpload.pickAndUpload({
+                    kind: 'note',
+                    afterPick: () => {
+                        const courseCode = prompt('Course code (optional, e.g. CSI201):') || '';
+                        return { courseCode };
+                    },
+                })
+                .then(row => { userFiles.unshift(row); renderFiles(); showToast('File uploaded!', 'success'); })
+                .catch(e => { if (e.message !== 'cancelled' && e.message !== 'no file') showToast(e.message || 'Upload failed', 'error'); });
+            });
+        });
 
         // Rich Text Editor - Fixed highlight
         function execCmd(cmd, value) { document.execCommand(cmd, false, value || null); document.getElementById('noteContent').focus(); }

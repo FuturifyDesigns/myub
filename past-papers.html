@@ -199,20 +199,32 @@ function render(){
     const date = new Date(r.created_at).toLocaleDateString();
     const url = MyUBUpload.publicUrl(r.r2_key);
     const safeTitle = r.title.replace(/[<>&"']/g,c=>({ '<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;' }[c]));
+    const isOwner = currentUser && r.uploader_id === currentUser.id;
     return `<div class="card">
       <div class="card-title">${safeTitle}</div>
       <div class="card-meta">
         <span class="tag">${r.kind==='past_paper'?'Past paper':'Resource'}</span>
         ${r.course_code?`<span class="tag">${r.course_code}</span>`:''}
+        ${isOwner?`<span class="tag" style="background:#dcfce7;color:#166534;">Yours</span>`:''}
         <span>${sizeKb} KB</span><span>${date}</span>
       </div>
       ${r.description?`<div class="card-desc">${r.description.replace(/[<>&]/g,c=>({ '<':'&lt;','>':'&gt;','&':'&amp;' }[c]))}</div>`:''}
       <div class="card-actions">
         <a class="primary" href="${url}" target="_blank" rel="noopener">Download</a>
         <button onclick="reportRow('${r.id}')">Report</button>
+        ${isOwner?`<button onclick="deleteOwnPaper('${r.id}')" style="color:#dc2626;">Delete</button>`:''}
       </div>
     </div>`;
   }).join('');
+}
+
+async function deleteOwnPaper(id){
+  if (!confirm('Delete this past paper? It will be removed from the public list and sent to admins for review. You cannot undo this from your side.')) return;
+  try {
+    await MyUBUpload.softDelete(id);
+    allRows = allRows.filter(r => r.id !== id);
+    render();
+  } catch(e){ alert('Delete failed: ' + (e.message || e)); }
 }
 
 async function reportRow(id){
@@ -222,13 +234,18 @@ async function reportRow(id){
   catch(e){ alert(e.message || 'Failed to report'); }
 }
 
-document.getElementById('uploadBtn').addEventListener('click', async ()=>{
-  try {
-    const courseCode = prompt('Course code (e.g. CSI201)? Optional.') || '';
-    const row = await MyUBUpload.pickAndUpload({ kind:'past_paper', courseCode });
-    allRows.unshift(row);
-    render();
-  } catch(e){ if (e.message!=='cancelled' && e.message!=='no file') alert(e.message); }
+document.getElementById('uploadBtn').addEventListener('click', () => {
+  // IMPORTANT: call pickAndUpload synchronously inside the click handler.
+  // No await/prompt before this line, or browsers reject the file picker.
+  MyUBUpload.pickAndUpload({
+    kind: 'past_paper',
+    afterPick: () => {
+      const courseCode = prompt('Course code (e.g. CSI201)? Optional.') || '';
+      return { courseCode };
+    },
+  })
+  .then(row => { allRows.unshift(row); render(); })
+  .catch(e => { if (e.message !== 'cancelled' && e.message !== 'no file') alert(e.message); });
 });
 ['searchInput','kindFilter','sortFilter'].forEach(id=>document.getElementById(id).addEventListener('input', render));
 

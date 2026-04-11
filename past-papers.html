@@ -1905,6 +1905,9 @@
                 <button class="btn-primary" id="uploadFileBtn"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5-5m0 0l5 5m-5-5v12"/></svg>Upload Past Paper</button>
             </div>
         </div>
+        <div style="padding:0 28px;margin-top:-4px;font-size:12px;color:var(--text-muted,rgba(255,255,255,.5));">
+            Accepted: PDF, JPG, PNG, DOCX · Max 10&nbsp;MB per file
+        </div>
         <div class="content-area">
             <div class="toolbar">
                 <div class="search-box"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg><input type="text" id="searchInput" placeholder="Search by title or course code..." oninput="renderPapers()"></div>
@@ -1927,7 +1930,7 @@
             <div class="empty-state" id="emptyState" style="display:none;">
                 <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 <h3>No past papers yet</h3>
-                <p>Be the first to share — click "Upload Past Paper" to get started.</p>
+                <p>Be the first to share — click "Upload Past Paper" to get started.<br><span style="font-size:12px;color:var(--text-muted,rgba(255,255,255,.5));">PDF, JPG, PNG, DOCX · up to 10&nbsp;MB each</span></p>
             </div>
         </div>
     </main>
@@ -2292,73 +2295,85 @@
             empty.style.display = 'none';
 
             grid.innerHTML = rows.map(r => {
-                const url = window.MyUBUpload ? MyUBUpload.publicUrl(r.r2_key) : '#';
                 const date = new Date(r.created_at).toLocaleDateString();
                 const isOwner = currentUser && r.uploader_id === currentUser.id;
                 const isPdf = r.mime_type === 'application/pdf';
-                const iconColor = isPdf ? '#ef4444' : (r.mime_type && r.mime_type.startsWith('image/') ? '#10b981' : '#3b82f6');
+                const iconColor = isPdf ? '#e63956' : (r.mime_type && r.mime_type.startsWith('image/') ? '#4ade80' : '#60a5fa');
+                const ext = (r.file_name && r.file_name.split('.').pop() || '').toUpperCase().slice(0,4);
                 return `
-                <div style="background:var(--surface-1,#fff);border:1px solid var(--gray-200,#e5e7eb);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;box-shadow:0 1px 2px rgba(0,0,0,.04);">
-                    <div style="display:flex;align-items:flex-start;gap:12px;">
-                        <div style="width:44px;height:44px;border-radius:10px;background:${iconColor}1a;color:${iconColor};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <div class="myub-file-card" style="background:linear-gradient(180deg,rgba(26,54,93,.45),rgba(15,39,68,.55));border:1px solid var(--border,rgba(255,255,255,.09));border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:14px;transition:transform .2s var(--ease-out-expo,cubic-bezier(.19,1,.22,1)),border-color .2s,box-shadow .2s;cursor:pointer;" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='var(--border-strong,rgba(255,255,255,.18))';this.style.boxShadow='0 12px 32px rgba(0,0,0,.35)';" onmouseout="this.style.transform='';this.style.borderColor='var(--border,rgba(255,255,255,.09))';this.style.boxShadow='';" onclick="viewPaper('${r.id}')">
+                    <div style="display:flex;align-items:flex-start;gap:14px;">
+                        <div style="width:52px;height:60px;border-radius:10px;background:linear-gradient(180deg,${iconColor}33,${iconColor}1a);border:1px solid ${iconColor}44;color:${iconColor};display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;font-weight:700;font-size:10px;letter-spacing:.5px;">
+                            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-bottom:3px;"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            ${escHtml(ext)}
                         </div>
                         <div style="flex:1;min-width:0;">
-                            <div style="font-weight:600;font-size:15px;color:var(--text,#111);line-height:1.3;word-break:break-word;">${escHtml(r.title)}</div>
-                            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">
-                                <span style="font-size:11px;padding:2px 8px;border-radius:999px;background:#eff6ff;color:#1d4ed8;font-weight:500;">${r.kind === 'past_paper' ? 'Past paper' : 'Resource'}</span>
-                                ${r.course_code ? `<span style="font-size:11px;padding:2px 8px;border-radius:999px;background:#f3f4f6;color:#374151;font-weight:500;">${escHtml(r.course_code)}</span>` : ''}
-                                ${isOwner ? `<span style="font-size:11px;padding:2px 8px;border-radius:999px;background:#dcfce7;color:#166534;font-weight:500;">Yours</span>` : ''}
+                            <div style="font-weight:600;font-size:15px;color:var(--text,#fff);line-height:1.35;word-break:break-word;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${escHtml(r.title)}</div>
+                            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">
+                                <span style="font-size:11px;padding:3px 9px;border-radius:999px;background:rgba(96,165,250,.18);color:#93c5fd;font-weight:500;">${r.kind === 'past_paper' ? 'Past paper' : 'Resource'}</span>
+                                ${r.course_code ? `<span style="font-size:11px;padding:3px 9px;border-radius:999px;background:rgba(255,255,255,.08);color:var(--text-soft,rgba(255,255,255,.72));font-weight:500;">${escHtml(r.course_code)}</span>` : ''}
+                                ${isOwner ? `<span style="font-size:11px;padding:3px 9px;border-radius:999px;background:rgba(74,222,128,.18);color:#86efac;font-weight:500;">Yours</span>` : ''}
                             </div>
                         </div>
                     </div>
-                    ${r.description ? `<div style="font-size:13px;color:var(--text-soft,#6b7280);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${escHtml(r.description)}</div>` : ''}
-                    <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text-soft,#6b7280);">
+                    ${r.description ? `<div style="font-size:13px;color:var(--text-soft,rgba(255,255,255,.72));line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${escHtml(r.description)}</div>` : ''}
+                    <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text-muted,rgba(255,255,255,.5));border-top:1px solid var(--border,rgba(255,255,255,.09));padding-top:12px;">
                         <span>${fmtBytes(r.file_size)}</span>
                         <span>${escHtml(date)}</span>
                     </div>
-                    <div style="display:flex;gap:6px;">
-                        <a href="${url}" target="_blank" rel="noopener" style="flex:1;text-align:center;padding:8px 12px;background:var(--primary,#3b82f6);color:#fff;border-radius:8px;text-decoration:none;font-size:13px;font-weight:500;">Download</a>
-                        <button onclick="reportPaper('${r.id}')" style="padding:8px 12px;background:transparent;border:1px solid var(--gray-300,#d1d5db);color:var(--text-soft,#6b7280);border-radius:8px;font-size:13px;cursor:pointer;">Report</button>
-                        ${isOwner ? `<button onclick="deleteOwnPaper('${r.id}')" style="padding:8px 12px;background:transparent;border:1px solid #fecaca;color:#dc2626;border-radius:8px;font-size:13px;cursor:pointer;">Delete</button>` : ''}
+                    <div style="display:flex;gap:6px;" onclick="event.stopPropagation();">
+                        <button onclick="viewPaper('${r.id}')" style="flex:1;padding:9px 12px;background:var(--red,#c41e3a);color:#fff;border:0;border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;">View</button>
+                        <a href="${MyUBUpload.publicUrl(r.r2_key)}" target="_blank" rel="noopener" style="flex:1;text-align:center;padding:9px 12px;background:rgba(255,255,255,.08);color:var(--text,#fff);border-radius:9px;text-decoration:none;font-size:13px;font-weight:500;">Download</a>
+                        <button onclick="reportPaper('${r.id}')" title="Report" style="padding:9px 11px;background:transparent;border:1px solid var(--border,rgba(255,255,255,.14));color:var(--text-muted,rgba(255,255,255,.5));border-radius:9px;cursor:pointer;"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21V5a2 2 0 012-2h11l-2 4 2 4H5"/></svg></button>
+                        ${isOwner ? `<button onclick="deleteOwnPaper('${r.id}')" title="Delete" style="padding:9px 11px;background:transparent;border:1px solid rgba(230,57,86,.4);color:#e63956;border-radius:9px;cursor:pointer;"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M4 7h16M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"/></svg></button>` : ''}
                     </div>
                 </div>`;
             }).join('');
         }
 
+        function viewPaper(id) {
+            const r = allPapers.find(x => x.id === id);
+            if (r) MyUBModals.viewer(r);
+        }
+
         async function reportPaper(id) {
-            const reason = prompt('Why are you reporting this? (copyright, inappropriate, spam, etc.)');
+            const reason = await MyUBModals.prompt({ title: 'Report this file', message: 'Tell admins what\'s wrong (copyright, inappropriate, spam, etc.)', placeholder: 'Reason', required: true });
             if (!reason) return;
-            try { await MyUBUpload.reportNote(id, reason); showToast('Reported. Thanks.', 'success'); }
-            catch (e) { showToast(e.message || 'Failed to report', 'error'); }
+            try { await MyUBUpload.reportNote(id, reason); MyUBModals.toast('Reported. Thanks for letting us know.', 'success'); }
+            catch (e) { MyUBModals.toast(e.message || 'Failed to report', 'error'); }
         }
 
         async function deleteOwnPaper(id) {
-            if (!confirm('Delete this past paper? It will be removed from the public list and sent to admins for review.')) return;
+            const ok = await MyUBModals.confirm({ title: 'Delete this past paper?', message: 'It will be removed from the public list and sent to admins for review.', okLabel: 'Delete', danger: true });
+            if (!ok) return;
             try {
                 await MyUBUpload.softDelete(id);
                 allPapers = allPapers.filter(p => p.id !== id);
                 renderPapers();
-                showToast('Deleted', 'success');
-            } catch (e) { showToast('Delete failed: ' + (e.message || e), 'error'); }
+                MyUBModals.toast('Deleted', 'success');
+            } catch (e) { MyUBModals.toast('Delete failed: ' + (e.message || e), 'error'); }
         }
 
-        // Upload button — synchronous click handler, prompt fires inside afterPick.
+        // Upload button — synchronous click handler, prompts fire inside afterPick.
         document.addEventListener('DOMContentLoaded', () => {
             const btn = document.getElementById('uploadFileBtn');
             if (!btn) return;
             btn.addEventListener('click', () => {
-                if (!window.MyUBUpload) { alert('Upload module not loaded yet. Refresh and try again.'); return; }
-                if (!currentUser) { alert('Please wait for sign-in to finish.'); return; }
+                if (!window.MyUBUpload) { MyUBModals.alert({ title: 'Not ready', message: 'Upload module not loaded yet. Refresh and try again.' }); return; }
+                if (!currentUser) { MyUBModals.alert({ title: 'Hold on', message: 'Please wait for sign-in to finish.' }); return; }
                 MyUBUpload.pickAndUpload({
                     kind: 'past_paper',
-                    afterPick: () => {
-                        const courseCode = prompt('Course code (e.g. CSI201)? Optional.') || '';
-                        return { courseCode };
+                    afterPick: async (file) => {
+                        const courseCode = await MyUBModals.prompt({ title: 'Course code', message: 'Which course is this past paper from?', placeholder: 'e.g. CSI201', required: true });
+                        if (!courseCode) return false;
+                        const defaultTitle = file.name.replace(/\.[^.]+$/, '');
+                        const title = await MyUBModals.prompt({ title: 'Title', message: 'A clear name helps others find it.', placeholder: 'e.g. CSI201 Final 2023', defaultValue: defaultTitle, required: true });
+                        if (!title) return false;
+                        return { courseCode, title };
                     },
                 })
-                .then(row => { allPapers.unshift(row); renderPapers(); showToast('Past paper uploaded!', 'success'); })
-                .catch(e => { if (e.message !== 'cancelled' && e.message !== 'no file') showToast(e.message || 'Upload failed', 'error'); });
+                .then(row => { allPapers.unshift(row); renderPapers(); MyUBModals.toast('Past paper uploaded — thanks for sharing!', 'success'); })
+                .catch(e => { if (e.message !== 'cancelled' && e.message !== 'no file') MyUBModals.toast(e.message || 'Upload failed', 'error'); });
             });
         });
 

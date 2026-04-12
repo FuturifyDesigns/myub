@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://unpkg.com" crossorigin>
     <link rel="dns-prefetch" href="https://cdn.onesignal.com">
     <link rel="dns-prefetch" href="https://files.myub.online">
+    <link rel="preconnect" href="https://myub-uploads.futurifydesigns.workers.dev" crossorigin>
 
     <link rel="preconnect" href="https://files.myub.online" crossorigin>
     <link rel="dns-prefetch" href="https://unpkg.com">
@@ -2524,6 +2525,7 @@
                         </div>
                         <div class="form-field"><label>Capacity</label><input name="capacity" type="number" min="1" placeholder="Optional"></div>
                     </div>
+                    
                     <div class="form-field"><label>Cover image <span style="text-transform:none;font-weight:400;opacity:.7;">(jpg · png · webp, ≤5MB)</span></label><input name="cover" type="file" accept="image/jpeg,image/png,image/webp"></div>
                     <div class="form-actions">
                         <button type="button" class="btn-secondary" onclick="closeCreateModal()">Cancel</button>
@@ -4121,6 +4123,8 @@
                 };
                 const { data: inserted, error } = await supabaseClient.from('events').insert(payload).select().single();
                 if (error) throw error;
+
+                // Upload cover image (optional — event still saves if upload fails)
                 const file = fd.get('cover');
                 let coverFailed = false;
                 if (file && file.size){
@@ -4129,7 +4133,7 @@
                     } else {
                         try {
                             const { data: { session } } = await supabaseClient.auth.getSession();
-                            const r = await fetch('https://files.myub.online/presign', {
+                            const r = await fetch('https://myub-uploads.futurifydesigns.workers.dev/presign', {
                                 method:'POST',
                                 headers:{'Content-Type':'application/json','Authorization':`Bearer ${session.access_token}`},
                                 body: JSON.stringify({ fileName:file.name, mimeType:file.type, fileSize:file.size, kind:'event_cover', event_id:inserted.id })

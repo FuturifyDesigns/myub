@@ -4116,7 +4116,7 @@
                     ends_at: ends.toISOString(),
                     category: fd.get('category') || 'other',
                     capacity: fd.get('capacity') ? parseInt(fd.get('capacity'),10) : null,
-                    created_by: user.id,
+                    creator_id: user.id,
                     status: 'pending'
                 };
                 const { data: inserted, error } = await supabaseClient.from('events').insert(payload).select().single();

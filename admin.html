@@ -3361,7 +3361,7 @@
                 const ids = [...new Set(pendingEvents.map(e=>e.creator_id))];
                 let profileMap = {};
                 if (ids.length){
-                    const { data: profs } = await supabaseClient.from('profiles').select('id,username').in('id', ids);
+                    const { data: profs } = await supabaseClient.from('profiles').select('*').in('id', ids);
                     (profs||[]).forEach(p => profileMap[p.id] = p);
                 }
                 pendingEvents.forEach(e => e._creator = profileMap[e.creator_id] || {});
@@ -3384,7 +3384,15 @@
                 return;
             }
             body.innerHTML = pendingEvents.map(e => {
-                const who = e._creator.username ? `@${eEsc(e._creator.username)}` : 'Unknown';
+                const c = e._creator || {};
+                const who = eEsc(
+                    c.username ? '@' + c.username :
+                    c.full_name ? c.full_name :
+                    c.display_name ? c.display_name :
+                    (c.first_name || c.last_name) ? ((c.first_name||'') + ' ' + (c.last_name||'')).trim() :
+                    c.email ? c.email :
+                    'Unknown'
+                );
                 const cover = e.cover_r2_key ? `https://files.myub.online/${eEsc(e.cover_r2_key)}` : '';
                 return `
                 <div style="border:1px solid var(--border); border-radius:12px; padding:18px; margin-bottom:14px; background:var(--surface-2);">
@@ -3412,15 +3420,9 @@
         window.approveEvent = async function(id){
             const row = pendingEvents.find(e=>e.id===id); if (!row) return;
             if (!confirm(`Approve "${row.title}"?`)) return;
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            const { error } = await supabaseClient.from('events').update({
-                status: 'approved',
-                approved_at: new Date().toISOString(),
-                approved_by: user.id
-            }).eq('id', id);
+            const { error } = await supabaseClient.from('events').update({ status: 'approved' }).eq('id', id);
             if (error){ alert('Approve failed: ' + error.message); return; }
-            // Log to admin_actions if the table exists (best-effort, swallow errors)
-            try { await supabaseClient.from('admin_actions').insert({ admin_user_id: user.id, action_type: 'approve_event', target_type: 'event', target_id: id }); } catch(_){}
+            // Trigger events_log_status_change handles approved_at/approved_by + admin_actions audit
             pendingEvents = pendingEvents.filter(e=>e.id!==id);
             renderPendingEvents();
             const badge = document.getElementById('eventsTabBadge');
@@ -3431,13 +3433,12 @@
             const row = pendingEvents.find(e=>e.id===id); if (!row) return;
             const reason = prompt(`Reject "${row.title}"?\n\nOptional reason (shown to creator):`);
             if (reason === null) return;
-            const { data: { user } } = await supabaseClient.auth.getUser();
             const { error } = await supabaseClient.from('events').update({
                 status: 'rejected',
                 rejection_reason: reason || null
             }).eq('id', id);
             if (error){ alert('Reject failed: ' + error.message); return; }
-            try { await supabaseClient.from('admin_actions').insert({ admin_user_id: user.id, action_type: 'reject_event', target_type: 'event', target_id: id, metadata: { reason: reason || null } }); } catch(_){}
+            // Trigger events_log_status_change handles admin_actions audit
             pendingEvents = pendingEvents.filter(e=>e.id!==id);
             renderPendingEvents();
             const badge = document.getElementById('eventsTabBadge');

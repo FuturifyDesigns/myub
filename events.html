@@ -1599,6 +1599,8 @@
         .rsvp-btn { background: var(--surface-3); border: 1px solid var(--border); color: var(--text-soft); padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; cursor: pointer; font-family: inherit; transition: all 0.2s; }
         .rsvp-btn:hover { border-color: var(--border-strong); color: var(--text); }
         .rsvp-btn.active { background: var(--red); color: #fff; border-color: var(--red); }
+        .rsvp-btn-danger { border-color: var(--red); color: var(--red); padding: 6px 10px; }
+        .rsvp-btn-danger:hover { background: var(--red); color: #fff; }
         .events-loading { display: flex; justify-content: center; padding: 40px 0; }
         .spinner { width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--red); border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -3996,6 +3998,7 @@
         let currentEvents = [];
         let myRsvpMap = {}; // event_id -> status
         let countdownTimer = null;
+        let isAdmin = false;
         const CAT_LABELS = { academic:'Academic', social:'Social', sports:'Sports', club:'Club', cultural:'Cultural', other:'Other' };
 
         window.switchTab = function(tab){
@@ -4008,6 +4011,12 @@
             if (window.currentUser) return window.currentUser;
             const { data } = await supabaseClient.auth.getUser();
             window.currentUser = data.user;
+            if (data.user){
+                try {
+                    const { data: prof } = await supabaseClient.from('profiles').select('is_admin').eq('id', data.user.id).single();
+                    isAdmin = !!(prof && prof.is_admin);
+                } catch(_){ isAdmin = false; }
+            }
             return data.user;
         }
 
@@ -4082,6 +4091,7 @@
                         <div class="rsvp-btn-group" onclick="event.stopPropagation()">
                             <button class="rsvp-btn ${myStatus==='going'?'active':''}" onclick="rsvp('${e.id}','going')">Going</button>
                             <button class="rsvp-btn ${myStatus==='maybe'?'active':''}" onclick="rsvp('${e.id}','maybe')">Maybe</button>
+                            ${(isAdmin || e.creator_id===window.currentUser?.id) ? `<button class="rsvp-btn rsvp-btn-danger" title="Delete event" onclick="deleteEvent('${e.id}')">🗑</button>` : ''}
                         </div>
                     </div>
                 </div>
@@ -4098,6 +4108,19 @@
             const { error } = await supabaseClient.from('event_rsvps').upsert({ event_id:eventId, user_id:user.id, status }, { onConflict:'event_id,user_id' });
             if (error){ myRsvpMap[eventId] = prev; showToast('RSVP failed','error'); loadEvents(currentTab); }
             else showToast(status==='going'?"You're going!":'RSVP updated','success');
+        };
+
+        window.deleteEvent = async function(eventId){
+            const ev = currentEvents.find(e => e.id === eventId);
+            const label = ev ? `"${ev.title}"` : 'this event';
+            if (!confirm(`Delete ${label}? This cannot be undone.`)) return;
+            const { error } = await supabaseClient.from('events').delete().eq('id', eventId);
+            if (error){ showToast('Delete failed: ' + error.message, 'error'); return; }
+            showToast('Event deleted', 'success');
+            // Close detail modal if it was showing this event
+            const detail = document.getElementById('eventDetailModal');
+            if (detail && detail.style.display === 'flex') detail.style.display = 'none';
+            loadEvents(currentTab);
         };
 
         window.openCreateModal = function(){ document.getElementById('createEventModal').style.display='flex'; };
@@ -4193,6 +4216,7 @@
                     <button class="rsvp-btn ${myStatus==='maybe'?'active':''}" onclick="rsvp('${e.id}','maybe').then(()=>openEventDetail('${e.id}'))">Maybe</button>
                     <button class="rsvp-btn ${myStatus==='not_going'?'active':''}" onclick="rsvp('${e.id}','not_going').then(()=>openEventDetail('${e.id}'))">Not going</button>
                     <button class="rsvp-btn" onclick="shareEvent('${e.id}')">Share</button>
+                    ${(isAdmin || e.creator_id===user.id) ? `<button class="rsvp-btn rsvp-btn-danger" onclick="deleteEvent('${e.id}')">Delete</button>` : ''}
                 </div>
                 <h4 style="font-size:13px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Attendees</h4>
                 <div class="attendee-grid">${profiles.map(p=>`<img class="attendee-avatar" src="${esc(p.avatar_url||'/favicon-48x48.png')}" title="${esc(p.username||'')}" onclick="location.href='profile.html?u='+encodeURIComponent('${esc(p.username||'')}')" loading="lazy" decoding="async">`).join('') || '<span style="color:var(--text-dim);font-size:13px;">No attendees yet</span>'}</div>

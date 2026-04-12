@@ -1545,6 +1545,17 @@
             transform: translateY(-1px);
         }
 
+        /* ========== HAPPENING SOON ========== */
+        .happening-soon-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+        .hs-item { display: flex; gap: 12px; padding: 10px; border-radius: 10px; background: var(--surface-3); border: 1px solid var(--border); cursor: pointer; transition: transform .2s var(--ease-out-expo), border-color .2s; }
+        .hs-item:hover { transform: translateY(-2px); border-color: var(--red); }
+        .hs-icon { width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; background: linear-gradient(135deg, var(--navy-light), var(--navy)); }
+        .hs-body { flex: 1; min-width: 0; }
+        .hs-title { font-weight: 600; font-size: 14px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .hs-time { font-size: 12px; color: var(--text-muted); margin-top: 3px; font-variant-numeric: tabular-nums; }
+        .hs-time.live { color: var(--red-light); font-weight: 600; }
+        .hs-time.soon { color: var(--orange); font-weight: 600; }
+
         /* ========== TOASTS ========== */
         @keyframes slideUp { from { transform: translate(-50%, 20px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
         @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
@@ -2125,6 +2136,12 @@
                     </svg>
                     Schedule
                 </a>
+                <a href="events.html" class="nav-item">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                    </svg>
+                    Events
+                </a>
                 <a href="notes.html" class="nav-item">
                     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
@@ -2353,6 +2370,15 @@
                         <p>Pending Tasks</p>
                     </div>
                 </div>
+            </div>
+
+            <!-- Happening Soon -->
+            <div class="card happening-soon-card" id="happeningSoonCard" style="margin-bottom:20px;display:none;">
+                <div class="card-header">
+                    <h3 class="card-title">🔥 Happening Soon</h3>
+                    <a href="events.html" class="card-action">View All</a>
+                </div>
+                <div class="happening-soon-list" id="happeningSoonList"></div>
             </div>
 
             <!-- Main Grid -->
@@ -3887,5 +3913,58 @@
             setTimeout(setupParallax, 1500);
         })();
     </script>
+
+    <script>
+    // ===== Happening Soon (dashboard) =====
+    (function(){
+        const CAT_ICON = { academic:'📚', social:'🎉', sports:'⚽', club:'🎭', cultural:'🌍', other:'✨' };
+        function esc(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+        function fmtSoon(startsAt, endsAt){
+            const now = Date.now(), s = new Date(startsAt).getTime(), e = new Date(endsAt).getTime();
+            if (now >= e) return { text: '', cls:'' };
+            if (now >= s){ const m = Math.max(1, Math.floor((e-now)/60000)); return { text: `🔴 Live • ends in ${m}m`, cls:'live' }; }
+            const diff = s - now;
+            const days = Math.floor(diff/86400000);
+            if (days >= 1){ const h = Math.floor((diff%86400000)/3600000); return { text: `in ${days}d ${h}h`, cls:'' }; }
+            const hours = Math.floor(diff/3600000);
+            if (hours >= 1){ const m = Math.floor((diff%3600000)/60000); return { text: `in ${hours}h ${m}m`, cls:'soon' }; }
+            const mins = Math.max(1, Math.floor(diff/60000));
+            return { text: `in ${mins}m`, cls:'soon' };
+        }
+        async function loadHappeningSoon(){
+            const card = document.getElementById('happeningSoonCard');
+            const list = document.getElementById('happeningSoonList');
+            if (!card || !list || !window.supabaseClient) return;
+            try {
+                const now = new Date().toISOString();
+                const in48h = new Date(Date.now() + 48*3600*1000).toISOString();
+                const { data, error } = await supabaseClient.from('events')
+                    .select('id,title,category,starts_at,ends_at')
+                    .eq('status','approved')
+                    .lte('starts_at', in48h)
+                    .gte('ends_at', now)
+                    .order('starts_at')
+                    .limit(6);
+                if (error) return;
+                if (!data || !data.length){ card.style.display='none'; return; }
+                card.style.display = '';
+                list.innerHTML = data.map(e => {
+                    const t = fmtSoon(e.starts_at, e.ends_at);
+                    return `<div class="hs-item" onclick="location.href='events.html#${e.id}'">
+                        <div class="hs-icon">${CAT_ICON[e.category]||'✨'}</div>
+                        <div class="hs-body">
+                            <div class="hs-title">${esc(e.title)}</div>
+                            <div class="hs-time ${t.cls}">${esc(t.text)}</div>
+                        </div>
+                    </div>`;
+                }).join('');
+            } catch(_){}
+        }
+        // Refresh every minute so "in 23m" stays accurate
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => { loadHappeningSoon(); setInterval(loadHappeningSoon, 60000); });
+        else { loadHappeningSoon(); setInterval(loadHappeningSoon, 60000); }
+    })();
+    </script>
+
 </body>
 </html>

@@ -1619,6 +1619,120 @@
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
 
+        /* ========== EVENT MODAL POLISH ========== */
+        #createEventModal .notif-modal, #eventDetailModal .notif-modal {
+            max-width: 600px;
+            width: min(600px, calc(100vw - 40px));
+        }
+        #createEventModal .notif-modal-body,
+        #eventDetailModal .notif-modal-body {
+            padding: 24px 26px 26px !important;
+            overflow-y: auto;
+            flex: 1 1 auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-strong) transparent;
+        }
+        #createEventModal .notif-modal-body::-webkit-scrollbar,
+        #eventDetailModal .notif-modal-body::-webkit-scrollbar { width: 6px; }
+        #createEventModal .notif-modal-body::-webkit-scrollbar-thumb,
+        #eventDetailModal .notif-modal-body::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+
+        /* Form polish */
+        #createEventForm .form-field { margin-bottom: 16px; }
+        #createEventForm .form-field label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 7px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+        #createEventForm input[type="text"],
+        #createEventForm input[type="number"],
+        #createEventForm input[type="datetime-local"],
+        #createEventForm textarea,
+        #createEventForm select {
+            width: 100%;
+            background: rgba(10, 25, 47, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 11px 13px;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 14px;
+            transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+        }
+        #createEventForm input:hover:not(:focus),
+        #createEventForm textarea:hover:not(:focus),
+        #createEventForm select:hover:not(:focus) { border-color: var(--border-strong); }
+        #createEventForm input:focus,
+        #createEventForm textarea:focus,
+        #createEventForm select:focus {
+            outline: none;
+            border-color: var(--red);
+            background: rgba(10, 25, 47, 0.85);
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+        }
+        #createEventForm textarea { resize: vertical; min-height: 90px; }
+        #createEventForm input[type="datetime-local"] { color-scheme: dark; }
+        #createEventForm input[type="file"] {
+            width: 100%;
+            background: rgba(10, 25, 47, 0.4);
+            border: 1px dashed var(--border-strong);
+            border-radius: 10px;
+            padding: 14px;
+            color: var(--text-muted);
+            font-size: 13px;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        #createEventForm input[type="file"]:hover {
+            border-color: var(--red);
+            background: rgba(10, 25, 47, 0.6);
+        }
+        #createEventForm input[type="file"]::file-selector-button {
+            background: var(--red);
+            color: #fff;
+            border: none;
+            padding: 7px 14px;
+            border-radius: 7px;
+            font-weight: 600;
+            font-family: inherit;
+            margin-right: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        #createEventForm input[type="file"]:hover::file-selector-button { background: var(--red-dark); }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            padding-top: 10px;
+            margin-top: 4px;
+            border-top: 1px solid var(--border);
+            padding-top: 16px;
+        }
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-soft);
+            border: 1px solid var(--border);
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        .btn-secondary:hover { background: var(--surface-2); color: var(--text); border-color: var(--border-strong); }
+
+
+
         /* ========== MOBILE ========== */
         @media (max-width: 1100px) {
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
@@ -2393,26 +2507,26 @@
         <div class="notif-modal" style="max-width:560px;">
             <div class="notif-modal-header">
                 <h3>Create Event</h3>
-                <button class="notif-close-btn" onclick="closeCreateModal()">×</button>
+                <button class="notif-modal-close" onclick="closeCreateModal()">×</button>
             </div>
-            <div class="notif-modal-body" style="padding:20px;">
+            <div class="notif-modal-body">
                 <form id="createEventForm" onsubmit="event.preventDefault();submitNewEvent(this);">
-                    <div class="form-field"><label>Title *</label><input name="title" type="text" required maxlength="120"></div>
-                    <div class="form-field"><label>Description</label><textarea name="description" maxlength="2000"></textarea></div>
-                    <div class="form-field"><label>Location</label><input name="location" type="text" maxlength="200"></div>
+                    <div class="form-field"><label>Event title</label><input name="title" type="text" required maxlength="120" placeholder="e.g. Study Jam: Calc II Midterm Prep"></div>
+                    <div class="form-field"><label>Description</label><textarea name="description" maxlength="2000" placeholder="What's the event about? Who should come?"></textarea></div>
+                    <div class="form-field"><label>Location</label><input name="location" type="text" maxlength="200" placeholder="Library Room 204, Zoom link, etc."></div>
                     <div class="form-row">
-                        <div class="form-field"><label>Starts at *</label><input name="starts_at" type="datetime-local" required></div>
-                        <div class="form-field"><label>Ends at *</label><input name="ends_at" type="datetime-local" required></div>
+                        <div class="form-field"><label>Starts at</label><input name="starts_at" type="datetime-local" required></div>
+                        <div class="form-field"><label>Ends at</label><input name="ends_at" type="datetime-local" required></div>
                     </div>
                     <div class="form-row">
                         <div class="form-field"><label>Category</label>
-                            <select name="category"><option value="academic">Academic</option><option value="social">Social</option><option value="sports">Sports</option><option value="club">Club</option><option value="cultural">Cultural</option><option value="other" selected>Other</option></select>
+                            <select name="category"><option value="academic">📚 Academic</option><option value="social">🎉 Social</option><option value="sports">⚽ Sports</option><option value="club">🎭 Club</option><option value="cultural">🌍 Cultural</option><option value="other" selected>✨ Other</option></select>
                         </div>
                         <div class="form-field"><label>Capacity</label><input name="capacity" type="number" min="1" placeholder="Optional"></div>
                     </div>
-                    <div class="form-field"><label>Cover image (jpg/png/webp, ≤5MB)</label><input name="cover" type="file" accept="image/jpeg,image/png,image/webp"></div>
-                    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
-                        <button type="button" class="rsvp-btn" onclick="closeCreateModal()">Cancel</button>
+                    <div class="form-field"><label>Cover image <span style="text-transform:none;font-weight:400;opacity:.7;">(jpg · png · webp, ≤5MB)</span></label><input name="cover" type="file" accept="image/jpeg,image/png,image/webp"></div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="closeCreateModal()">Cancel</button>
                         <button type="submit" class="btn-create-event" id="createEventSubmit">Submit for approval</button>
                     </div>
                 </form>
@@ -2425,9 +2539,9 @@
         <div class="notif-modal" style="max-width:620px;">
             <div class="notif-modal-header">
                 <h3 id="eventDetailHeader">Event</h3>
-                <button class="notif-close-btn" onclick="closeEventDetail()">×</button>
+                <button class="notif-modal-close" onclick="closeEventDetail()">×</button>
             </div>
-            <div class="notif-modal-body" style="padding:20px;" id="eventDetailBody"></div>
+            <div class="notif-modal-body" id="eventDetailBody"></div>
         </div>
     </div>
 

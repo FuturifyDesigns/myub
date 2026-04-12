@@ -2,18 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-<!-- myub-perf-preconnects -->
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-    <link rel="preconnect" href="https://unpkg.com" crossorigin>
-    <link rel="dns-prefetch" href="https://cdn.onesignal.com">
-    <link rel="dns-prefetch" href="https://files.myub.online">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content, maximum-scale=1.0, user-scalable=no">
     <title>Admin Panel - MyUB</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="myub-security.js"></script>
@@ -1641,6 +1634,7 @@
                 <button class="admin-tab" onclick="switchTab('groups')">Study Groups</button>
                 <button class="admin-tab" onclick="switchTab('content')">Content</button>
                 <button class="admin-tab" onclick="switchTab('papers')">Past Papers <span id="papersTabBadge" class="nav-badge" style="display:none;">0</span></button>
+                <button class="admin-tab" onclick="switchTab('events')">Events <span id="eventsTabBadge" class="nav-badge" style="display:none;">0</span></button>
                 <button class="admin-tab" onclick="switchTab('announcements')">Announcements</button>
                 <button class="admin-tab" onclick="switchTab('settings')">Settings</button>
             </div>
@@ -1838,6 +1832,19 @@
                             <button class="btn btn-secondary" onclick="loadPendingPapers()" style="font-size:12px;padding:6px 12px;">Refresh</button>
                         </div>
                         <div class="card-body" id="pendingPapersBody">
+                            <div class="empty-state"><h3>Loading…</h3></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Events Moderation Tab -->
+                <div id="tab-events" class="tab-panel">
+                    <div class="admin-card">
+                        <div class="card-header">
+                            <span class="card-title">Pending Events</span>
+                            <button class="btn btn-secondary" onclick="loadPendingEvents()" style="font-size:12px;padding:6px 12px;">Refresh</button>
+                        </div>
+                        <div class="card-body" id="pendingEventsBody">
                             <div class="empty-state"><h3>Loading…</h3></div>
                         </div>
                     </div>
@@ -2171,6 +2178,7 @@
             document.querySelector(`[onclick="switchTab('${tabId}')"]`).classList.add('active');
             document.getElementById(`tab-${tabId}`).classList.add('active');
             if (tabId === 'papers') loadPendingPapers();
+            if (tabId === 'events') loadPendingEvents();
         }
 
         // ===== Past papers moderation =====
@@ -2392,7 +2400,7 @@
                         <td>
                             <div class="user-info">
                                 <div class="user-info-avatar">
-                                    ${r.reporter?.avatar_url ? `<img src="${r.reporter.avatar_url}" alt="" loading="lazy" decoding="async">` : (r.reporter?.full_name || 'U')[0].toUpperCase()}
+                                    ${r.reporter?.avatar_url ? `<img src="${r.reporter.avatar_url}" alt="">` : (r.reporter?.full_name || 'U')[0].toUpperCase()}
                                 </div>
                                 <div class="user-info-details">
                                     <div class="user-info-name">${escapeHtml(r.reporter?.full_name || 'Unknown')}</div>
@@ -2402,7 +2410,7 @@
                         <td>
                             <div class="user-info">
                                 <div class="user-info-avatar">
-                                    ${r.reported?.avatar_url ? `<img src="${r.reported.avatar_url}" alt="" loading="lazy" decoding="async">` : (r.reported?.full_name || 'U')[0].toUpperCase()}
+                                    ${r.reported?.avatar_url ? `<img src="${r.reported.avatar_url}" alt="">` : (r.reported?.full_name || 'U')[0].toUpperCase()}
                                 </div>
                                 <div class="user-info-details">
                                     <div class="user-info-name">${escapeHtml(r.reported?.full_name || 'Unknown')}</div>
@@ -2555,7 +2563,7 @@
                         <td>
                             <div class="user-info">
                                 <div class="user-info-avatar">
-                                    ${u.avatar_url ? `<img src="${u.avatar_url}" alt="" loading="lazy" decoding="async">` : (u.full_name || 'U')[0].toUpperCase()}
+                                    ${u.avatar_url ? `<img src="${u.avatar_url}" alt="">` : (u.full_name || 'U')[0].toUpperCase()}
                                 </div>
                                 <div class="user-info-details">
                                     <div class="user-info-name">${escapeHtml(u.full_name || 'No Name')}</div>
@@ -2615,7 +2623,7 @@
             document.getElementById('userModalBody').innerHTML = `
                 <div style="text-align: center; margin-bottom: 20px;">
                     <div class="user-info-avatar" style="width: 80px; height: 80px; font-size: 32px; margin: 0 auto 15px;">
-                        ${user.avatar_url ? `<img src="${user.avatar_url}" alt="" loading="lazy" decoding="async">` : (user.full_name || 'U')[0].toUpperCase()}
+                        ${user.avatar_url ? `<img src="${user.avatar_url}" alt="">` : (user.full_name || 'U')[0].toUpperCase()}
                     </div>
                     <h3 style="color: var(--navy); margin-bottom: 5px;">${escapeHtml(user.full_name || 'No Name')}</h3>
                     <p style="color: var(--gray-500);">${escapeHtml(user.email || '')}</p>
@@ -3326,5 +3334,127 @@
             }, 800);
         })();
     </script>
+
+    <script>
+    // ===== Events moderation =====
+    (function(){
+        let pendingEvents = [];
+        function eEsc(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+        function fmt(iso){ return new Date(iso).toLocaleString(undefined,{dateStyle:'medium',timeStyle:'short'}); }
+        const CAT_LABEL = { academic:'📚 Academic', social:'🎉 Social', sports:'⚽ Sports', club:'🎭 Club', cultural:'🌍 Cultural', other:'✨ Other' };
+
+        window.loadPendingEvents = async function(){
+            const body = document.getElementById('pendingEventsBody');
+            if (!body) return;
+            body.innerHTML = '<div class="empty-state"><h3>Loading…</h3></div>';
+            try {
+                const { data, error } = await supabaseClient
+                    .from('events')
+                    .select('id,title,description,location,starts_at,ends_at,category,capacity,cover_r2_key,creator_id,created_at,status')
+                    .eq('status','pending')
+                    .order('created_at', { ascending: false })
+                    .limit(200);
+                if (error) throw error;
+                pendingEvents = data || [];
+
+                // Resolve creator profiles in one round-trip
+                const ids = [...new Set(pendingEvents.map(e=>e.creator_id))];
+                let profileMap = {};
+                if (ids.length){
+                    const { data: profs } = await supabaseClient.from('profiles').select('id,username,first_name,last_name').in('id', ids);
+                    (profs||[]).forEach(p => profileMap[p.id] = p);
+                }
+                pendingEvents.forEach(e => e._creator = profileMap[e.creator_id] || {});
+
+                const badge = document.getElementById('eventsTabBadge');
+                if (badge){
+                    if (pendingEvents.length){ badge.style.display='inline'; badge.textContent = pendingEvents.length; }
+                    else badge.style.display='none';
+                }
+                renderPendingEvents();
+            } catch(e){
+                body.innerHTML = `<div class="empty-state"><h3>Failed to load</h3><p>${eEsc(e.message||e)}</p></div>`;
+            }
+        };
+
+        function renderPendingEvents(){
+            const body = document.getElementById('pendingEventsBody');
+            if (!pendingEvents.length){
+                body.innerHTML = '<div class="empty-state"><h3>Nothing pending</h3><p>No events awaiting approval.</p></div>';
+                return;
+            }
+            body.innerHTML = pendingEvents.map(e => {
+                const who = e._creator.username ? `@${eEsc(e._creator.username)}` :
+                             (e._creator.first_name ? eEsc(`${e._creator.first_name} ${e._creator.last_name||''}`) : 'Unknown');
+                const cover = e.cover_r2_key ? `https://files.myub.online/${eEsc(e.cover_r2_key)}` : '';
+                return `
+                <div style="border:1px solid var(--border); border-radius:12px; padding:18px; margin-bottom:14px; background:var(--surface-2);">
+                    <div style="display:flex; gap:16px; align-items:flex-start;">
+                        ${cover ? `<img src="${cover}" style="width:140px; aspect-ratio:16/9; object-fit:cover; border-radius:8px; flex-shrink:0;" loading="lazy">` : `<div style="width:140px; aspect-ratio:16/9; background:var(--surface-3); border-radius:8px; display:flex;align-items:center;justify-content:center; font-size:24px; flex-shrink:0;">${eEsc(CAT_LABEL[e.category]||'').split(' ')[0]}</div>`}
+                        <div style="flex:1; min-width:0;">
+                            <div style="font-size:17px; font-weight:600; color:var(--text); margin-bottom:6px;">${eEsc(e.title)}</div>
+                            <div style="font-size:13px; color:var(--text-muted); margin-bottom:10px;">
+                                ${eEsc(CAT_LABEL[e.category]||'')} &middot; by ${who} &middot; submitted ${fmt(e.created_at)}
+                            </div>
+                            <div style="font-size:13px; color:var(--text-soft); margin-bottom:6px;">📅 ${fmt(e.starts_at)} — ${fmt(e.ends_at)}</div>
+                            ${e.location?`<div style="font-size:13px; color:var(--text-soft); margin-bottom:6px;">📍 ${eEsc(e.location)}</div>`:''}
+                            ${e.capacity?`<div style="font-size:13px; color:var(--text-soft); margin-bottom:6px;">👥 Capacity: ${e.capacity}</div>`:''}
+                            ${e.description?`<div style="font-size:13px; color:var(--text-dim); margin-top:10px; white-space:pre-wrap; max-height:100px; overflow-y:auto;">${eEsc(e.description)}</div>`:''}
+                            <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">
+                                <button class="btn btn-primary" style="font-size:13px; padding:8px 16px;" onclick="approveEvent('${e.id}')">✓ Approve</button>
+                                <button class="btn btn-secondary" style="font-size:13px; padding:8px 16px;" onclick="rejectEvent('${e.id}')">✗ Reject</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        window.approveEvent = async function(id){
+            const row = pendingEvents.find(e=>e.id===id); if (!row) return;
+            if (!confirm(`Approve "${row.title}"?`)) return;
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            const { error } = await supabaseClient.from('events').update({
+                status: 'approved',
+                approved_at: new Date().toISOString(),
+                approved_by: user.id
+            }).eq('id', id);
+            if (error){ alert('Approve failed: ' + error.message); return; }
+            // Log to admin_actions if the table exists (best-effort, swallow errors)
+            try { await supabaseClient.from('admin_actions').insert({ admin_id: user.id, action: 'approve_event', target_id: id }); } catch(_){}
+            pendingEvents = pendingEvents.filter(e=>e.id!==id);
+            renderPendingEvents();
+            const badge = document.getElementById('eventsTabBadge');
+            if (badge){ if (pendingEvents.length){ badge.textContent = pendingEvents.length; } else { badge.style.display='none'; } }
+        };
+
+        window.rejectEvent = async function(id){
+            const row = pendingEvents.find(e=>e.id===id); if (!row) return;
+            const reason = prompt(`Reject "${row.title}"?\n\nOptional reason (shown to creator):`);
+            if (reason === null) return;
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            const { error } = await supabaseClient.from('events').update({
+                status: 'rejected',
+                rejection_reason: reason || null
+            }).eq('id', id);
+            if (error){ alert('Reject failed: ' + error.message); return; }
+            try { await supabaseClient.from('admin_actions').insert({ admin_id: user.id, action: 'reject_event', target_id: id, metadata: { reason: reason || null } }); } catch(_){}
+            pendingEvents = pendingEvents.filter(e=>e.id!==id);
+            renderPendingEvents();
+            const badge = document.getElementById('eventsTabBadge');
+            if (badge){ if (pendingEvents.length){ badge.textContent = pendingEvents.length; } else { badge.style.display='none'; } }
+        };
+
+        // Prefetch badge count on page load so admins see the pending number without clicking the tab
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const { count } = await supabaseClient.from('events').select('id', { count:'exact', head:true }).eq('status','pending');
+                const badge = document.getElementById('eventsTabBadge');
+                if (badge && count){ badge.style.display='inline'; badge.textContent = count; }
+            } catch(_){}
+        });
+    })();
+    </script>
+
 </body>
 </html>

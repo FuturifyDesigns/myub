@@ -3421,7 +3421,7 @@
             }).eq('id', id);
             if (error){ alert('Approve failed: ' + error.message); return; }
             // Log to admin_actions if the table exists (best-effort, swallow errors)
-            try { await supabaseClient.from('admin_actions').insert({ admin_id: user.id, action: 'approve_event', target_id: id }); } catch(_){}
+            try { await supabaseClient.from('admin_actions').insert({ admin_user_id: user.id, action_type: 'approve_event', target_type: 'event', target_id: id }); } catch(_){}
             pendingEvents = pendingEvents.filter(e=>e.id!==id);
             renderPendingEvents();
             const badge = document.getElementById('eventsTabBadge');
@@ -3438,7 +3438,7 @@
                 rejection_reason: reason || null
             }).eq('id', id);
             if (error){ alert('Reject failed: ' + error.message); return; }
-            try { await supabaseClient.from('admin_actions').insert({ admin_id: user.id, action: 'reject_event', target_id: id, metadata: { reason: reason || null } }); } catch(_){}
+            try { await supabaseClient.from('admin_actions').insert({ admin_user_id: user.id, action_type: 'reject_event', target_type: 'event', target_id: id, metadata: { reason: reason || null } }); } catch(_){}
             pendingEvents = pendingEvents.filter(e=>e.id!==id);
             renderPendingEvents();
             const badge = document.getElementById('eventsTabBadge');

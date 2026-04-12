@@ -3361,7 +3361,7 @@
                 const ids = [...new Set(pendingEvents.map(e=>e.creator_id))];
                 let profileMap = {};
                 if (ids.length){
-                    const { data: profs } = await supabaseClient.from('profiles').select('id,username,first_name,last_name').in('id', ids);
+                    const { data: profs } = await supabaseClient.from('profiles').select('id,username').in('id', ids);
                     (profs||[]).forEach(p => profileMap[p.id] = p);
                 }
                 pendingEvents.forEach(e => e._creator = profileMap[e.creator_id] || {});
@@ -3384,8 +3384,7 @@
                 return;
             }
             body.innerHTML = pendingEvents.map(e => {
-                const who = e._creator.username ? `@${eEsc(e._creator.username)}` :
-                             (e._creator.first_name ? eEsc(`${e._creator.first_name} ${e._creator.last_name||''}`) : 'Unknown');
+                const who = e._creator.username ? `@${eEsc(e._creator.username)}` : 'Unknown';
                 const cover = e.cover_r2_key ? `https://files.myub.online/${eEsc(e.cover_r2_key)}` : '';
                 return `
                 <div style="border:1px solid var(--border); border-radius:12px; padding:18px; margin-bottom:14px; background:var(--surface-2);">

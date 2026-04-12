@@ -2,6 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+<!-- myub-perf-preconnects -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.onesignal.com">
+    <link rel="dns-prefetch" href="https://files.myub.online">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content, maximum-scale=1.0, user-scalable=no">
     <title>Study Groups - MyUB</title>
     <link rel="icon" type="image/png" sizes="48x48" href="favicon-48x48.png">
@@ -10,12 +17,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="myub-security.js"></script>
-    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
-    <script src="myub-calls.js"></script>
+    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js" defer></script>
+    <script src="myub-calls.js" defer></script>
     <script src="myub-utils.js"></script>
     <script src="myub-mobile.js"></script>
         <style>
@@ -3643,6 +3650,7 @@
                 <a href="dashboard.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Dashboard</a>
                 <a href="gpa-calculator.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>GPA Calculator</a>
                 <a href="schedule.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>Schedule</a>
+                <a href="events.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>Events</a>
                 <a href="notes.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>Notes</a>
                 <a href="past-papers.html" class="nav-item">
                     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -3754,7 +3762,7 @@
                 <div class="reply-bar" id="replyBar"><div class="reply-bar-content"><div class="reply-bar-name" id="replyBarName">Replying to User</div><div class="reply-bar-text" id="replyBarText">Message preview...</div></div><button class="reply-bar-close" onclick="cancelReply()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button></div>
                 <div class="chat-input-area" id="chatInputArea" style="display:none;">
                     <button class="emoji-btn" onclick="toggleEmojiPicker()">
-                        <img src="emoji-button.jpg" alt="😊" style="width: 28px; height: 28px; border-radius: 50%;">
+                        <img src="emoji-button.jpg" alt="😊" style="width: 28px; height: 28px; border-radius: 50%;" loading="lazy" decoding="async">
                         <div class="emoji-picker" id="emojiPicker"></div>
                     </button>
                     <div class="chat-input-wrapper">
@@ -4028,7 +4036,7 @@
                 <div class="upload-step" id="cropStep">
                     <div class="crop-layout">
                         <div class="crop-main">
-                            <div class="cropper-wrapper"><img id="cropperImage" src="" alt="Crop preview"></div>
+                            <div class="cropper-wrapper"><img id="cropperImage" src="" alt="Crop preview" loading="lazy" decoding="async"></div>
                             <div class="crop-controls">
                                 <button type="button" class="crop-btn" onclick="groupCropper.rotate(-90)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.5 2v6h6M2.66 15.57a10 10 0 1 0 .57-8.38"/></svg><span>Left</span></button>
                                 <button type="button" class="crop-btn" onclick="groupCropper.rotate(90)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38"/></svg><span>Right</span></button>
@@ -4313,7 +4321,7 @@
                 if (!user) { showToast('User not found', 'error'); return; }
                 var userName = user.full_name || ((user.first_name || '') + ' ' + (user.last_name || '')).trim() || 'Someone';
                 var userInitials = getInitials(userName);
-                var userAvatarHtml = hasValidAvatar(user.avatar_url) ? '<img src="' + escapeHtml(user.avatar_url) + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">' : userInitials;
+                var userAvatarHtml = hasValidAvatar(user.avatar_url) ? '<img src="' + escapeHtml(user.avatar_url) + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" loading="lazy" decoding="async">' : userInitials;
                 
                 // Create popup overlay
                 var overlay = document.createElement('div');
@@ -4646,7 +4654,7 @@
                     preview = senderName + ': ' + filterBadWords(truncate(g.lastMessage.content, 25));
                 }
                 var time = g.lastMessage ? formatTimeAgo(g.lastMessage.created_at) : '';
-                var avatarHtml = hasValidAvatar(g.avatar_url) ? '<img src="' + escapeHtml(g.avatar_url) + '">' : initials;
+                var avatarHtml = hasValidAvatar(g.avatar_url) ? '<img src="' + escapeHtml(g.avatar_url) + '" loading="lazy" decoding="async">' : initials;
                 
                 // Determine click action based on request status
                 var clickAction = '';
@@ -4734,7 +4742,7 @@
                 html += '<div class="message-select ' + (isSelectionMode ? 'show' : '') + ' ' + (isSelected ? 'checked' : '') + '" onclick="toggleMessageSelect(\'' + msg.id + '\')"></div>';
                 
                 if (!isSent) {
-                    var avatarContent = hasValidAvatar(sender.avatar_url) ? '<img src="' + escapeHtml(sender.avatar_url) + '">' : initials;
+                    var avatarContent = hasValidAvatar(sender.avatar_url) ? '<img src="' + escapeHtml(sender.avatar_url) + '" loading="lazy" decoding="async">' : initials;
                     html += '<div class="message-avatar" onclick="openProfileModal(\'' + msg.sender_id + '\')" style="background:' + getColorFromId(msg.sender_id) + ';">' + avatarContent + '</div>';
                 }
                 html += '<div class="message-bubble" onclick="if(isSelectionMode) toggleMessageSelect(\'' + msg.id + '\')">';
@@ -4813,7 +4821,7 @@
                 var initials = getInitials(name);
                 var isMe = m.user_id === currentUser.id;
                 var isMemberAdmin = m.role === 'admin';
-                var avatarContent = hasValidAvatar(p.avatar_url) ? '<img src="' + escapeHtml(p.avatar_url) + '">' : initials;
+                var avatarContent = hasValidAvatar(p.avatar_url) ? '<img src="' + escapeHtml(p.avatar_url) + '" loading="lazy" decoding="async">' : initials;
                 
                 html += '<div class="member-item">';
                 html += '<div class="member-avatar" onclick="openProfileModal(\'' + m.user_id + '\')" style="background:' + getColorFromId(m.user_id) + ';">' + avatarContent + '<div class="member-status-dot ' + (p.is_online ? 'online' : 'offline') + '"></div></div>';
@@ -4858,7 +4866,7 @@
             
             var initials = getInitials(currentGroup.name);
             var chatAvatar = document.getElementById('chatAvatar');
-            chatAvatar.innerHTML = hasValidAvatar(currentGroup.avatar_url) ? '<img src="' + escapeHtml(currentGroup.avatar_url) + '">' : initials;
+            chatAvatar.innerHTML = hasValidAvatar(currentGroup.avatar_url) ? '<img src="' + escapeHtml(currentGroup.avatar_url) + '" loading="lazy" decoding="async">' : initials;
             document.getElementById('chatGroupName').textContent = currentGroup.name;
             
             await loadGroupMembers();
@@ -5343,7 +5351,7 @@
                 var p = b.profiles || {};
                 var name = getName(p);
                 var initials = getInitials(name);
-                var avatarContent = hasValidAvatar(p.avatar_url) ? '<img src="' + escapeHtml(p.avatar_url) + '">' : initials;
+                var avatarContent = hasValidAvatar(p.avatar_url) ? '<img src="' + escapeHtml(p.avatar_url) + '" loading="lazy" decoding="async">' : initials;
                 html += '<div class="member-item"><div class="member-avatar" style="background:' + getColorFromId(b.user_id) + ';">' + avatarContent + '</div><div class="member-info"><div class="member-name">' + escapeHtml(name) + ' <span class="member-role banned">Banned</span></div></div><button class="btn btn-sm btn-success" onclick="unbanMember(\'' + b.user_id + '\')">Unban</button></div>';
             }
             container.innerHTML = html;
@@ -5382,7 +5390,7 @@
                             var u = users[i];
                             var name = u.full_name || getName(u);
                             var initials = getInitials(name);
-                            var avatarContent = hasValidAvatar(u.avatar_url) ? '<img src="' + escapeHtml(u.avatar_url) + '">' : initials;
+                            var avatarContent = hasValidAvatar(u.avatar_url) ? '<img src="' + escapeHtml(u.avatar_url) + '" loading="lazy" decoding="async">' : initials;
                             var isSelected = selectedMembers.findIndex(function(s) { return s.id === u.id; }) !== -1;
                             
                             html += '<div class="user-search-item' + (isSelected ? ' selected' : '') + '" onclick="toggleSelectMember(\'' + u.id + '\', \'' + escapeHtml(name) + '\', \'' + escapeHtml(u.avatar_url || '') + '\')">';
@@ -5427,7 +5435,7 @@
             for (var i = 0; i < selectedMembers.length; i++) {
                 var m = selectedMembers[i];
                 var initials = getInitials(m.name);
-                var avatarContent = hasValidAvatar(m.avatar_url) ? '<img src="' + escapeHtml(m.avatar_url) + '">' : initials;
+                var avatarContent = hasValidAvatar(m.avatar_url) ? '<img src="' + escapeHtml(m.avatar_url) + '" loading="lazy" decoding="async">' : initials;
                 html += '<div class="selected-member"><div class="selected-member-avatar" style="background:' + getColorFromId(m.id) + ';">' + avatarContent + '</div><span>' + escapeHtml(m.name.split(' ')[0]) + '</span><button type="button" class="selected-member-remove" onclick="event.stopPropagation(); removeSelectedMember(\'' + m.id + '\'); return false;"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button></div>';
             }
             container.innerHTML = html;
@@ -5467,7 +5475,7 @@
                             var u = users[i];
                             var name = u.full_name || getName(u);
                             var initials = getInitials(name);
-                            var avatarContent = hasValidAvatar(u.avatar_url) ? '<img src="' + escapeHtml(u.avatar_url) + '">' : initials;
+                            var avatarContent = hasValidAvatar(u.avatar_url) ? '<img src="' + escapeHtml(u.avatar_url) + '" loading="lazy" decoding="async">' : initials;
                             
                             html += '<div class="user-search-item" onclick="addMemberToGroup(\'' + u.id + '\')">';
                             html += '<div class="user-search-avatar" style="background:' + getColorFromId(u.id) + ';">' + avatarContent + '</div>';
@@ -5665,7 +5673,7 @@
             var editOverlay = '<div class="edit-overlay"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>';
             
             if (hasValidAvatar(currentGroup.avatar_url)) {
-                avatar.innerHTML = '<img src="' + escapeHtml(currentGroup.avatar_url) + '">' + (isAdmin ? editOverlay : '');
+                avatar.innerHTML = '<img src="' + escapeHtml(currentGroup.avatar_url) + '" loading="lazy" decoding="async">' + (isAdmin ? editOverlay : '');
             } else {
                 avatar.innerHTML = '<span>' + initials + '</span>' + (isAdmin ? editOverlay : '');
             }
@@ -5717,7 +5725,7 @@
                 document.getElementById('profileBlockedNotice').textContent = isBlocked ? 'You have blocked this user' : '';
                 
                 var avatar = document.getElementById('profileAvatar');
-                var avatarContent = hasValidAvatar(p.avatar_url) ? '<img src="' + escapeHtml(p.avatar_url) + '">' : initials;
+                var avatarContent = hasValidAvatar(p.avatar_url) ? '<img src="' + escapeHtml(p.avatar_url) + '" loading="lazy" decoding="async">' : initials;
                 avatar.innerHTML = avatarContent + '<div class="status-dot ' + (p.is_online ? 'online' : 'offline') + '"></div>';
                 avatar.style.background = hasValidAvatar(p.avatar_url) ? 'transparent' : getColorFromId(userId);
                 
@@ -6219,7 +6227,7 @@
                 if (avatarMode === 'create') {
                     croppedImageBlob = blob;
                     var url = URL.createObjectURL(blob);
-                    document.getElementById('avatarPreview').innerHTML = '<img src="' + url + '">';
+                    document.getElementById('avatarPreview').innerHTML = '<img src="' + url + '" loading="lazy" decoding="async">';
                     closeGroupAvatarModal();
                 } else {
                     // Upload directly for edit mode
@@ -6240,7 +6248,7 @@
                 
                 await supabaseClient.from('study_groups').update({ avatar_url: publicUrl }).eq('id', currentGroup.id);
                 currentGroup.avatar_url = publicUrl;
-                document.getElementById('chatAvatar').innerHTML = '<img src="' + escapeHtml(publicUrl) + '">';
+                document.getElementById('chatAvatar').innerHTML = '<img src="' + escapeHtml(publicUrl) + '" loading="lazy" decoding="async">';
                 closeGroupAvatarModal();
                 openGroupInfoModal();
                 showToast('Avatar updated!', 'success');
@@ -6480,7 +6488,7 @@
                 var name = getName(f);
                 var initials = getInitials(name);
                 var isSelected = forwardToUsers.indexOf(f.id) !== -1;
-                var avatarContent = hasValidAvatar(f.avatar_url) ? '<img src="' + escapeHtml(f.avatar_url) + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">' : initials;
+                var avatarContent = hasValidAvatar(f.avatar_url) ? '<img src="' + escapeHtml(f.avatar_url) + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" loading="lazy" decoding="async">' : initials;
                 
                 html += '<div class="user-search-item" onclick="toggleForwardUser(\'' + f.id + '\')" style="' + (isSelected ? 'background:var(--blue-light);' : '') + '">';
                 html += '<div class="user-search-avatar" style="background:' + getColorFromId(f.id) + ';">' + avatarContent;
@@ -6846,7 +6854,7 @@
             if (existing) return;
             
             var initials = getInitials(name);
-            var avatarHtml = avatarUrl ? '<img src="' + avatarUrl + '" alt="">' : initials;
+            var avatarHtml = avatarUrl ? '<img src="' + avatarUrl + '" alt="" loading="lazy" decoding="async">' : initials;
             
             var html = '<div class="call-participant" id="participant_' + userId + '">' +
                 '<div class="call-participant-avatar">' + avatarHtml + '</div>' +

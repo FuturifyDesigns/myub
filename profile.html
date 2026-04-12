@@ -2,17 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+<!-- myub-perf-preconnects -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.onesignal.com">
+    <link rel="dns-prefetch" href="https://files.myub.online">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content, maximum-scale=1.0, user-scalable=no">
     <title>My Profile - MyUB</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="myub-security.js"></script>
-    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
-    <script src="myub-calls.js"></script>
+    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js" defer></script>
+    <script src="myub-calls.js" defer></script>
     <script src="myub-utils.js"></script>
     <script src="myub-mobile.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
@@ -1712,6 +1719,12 @@
                     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                     Schedule
                 </a>
+                <a href="events.html" class="nav-item">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                    </svg>
+                    Events
+                </a>
                 <a href="notes.html" class="nav-item">
                     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                     Notes
@@ -1969,7 +1982,7 @@
                     <div class="crop-layout">
                         <div class="crop-main">
                             <div class="cropper-wrapper">
-                                <img id="cropperImage" src="" alt="Crop preview">
+                                <img id="cropperImage" src="" alt="Crop preview" loading="lazy" decoding="async">
                             </div>
                             <div class="crop-controls">
                                 <button type="button" class="crop-btn" onclick="cropper.rotate(-90)">
@@ -2424,7 +2437,7 @@
             const avatarEl = document.getElementById('profileAvatar');
             if (avatarEl) {
                 if (user.avatar_url) {
-                    avatarEl.innerHTML = `<img src="${user.avatar_url}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+                    avatarEl.innerHTML = `<img src="${user.avatar_url}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" loading="lazy" decoding="async">`;
                 } else {
                     avatarEl.innerHTML = initials;
                 }
@@ -2565,7 +2578,7 @@
 
             const avatar = document.getElementById('profileAvatar');
             if (p.avatar_url) {
-                avatar.innerHTML = `<img src="${p.avatar_url}" alt="Avatar">`;
+                avatar.innerHTML = `<img src="${p.avatar_url}" alt="Avatar" loading="lazy" decoding="async">`;
             } else {
                 avatar.textContent = getInitials(p.first_name, p.last_name);
             }

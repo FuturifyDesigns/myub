@@ -2,18 +2,25 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+<!-- myub-perf-preconnects -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.onesignal.com">
+    <link rel="dns-prefetch" href="https://files.myub.online">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content, maximum-scale=1.0, user-scalable=no">
     <title>Friends - MyUB</title>
     <link rel="icon" type="image/png" sizes="48x48" href="favicon-48x48.png">
     <link rel="shortcut icon" href="favicon-48x48.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="myub-security.js"></script>
-    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
-    <script src="myub-calls.js"></script>
+    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js" defer></script>
+    <script src="myub-calls.js" defer></script>
     <script src="myub-utils.js"></script>
     <script src="myub-mobile.js"></script>
     <style>
@@ -2333,6 +2340,7 @@
                 <a href="dashboard.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Dashboard</a>
                 <a href="gpa-calculator.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>GPA Calculator</a>
                 <a href="schedule.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>Schedule</a>
+                <a href="events.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>Events</a>
                 <a href="notes.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>Notes</a>
                 <a href="past-papers.html" class="nav-item">
                     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -2652,7 +2660,7 @@
                 const initials = getInitials(name);
                 const lastSeen = f.last_seen ? formatTimeAgo(f.last_seen) : 'Never';
                 return `<div class="friend-card">
-                    <div class="friend-avatar" onclick="openProfileModal('${f.id}')" style="cursor:pointer;">${f.avatar_url ? `<img src="${f.avatar_url}" alt="">` : initials}<div class="online-indicator ${f.is_online ? '' : 'offline'}"></div></div>
+                    <div class="friend-avatar" onclick="openProfileModal('${f.id}')" style="cursor:pointer;">${f.avatar_url ? `<img src="${f.avatar_url}" alt="" loading="lazy" decoding="async">` : initials}<div class="online-indicator ${f.is_online ? '' : 'offline'}"></div></div>
                     <div class="friend-info" onclick="openProfileModal('${f.id}')" style="cursor:pointer;">
                         <div class="friend-name">${escapeHtml(name)}${f.is_online ? '<span class="online-text">● Online</span>' : `<span class="offline-text">● ${lastSeen}</span>`}</div>
                         <div class="friend-program">${escapeHtml(f.program_name || 'Student')}</div>
@@ -2686,7 +2694,7 @@
                 } else {
                     inContainer.innerHTML = incomingRequests.map(r => {
                         const s = r.sender, name = s.full_name || `${s.first_name} ${s.last_name}`, initials = getInitials(name);
-                        return `<div class="request-card"><div class="request-type">Friend Request</div><div class="request-header"><div class="friend-avatar" style="width:48px;height:48px;font-size:16px;">${s.avatar_url ? `<img src="${s.avatar_url}">` : initials}<div class="online-indicator ${s.is_online ? '' : 'offline'}"></div></div><div class="friend-info"><div class="friend-name">${escapeHtml(name)}</div><div class="friend-program">${escapeHtml(s.program_name||'Student')}</div><div class="friend-meta">${formatTimeAgo(r.created_at)}</div></div></div><div class="request-actions"><button class="btn btn-success btn-sm" onclick="acceptRequest('${r.id}','${s.id}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>Accept</button><button class="btn btn-danger btn-sm" onclick="declineRequest('${r.id}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>Decline</button></div></div>`;
+                        return `<div class="request-card"><div class="request-type">Friend Request</div><div class="request-header"><div class="friend-avatar" style="width:48px;height:48px;font-size:16px;">${s.avatar_url ? `<img src="${s.avatar_url}" loading="lazy" decoding="async">` : initials}<div class="online-indicator ${s.is_online ? '' : 'offline'}"></div></div><div class="friend-info"><div class="friend-name">${escapeHtml(name)}</div><div class="friend-program">${escapeHtml(s.program_name||'Student')}</div><div class="friend-meta">${formatTimeAgo(r.created_at)}</div></div></div><div class="request-actions"><button class="btn btn-success btn-sm" onclick="acceptRequest('${r.id}','${s.id}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>Accept</button><button class="btn btn-danger btn-sm" onclick="declineRequest('${r.id}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>Decline</button></div></div>`;
                     }).join('');
                 }
             }
@@ -2699,7 +2707,7 @@
                 } else {
                     outContainer.innerHTML = outgoingRequests.map(r => {
                         const rec = r.receiver, name = rec.full_name || `${rec.first_name} ${rec.last_name}`, initials = getInitials(name);
-                        return `<div class="request-card outgoing"><div class="request-type">Sent Request</div><div class="request-header"><div class="friend-avatar" style="width:48px;height:48px;font-size:16px;">${rec.avatar_url ? `<img src="${rec.avatar_url}">` : initials}</div><div class="friend-info"><div class="friend-name">${escapeHtml(name)}</div><div class="friend-program">${escapeHtml(rec.program_name||'Student')}</div><div class="friend-meta">Sent ${formatTimeAgo(r.created_at)}</div></div></div><div class="request-actions"><button class="btn btn-secondary btn-sm" onclick="cancelRequest('${r.id}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>Cancel</button></div></div>`;
+                        return `<div class="request-card outgoing"><div class="request-type">Sent Request</div><div class="request-header"><div class="friend-avatar" style="width:48px;height:48px;font-size:16px;">${rec.avatar_url ? `<img src="${rec.avatar_url}" loading="lazy" decoding="async">` : initials}</div><div class="friend-info"><div class="friend-name">${escapeHtml(name)}</div><div class="friend-program">${escapeHtml(rec.program_name||'Student')}</div><div class="friend-meta">Sent ${formatTimeAgo(r.created_at)}</div></div></div><div class="request-actions"><button class="btn btn-secondary btn-sm" onclick="cancelRequest('${r.id}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>Cancel</button></div></div>`;
                     }).join('');
                 }
             }
@@ -2802,7 +2810,7 @@
                 else if (isPendingIn) btn = '<button class="btn btn-success btn-sm" onclick="switchTab(\'requests\')">Accept Request</button>';
                 else btn = `<button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); sendFriendRequest('${u.id}','${escapeHtml(name)}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>Add Friend</button>`;
                 return `<div class="friend-card" onclick="openProfileModal('${u.id}')" style="cursor:pointer;">
-                    <div class="friend-avatar">${u.avatar_url ? `<img src="${u.avatar_url}">` : initials}<div class="online-indicator ${u.is_online ? '' : 'offline'}"></div></div>
+                    <div class="friend-avatar">${u.avatar_url ? `<img src="${u.avatar_url}" loading="lazy" decoding="async">` : initials}<div class="online-indicator ${u.is_online ? '' : 'offline'}"></div></div>
                     <div class="friend-info"><div class="friend-name">${escapeHtml(name)}</div><div class="friend-program">${escapeHtml(u.program_name||'Student')}</div></div>
                     <div class="friend-actions" onclick="event.stopPropagation();">${btn}</div>
                 </div>`;
@@ -3195,7 +3203,7 @@
                 return `
                     <div class="discover-card" onclick="openProfileModal('${user.id}')">
                         <div class="discover-avatar">
-                            ${user.avatar_url ? `<img src="${user.avatar_url}" alt="">` : initials}
+                            ${user.avatar_url ? `<img src="${user.avatar_url}" alt="" loading="lazy" decoding="async">` : initials}
                             <div class="online-dot ${user.is_online ? '' : 'offline'}"></div>
                         </div>
                         <div class="discover-name">${escapeHtml(name)}</div>
@@ -3299,7 +3307,7 @@
                 const initials = getInitials(name);
                 const blockedDate = new Date(b.created_at).toLocaleDateString();
                 return `<div class="blocked-user-item">
-                    <div class="blocked-user-avatar">${user.avatar_url ? `<img src="${user.avatar_url}">` : initials}</div>
+                    <div class="blocked-user-avatar">${user.avatar_url ? `<img src="${user.avatar_url}" loading="lazy" decoding="async">` : initials}</div>
                     <div class="blocked-user-info"><div class="blocked-user-name">${escapeHtml(name)}</div><div class="blocked-user-date">Blocked on ${blockedDate}</div></div>
                     <button class="btn btn-sm btn-secondary" onclick="unblockUser('${user.id}', '${escapeHtml(name)}')">Unblock</button>
                 </div>`;
@@ -3372,7 +3380,7 @@
             document.getElementById('profileModalBody').innerHTML = `
                 <div class="profile-modal-content">
                     <div class="profile-modal-avatar">
-                        ${user.avatar_url ? `<img src="${user.avatar_url}" alt="">` : initials}
+                        ${user.avatar_url ? `<img src="${user.avatar_url}" alt="" loading="lazy" decoding="async">` : initials}
                         <div class="online-dot ${user.is_online ? '' : 'offline'}"></div>
                     </div>
                     <div class="profile-modal-name">${escapeHtml(name)}</div>

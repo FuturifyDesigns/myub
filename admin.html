@@ -2,11 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+<!-- myub-perf-preconnects -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.onesignal.com">
+    <link rel="dns-prefetch" href="https://files.myub.online">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content, maximum-scale=1.0, user-scalable=no">
     <title>Admin Panel - MyUB</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="myub-security.js"></script>
@@ -2385,7 +2392,7 @@
                         <td>
                             <div class="user-info">
                                 <div class="user-info-avatar">
-                                    ${r.reporter?.avatar_url ? `<img src="${r.reporter.avatar_url}" alt="">` : (r.reporter?.full_name || 'U')[0].toUpperCase()}
+                                    ${r.reporter?.avatar_url ? `<img src="${r.reporter.avatar_url}" alt="" loading="lazy" decoding="async">` : (r.reporter?.full_name || 'U')[0].toUpperCase()}
                                 </div>
                                 <div class="user-info-details">
                                     <div class="user-info-name">${escapeHtml(r.reporter?.full_name || 'Unknown')}</div>
@@ -2395,7 +2402,7 @@
                         <td>
                             <div class="user-info">
                                 <div class="user-info-avatar">
-                                    ${r.reported?.avatar_url ? `<img src="${r.reported.avatar_url}" alt="">` : (r.reported?.full_name || 'U')[0].toUpperCase()}
+                                    ${r.reported?.avatar_url ? `<img src="${r.reported.avatar_url}" alt="" loading="lazy" decoding="async">` : (r.reported?.full_name || 'U')[0].toUpperCase()}
                                 </div>
                                 <div class="user-info-details">
                                     <div class="user-info-name">${escapeHtml(r.reported?.full_name || 'Unknown')}</div>
@@ -2548,7 +2555,7 @@
                         <td>
                             <div class="user-info">
                                 <div class="user-info-avatar">
-                                    ${u.avatar_url ? `<img src="${u.avatar_url}" alt="">` : (u.full_name || 'U')[0].toUpperCase()}
+                                    ${u.avatar_url ? `<img src="${u.avatar_url}" alt="" loading="lazy" decoding="async">` : (u.full_name || 'U')[0].toUpperCase()}
                                 </div>
                                 <div class="user-info-details">
                                     <div class="user-info-name">${escapeHtml(u.full_name || 'No Name')}</div>
@@ -2608,7 +2615,7 @@
             document.getElementById('userModalBody').innerHTML = `
                 <div style="text-align: center; margin-bottom: 20px;">
                     <div class="user-info-avatar" style="width: 80px; height: 80px; font-size: 32px; margin: 0 auto 15px;">
-                        ${user.avatar_url ? `<img src="${user.avatar_url}" alt="">` : (user.full_name || 'U')[0].toUpperCase()}
+                        ${user.avatar_url ? `<img src="${user.avatar_url}" alt="" loading="lazy" decoding="async">` : (user.full_name || 'U')[0].toUpperCase()}
                     </div>
                     <h3 style="color: var(--navy); margin-bottom: 5px;">${escapeHtml(user.full_name || 'No Name')}</h3>
                     <p style="color: var(--gray-500);">${escapeHtml(user.email || '')}</p>

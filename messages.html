@@ -2,11 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+<!-- myub-perf-preconnects -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.onesignal.com">
+    <link rel="dns-prefetch" href="https://files.myub.online">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content, maximum-scale=1.0, user-scalable=no">
     <title>Messages - MyUB</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="myub-security.js"></script>
@@ -2650,7 +2657,7 @@
             </a>
         </div>
         <nav>
-            <div class="nav-section"><div class="nav-section-title">Menu</div><a href="dashboard.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Dashboard</a><a href="gpa-calculator.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>GPA Calculator</a><a href="schedule.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>Schedule</a><a href="notes.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>Notes</a>
+            <div class="nav-section"><div class="nav-section-title">Menu</div><a href="dashboard.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Dashboard</a><a href="gpa-calculator.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>GPA Calculator</a><a href="schedule.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>Schedule</a><a href="events.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>Events</a><a href="notes.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>Notes</a>
             <div class="nav-section"><div class="nav-section-title">Menu</div><a href="dashboard.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Dashboard</a><a href="gpa-calculator.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>GPA Calculator</a><a href="schedule.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>Schedule</a><a href="past-papers.html" class="nav-item">
             <div class="nav-section"><div class="nav-section-title">Menu</div><a href="dashboard.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Dashboard</a><a href="gpa-calculator.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>GPA Calculator</a><a href="schedule.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>Schedule</a>    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <div class="nav-section"><div class="nav-section-title">Menu</div><a href="dashboard.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Dashboard</a><a href="gpa-calculator.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>GPA Calculator</a><a href="schedule.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>Schedule</a>        <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -2671,7 +2678,7 @@
                 <div class="chat-blocked" id="chatBlocked" style="display: none;"><p id="blockedMessage">You cannot send messages to this user.</p></div>
                 <div class="chat-messages" id="chatMessages"></div>
                 <div class="reply-bar" id="replyBar"><div class="reply-bar-content"><div class="reply-bar-name" id="replyBarName">Replying to User</div><div class="reply-bar-text" id="replyBarText">Message preview...</div></div><button class="reply-bar-close" onclick="cancelReply()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button></div>
-                <div class="chat-input-area" id="chatInputArea" style="display: none;"><button class="emoji-btn" onclick="toggleEmojiPicker(event)"><img src="emoji-button.jpg" alt="😊" style="width: 28px; height: 28px; border-radius: 50%;"><div class="emoji-picker" id="emojiPicker"></div></button><div class="chat-input-wrapper"><textarea class="chat-input" id="messageInput" placeholder="Type a message..." rows="1" oninput="autoResize(this)"></textarea></div><button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg></button></div>
+                <div class="chat-input-area" id="chatInputArea" style="display: none;"><button class="emoji-btn" onclick="toggleEmojiPicker(event)"><img src="emoji-button.jpg" alt="😊" style="width: 28px; height: 28px; border-radius: 50%;" loading="lazy" decoding="async"><div class="emoji-picker" id="emojiPicker"></div></button><div class="chat-input-wrapper"><textarea class="chat-input" id="messageInput" placeholder="Type a message..." rows="1" oninput="autoResize(this)"></textarea></div><button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg></button></div>
                 <div class="chat-empty" id="chatEmpty"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg><h3>Select a conversation</h3><p>Choose a conversation or start a new chat</p></div>
             </div>
         </div>
@@ -2960,7 +2967,7 @@
                 const timeStr = formatConvTime(conv.lastMessageTime);
                 // Show "No messages" if lastMessage is empty or undefined
                 const preview = conv.lastMessage ? truncate(conv.lastMessage, 35) : 'No messages';
-                return `<div class="conversation-item ${isActive ? 'active' : ''} ${conv.unreadCount > 0 ? 'unread' : ''}" onclick="openConversation('${user.id}')"><div class="conv-avatar">${user.avatar_url ? `<img src="${user.avatar_url}" alt="">` : initials}<div class="conv-online ${user.is_online ? '' : 'offline'}"></div></div><div class="conv-info"><div class="conv-name">${escapeHtml(name)}</div><div class="conv-preview" style="${!conv.lastMessage ? 'font-style:italic;opacity:0.6;' : ''}">${escapeHtml(preview)}</div></div><div class="conv-meta"><div class="conv-time">${timeStr}</div>${conv.unreadCount > 0 ? `<div class="conv-unread-badge">${conv.unreadCount}</div>` : ''}</div></div>`; 
+                return `<div class="conversation-item ${isActive ? 'active' : ''} ${conv.unreadCount > 0 ? 'unread' : ''}" onclick="openConversation('${user.id}')"><div class="conv-avatar">${user.avatar_url ? `<img src="${user.avatar_url}" alt="" loading="lazy" decoding="async">` : initials}<div class="conv-online ${user.is_online ? '' : 'offline'}"></div></div><div class="conv-info"><div class="conv-name">${escapeHtml(name)}</div><div class="conv-preview" style="${!conv.lastMessage ? 'font-style:italic;opacity:0.6;' : ''}">${escapeHtml(preview)}</div></div><div class="conv-meta"><div class="conv-time">${timeStr}</div>${conv.unreadCount > 0 ? `<div class="conv-unread-badge">${conv.unreadCount}</div>` : ''}</div></div>`; 
             }).join('');
         }
 
@@ -2986,7 +2993,7 @@
                 html += `<div class="message-row ${isSent ? 'sent' : 'received'}" data-id="${msg.id}">
                     <div class="message-select ${isSelectionMode ? 'show' : ''} ${isSelected ? 'checked' : ''}" onclick="toggleMessageSelect('${msg.id}')"></div>
                     <div class="message-wrapper">
-                        ${!isSent ? `<div class="message-avatar">${currentChatUser?.avatar_url ? `<img src="${currentChatUser.avatar_url}">` : getInitials(currentChatUser?.full_name || currentChatUser?.first_name || 'U')}</div>` : ''}
+                        ${!isSent ? `<div class="message-avatar">${currentChatUser?.avatar_url ? `<img src="${currentChatUser.avatar_url}" loading="lazy" decoding="async">` : getInitials(currentChatUser?.full_name || currentChatUser?.first_name || 'U')}</div>` : ''}
                         <div class="message-bubble ${isSelected ? 'selected' : ''}" onclick="handleMessageClick(event, '${msg.id}')">
                             <div class="message-actions">
                                 <button class="message-action-btn" onclick="event.stopPropagation(); setReply('${msg.id}')" title="Reply"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg></button>
@@ -3017,7 +3024,7 @@
             const name = user.full_name || `${user.first_name} ${user.last_name}`;
             document.getElementById('chatUserName').textContent = name;
             const avatarEl = document.getElementById('chatAvatar');
-            avatarEl.innerHTML = user.avatar_url ? `<img src="${user.avatar_url}" alt=""><div class="online-dot ${user.is_online ? '' : 'offline'}"></div>` : `<span>${getInitials(name)}</span><div class="online-dot ${user.is_online ? '' : 'offline'}"></div>`;
+            avatarEl.innerHTML = user.avatar_url ? `<img src="${user.avatar_url}" alt="" loading="lazy" decoding="async"><div class="online-dot ${user.is_online ? '' : 'offline'}"></div>` : `<span>${getInitials(name)}</span><div class="online-dot ${user.is_online ? '' : 'offline'}"></div>`;
             const statusEl = document.getElementById('chatUserStatus');
             statusEl.textContent = user.is_online ? 'Online' : (user.last_seen ? `Last seen ${formatTimeAgo(user.last_seen)}` : 'Offline');
             statusEl.className = 'chat-user-status' + (user.is_online ? '' : ' offline');
@@ -3400,7 +3407,7 @@
         function renderForwardUserList() {
             const container = document.getElementById('forwardUserList');
             if (friends.length === 0) { container.innerHTML = '<p style="text-align:center;color:var(--gray-500);padding:20px;">No friends to forward to</p>'; return; }
-            container.innerHTML = friends.filter(f => f.id !== currentConversation).map(f => { const name = f.full_name || `${f.first_name} ${f.last_name}`; const isSelected = forwardToUsers.has(f.id); return `<div class="forward-user-item ${isSelected ? 'selected' : ''}" onclick="toggleForwardUser('${f.id}')"><div class="forward-user-avatar">${f.avatar_url ? `<img src="${f.avatar_url}">` : getInitials(name)}</div><div class="forward-user-name">${escapeHtml(name)}</div><div class="forward-check"></div></div>`; }).join('');
+            container.innerHTML = friends.filter(f => f.id !== currentConversation).map(f => { const name = f.full_name || `${f.first_name} ${f.last_name}`; const isSelected = forwardToUsers.has(f.id); return `<div class="forward-user-item ${isSelected ? 'selected' : ''}" onclick="toggleForwardUser('${f.id}')"><div class="forward-user-avatar">${f.avatar_url ? `<img src="${f.avatar_url}" loading="lazy" decoding="async">` : getInitials(name)}</div><div class="forward-user-name">${escapeHtml(name)}</div><div class="forward-check"></div></div>`; }).join('');
         }
         function toggleForwardUser(userId) { if (forwardToUsers.has(userId)) forwardToUsers.delete(userId); else forwardToUsers.add(userId); renderForwardUserList(); document.getElementById('forwardBtn').disabled = forwardToUsers.size === 0; }
         async function forwardMessages() {
@@ -3769,7 +3776,7 @@
                         return `
                             <div class="user-search-item" onclick="startConversation('${user.id}')">
                                 <div class="user-search-avatar">
-                                    ${user.avatar_url ? `<img src="${user.avatar_url}" alt="">` : initials}
+                                    ${user.avatar_url ? `<img src="${user.avatar_url}" alt="" loading="lazy" decoding="async">` : initials}
                                     <div class="online-indicator ${user.is_online ? '' : 'offline'}"></div>
                                 </div>
                                 <div class="user-search-info">
@@ -3822,7 +3829,7 @@
             let bodyHtml = `
                 <div class="profile-modal-content">
                     <div class="profile-modal-avatar">
-                        ${user.avatar_url ? `<img src="${user.avatar_url}" alt="">` : initials}
+                        ${user.avatar_url ? `<img src="${user.avatar_url}" alt="" loading="lazy" decoding="async">` : initials}
                         <div class="online-dot ${user.is_online ? '' : 'offline'}"></div>
                     </div>
                     <div class="profile-modal-name">${escapeHtml(name)}</div>
@@ -4131,7 +4138,7 @@
     </script>
 
     <!-- MyUB Calls Script -->
-    <script src="myub-calls.js"></script>
+    <script src="myub-calls.js" defer></script>
     
     <!-- MyUB Heartbeat Script -->
     <script src="myub-heartbeat.js"></script>

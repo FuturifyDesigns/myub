@@ -2,6 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+<!-- myub-perf-preconnects -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.onesignal.com">
+    <link rel="dns-prefetch" href="https://files.myub.online">
+
     <link rel="preconnect" href="https://files.myub.online" crossorigin>
     <link rel="dns-prefetch" href="https://unpkg.com">
     <link rel="dns-prefetch" href="https://cdn.onesignal.com">
@@ -10,13 +17,13 @@
     <title>Events — MyUB</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="myub-security.js"></script>
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js" defer></script>
-    <script src="myub-calls.js"></script>
+    <script src="myub-calls.js" defer></script>
     <script src="myub-utils.js"></script>
     <script src="myub-mobile.js"></script>
     
@@ -2630,8 +2637,8 @@
                 
                 // Set avatar image if exists
                 if (data.avatar_url) {
-                    document.getElementById('userAvatar').innerHTML = `<img src="${data.avatar_url}" alt="Avatar">`;
-                    document.getElementById('dropdownAvatar').innerHTML = `<img src="${data.avatar_url}" alt="Avatar">`;
+                    document.getElementById('userAvatar').innerHTML = `<img src="${data.avatar_url}" alt="Avatar" loading="lazy" decoding="async">`;
+                    document.getElementById('dropdownAvatar').innerHTML = `<img src="${data.avatar_url}" alt="Avatar" loading="lazy" decoding="async">`;
                 }
             } else {
                 // Profile might not exist yet (trigger hasn't run)
@@ -3941,7 +3948,7 @@
             const cat = e.category || 'other';
             const cover = coverUrl(e.cover_r2_key);
             const coverHtml = cover
-                ? `<img class="event-cover" src="${esc(cover)}" alt="" loading="lazy">`
+                ? `<img class="event-cover" src="${esc(cover)}" alt="" loading="lazy" decoding="async">`
                 : `<div class="event-cover-fallback cat-${cat}" style="background:linear-gradient(135deg,var(--${catColor(cat)}),var(--${catColor(cat)}-dark,var(--navy-darker)));">${esc(CAT_LABELS[cat][0])}</div>`;
             return `
             <div class="event-card" onclick="openEventDetail('${e.id}')">
@@ -4043,7 +4050,7 @@
             const myStatus = (rsvps||[]).find(r=>r.user_id===user.id)?.status;
             const cover = coverUrl(e.cover_r2_key);
             body.innerHTML = `
-                ${cover?`<img class="event-detail-cover" src="${esc(cover)}" alt="">`:`<div class="event-detail-cover cat-${e.category}" style="display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.5);font-size:40px;">${esc(CAT_LABELS[e.category]||'')}</div>`}
+                ${cover?`<img class="event-detail-cover" src="${esc(cover)}" alt="" loading="lazy" decoding="async">`:`<div class="event-detail-cover cat-${e.category}" style="display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.5);font-size:40px;">${esc(CAT_LABELS[e.category]||'')}</div>`}
                 <span class="event-category-pill cat-${e.category}" style="position:static;display:inline-block;margin-bottom:8px;">${esc(CAT_LABELS[e.category]||'')}</span>
                 <div class="event-detail-title">${esc(e.title)}</div>
                 <div class="event-detail-meta">
@@ -4059,7 +4066,7 @@
                     <button class="rsvp-btn" onclick="shareEvent('${e.id}')">Share</button>
                 </div>
                 <h4 style="font-size:13px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Attendees</h4>
-                <div class="attendee-grid">${profiles.map(p=>`<img class="attendee-avatar" src="${esc(p.avatar_url||'/favicon-48x48.png')}" title="${esc(p.username||'')}" onclick="location.href='profile.html?u='+encodeURIComponent('${esc(p.username||'')}')">`).join('') || '<span style="color:var(--text-dim);font-size:13px;">No attendees yet</span>'}</div>
+                <div class="attendee-grid">${profiles.map(p=>`<img class="attendee-avatar" src="${esc(p.avatar_url||'/favicon-48x48.png')}" title="${esc(p.username||'')}" onclick="location.href='profile.html?u='+encodeURIComponent('${esc(p.username||'')}')" loading="lazy" decoding="async">`).join('') || '<span style="color:var(--text-dim);font-size:13px;">No attendees yet</span>'}</div>
             `;
         };
         window.closeEventDetail = function(){ document.getElementById('eventDetailModal').style.display='none'; history.replaceState(null,'',location.pathname); };
@@ -4105,5 +4112,15 @@
     })();
     </script>
 
+    <!-- Hidden stubs so dashboard-origin JS (loadProfile / loadDashboardData) can write to them without throwing -->
+    <div style="display:none" aria-hidden="true">
+        <span id="welcomeMessage"></span>
+        <span id="coursesCount"></span><span id="creditsCount"></span>
+        <span id="tasksCount"></span><span id="groupsCount"></span>
+        <span id="gpaValue"></span><span id="gpaStatus"></span>
+        <svg id="gpaCircle"></svg>
+        <span id="currentDay"></span><span id="currentMonth"></span>
+        <div id="scheduleList"></div>
+    </div>
 </body>
 </html>

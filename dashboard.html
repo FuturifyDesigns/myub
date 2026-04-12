@@ -2,17 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+<!-- myub-perf-preconnects -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.onesignal.com">
+    <link rel="dns-prefetch" href="https://files.myub.online">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content, maximum-scale=1.0, user-scalable=no">
     <title>Dashboard - MyUB</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="myub-security.js"></script>
-    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
-    <script src="myub-calls.js"></script>
+    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js" defer></script>
+    <script src="myub-calls.js" defer></script>
     <script src="myub-utils.js"></script>
     <script src="myub-mobile.js"></script>
     
@@ -2645,8 +2652,8 @@
                 
                 // Set avatar image if exists
                 if (data.avatar_url) {
-                    document.getElementById('userAvatar').innerHTML = `<img src="${data.avatar_url}" alt="Avatar">`;
-                    document.getElementById('dropdownAvatar').innerHTML = `<img src="${data.avatar_url}" alt="Avatar">`;
+                    document.getElementById('userAvatar').innerHTML = `<img src="${data.avatar_url}" alt="Avatar" loading="lazy" decoding="async">`;
+                    document.getElementById('dropdownAvatar').innerHTML = `<img src="${data.avatar_url}" alt="Avatar" loading="lazy" decoding="async">`;
                 }
             } else {
                 // Profile might not exist yet (trigger hasn't run)

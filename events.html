@@ -2509,7 +2509,7 @@
     <div class="modal-overlay notif-modal-overlay" id="createEventModal" style="display:none;" onclick="if(event.target===this)closeCreateModal()">
         <div class="notif-modal" style="max-width:560px;">
             <div class="notif-modal-header">
-                <h3>Create Event</h3>
+                <h3 id="createEventModalTitle">Create Event</h3>
                 <button class="notif-modal-close" onclick="closeCreateModal()">×</button>
             </div>
             <div class="notif-modal-body">
@@ -2528,7 +2528,17 @@
                         <div class="form-field"><label>Capacity</label><input name="capacity" type="number" min="1" placeholder="Optional"></div>
                     </div>
                     
-                    <div class="form-field"><label>Cover image <span style="text-transform:none;font-weight:400;opacity:.7;">(jpg · png · webp, ≤5MB)</span></label><input name="cover" type="file" accept="image/jpeg,image/png,image/webp"></div>
+                    <div class="form-field">
+                        <label>Cover image <span style="text-transform:none;font-weight:400;opacity:.7;">(jpg · png · webp, ≤5MB)</span></label>
+                        <div id="currentCoverPreview" style="display:none;margin-bottom:8px;">
+                            <img id="currentCoverImg" style="max-width:200px;max-height:100px;border-radius:8px;border:1px solid var(--border);object-fit:cover;" alt="Current cover">
+                            <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Current cover — pick a new file below to replace it.</div>
+                        </div>
+                        <input name="cover" type="file" accept="image/jpeg,image/png,image/webp">
+                    </div>
+                    <div id="editRepublishNote" style="display:none;padding:10px;margin-bottom:12px;border-radius:8px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);color:#fbbf24;font-size:12px;line-height:1.4;">
+                        ⚠️ Editing an approved event will set it back to <strong>pending</strong> for re-moderation.
+                    </div>
                     <div class="form-actions">
                         <button type="button" class="btn-secondary" onclick="closeCreateModal()">Cancel</button>
                         <button type="submit" class="btn-create-event" id="createEventSubmit">Submit for approval</button>
@@ -4092,6 +4102,7 @@
                         <div class="rsvp-btn-group" onclick="event.stopPropagation()">
                             <button class="rsvp-btn ${myStatus==='going'?'active':''}" onclick="rsvp('${e.id}','going')">Going</button>
                             <button class="rsvp-btn ${myStatus==='maybe'?'active':''}" onclick="rsvp('${e.id}','maybe')">Maybe</button>
+                            ${(isAdmin || e.creator_id===window.currentUser?.id) ? `<button class="rsvp-btn" title="Edit event" onclick="openEditModal('${e.id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></button>` : ''}
                             ${(isAdmin || e.creator_id===window.currentUser?.id) ? `<button class="rsvp-btn rsvp-btn-danger" title="Delete event" onclick="deleteEvent('${e.id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></button>` : ''}
                         </div>
                     </div>
@@ -4140,50 +4151,157 @@
             loadEvents(currentTab);
         };
 
-        window.openCreateModal = function(){ document.getElementById('createEventModal').style.display='flex'; };
-        window.closeCreateModal = function(){ document.getElementById('createEventModal').style.display='none'; document.getElementById('createEventForm').reset(); };
+        // editingEventId = null means "create"; a UUID means "edit that event"
+        window.editingEventId = null;
+
+        window.openCreateModal = function(){
+            window.editingEventId = null;
+            document.getElementById('createEventModalTitle').textContent = 'Create Event';
+            document.getElementById('createEventSubmit').textContent = 'Submit for approval';
+            document.getElementById('currentCoverPreview').style.display = 'none';
+            document.getElementById('editRepublishNote').style.display = 'none';
+            document.getElementById('createEventForm').reset();
+            document.getElementById('createEventModal').style.display='flex';
+        };
+
+        window.closeCreateModal = function(){
+            document.getElementById('createEventModal').style.display='none';
+            document.getElementById('createEventForm').reset();
+            document.getElementById('currentCoverPreview').style.display = 'none';
+            document.getElementById('editRepublishNote').style.display = 'none';
+            window.editingEventId = null;
+        };
+
+        window.openEditModal = async function(eventId){
+            // Fetch event to prefill
+            const { data: e, error } = await supabaseClient.from('events').select('*').eq('id', eventId).single();
+            if (error || !e){ showToast('Could not load event', 'error'); return; }
+
+            // Authorization check (UI-level; RLS enforces for real)
+            const user = await ensureUser();
+            if (!isAdmin && e.creator_id !== user.id){ showToast('Not allowed', 'error'); return; }
+
+            window.editingEventId = eventId;
+            document.getElementById('createEventModalTitle').textContent = 'Edit Event';
+            document.getElementById('createEventSubmit').textContent = 'Save changes';
+
+            // Prefill form
+            const form = document.getElementById('createEventForm');
+            form.reset();
+            form.elements['title'].value = e.title || '';
+            form.elements['description'].value = e.description || '';
+            form.elements['location'].value = e.location || '';
+            form.elements['category'].value = e.category || 'other';
+            form.elements['capacity'].value = e.capacity || '';
+            // datetime-local needs "YYYY-MM-DDTHH:MM" in local time
+            form.elements['starts_at'].value = toLocalDatetimeValue(e.starts_at);
+            form.elements['ends_at'].value = toLocalDatetimeValue(e.ends_at);
+
+            // Current cover preview
+            const preview = document.getElementById('currentCoverPreview');
+            if (e.cover_r2_key){
+                document.getElementById('currentCoverImg').src = coverUrl(e.cover_r2_key);
+                preview.style.display = '';
+            } else {
+                preview.style.display = 'none';
+            }
+
+            // Show re-moderation warning if approved (unless admin, who can edit without re-moderation)
+            document.getElementById('editRepublishNote').style.display =
+                (!isAdmin && e.status === 'approved') ? '' : 'none';
+
+            // Close detail modal if open
+            const detail = document.getElementById('eventDetailModal');
+            if (detail && detail.style.display === 'flex') detail.style.display = 'none';
+
+            document.getElementById('createEventModal').style.display='flex';
+        };
+
+        // Convert ISO/UTC timestamp → "YYYY-MM-DDTHH:MM" in LOCAL time for <input type="datetime-local">
+        function toLocalDatetimeValue(iso){
+            if (!iso) return '';
+            const d = new Date(iso);
+            const pad = n => String(n).padStart(2,'0');
+            return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        }
 
         window.submitNewEvent = async function(form){
-            const btn = document.getElementById('createEventSubmit'); btn.disabled = true; btn.textContent='Submitting…';
+            const isEdit = !!window.editingEventId;
+            const btn = document.getElementById('createEventSubmit');
+            btn.disabled = true;
+            btn.textContent = isEdit ? 'Saving…' : 'Submitting…';
             try {
                 const user = await ensureUser();
                 const fd = new FormData(form);
                 const starts = new Date(fd.get('starts_at')); const ends = new Date(fd.get('ends_at'));
                 if (ends <= starts){ showToast('End must be after start','error'); return; }
-                const payload = {
-                    title: fd.get('title').trim(),
-                    description: fd.get('description')?.trim() || null,
-                    location: fd.get('location')?.trim() || null,
-                    starts_at: starts.toISOString(),
-                    ends_at: ends.toISOString(),
-                    category: fd.get('category') || 'other',
-                    capacity: fd.get('capacity') ? parseInt(fd.get('capacity'),10) : null,
-                    creator_id: user.id,
-                    status: 'pending'
-                };
-                const { data: inserted, error } = await supabaseClient.from('events').insert(payload).select().single();
-                if (error) throw error;
 
-                // Upload cover image (optional — event still saves if upload fails)
+                let targetEventId;
+
+                if (isEdit){
+                    // UPDATE path
+                    targetEventId = window.editingEventId;
+                    // Fetch current status to decide if we need to reset to pending
+                    const { data: existing } = await supabaseClient.from('events').select('status,creator_id').eq('id', targetEventId).single();
+                    if (!existing){ showToast('Event not found', 'error'); return; }
+                    if (!isAdmin && existing.creator_id !== user.id){ showToast('Not allowed', 'error'); return; }
+
+                    const payload = {
+                        title: fd.get('title').trim(),
+                        description: fd.get('description')?.trim() || null,
+                        location: fd.get('location')?.trim() || null,
+                        starts_at: starts.toISOString(),
+                        ends_at: ends.toISOString(),
+                        category: fd.get('category') || 'other',
+                        capacity: fd.get('capacity') ? parseInt(fd.get('capacity'),10) : null,
+                    };
+                    // Non-admins editing an approved event → reset to pending for re-moderation
+                    if (!isAdmin && existing.status === 'approved'){
+                        payload.status = 'pending';
+                        payload.approved_at = null;
+                        payload.approved_by = null;
+                        payload.notified_at = null;
+                    }
+                    const { error: updErr } = await supabaseClient.from('events').update(payload).eq('id', targetEventId);
+                    if (updErr) throw updErr;
+                } else {
+                    // INSERT path (original)
+                    const payload = {
+                        title: fd.get('title').trim(),
+                        description: fd.get('description')?.trim() || null,
+                        location: fd.get('location')?.trim() || null,
+                        starts_at: starts.toISOString(),
+                        ends_at: ends.toISOString(),
+                        category: fd.get('category') || 'other',
+                        capacity: fd.get('capacity') ? parseInt(fd.get('capacity'),10) : null,
+                        creator_id: user.id,
+                        status: 'pending'
+                    };
+                    const { data: inserted, error } = await supabaseClient.from('events').insert(payload).select().single();
+                    if (error) throw error;
+                    targetEventId = inserted.id;
+                }
+
+                // Upload / replace cover (optional)
                 const file = fd.get('cover');
                 let coverFailed = false;
                 if (file && file.size){
                     if (file.size > 5*1024*1024){
-                        showToast('Cover >5MB — event submitted without image','info');
+                        showToast('Cover >5MB — skipped','info');
                     } else {
                         try {
                             const { data: { session } } = await supabaseClient.auth.getSession();
                             const r = await fetch('https://myub-uploads.futurifydesigns.workers.dev/presign', {
                                 method:'POST',
                                 headers:{'Content-Type':'application/json','Authorization':`Bearer ${session.access_token}`},
-                                body: JSON.stringify({ fileName:file.name, mimeType:file.type, fileSize:file.size, kind:'event_cover', event_id:inserted.id })
+                                body: JSON.stringify({ fileName:file.name, mimeType:file.type, fileSize:file.size, kind:'event_cover', event_id:targetEventId })
                             });
                             if (!r.ok) throw new Error('presign '+r.status);
                             const pres = await r.json();
                             if (pres.uploadUrl){
                                 const put = await fetch(pres.uploadUrl, { method:'PUT', headers:{'Content-Type':file.type}, body:file });
                                 if (!put.ok) throw new Error('upload '+put.status);
-                                await supabaseClient.from('events').update({ cover_r2_key: pres.key }).eq('id', inserted.id);
+                                await supabaseClient.from('events').update({ cover_r2_key: pres.key }).eq('id', targetEventId);
                             }
                         } catch(uploadErr){
                             console.error('Cover upload failed:', uploadErr);
@@ -4191,12 +4309,21 @@
                         }
                     }
                 }
-                if (coverFailed) showToast('Event submitted — cover upload failed, you can add it later','info');
-                else showToast('Event submitted for approval.','success');
+
+                if (isEdit){
+                    showToast(coverFailed ? 'Saved — cover update failed' : 'Event updated', coverFailed?'info':'success');
+                } else {
+                    showToast(coverFailed ? 'Event submitted — cover upload failed, you can add it later' : 'Event submitted for approval.', coverFailed?'info':'success');
+                }
                 closeCreateModal();
                 loadEvents(currentTab);
-            } catch(e){ console.error(e); showToast('Could not create event','error'); }
-            finally { btn.disabled=false; btn.textContent='Submit for approval'; }
+            } catch(e){
+                console.error(e);
+                showToast(isEdit ? 'Could not save changes' : 'Could not create event', 'error');
+            } finally {
+                btn.disabled=false;
+                btn.textContent = window.editingEventId ? 'Save changes' : 'Submit for approval';
+            }
         };
 
         window.openEventDetail = async function(id){
@@ -4233,6 +4360,7 @@
                     <button class="rsvp-btn ${myStatus==='maybe'?'active':''}" onclick="rsvp('${e.id}','maybe').then(()=>openEventDetail('${e.id}'))">Maybe</button>
                     <button class="rsvp-btn ${myStatus==='not_going'?'active':''}" onclick="rsvp('${e.id}','not_going').then(()=>openEventDetail('${e.id}'))">Not going</button>
                     <button class="rsvp-btn" onclick="shareEvent('${e.id}')">Share</button>
+                    ${(isAdmin || e.creator_id===user.id) ? `<button class="rsvp-btn" onclick="openEditModal('${e.id}')">Edit</button>` : ''}
                     ${(isAdmin || e.creator_id===user.id) ? `<button class="rsvp-btn rsvp-btn-danger" onclick="deleteEvent('${e.id}')">Delete</button>` : ''}
                 </div>
                 <h4 style="font-size:13px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Attendees</h4>

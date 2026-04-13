@@ -4149,8 +4149,21 @@
         }
 
         function runAll(){ loadBanner(); loadMyRsvps(); loadUpcoming(); }
-        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => { runAll(); setInterval(runAll, 120000); });
-        else { runAll(); setInterval(runAll, 120000); }
+
+        // Wait until supabaseClient + session are ready before first run.
+        async function waitAndStart(){
+            for (let i = 0; i < 40; i++){ // up to ~20s
+                if (window.supabaseClient){
+                    try {
+                        const { data: { session } } = await supabaseClient.auth.getSession();
+                        if (session && session.user){ runAll(); setInterval(runAll, 120000); return; }
+                    } catch(_){}
+                }
+                await new Promise(r => setTimeout(r, 500));
+            }
+        }
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', waitAndStart);
+        else waitAndStart();
     })();
     </script>
 

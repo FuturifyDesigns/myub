@@ -158,11 +158,11 @@
         const coverUrl = ev.cover_r2_key ? (R2_BASE + ev.cover_r2_key) : null;
         const color = CAT_COLOR[ev.category] || CAT_COLOR.other;
         const icon = CAT_ICON[ev.category] || CAT_ICON.other;
-        const fallback = `<div class="mup-cover-fallback" style="background:${color}"><i data-lucide="${icon}"></i></div>`;
+        const fallbackHtml = `<div class="mup-cover-fallback" style="background:${color}"><i data-lucide="${icon}"></i></div>`;
         cover.innerHTML = `
             ${coverUrl
-                ? `<img src="${esc(coverUrl)}" alt="" onerror="this.outerHTML='${fallback.replace(/'/g,"\\'")}';if(window.lucide)lucide.createIcons();">`
-                : fallback
+                ? `<img id="mupCoverImg" src="${esc(coverUrl)}" alt="">`
+                : fallbackHtml
             }
             <span class="mup-cat-badge" style="background:${color}">${esc(ev.category)}</span>
             <button class="mup-close" id="mupClose" aria-label="Close" type="button">×</button>
@@ -194,6 +194,15 @@
         }
 
         if (window.lucide) lucide.createIcons();
+
+        // Wire cover image fallback on error (cleaner than inline onerror)
+        const coverImg = document.getElementById('mupCoverImg');
+        if (coverImg){
+            coverImg.addEventListener('error', () => {
+                coverImg.outerHTML = fallbackHtml;
+                if (window.lucide) lucide.createIcons();
+            });
+        }
 
         document.getElementById('mupClose').onclick = closePopup;
         document.getElementById('mupView').onclick = () => {

@@ -4114,6 +4114,22 @@
             const ev = currentEvents.find(e => e.id === eventId);
             const label = ev ? `"${ev.title}"` : 'this event';
             if (!confirm(`Delete ${label}? This cannot be undone.`)) return;
+
+            // 1. Try to clean up R2 cover first (best-effort — don't block DB delete on failure)
+            if (ev && ev.cover_r2_key){
+                try {
+                    const { data: { session } } = await supabaseClient.auth.getSession();
+                    await fetch('https://myub-uploads.futurifydesigns.workers.dev/delete-cover', {
+                        method:'POST',
+                        headers:{'Content-Type':'application/json','Authorization':`Bearer ${session.access_token}`},
+                        body: JSON.stringify({ event_id: eventId })
+                    });
+                } catch(coverErr){
+                    console.warn('Cover cleanup failed (continuing with DB delete):', coverErr);
+                }
+            }
+
+            // 2. Delete the DB row
             const { error } = await supabaseClient.from('events').delete().eq('id', eventId);
             if (error){ showToast('Delete failed: ' + error.message, 'error'); return; }
             showToast('Event deleted', 'success');

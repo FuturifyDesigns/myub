@@ -1549,7 +1549,9 @@
         .happening-soon-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
         .hs-item { display: flex; gap: 12px; padding: 10px; border-radius: 10px; background: var(--surface-3); border: 1px solid var(--border); cursor: pointer; transition: transform .2s var(--ease-out-expo), border-color .2s; }
         .hs-item:hover { transform: translateY(-2px); border-color: var(--red); }
-        .hs-icon { width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; background: linear-gradient(135deg, var(--navy-light), var(--navy)); }
+        .hs-icon { width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; background: linear-gradient(135deg, var(--navy-light), var(--navy)); overflow: hidden; color: var(--text-muted); }
+        .hs-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .hs-icon svg { width: 22px; height: 22px; }
         .hs-body { flex: 1; min-width: 0; }
         .hs-title { font-weight: 600; font-size: 14px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .hs-time { font-size: 12px; color: var(--text-muted); margin-top: 3px; font-variant-numeric: tabular-nums; }
@@ -1560,7 +1562,6 @@
         .events-banner { position: relative; display: flex; align-items: center; gap: 14px; padding: 12px 16px; margin-bottom: 20px; border-radius: 12px;
             background: linear-gradient(90deg, rgba(99, 102, 241, 0.15), rgba(236, 72, 153, 0.15));
             border: 1px solid rgba(99, 102, 241, 0.35); }
-        .events-banner-icon { font-size: 22px; flex-shrink: 0; }
         .events-banner-body { flex: 1; min-width: 0; }
         .events-banner-title { font-weight: 600; font-size: 14px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .events-banner-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
@@ -1576,7 +1577,13 @@
         .ev-list { display: flex; flex-direction: column; gap: 10px; }
         .ev-item { display: flex; gap: 12px; padding: 10px; border-radius: 10px; background: var(--surface-3); border: 1px solid var(--border); cursor: pointer; transition: transform .2s var(--ease-out-expo), border-color .2s; }
         .ev-item:hover { transform: translateY(-2px); border-color: var(--indigo, #6366f1); }
-        .ev-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; background: linear-gradient(135deg, var(--navy-light), var(--navy)); }
+        .ev-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; background: linear-gradient(135deg, var(--navy-light), var(--navy)); overflow: hidden; color: var(--text-muted); }
+        .ev-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .ev-icon svg { width: 20px; height: 20px; }
+        /* Events banner icon should also support cover image */
+        .events-banner-icon { font-size: 22px; flex-shrink: 0; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: linear-gradient(135deg, rgba(99,102,241,.25), rgba(236,72,153,.25)); color: var(--text-muted); }
+        .events-banner-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .events-banner-icon svg { width: 20px; height: 20px; }
         .ev-body { flex: 1; min-width: 0; }
         .ev-title { font-weight: 600; font-size: 14px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .ev-meta { font-size: 12px; color: var(--text-muted); margin-top: 3px; font-variant-numeric: tabular-nums; }
@@ -2352,7 +2359,7 @@
 
             <!-- Events Banner (dismissible per-event) -->
             <div class="events-banner" id="eventsBanner" style="display:none;">
-                <div class="events-banner-icon">📣</div>
+                <div class="events-banner-icon" id="eventsBannerIcon"></div>
                 <div class="events-banner-body">
                     <div class="events-banner-title" id="eventsBannerTitle">—</div>
                     <div class="events-banner-sub" id="eventsBannerSub">—</div>
@@ -3973,8 +3980,27 @@
     <script>
     // ===== Happening Soon (dashboard) =====
     (function(){
-        const CAT_ICON = { academic:'📚', social:'🎉', sports:'⚽', club:'🎭', cultural:'🌍', other:'✨' };
+        const CAT_SVG = {
+            academic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
+            social:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5.8 11.3 2 22l10.7-3.79"/><path d="M11 13c1.93 1.93 2.83 4.17 2 5-.83.83-3.07-.07-5-2-1.93-1.93-2.83-4.17-2-5 .83-.83 3.07.07 5 2Z"/></svg>',
+            sports:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>',
+            club:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>',
+            cultural: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+            other:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275z"/></svg>'
+        };
         function esc(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+        function coverUrl(key){ return key ? ('https://files.myub.online/' + key) : null; }
+        window.__myubEventImgFallback = window.__myubEventImgFallback || function(img, category){
+            const svg = CAT_SVG[category] || CAT_SVG.other;
+            if (img && img.parentElement) img.outerHTML = svg;
+        };
+        function iconHtml(e){
+            const url = coverUrl(e.cover_r2_key);
+            if (url){
+                return `<img src="${esc(url)}" alt="" loading="lazy" onerror="window.__myubEventImgFallback(this, '${esc(e.category||'other')}')">`;
+            }
+            return CAT_SVG[e.category] || CAT_SVG.other;
+        }
         function fmtSoon(startsAt, endsAt){
             const now = Date.now(), s = new Date(startsAt).getTime(), e = new Date(endsAt).getTime();
             if (now >= e) return { text: '', cls:'' };
@@ -3995,7 +4021,7 @@
                 const now = new Date().toISOString();
                 const in48h = new Date(Date.now() + 48*3600*1000).toISOString();
                 const { data, error } = await supabaseClient.from('events')
-                    .select('id,title,category,starts_at,ends_at')
+                    .select('id,title,category,starts_at,ends_at,cover_r2_key')
                     .eq('status','approved')
                     .lte('starts_at', in48h)
                     .gte('ends_at', now)
@@ -4007,7 +4033,7 @@
                 list.innerHTML = data.map(e => {
                     const t = fmtSoon(e.starts_at, e.ends_at);
                     return `<div class="hs-item" onclick="location.href='events.html#${e.id}'">
-                        <div class="hs-icon">${CAT_ICON[e.category]||'✨'}</div>
+                        <div class="hs-icon">${iconHtml(e)}</div>
                         <div class="hs-body">
                             <div class="hs-title">${esc(e.title)}</div>
                             <div class="hs-time ${t.cls}">${esc(t.text)}</div>
@@ -4025,9 +4051,29 @@
     <script>
     // ===== Dashboard Events: Banner + My RSVPs + Upcoming =====
     (function(){
-        const CAT_ICON = { academic:'📚', social:'🎉', sports:'⚽', club:'🎭', cultural:'🌍', other:'✨' };
+        const CAT_SVG = {
+            academic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
+            social:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5.8 11.3 2 22l10.7-3.79"/><path d="M4 3h.01"/><path d="M22 8h.01"/><path d="M15 2h.01"/><path d="M22 20h.01"/><path d="m22 2-2.24.75a2.9 2.9 0 0 0-1.96 3.12v0c.1.86-.57 1.63-1.45 1.63h-.38c-.86 0-1.6.6-1.76 1.44L14 10"/><path d="m22 13-.82-.33c-.86-.34-1.82.2-1.98 1.11v0c-.11.7-.72 1.22-1.43 1.22H17"/><path d="m11 2 .33.82c.34.86-.2 1.82-1.11 1.98v0C9.52 4.9 9 5.52 9 6.23V7"/><path d="M11 13c1.93 1.93 2.83 4.17 2 5-.83.83-3.07-.07-5-2-1.93-1.93-2.83-4.17-2-5 .83-.83 3.07.07 5 2Z"/></svg>',
+            sports:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>',
+            club:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>',
+            cultural: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+            other:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275z"/></svg>'
+        };
         const DISMISS_KEY = 'myub_events_banner_dismissed';
         function esc(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+        function coverUrl(key){ return key ? ('https://files.myub.online/' + key) : null; }
+        // Global fallback: when an event cover img fails, replace with SVG
+        window.__myubEventImgFallback = function(img, category){
+            const svg = CAT_SVG[category] || CAT_SVG.other;
+            if (img && img.parentElement) img.outerHTML = svg;
+        };
+        function iconHtml(e){
+            const url = coverUrl(e.cover_r2_key);
+            if (url){
+                return `<img src="${esc(url)}" alt="" loading="lazy" onerror="window.__myubEventImgFallback(this, '${esc(e.category||'other')}')">`;
+            }
+            return CAT_SVG[e.category] || CAT_SVG.other;
+        }
 
         function fmtDateLabel(startsAt){
             const d = new Date(startsAt);
@@ -4059,7 +4105,7 @@
             try {
                 const now = new Date().toISOString();
                 const { data, error } = await supabaseClient.from('events')
-                    .select('id,title,category,starts_at,location')
+                    .select('id,title,category,starts_at,location,cover_r2_key')
                     .eq('status','approved')
                     .gte('starts_at', now)
                     .order('created_at', { ascending: false })
@@ -4068,9 +4114,10 @@
                 const dismissed = getDismissed();
                 const ev = data.find(e => !dismissed.includes(e.id));
                 if (!ev){ banner.style.display='none'; return; }
+                document.getElementById('eventsBannerIcon').innerHTML = iconHtml(ev);
                 document.getElementById('eventsBannerTitle').textContent = ev.title;
                 document.getElementById('eventsBannerSub').textContent =
-                    `${CAT_ICON[ev.category]||'✨'} ${fmtDateLabel(ev.starts_at)}${ev.location ? ' • ' + ev.location : ''}`;
+                    `${fmtDateLabel(ev.starts_at)}${ev.location ? ' • ' + ev.location : ''}`;
                 document.getElementById('eventsBannerCta').href = `events.html#${ev.id}`;
                 document.getElementById('eventsBannerClose').onclick = () => {
                     const d = getDismissed(); d.push(ev.id); setDismissed(d);
@@ -4102,7 +4149,7 @@
                 // Step 2: fetch those events, future only, approved only
                 const { data: events, error: eErr } = await supabaseClient
                     .from('events')
-                    .select('id,title,category,starts_at,location')
+                    .select('id,title,category,starts_at,location,cover_r2_key')
                     .in('id', ids)
                     .eq('status', 'approved')
                     .gte('starts_at', now)
@@ -4112,7 +4159,7 @@
                 card.style.display = '';
                 list.innerHTML = events.map(e => `
                     <div class="ev-item" onclick="location.href='events.html#${e.id}'">
-                        <div class="ev-icon">${CAT_ICON[e.category]||'✨'}</div>
+                        <div class="ev-icon">${iconHtml(e)}</div>
                         <div class="ev-body">
                             <div class="ev-title">${esc(e.title)}</div>
                             <div class="ev-meta">${esc(fmtDateLabel(e.starts_at))}${e.location ? ' • ' + esc(e.location) : ''}</div>
@@ -4130,7 +4177,7 @@
             try {
                 const now = new Date().toISOString();
                 const { data, error } = await supabaseClient.from('events')
-                    .select('id,title,category,starts_at,location')
+                    .select('id,title,category,starts_at,location,cover_r2_key')
                     .eq('status','approved')
                     .gte('starts_at', now)
                     .order('starts_at')
@@ -4139,7 +4186,7 @@
                 card.style.display = '';
                 list.innerHTML = data.map(e => `
                     <div class="ev-item" onclick="location.href='events.html#${e.id}'">
-                        <div class="ev-icon">${CAT_ICON[e.category]||'✨'}</div>
+                        <div class="ev-icon">${iconHtml(e)}</div>
                         <div class="ev-body">
                             <div class="ev-title">${esc(e.title)}</div>
                             <div class="ev-meta">${esc(fmtDateLabel(e.starts_at))}${e.location ? ' • ' + esc(e.location) : ''}</div>
@@ -4168,5 +4215,6 @@
     })();
     </script>
 
+    <script src="myub-events-popup.js" defer></script>
 </body>
 </html>

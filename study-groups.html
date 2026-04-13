@@ -4136,6 +4136,7 @@
         var SUPABASE_URL = 'https://weuxtwmaqmbhskjpjdyi.supabase.co';
         var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndldXh0d21hcW1iaHNranBqZHlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NTYzMTcsImV4cCI6MjA4MDMzMjMxN30.J-0Nd0MY6-g_ltbBNHwOulqZuQfb8mKIRgx0dAaJ76o';
         var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        window.supabaseClient = supabaseClient;
         
         var BAD_WORDS = ['fuck','shit','ass','bitch','damn','crap','bastard','dick','pussy','cock','cunt','whore','slut','fag','nigger','nigga','retard'];
         var BAD_WORD_REGEX = new RegExp('\\b(' + BAD_WORDS.join('|') + ')\\b', 'gi');
@@ -7071,5 +7072,6 @@
             }, 800);
         })();
     </script>
+    <script src="myub-events-popup.js" defer></script>
 </body>
 </html>

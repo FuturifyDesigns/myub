@@ -2523,7 +2523,7 @@
                     </div>
                     <div class="form-row">
                         <div class="form-field"><label>Category</label>
-                            <select name="category"><option value="academic">📚 Academic</option><option value="social">🎉 Social</option><option value="sports">⚽ Sports</option><option value="club">🎭 Club</option><option value="cultural">🌍 Cultural</option><option value="other" selected>✨ Other</option></select>
+                            <select name="category"><option value="academic">Academic</option><option value="social">Social</option><option value="sports">Sports</option><option value="club">Club</option><option value="cultural">Cultural</option><option value="other" selected>Other</option></select>
                         </div>
                         <div class="form-field"><label>Capacity</label><input name="capacity" type="number" min="1" placeholder="Optional"></div>
                     </div>
@@ -2571,6 +2571,7 @@
         const SUPABASE_URL = 'https://weuxtwmaqmbhskjpjdyi.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndldXh0d21hcW1iaHNranBqZHlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NTYzMTcsImV4cCI6MjA4MDMzMjMxN30.J-0Nd0MY6-g_ltbBNHwOulqZuQfb8mKIRgx0dAaJ76o';
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        window.supabaseClient = supabaseClient;
 
         let currentUser = null;
         let userProfile = null;
@@ -4091,7 +4092,7 @@
                         <div class="rsvp-btn-group" onclick="event.stopPropagation()">
                             <button class="rsvp-btn ${myStatus==='going'?'active':''}" onclick="rsvp('${e.id}','going')">Going</button>
                             <button class="rsvp-btn ${myStatus==='maybe'?'active':''}" onclick="rsvp('${e.id}','maybe')">Maybe</button>
-                            ${(isAdmin || e.creator_id===window.currentUser?.id) ? `<button class="rsvp-btn rsvp-btn-danger" title="Delete event" onclick="deleteEvent('${e.id}')">🗑</button>` : ''}
+                            ${(isAdmin || e.creator_id===window.currentUser?.id) ? `<button class="rsvp-btn rsvp-btn-danger" title="Delete event" onclick="deleteEvent('${e.id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></button>` : ''}
                         </div>
                     </div>
                 </div>
@@ -4291,5 +4292,6 @@
         <span id="currentDay"></span><span id="currentMonth"></span>
         <div id="scheduleList"></div>
     </div>
+    <script src="myub-events-popup.js" defer></script>
 </body>
 </html>

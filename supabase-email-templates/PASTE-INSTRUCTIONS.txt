@@ -1,0 +1,30 @@
+SUPABASE EMAIL TEMPLATES
+========================
+
+If Preview shows only a dark/blank box:
+1. Click "Reset template" then paste the NEW reset-password.html again
+2. Make sure you are on the SOURCE tab when pasting (not Preview)
+3. If still blank in Preview, try reset-password-minimal.html (simple h2/p/a only)
+4. Send a real test email - Preview is often wrong; real emails usually work
+
+RESET PASSWORD
+  Subject: Reset your MyUB password
+  File: reset-password.html (full branded)
+  Fallback: reset-password-minimal.html (if preview stays blank)
+
+CONFIRM SIGNUP
+  Subject: Confirm your MyUB account
+  File: confirm-signup.html
+
+PASTE STEPS
+  1. Open the .html file in Notepad
+  2. Select All (Ctrl+A) and Copy
+  3. In Supabase: Authentication > Emails > Reset Password
+  4. Source tab > delete everything > paste
+  5. Save changes
+  6. Check Preview - you should see white card, navy header, red button
+
+Variables (do not change spelling):
+  {{ .ConfirmationURL }}
+  {{ .Email }}
+  {{ .SiteURL }}

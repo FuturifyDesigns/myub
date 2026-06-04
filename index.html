@@ -1443,8 +1443,10 @@
                     <!-- Login Form -->
                     <form class="form" id="loginForm" onsubmit="handleLogin(event)">
                         <div class="form-group">
-                            <label>Email <span class="required">*</span></label>
-                            <input type="email" id="loginEmail" placeholder="you@email.com" required>
+                            <label>UB Email <span class="required">*</span></label>
+                            <input type="email" id="loginEmail" placeholder="202103457@ub.ac.bw" required autocomplete="email" oninput="validateUbEmailInput(this, 'loginEmailError')">
+                            <p class="hint">University email: 4-digit year + 5-digit ID @ub.ac.bw</p>
+                            <p class="error-msg" id="loginEmailError"></p>
                         </div>
                         <div class="form-group">
                             <label>Password <span class="required">*</span></label>
@@ -1477,13 +1479,15 @@
                         </div>
                         <div class="form-group">
                             <label>Student ID <span class="required">*</span></label>
-                            <input type="text" id="studentId" placeholder="e.g. 202103579" required maxlength="9" oninput="validateStudentId(this)">
+                            <input type="text" id="studentId" placeholder="e.g. 202103579" required maxlength="9" oninput="onStudentIdInput(this)">
                             <p class="hint">Year (4 digits) + ID (5 digits)</p>
                             <p class="error-msg" id="studentIdError"></p>
                         </div>
                         <div class="form-group">
-                            <label>Email <span class="required">*</span></label>
-                            <input type="email" id="signupEmail" placeholder="you@email.com" required>
+                            <label>UB Email <span class="required">*</span></label>
+                            <input type="email" id="signupEmail" placeholder="202103457@ub.ac.bw" required autocomplete="email" oninput="validateUbEmailInput(this, 'signupEmailError')">
+                            <p class="hint">Must match your Student ID (e.g. 202103457@ub.ac.bw)</p>
+                            <p class="error-msg" id="signupEmailError"></p>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
@@ -1643,13 +1647,15 @@
             btn.classList.toggle('visible', input.type === 'text');
         }
 
+        const UB_EMAIL_REGEX = /^[0-9]{4}[0-9]{5}@ub\.ac\.bw$/i;
+
         function validateStudentId(input) {
             const value = input.value.replace(/\D/g, '');
             input.value = value;
             const errorEl = document.getElementById('studentIdError');
             
             if (value.length === 9) {
-                const year = parseInt(value.substring(0, 4));
+                const year = parseInt(value.substring(0, 4), 10);
                 const currentYear = new Date().getFullYear();
                 
                 if (year < 2010) {
@@ -1677,6 +1683,58 @@
                 errorEl.classList.remove('show');
                 return value.length === 0;
             }
+        }
+
+        function onStudentIdInput(input) {
+            const valid = validateStudentId(input);
+            const emailInput = document.getElementById('signupEmail');
+            if (valid && input.value.length === 9) {
+                emailInput.value = input.value + '@ub.ac.bw';
+                validateUbEmailInput(emailInput, 'signupEmailError');
+            }
+        }
+
+        function validateUbEmail(email, options = {}) {
+            const normalized = (email || '').trim().toLowerCase();
+            if (!normalized) {
+                return { valid: false, error: 'UB email is required.' };
+            }
+            if (!UB_EMAIL_REGEX.test(normalized)) {
+                return { valid: false, error: 'Use your UB email: year + 5-digit ID @ub.ac.bw (e.g. 202103457@ub.ac.bw).' };
+            }
+            const year = parseInt(normalized.substring(0, 4), 10);
+            const currentYear = new Date().getFullYear();
+            if (year < 2010 || year > currentYear) {
+                return { valid: false, error: `Year must be between 2010 and ${currentYear}.` };
+            }
+            if (options.matchStudentId) {
+                const studentId = (document.getElementById('studentId').value || '').trim();
+                if (studentId.length === 9 && normalized !== studentId.toLowerCase() + '@ub.ac.bw') {
+                    return { valid: false, error: 'Email must match your Student ID (e.g. ' + studentId + '@ub.ac.bw).' };
+                }
+            }
+            return { valid: true, normalized };
+        }
+
+        function validateUbEmailInput(input, errorId) {
+            const errorEl = document.getElementById(errorId);
+            const value = input.value.trim();
+            if (!value) {
+                input.classList.remove('error');
+                if (errorEl) { errorEl.textContent = ''; errorEl.classList.remove('show'); }
+                return false;
+            }
+            const matchStudentId = errorId === 'signupEmailError';
+            const result = validateUbEmail(value, { matchStudentId });
+            if (!result.valid) {
+                input.classList.add('error');
+                if (errorEl) { errorEl.textContent = result.error; errorEl.classList.add('show'); }
+                return false;
+            }
+            input.value = result.normalized;
+            input.classList.remove('error');
+            if (errorEl) { errorEl.textContent = ''; errorEl.classList.remove('show'); }
+            return true;
         }
         
         // Check if student ID already exists in database
@@ -1793,10 +1851,15 @@
         async function handleLogin(e) {
             e.preventDefault();
             hideAlert();
-            setLoading('loginBtn', true);
-            
-            const email = document.getElementById('loginEmail').value;
+
+            const loginEmailInput = document.getElementById('loginEmail');
+            if (!validateUbEmailInput(loginEmailInput, 'loginEmailError')) {
+                showAlert(document.getElementById('loginEmailError').textContent || 'Please enter a valid UB email.');
+                return;
+            }
+            const email = loginEmailInput.value.trim().toLowerCase();
             const password = document.getElementById('loginPassword').value;
+            setLoading('loginBtn', true);
             const rememberMe = document.getElementById('rememberMe').checked;
             
             try {
@@ -1926,7 +1989,13 @@
             if (!/[a-z]/.test(pw)) { setLoading('signupBtn', false); showAlert('Password must contain at least one lowercase letter'); return; }
             if (!/[0-9]/.test(pw)) { setLoading('signupBtn', false); showAlert('Password must contain at least one number'); return; }
             
-            const email = document.getElementById('signupEmail').value;
+            const emailInput = document.getElementById('signupEmail');
+            if (!validateUbEmailInput(emailInput, 'signupEmailError')) {
+                setLoading('signupBtn', false);
+                showAlert(document.getElementById('signupEmailError').textContent || 'Please enter a valid UB email.');
+                return;
+            }
+            const email = emailInput.value.trim().toLowerCase();
             
             try {
                 const { data, error } = await supabaseClient.auth.signUp({
@@ -1968,8 +2037,13 @@
         // Forgot Password
         async function forgotPassword(e) {
             e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            if (!email) { showAlert('Enter your email first'); return; }
+            const loginEmailInput = document.getElementById('loginEmail');
+            if (!loginEmailInput.value.trim()) { showAlert('Enter your UB email first'); return; }
+            if (!validateUbEmailInput(loginEmailInput, 'loginEmailError')) {
+                showAlert(document.getElementById('loginEmailError').textContent || 'Please enter a valid UB email.');
+                return;
+            }
+            const email = loginEmailInput.value.trim().toLowerCase();
             
             // Show loading state
             const forgotLink = document.querySelector('.forgot');

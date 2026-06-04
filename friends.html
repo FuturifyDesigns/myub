@@ -1,0 +1,3608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<!-- myub-perf-preconnects -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.onesignal.com">
+    <link rel="dns-prefetch" href="https://files.myub.online">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content, maximum-scale=1.0, user-scalable=no">
+    <title>Friends - MyUB</title>
+    <link rel="icon" type="image/png" sizes="48x48" href="favicon-48x48.png">
+    <link rel="shortcut icon" href="favicon-48x48.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="myub-security.js"></script>
+    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js" defer></script>
+    <script src="myub-calls.js" defer></script>
+    <script src="myub-utils.js"></script>
+    <script src="myub-mobile.js"></script>
+    <style>
+        /* ==========================================================
+           MyUB Friends — dark navy/red theme
+           ========================================================== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --navy: #1a365d;
+            --navy-light: #2c5282;
+            --navy-lighter: #3a6fa8;
+            --navy-dark: #0f2744;
+            --navy-darker: #081726;
+            --navy-deepest: #050f1c;
+            --red: #c41e3a;
+            --red-light: #e63956;
+            --red-dark: #9a1730;
+            --white: #ffffff;
+            --blue: #60a5fa;
+            --green: #4ade80;
+            --purple: #a78bfa;
+            --orange: #fb923c;
+            --pink: #f472b6;
+            --yellow: #fbbf24;
+
+            --text: #ffffff;
+            --text-soft: rgba(255, 255, 255, 0.72);
+            --text-muted: rgba(255, 255, 255, 0.5);
+            --text-dim: rgba(255, 255, 255, 0.35);
+            --surface-1: rgba(255, 255, 255, 0.03);
+            --surface-2: rgba(255, 255, 255, 0.05);
+            --surface-3: rgba(255, 255, 255, 0.08);
+            --surface-4: rgba(255, 255, 255, 0.12);
+            --border: rgba(255, 255, 255, 0.09);
+            --border-strong: rgba(255, 255, 255, 0.14);
+
+            /* Legacy light-theme var overrides */
+            --gray-50: rgba(255, 255, 255, 0.04);
+            --gray-100: rgba(255, 255, 255, 0.06);
+            --gray-200: rgba(255, 255, 255, 0.1);
+            --gray-300: rgba(255, 255, 255, 0.14);
+            --gray-400: rgba(255, 255, 255, 0.4);
+            --gray-500: rgba(255, 255, 255, 0.55);
+            --gray-600: rgba(255, 255, 255, 0.7);
+            --gray-700: rgba(255, 255, 255, 0.85);
+            --gray-800: rgba(255, 255, 255, 0.92);
+            --gray-900: #ffffff;
+
+            --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+            --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --sidebar-w: 260px;
+        }
+
+        html {
+            height: 100%;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        
+            background: var(--navy-deepest);
+        }
+        body {
+            font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            min-height: 100dvh;
+            background: var(--navy-deepest);
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        
+        }
+        button, input, select, textarea { font-family: inherit; }
+        input[type="text"], input[type="email"], input[type="password"], input[type="number"], input[type="search"], textarea, [contenteditable="true"] {
+            cursor: text !important;
+            caret-color: var(--white);
+        }
+        button, select, input[type="checkbox"], input[type="radio"] { cursor: pointer !important; }
+        a { color: inherit; text-decoration: none; }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            background:
+                radial-gradient(circle at 15% 10%, rgba(58, 111, 168, 0.22) 0%, transparent 45%),
+                radial-gradient(circle at 88% 85%, rgba(196, 30, 58, 0.14) 0%, transparent 50%),
+                linear-gradient(160deg, #0a1929 0%, #0f2744 50%, #050f1c 100%);
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
+            background-size: 56px 56px;
+            mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.8), transparent 80%);
+            -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.8), transparent 80%);
+        }
+
+        /* ========== REAL MyUB LOGO COMPONENT ========== */
+        .myub-logo {
+            --logo-size: 36px;
+            --logo-m-color: #ffffff;
+            --logo-ub-color: #ffffff;
+            position: relative;
+            display: inline-flex;
+            align-items: flex-end;
+            gap: calc(var(--logo-size) * 0.06);
+            font-family: 'Sora', 'Outfit', sans-serif;
+            line-height: 1;
+            user-select: none;
+        }
+        .myub-logo .ml-m-wrap { position: relative; display: inline-block; line-height: 0.82; }
+        .myub-logo .ml-m {
+            font-size: var(--logo-size);
+            font-weight: 800;
+            color: var(--logo-m-color);
+            letter-spacing: -0.03em;
+            display: inline-block;
+            font-family: 'Cormorant Garamond', Georgia, serif;
+        }
+        .myub-logo .ml-cap {
+            position: absolute;
+            top: calc(var(--logo-size) * -0.34);
+            left: 50%;
+            transform: translateX(-50%) rotate(-6deg);
+            width: calc(var(--logo-size) * 0.78);
+            height: calc(var(--logo-size) * 0.55);
+            pointer-events: none;
+        }
+        .myub-logo .ml-cap svg { width: 100%; height: 100%; overflow: visible; }
+        .myub-logo .ml-ub {
+            font-size: calc(var(--logo-size) * 0.38);
+            font-weight: 800;
+            color: var(--logo-ub-color);
+            letter-spacing: 0.01em;
+            display: inline-block;
+            line-height: 0.85;
+            font-family: 'Cormorant Garamond', Georgia, serif;
+        }
+
+        /* ========== LOADING ========== */
+        .loading {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--navy-deepest);
+        }
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid rgba(255, 255, 255, 0.08);
+            border-top-color: var(--navy-lighter);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        .loading-spinner-small {
+            width: 28px;
+            height: 28px;
+            border: 2.5px solid rgba(255, 255, 255, 0.08);
+            border-top-color: var(--navy-lighter);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ========== SIDEBAR ========== */
+        .sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 90;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.35s ease, visibility 0.35s ease;
+        }
+        .sidebar-overlay.show { opacity: 1; visibility: visible; }
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: var(--sidebar-w);
+            background: rgba(8, 20, 35, 0.85);
+            backdrop-filter: blur(20px) saturate(150%);
+            -webkit-backdrop-filter: blur(20px) saturate(150%);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            padding: 22px 14px 18px;
+            overflow-y: auto;
+            transition: transform 0.45s var(--ease-out-expo);
+        }
+        .sidebar::-webkit-scrollbar { width: 6px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 3px; }
+        .sidebar-header {
+            padding: 26px 14px 22px;
+            margin-bottom: 14px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        .sidebar-header::before {
+            content: 'STUDENT PORTAL';
+            position: absolute;
+            top: 0;
+            left: 18px;
+            font-size: 9px;
+            letter-spacing: 2.5px;
+            color: var(--text-dim);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .sidebar-logo {
+            display: inline-flex;
+            align-items: flex-end;
+            padding-top: 18px;
+            padding-left: 4px;
+        }
+        .sidebar-logo .myub-logo { --logo-size: 36px; }
+        .sidebar-logo-m-wrapper,
+        .sidebar-logo-cap,
+        .sidebar-logo-m,
+        .sidebar-logo-yub { display: none !important; }
+
+        nav { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+        .nav-section { display: flex; flex-direction: column; gap: 2px; margin-bottom: 6px; }
+        .nav-section-title {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text-dim);
+            padding: 10px 14px 6px;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            color: var(--text-soft);
+            font-size: 14px;
+            font-weight: 500;
+            border: 1px solid transparent;
+            background: transparent;
+            text-align: left;
+            width: 100%;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s var(--ease-out-expo);
+        }
+        .nav-item svg {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            flex-shrink: 0;
+            transition: transform 0.3s var(--ease-out-expo);
+        }
+        .nav-item:hover {
+            background: var(--surface-2);
+            color: var(--white);
+            transform: translateX(3px);
+        }
+        .nav-item:hover svg { transform: scale(1.08); }
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(44, 82, 130, 0.55), rgba(26, 54, 93, 0.45));
+            color: var(--white);
+            border-color: rgba(58, 111, 168, 0.35);
+            box-shadow: 0 8px 24px -10px rgba(44, 82, 130, 0.8);
+        }
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: -14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 24px;
+            background: var(--red);
+            border-radius: 0 3px 3px 0;
+            box-shadow: 0 0 12px rgba(196, 30, 58, 0.6);
+        }
+        .nav-item .badge {
+            margin-left: auto;
+            background: var(--red);
+            color: var(--white);
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 999px;
+            min-width: 20px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(196, 30, 58, 0.4);
+        }
+
+        /* ========== MAIN CONTENT ========== */
+        .main-content {
+            margin-left: var(--sidebar-w);
+            min-height: 100vh;
+            padding: 18px 28px 40px;
+            position: relative;
+        }
+
+        /* ========== TOPBAR ========== */
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 12px 18px;
+            background: rgba(15, 39, 68, 0.72);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            backdrop-filter: blur(20px) saturate(140%);
+            -webkit-backdrop-filter: blur(20px) saturate(140%);
+            margin-bottom: 22px;
+            position: sticky;
+            top: 12px;
+            z-index: 50;
+        }
+        .topbar::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 24px;
+            background: var(--red);
+            border-radius: 0 3px 3px 0;
+            box-shadow: 0 0 12px rgba(196, 30, 58, 0.6);
+        }
+        .topbar-left { display: flex; align-items: center; gap: 14px; min-width: 0; }
+        .menu-toggle {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            color: var(--white);
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            flex-shrink: 0;
+        }
+        .menu-toggle svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; }
+        .page-title {
+            font-family: 'Sora', 'Outfit', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--white);
+            letter-spacing: -0.3px;
+            white-space: nowrap;
+        }
+        .page-title::after {
+            content: '';
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: var(--red);
+            border-radius: 50%;
+            margin-left: 10px;
+            vertical-align: middle;
+            box-shadow: 0 0 10px rgba(196, 30, 58, 0.8);
+            animation: dotPulse 2.5s ease-in-out infinite;
+        }
+        @keyframes dotPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.6; }
+        }
+        .topbar-right { display: flex; align-items: center; gap: 12px; position: relative; }
+
+        .icon-btn {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--surface-1);
+            border: 1px solid var(--border);
+            color: var(--text-soft);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+        .icon-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .icon-btn:hover { background: var(--surface-2); color: var(--white); transform: translateY(-1px); }
+
+        .notification-badge {
+            position: absolute !important;
+            top: -4px !important;
+            right: -4px !important;
+            min-width: 18px !important;
+            height: 18px !important;
+            padding: 0 5px !important;
+            border-radius: 999px !important;
+            background: var(--red) !important;
+            color: var(--white) !important;
+            font-size: 10px !important;
+            font-weight: 700 !important;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(196, 30, 58, 0.5);
+            border: 2px solid var(--navy-deepest) !important;
+            text-align: center;
+        }
+        .notification-wrapper { position: relative; }
+        .notification-dropdown {
+            position: absolute;
+            top: 52px;
+            right: 0;
+            width: 360px;
+            max-height: 480px;
+            background: rgba(10, 25, 45, 0.96);
+            border: 1px solid var(--border-strong);
+            border-radius: 14px;
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            box-shadow: 0 20px 60px -10px rgba(0, 0, 0, 0.55);
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px);
+            transition: all 0.35s var(--ease-out-expo);
+            z-index: 100;
+            overflow: hidden;
+        }
+        .notification-dropdown.show { opacity: 1; visibility: visible; transform: translateY(0); }
+        .notification-dropdown svg { max-width: 40px; max-height: 40px; }
+        .notif-dropdown-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border);
+        }
+        .notif-dropdown-header h3 { font-size: 14px; font-weight: 700; color: var(--white); }
+        .notif-dropdown-header button {
+            background: transparent;
+            border: none;
+            color: var(--navy-lighter);
+            font-size: 12px;
+            font-weight: 500;
+            padding: 4px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .notif-dropdown-header button:hover { color: #8ab4e8; }
+        .notif-dropdown-list { flex: 1; overflow-y: auto; max-height: 340px; }
+        .notif-empty {
+            padding: 40px 20px !important;
+            text-align: center;
+            color: var(--text-muted) !important;
+            background: none !important;
+        }
+        .notif-dropdown-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s ease;
+        }
+        .notif-dropdown-item:hover { background: var(--surface-2); }
+        .notif-dropdown-item.unread { background: rgba(58, 111, 168, 0.08); }
+        .notif-icon {
+            width: 36px; height: 36px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            background: rgba(58, 111, 168, 0.18);
+        }
+        .notif-icon svg { width: 16px; height: 16px; stroke: var(--blue); fill: none; stroke-width: 2; }
+        .notif-icon.friend { background: rgba(74, 222, 128, 0.18); }
+        .notif-icon.friend svg { stroke: var(--green); }
+        .notif-icon.message { background: rgba(96, 165, 250, 0.18); }
+        .notif-icon.message svg { stroke: var(--blue); }
+        .notif-icon.group { background: rgba(167, 139, 250, 0.18); }
+        .notif-icon.group svg { stroke: var(--purple); }
+        .notif-icon.warning { background: rgba(251, 191, 36, 0.18); }
+        .notif-icon.warning svg { stroke: var(--yellow); }
+        .notif-content { flex: 1; min-width: 0; }
+        .notif-content h4,
+        .notif-content h5 {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .notif-content p {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .notif-content .time { font-size: 10.5px; color: var(--text-dim); }
+        .notif-dropdown-footer { padding: 12px 16px; border-top: 1px solid var(--border); text-align: center; }
+        .notif-dropdown-footer a { color: var(--navy-lighter); font-size: 12.5px; font-weight: 500; cursor: pointer; }
+
+        /* ========== FRIENDS PAGE ========== */
+        .friends-page {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Stats bar */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+        .stat-card {
+            padding: 22px 24px;
+            background: rgba(15, 39, 68, 0.55);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            transition: all 0.35s var(--ease-out-expo);
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--navy-lighter), var(--red));
+            opacity: 0.6;
+            transition: opacity 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--border-strong);
+            box-shadow: 0 18px 40px -16px rgba(0, 0, 0, 0.6);
+        }
+        .stat-card:hover::before { opacity: 1; }
+        .stat-card.online::before {
+            background: linear-gradient(90deg, var(--green), #22c55e);
+        }
+        .stat-value {
+            font-family: 'Sora', sans-serif;
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--white);
+            letter-spacing: -1px;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+        .stat-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-dim);
+        }
+        .stat-card.online .stat-value {
+            color: var(--green);
+            text-shadow: 0 0 20px rgba(74, 222, 128, 0.35);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            padding: 4px;
+            background: rgba(15, 39, 68, 0.55);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            overflow-x: auto;
+        }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab {
+            flex: 1;
+            min-width: fit-content;
+            padding: 11px 18px;
+            background: transparent;
+            border: none;
+            color: var(--text-soft);
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.35s var(--ease-out-expo);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+        .tab:hover:not(.active) {
+            background: var(--surface-2);
+            color: var(--white);
+        }
+        .tab.active {
+            background: linear-gradient(135deg, var(--navy-light), var(--navy));
+            color: var(--white);
+            box-shadow: 0 8px 22px -10px rgba(44, 82, 130, 0.8);
+        }
+        .tab .count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 6px;
+            background: var(--red);
+            color: var(--white);
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 700;
+            box-shadow: 0 4px 10px rgba(196, 30, 58, 0.4);
+        }
+
+        /* Tab content */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: tabFadeIn 0.4s var(--ease-out-expo); }
+        @keyframes tabFadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Section headers (requests tab) */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+        .section-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--white);
+            letter-spacing: -0.2px;
+        }
+        .section-count {
+            font-size: 11.5px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Search */
+        .search-container {
+            margin-bottom: 16px;
+        }
+        .search-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            background: rgba(15, 39, 68, 0.55);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            transition: all 0.3s ease;
+        }
+        .search-input-wrapper:focus-within {
+            border-color: var(--navy-lighter);
+            box-shadow: 0 0 0 3px rgba(58, 111, 168, 0.18);
+        }
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            width: 16px;
+            height: 16px;
+            stroke: var(--text-muted);
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            pointer-events: none;
+        }
+        .search-input {
+            flex: 1;
+            padding: 12px 14px 12px 40px;
+            background: transparent;
+            border: none;
+            color: var(--white);
+            font-family: 'Outfit', sans-serif;
+            font-size: 13.5px;
+            outline: none;
+        }
+        .search-input::placeholder { color: var(--text-dim); }
+        .search-btn {
+            padding: 10px 20px;
+            margin-right: 4px;
+            background: linear-gradient(135deg, var(--navy-light), var(--navy));
+            border: none;
+            border-radius: 9px;
+            color: var(--white);
+            font-family: 'Outfit', sans-serif;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s var(--ease-out-expo), background 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 6px 16px -8px rgba(44, 82, 130, 0.8);
+            flex-shrink: 0;
+        }
+        .search-btn:hover {
+            background: linear-gradient(135deg, var(--red), var(--red-dark));
+            transform: translateY(-1px);
+            box-shadow: 0 10px 22px -10px rgba(196, 30, 58, 0.5);
+        }
+
+        /* Friends grid + cards */
+        .friends-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 14px;
+        }
+        .friend-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 18px;
+            background: rgba(15, 39, 68, 0.55);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            transition: all 0.35s var(--ease-out-expo);
+            position: relative;
+            overflow: hidden;
+        }
+        .friend-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, var(--navy-lighter), var(--red));
+            opacity: 0;
+            transition: opacity 0.35s ease;
+        }
+        .friend-card:hover {
+            transform: translateX(3px);
+            border-color: var(--border-strong);
+            box-shadow: 0 18px 40px -16px rgba(0, 0, 0, 0.6);
+        }
+        .friend-card:hover::before { opacity: 1; }
+
+        .friend-avatar {
+            position: relative;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--navy-light), var(--navy));
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Sora', sans-serif;
+            font-weight: 700;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .friend-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        .online-indicator {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--green);
+            border: 2.5px solid #0a1929;
+            box-shadow: 0 0 10px rgba(74, 222, 128, 0.7);
+            z-index: 2;
+        }
+        .online-indicator.offline {
+            background: var(--text-dim);
+            box-shadow: none;
+        }
+
+        .friend-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .friend-name {
+            font-family: 'Sora', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--white);
+            letter-spacing: -0.2px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .online-text {
+            font-size: 10.5px;
+            color: var(--green);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .offline-text {
+            font-size: 10.5px;
+            color: var(--text-dim);
+            font-weight: 500;
+        }
+        .friend-program {
+            font-size: 12px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .friend-meta {
+            font-size: 10.5px;
+            color: var(--text-dim);
+            margin-top: 2px;
+        }
+
+        .friend-actions {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        /* Request cards */
+        .request-card {
+            padding: 18px 20px;
+            background: rgba(15, 39, 68, 0.55);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .request-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--red-light), var(--red));
+        }
+        .request-card.outgoing::before {
+            background: linear-gradient(90deg, var(--navy-lighter), var(--navy-light));
+        }
+        .request-card:hover {
+            border-color: var(--border-strong);
+            transform: translateY(-2px);
+            box-shadow: 0 18px 40px -16px rgba(0, 0, 0, 0.6);
+        }
+        .request-type {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--red-light);
+            margin-bottom: 10px;
+        }
+        .request-card.outgoing .request-type {
+            color: var(--navy-lighter);
+        }
+        .request-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+        .request-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* Discover */
+        .discover-header {
+            margin-bottom: 14px;
+        }
+        .discover-header h3 {
+            font-family: 'Sora', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--white);
+            letter-spacing: -0.3px;
+            margin-bottom: 4px;
+        }
+        .discover-header p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        .discover-filters {
+            margin-bottom: 16px;
+        }
+        .filter-select {
+            padding: 10px 14px;
+            background: rgba(15, 39, 68, 0.55);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--white);
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            outline: none;
+            cursor: pointer;
+            min-width: 180px;
+            transition: all 0.3s ease;
+        }
+        .filter-select:focus {
+            border-color: var(--navy-lighter);
+            box-shadow: 0 0 0 3px rgba(58, 111, 168, 0.18);
+        }
+        .filter-select option {
+            background: var(--navy-dark);
+            color: var(--white);
+        }
+
+        /* Discover grid + cards (vertical layout, richer than friend-card) */
+        .discover-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+            gap: 16px;
+        }
+        .discover-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 26px 20px 20px;
+            background: rgba(15, 39, 68, 0.55);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            cursor: pointer;
+            transition: all 0.45s var(--ease-out-expo);
+            position: relative;
+            overflow: hidden;
+        }
+        .discover-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--navy-lighter), var(--red));
+            opacity: 0.5;
+            transition: opacity 0.4s ease;
+        }
+        .discover-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: radial-gradient(
+                circle 200px at var(--mx, 50%) var(--my, 50%),
+                rgba(255, 255, 255, 0.06) 0%,
+                transparent 60%
+            );
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+        }
+        .discover-card > * { position: relative; z-index: 2; }
+        .discover-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--border-strong);
+            box-shadow: 0 24px 50px -18px rgba(0, 0, 0, 0.7);
+        }
+        .discover-card:hover::before { opacity: 1; }
+        .discover-card:hover::after { opacity: 1; }
+
+        .discover-avatar {
+            position: relative;
+            width: 88px;
+            height: 88px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--navy-light), var(--navy));
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Sora', sans-serif;
+            font-weight: 800;
+            font-size: 28px;
+            margin-bottom: 14px;
+            transition: transform 0.45s var(--ease-out-expo);
+            box-shadow: 0 14px 34px -14px rgba(0, 0, 0, 0.6);
+        }
+        .discover-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        .discover-card:hover .discover-avatar {
+            transform: scale(1.06);
+        }
+        /* Online dot on the discover avatar */
+        .discover-avatar .online-dot {
+            position: absolute;
+            bottom: 3px;
+            right: 3px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--green);
+            border: 3px solid #0a1929;
+            box-shadow: 0 0 12px rgba(74, 222, 128, 0.7);
+            z-index: 3;
+        }
+        .discover-avatar .online-dot.offline {
+            background: var(--text-dim);
+            box-shadow: none;
+        }
+
+        .discover-name {
+            font-family: 'Sora', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--white);
+            letter-spacing: -0.2px;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+        .discover-program {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+        .discover-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10.5px;
+            font-weight: 600;
+            color: var(--green);
+            background: rgba(74, 222, 128, 0.1);
+            padding: 4px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+        }
+        .discover-status .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 8px var(--green);
+            animation: statusPulse 2s ease-in-out infinite;
+        }
+        .discover-status.offline {
+            color: var(--text-dim);
+            background: rgba(255, 255, 255, 0.04);
+            border-color: var(--border);
+        }
+        .discover-status.offline .dot {
+            background: var(--text-dim);
+            box-shadow: none;
+            animation: none;
+        }
+        @keyframes statusPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.3); }
+        }
+
+        .discover-actions {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            margin-top: auto;
+        }
+        .discover-actions .btn {
+            flex: 1;
+            padding: 9px 10px;
+            font-size: 12px;
+        }
+        .discover-actions .btn svg {
+            width: 14px;
+            height: 14px;
+        }
+        .discover-actions .btn-secondary:not(:disabled) {
+            flex: 0 0 auto;
+            padding: 9px 12px;
+        }
+
+        .loading-state {
+            padding: 60px 20px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+        .loading-state p {
+            font-size: 13px;
+        }
+
+        /* Empty state */
+        .empty-state {
+            padding: 60px 20px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 1.5;
+            margin: 0 auto 16px;
+            opacity: 0.3;
+        }
+        .empty-state h3 {
+            font-family: 'Sora', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-soft);
+            margin-bottom: 6px;
+            letter-spacing: -0.3px;
+        }
+        .empty-state p {
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+
+        /* ========== BUTTONS ========== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: transform 0.4s var(--ease-out-expo), background 0.4s ease, box-shadow 0.4s ease, color 0.3s ease, border-color 0.3s ease;
+            white-space: nowrap;
+        }
+        .btn svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .btn-sm {
+            padding: 7px 13px;
+            font-size: 11.5px;
+            border-radius: 8px;
+        }
+        .btn-sm svg { width: 14px; height: 14px; }
+        .btn-icon {
+            padding: 8px;
+            width: 36px;
+            height: 36px;
+        }
+        .btn-icon svg { width: 16px; height: 16px; }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--navy-light) 0%, var(--navy) 100%);
+            color: var(--white);
+            box-shadow: 0 10px 28px -12px rgba(26, 54, 93, 0.8);
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 14px 34px -10px rgba(196, 30, 58, 0.5);
+        }
+        .btn-secondary {
+            background: var(--surface-2);
+            color: var(--text-soft);
+            border-color: var(--border);
+        }
+        .btn-secondary:hover {
+            background: var(--surface-3);
+            color: var(--white);
+            border-color: var(--border-strong);
+            transform: translateY(-1px);
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
+            color: var(--white);
+            box-shadow: 0 10px 28px -12px rgba(196, 30, 58, 0.6);
+        }
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 34px -10px rgba(196, 30, 58, 0.6);
+        }
+        .btn-icon.btn-danger {
+            background: var(--surface-2);
+            color: var(--text-soft);
+            box-shadow: none;
+        }
+        .btn-icon.btn-danger:hover {
+            background: rgba(196, 30, 58, 0.18);
+            color: var(--red-light);
+            border-color: rgba(196, 30, 58, 0.4);
+            box-shadow: none;
+        }
+        .btn-success {
+            background: linear-gradient(135deg, var(--green), #16a34a);
+            color: var(--white);
+            box-shadow: 0 10px 28px -12px rgba(74, 222, 128, 0.5);
+        }
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 34px -10px rgba(74, 222, 128, 0.55);
+        }
+
+        /* ========== PROFILE PREVIEW MODAL (universal) ========== */
+        /* Used by friends.html, messages.html, study-groups.html
+           — uses dynamic innerHTML + .profile-modal-* classes */
+        #profileModal .modal,
+        #profileModal .modal-content {
+            width: min(440px, 100%);
+            max-width: 440px;
+        }
+        #profileModal .modal-body {
+            padding: 28px 24px 16px;
+        }
+        #profileModal .modal-footer {
+            flex-direction: column;
+            align-items: stretch;
+            padding: 14px 24px 22px;
+            gap: 12px;
+            border-top: 1px solid var(--border);
+        }
+        .profile-modal-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .profile-modal-avatar {
+            position: relative;
+            width: 110px;
+            height: 110px;
+            min-width: 110px;
+            min-height: 110px;
+            max-width: 110px;
+            max-height: 110px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--navy-light), var(--navy));
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Sora', sans-serif;
+            font-weight: 800;
+            font-size: 36px;
+            letter-spacing: -1px;
+            margin: 0 auto 16px;
+            border: 3px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 14px 38px -14px rgba(0, 0, 0, 0.7);
+            overflow: visible;
+            flex-shrink: 0;
+        }
+        .profile-modal-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        /* Constrain any SVG that sneaks into the avatar */
+        .profile-modal-avatar > svg,
+        .profile-modal-avatar svg:not(.online-dot svg):not(.status-dot svg) {
+            width: 42px !important;
+            height: 42px !important;
+            max-width: 42px !important;
+            max-height: 42px !important;
+            stroke: var(--white);
+            opacity: 0.7;
+        }
+        /* Online dot inside avatar (friends.html, messages.html use .online-dot) */
+        .profile-modal-avatar .online-dot {
+            position: absolute;
+            bottom: 6px;
+            right: 6px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--green);
+            border: 3px solid #0a1929;
+            box-shadow: 0 0 12px rgba(74, 222, 128, 0.7);
+            z-index: 2;
+        }
+        .profile-modal-avatar .online-dot.offline {
+            background: var(--text-dim);
+            box-shadow: none;
+        }
+        /* study-groups.html uses .status-dot inside avatar instead */
+        .profile-modal-avatar > .status-dot {
+            position: absolute;
+            bottom: 6px;
+            right: 6px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--green);
+            border: 3px solid #0a1929;
+            box-shadow: 0 0 12px rgba(74, 222, 128, 0.7);
+            z-index: 2;
+            animation: none;
+        }
+        .profile-modal-avatar > .status-dot.offline {
+            background: var(--text-dim);
+            box-shadow: none;
+        }
+        .profile-modal-name {
+            font-family: 'Sora', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--white);
+            letter-spacing: -0.5px;
+            line-height: 1.15;
+            margin-bottom: 6px;
+            max-width: 100%;
+            overflow-wrap: break-word;
+            text-align: center;
+        }
+        .profile-modal-program {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            max-width: 100%;
+            text-align: center;
+        }
+        .profile-modal-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: rgba(74, 222, 128, 0.12);
+            border: 1px solid rgba(74, 222, 128, 0.35);
+            border-radius: 999px;
+            color: var(--green);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 14px;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .profile-modal-status span {
+            font-size: 14px;
+            line-height: 1;
+        }
+        .profile-modal-status.offline {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: var(--border);
+            color: var(--text-muted);
+        }
+        .profile-modal-status.offline span {
+            color: var(--text-dim);
+        }
+        /* Bio paragraph variant (friends.html) */
+        .profile-modal-bio {
+            font-size: 13px;
+            color: var(--text-soft);
+            line-height: 1.55;
+            padding: 14px 18px;
+            background: rgba(0, 0, 0, 0.22);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 14px;
+            max-width: 100%;
+            width: 100%;
+            text-align: left;
+            font-style: italic;
+            position: relative;
+        }
+        .profile-modal-bio::before {
+            content: '"';
+            position: absolute;
+            top: -4px;
+            left: 10px;
+            font-size: 32px;
+            color: var(--red-light);
+            font-family: Georgia, serif;
+            line-height: 1;
+            opacity: 0.5;
+        }
+        /* Bio input variant (messages.html) */
+        .profile-modal-bio-input {
+            width: 100%;
+            margin-bottom: 14px;
+        }
+        .profile-modal-bio-input input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-soft);
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            font-style: italic;
+            text-align: center;
+            outline: none;
+            cursor: default !important;
+        }
+        .profile-modal-bio-input input::placeholder {
+            color: var(--text-dim);
+        }
+        /* Member since meta */
+        .profile-modal-meta {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            margin-bottom: 4px;
+        }
+        .profile-modal-meta .label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-dim);
+        }
+        .profile-modal-meta .value {
+            font-size: 13px;
+            color: var(--text-soft);
+            font-weight: 500;
+        }
+        /* Blocked notice */
+        .profile-blocked-notice {
+            padding: 12px 16px;
+            background: rgba(196, 30, 58, 0.12);
+            border: 1px solid rgba(196, 30, 58, 0.3);
+            border-radius: 10px;
+            color: var(--red-light);
+            font-size: 12px;
+            text-align: center;
+            width: 100%;
+            margin-bottom: 12px;
+        }
+
+        /* Profile modal actions (buttons stack vertically) */
+        .profile-modal-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+        }
+        .profile-modal-actions > .btn {
+            width: 100%;
+            justify-content: center;
+        }
+        .profile-modal-actions .btn-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .profile-modal-actions .btn-row .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* Extra button variants */
+        .btn-outline-danger {
+            background: rgba(196, 30, 58, 0.08);
+            color: var(--red-light);
+            border: 1px solid rgba(196, 30, 58, 0.35);
+        }
+        .btn-outline-danger:hover {
+            background: rgba(196, 30, 58, 0.18);
+            color: var(--red-light);
+            border-color: rgba(196, 30, 58, 0.55);
+            transform: translateY(-1px);
+        }
+        .btn-warning {
+            background: rgba(251, 146, 60, 0.1);
+            color: var(--orange);
+            border: 1px solid rgba(251, 146, 60, 0.35);
+        }
+        .btn-warning:hover {
+            background: rgba(251, 146, 60, 0.2);
+            color: var(--orange);
+            border-color: rgba(251, 146, 60, 0.55);
+            transform: translateY(-1px);
+        }
+
+        /* CRITICAL: constrain any SVG inside a .btn to prevent explosion */
+        .btn svg {
+            width: 16px !important;
+            height: 16px !important;
+            max-width: 16px !important;
+            max-height: 16px !important;
+            flex-shrink: 0;
+        }
+        .btn-sm svg {
+            width: 14px !important;
+            height: 14px !important;
+            max-width: 14px !important;
+            max-height: 14px !important;
+        }
+
+        /* View Full Profile link */
+        .profile-modal-link-container {
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            width: 100%;
+        }
+        .profile-modal-link {
+            display: inline-flex !important;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            color: var(--navy-lighter) !important;
+            font-size: 12.5px;
+            font-weight: 600;
+            border-radius: 9px;
+            transition: all 0.3s ease;
+            background: transparent !important;
+            border: none !important;
+            text-decoration: none;
+        }
+        .profile-modal-link:hover {
+            background: var(--surface-2) !important;
+            color: #8ab4e8 !important;
+            transform: translateX(2px);
+        }
+        .profile-modal-link svg {
+            width: 14px !important;
+            height: 14px !important;
+            max-width: 14px !important;
+            max-height: 14px !important;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            flex-shrink: 0;
+        }
+
+        /* Universal safety net: any dynamic SVG inside profile modal body/footer shouldn't explode */
+        #profileModalBody svg,
+        #profileModalFooter svg {
+            max-width: 100%;
+        }
+        #profileModal svg:not(.profile-modal-avatar svg) {
+            max-width: 42px;
+        }
+
+        /* ========== MODALS ========== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            background: rgba(5, 15, 28, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.show,
+        .modal-overlay[style*="display:flex"],
+        .modal-overlay[style*="display: flex"] { display: flex !important; animation: modalFadeIn 0.35s ease; }
+        @keyframes modalFadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .modal {
+            background: rgba(15, 39, 68, 0.92);
+            backdrop-filter: blur(24px) saturate(140%);
+            -webkit-backdrop-filter: blur(24px) saturate(140%);
+            border: 1px solid var(--border-strong);
+            border-radius: 18px;
+            box-shadow: 0 30px 80px -10px rgba(0, 0, 0, 0.6);
+            width: min(500px, 100%);
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: modalUp 0.5s var(--ease-out-expo);
+        }
+        @keyframes modalUp {
+            from { opacity: 0; transform: translateY(24px) scale(0.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 22px;
+            border-bottom: 1px solid var(--border);
+        }
+        .modal-title,
+        .modal-header h3 {
+            font-family: 'Sora', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--white) !important;
+            letter-spacing: -0.3px;
+        }
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 9px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            color: var(--text-soft);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .modal-close svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+        .modal-close:hover { background: var(--surface-3); color: var(--white); }
+        .modal-body {
+            padding: 22px;
+            overflow-y: auto;
+            flex: 1;
+            color: var(--text-soft);
+        }
+        .modal-body::-webkit-scrollbar { width: 6px; }
+        .modal-body::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 3px; }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 16px 22px;
+            border-top: 1px solid var(--border);
+            align-items: center;
+        }
+
+        /* Form elements */
+        .form-group { margin-bottom: 14px; }
+        .form-label {
+            display: block;
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-dim);
+            margin-bottom: 6px;
+        }
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 11px 14px;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--white);
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        .form-select option { background: var(--navy-dark); color: var(--white); }
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+            font-family: 'Outfit', sans-serif;
+        }
+        .form-textarea::placeholder { color: var(--text-dim); }
+        .form-select:focus,
+        .form-textarea:focus {
+            border-color: var(--navy-lighter);
+            background: rgba(0, 0, 0, 0.35);
+            box-shadow: 0 0 0 3px rgba(58, 111, 168, 0.18);
+        }
+
+        /* ========== TOAST ========== */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 22px;
+            background: rgba(15, 39, 68, 0.95);
+            border: 1px solid var(--border-strong);
+            border-radius: 12px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            color: var(--white);
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.6);
+            z-index: 10001;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s var(--ease-out-expo);
+            min-width: 200px;
+        }
+        .toast.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast svg {
+            width: 18px;
+            height: 18px;
+            stroke: #86efac;
+            fill: none;
+            stroke-width: 2.4;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .toast.error { border-color: rgba(196, 30, 58, 0.5); }
+        .toast.error svg { stroke: var(--red-light); }
+
+        /* ========== ANNOUNCEMENT POPUP ========== */
+        .announcement-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 10001;
+            background: rgba(5, 15, 28, 0.85);
+            backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: modalFadeIn 0.35s ease;
+        }
+        .announcement-popup {
+            width: min(440px, 100%);
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 30px 80px -10px rgba(0, 0, 0, 0.6);
+            color: var(--white);
+            overflow: hidden;
+            animation: modalUp 0.55s var(--ease-out-expo);
+        }
+        .announcement-header { display: flex; gap: 14px; padding: 20px 22px 16px; align-items: flex-start; }
+        .announcement-icon {
+            width: 48px; height: 48px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; color: var(--white);
+        }
+        .announcement-icon svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2; }
+        .announcement-header-text { flex: 1; min-width: 0; }
+        .announcement-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 4px; }
+        .announcement-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--white);
+            line-height: 1.2;
+            letter-spacing: -0.3px;
+        }
+        .announcement-body { padding: 4px 22px 18px; }
+        .announcement-message { font-size: 13.5px; line-height: 1.55; color: rgba(255, 255, 255, 0.88); margin-bottom: 12px; }
+        .announcement-time { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: rgba(255, 255, 255, 0.65); }
+        .announcement-time svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+        .announcement-footer { padding: 0 22px 22px; }
+        .announcement-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 22px;
+            background: rgba(255, 255, 255, 0.15);
+            color: var(--white);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 10px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.35s ease;
+        }
+        .announcement-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.2; }
+        .announcement-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-1px);
+        }
+
+        /* ========== OVERRIDES for inline-styled elements ========== */
+        [style*="color:var(--gray-600)"],
+        [style*="color: var(--gray-600)"] { color: var(--text-soft) !important; }
+        [style*="color:var(--gray-400)"],
+        [style*="color: var(--gray-400)"] { color: var(--text-dim) !important; }
+        [style*="color:var(--gray-500)"],
+        [style*="color: var(--gray-500)"] { color: var(--text-muted) !important; }
+        [style*="color:var(--gray-700)"],
+        [style*="color: var(--gray-700)"] { color: var(--white) !important; }
+        [style*="border-bottom:1px solid var(--gray-200)"],
+        [style*="border-bottom: 1px solid var(--gray-200)"] { border-bottom: 1px solid var(--border) !important; }
+
+        /* ========== BACKGROUND ORBS ========== */
+        .bg-orbs {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            mix-blend-mode: screen;
+        }
+        .orb-1 {
+            width: 500px; height: 500px; top: -120px; left: -120px;
+            background: radial-gradient(circle, rgba(58, 111, 168, 0.65) 0%, transparent 60%);
+            animation: orbFloat1 24s ease-in-out infinite;
+        }
+        .orb-2 {
+            width: 420px; height: 420px; bottom: -100px; right: -80px;
+            background: radial-gradient(circle, rgba(196, 30, 58, 0.55) 0%, transparent 60%);
+            animation: orbFloat2 30s ease-in-out infinite;
+        }
+        @keyframes orbFloat1 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(80px, 40px) scale(1.08); }
+        }
+        @keyframes orbFloat2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-70px, -50px) scale(1.1); }
+        }
+
+        /* ========== MOBILE ========== */
+        @media (max-width: 900px) {
+            :root { --sidebar-w: 0px; }
+            .sidebar { transform: translateX(-100%); width: 260px; }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 14px 16px 30px; }
+            .menu-toggle { display: flex; }
+            .topbar { padding: 10px 14px; top: 10px; }
+            .page-title { font-size: 19px; }
+            .stats-bar { grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+            .stat-card { padding: 16px 14px; }
+            .stat-value { font-size: 24px; }
+            .stat-label { font-size: 10px; }
+            .friends-grid { grid-template-columns: 1fr; }
+            /* Notification dropdown: pin to viewport edge on mobile */
+            .notification-dropdown {
+                position: fixed;
+                top: 70px;
+                right: 16px;
+                left: 16px;
+                width: auto;
+                max-width: none;
+            }
+        }
+        @media (max-width: 640px) {
+            .main-content { padding: 12px; }
+            .stats-bar { grid-template-columns: 1fr; }
+            .friend-card { padding: 14px; gap: 12px; }
+            .friend-avatar { width: 48px; height: 48px; font-size: 14px; }
+            .friend-name { font-size: 14px; }
+            .friend-actions { flex-direction: column; gap: 6px; }
+            .btn-sm { padding: 7px 10px; font-size: 11px; }
+            .request-card { padding: 14px; }
+            .modal { max-height: 95vh; }
+            .modal-body { padding: 16px; }
+            .tab { padding: 10px 14px; font-size: 12px; }
+            .search-btn { padding: 8px 14px; font-size: 11.5px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+            .orb { animation: none !important; }
+        }
+    
+        /* ==========================================================
+           PROFILE MODAL (shared) — bulletproof override.
+           This block must appear LAST in the stylesheet so its
+           cascade order beats any earlier profile-modal-* rules.
+           ========================================================== */
+
+        /* Modal sizing */
+        #profileModal .modal,
+        #profileModal .modal-content {
+            width: min(440px, 100%) !important;
+            max-width: 440px !important;
+        }
+        #profileModal .modal-body {
+            padding: 28px 24px 16px !important;
+        }
+        #profileModal .modal-footer {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            padding: 14px 24px 22px !important;
+            gap: 12px !important;
+            border-top: 1px solid var(--border) !important;
+        }
+
+        /* NUCLEAR SVG constraint — EVERY svg inside the profile modal
+           must have a real size cap so the runtime-injected content
+           cannot explode. */
+        #profileModal svg {
+            width: 16px !important;
+            height: 16px !important;
+            max-width: 16px !important;
+            max-height: 16px !important;
+            min-width: 0 !important;
+            min-height: 0 !important;
+            flex-shrink: 0 !important;
+        }
+        #profileModal .modal-close svg {
+            width: 16px !important;
+            height: 16px !important;
+        }
+
+        /* Content wrapper centers everything */
+        #profileModal .profile-modal-content {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            text-align: center !important;
+            width: 100% !important;
+        }
+
+        /* AVATAR — fixed 110px circle, initials or image */
+        #profileModal .profile-modal-avatar {
+            position: relative !important;
+            width: 110px !important;
+            height: 110px !important;
+            min-width: 110px !important;
+            min-height: 110px !important;
+            max-width: 110px !important;
+            max-height: 110px !important;
+            border-radius: 50% !important;
+            background: linear-gradient(135deg, var(--navy-light), var(--navy)) !important;
+            color: var(--white) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-family: 'Sora', sans-serif !important;
+            font-weight: 800 !important;
+            font-size: 36px !important;
+            letter-spacing: -1px !important;
+            margin: 0 auto 16px !important;
+            border: 3px solid rgba(255, 255, 255, 0.12) !important;
+            box-shadow: 0 14px 38px -14px rgba(0, 0, 0, 0.7) !important;
+            overflow: visible !important;
+            flex-shrink: 0 !important;
+        }
+        #profileModal .profile-modal-avatar img {
+            width: 100% !important;
+            height: 100% !important;
+            max-width: 100% !important;
+            max-height: 100% !important;
+            object-fit: cover !important;
+            border-radius: 50% !important;
+            display: block !important;
+        }
+        /* Just in case a stray SVG ends up inside the avatar */
+        #profileModal .profile-modal-avatar svg {
+            width: 42px !important;
+            height: 42px !important;
+            max-width: 42px !important;
+            max-height: 42px !important;
+            stroke: var(--white) !important;
+            opacity: 0.7 !important;
+        }
+
+        /* Status dot (friends/messages use .online-dot, study-groups uses .status-dot) */
+        #profileModal .profile-modal-avatar .online-dot,
+        #profileModal .profile-modal-avatar > .status-dot {
+            position: absolute !important;
+            bottom: 6px !important;
+            right: 6px !important;
+            width: 18px !important;
+            height: 18px !important;
+            min-width: 18px !important;
+            min-height: 18px !important;
+            max-width: 18px !important;
+            max-height: 18px !important;
+            border-radius: 50% !important;
+            background: var(--green) !important;
+            border: 3px solid #0a1929 !important;
+            box-shadow: 0 0 12px rgba(74, 222, 128, 0.7) !important;
+            z-index: 2 !important;
+            animation: none !important;
+        }
+        #profileModal .profile-modal-avatar .online-dot.offline,
+        #profileModal .profile-modal-avatar > .status-dot.offline {
+            background: var(--text-dim) !important;
+            box-shadow: none !important;
+        }
+
+        /* Name */
+        #profileModal .profile-modal-name {
+            font-family: 'Sora', sans-serif !important;
+            font-size: 22px !important;
+            font-weight: 800 !important;
+            color: var(--white) !important;
+            letter-spacing: -0.5px !important;
+            line-height: 1.15 !important;
+            margin-bottom: 6px !important;
+            max-width: 100% !important;
+            overflow-wrap: break-word !important;
+            text-align: center !important;
+        }
+        /* Program + year */
+        #profileModal .profile-modal-program {
+            font-size: 13px !important;
+            color: var(--text-muted) !important;
+            margin-bottom: 12px !important;
+            max-width: 100% !important;
+            text-align: center !important;
+        }
+        /* Status pill */
+        #profileModal .profile-modal-status {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            padding: 6px 14px !important;
+            background: rgba(74, 222, 128, 0.12) !important;
+            border: 1px solid rgba(74, 222, 128, 0.35) !important;
+            border-radius: 999px !important;
+            color: var(--green) !important;
+            font-size: 11px !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            margin-bottom: 14px !important;
+            width: fit-content !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+        #profileModal .profile-modal-status span {
+            font-size: 14px !important;
+            line-height: 1 !important;
+        }
+        #profileModal .profile-modal-status.offline {
+            background: rgba(255, 255, 255, 0.04) !important;
+            border-color: var(--border) !important;
+            color: var(--text-muted) !important;
+        }
+        #profileModal .profile-modal-status.offline span {
+            color: var(--text-dim) !important;
+        }
+
+        /* Bio */
+        #profileModal .profile-modal-bio {
+            width: 100% !important;
+            padding: 12px 16px !important;
+            background: rgba(0, 0, 0, 0.25) !important;
+            border: 1px solid var(--border) !important;
+            border-left: 3px solid var(--navy-lighter) !important;
+            border-radius: 10px !important;
+            font-size: 12.5px !important;
+            color: var(--text-soft) !important;
+            line-height: 1.55 !important;
+            margin-bottom: 14px !important;
+            text-align: left !important;
+            font-style: italic !important;
+        }
+
+        /* Meta row */
+        #profileModal .profile-modal-meta {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            width: 100% !important;
+            padding: 12px 16px !important;
+            background: rgba(0, 0, 0, 0.2) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 10px !important;
+            margin-bottom: 4px !important;
+        }
+        #profileModal .profile-modal-meta .label {
+            font-size: 10.5px !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.8px !important;
+            color: var(--text-dim) !important;
+        }
+        #profileModal .profile-modal-meta .value {
+            font-size: 12.5px !important;
+            color: var(--white) !important;
+            font-weight: 600 !important;
+        }
+
+        /* Actions container (inside modal-footer) */
+        #profileModal .profile-modal-actions {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 10px !important;
+            width: 100% !important;
+        }
+        #profileModal .profile-modal-actions > .btn {
+            width: 100% !important;
+            justify-content: center !important;
+            padding: 11px 16px !important;
+            font-size: 13px !important;
+        }
+        #profileModal .profile-modal-actions .btn-row {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 8px !important;
+        }
+        #profileModal .profile-modal-actions .btn-row .btn {
+            width: 100% !important;
+            justify-content: center !important;
+            padding: 10px 12px !important;
+            font-size: 12.5px !important;
+        }
+
+        /* Button variants used by the profile modal */
+        .btn-outline-danger {
+            background: rgba(196, 30, 58, 0.08);
+            color: var(--red-light);
+            border: 1px solid rgba(196, 30, 58, 0.35);
+        }
+        .btn-outline-danger:hover {
+            background: rgba(196, 30, 58, 0.18);
+            color: var(--red-light);
+            border-color: rgba(196, 30, 58, 0.55);
+            transform: translateY(-1px);
+        }
+        .btn-warning {
+            background: rgba(251, 146, 60, 0.1);
+            color: var(--orange);
+            border: 1px solid rgba(251, 146, 60, 0.35);
+        }
+        .btn-warning:hover {
+            background: rgba(251, 146, 60, 0.2);
+            color: var(--orange);
+            border-color: rgba(251, 146, 60, 0.55);
+            transform: translateY(-1px);
+        }
+
+        /* View Full Profile link at the bottom */
+        #profileModal .profile-modal-link-container {
+            padding-top: 12px !important;
+            border-top: 1px solid var(--border) !important;
+            text-align: center !important;
+            width: 100% !important;
+            margin-top: 4px !important;
+        }
+        #profileModal .profile-modal-link {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            padding: 10px 18px !important;
+            color: var(--navy-lighter) !important;
+            font-size: 12.5px !important;
+            font-weight: 600 !important;
+            border-radius: 9px !important;
+            transition: all 0.3s ease !important;
+            background: transparent !important;
+            border: none !important;
+            text-decoration: none !important;
+        }
+        #profileModal .profile-modal-link:hover {
+            background: var(--surface-2) !important;
+            color: #8ab4e8 !important;
+            transform: translateX(2px) !important;
+        }
+        #profileModal .profile-modal-link svg {
+            width: 14px !important;
+            height: 14px !important;
+            max-width: 14px !important;
+            max-height: 14px !important;
+            stroke: currentColor !important;
+            fill: none !important;
+            stroke-width: 2 !important;
+        }
+
+        /* Blocked notice */
+        #profileModal .profile-modal-actions p {
+            color: var(--text-muted) !important;
+            text-align: center !important;
+            font-size: 13px !important;
+            padding: 16px 0 !important;
+        }
+        .profile-blocked-notice {
+            padding: 12px 14px !important;
+            background: rgba(196, 30, 58, 0.1) !important;
+            border: 1px solid rgba(196, 30, 58, 0.3) !important;
+            border-radius: 10px !important;
+            color: var(--red-light) !important;
+            font-size: 12.5px !important;
+            text-align: center !important;
+            margin-bottom: 10px !important;
+        }
+        /* ========== END PROFILE MODAL OVERRIDE ========== */
+    </style>
+    <!-- Primary Meta Tags -->
+    <meta name="title" content="Friends - MyUB | University of Botswana">
+    <meta name="description" content="Connect with University of Botswana students. Build your campus network and see who is online.">
+    <meta name="keywords" content="MyUB, University of Botswana, UB, student portal, GPA calculator, study groups, student companion, Botswana education, UB students">
+    <meta name="author" content="Futurify Designs">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.myub.online/">
+    <meta property="og:title" content="Friends - MyUB | University of Botswana">
+    <meta property="og:description" content="Connect with University of Botswana students. Build your campus network and see who is online.">
+    <meta property="og:image" content="https://www.myub.online/icons/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="1200">
+    <meta property="og:site_name" content="MyUB">
+    <meta property="og:locale" content="en_US">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://www.myub.online/">
+    <meta name="twitter:title" content="Friends - MyUB | University of Botswana">
+    <meta name="twitter:description" content="Connect with University of Botswana students. Build your campus network and see who is online.">
+    <meta name="twitter:image" content="https://www.myub.online/icons/og-image.jpg">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+    <link rel="mask-icon" href="icons/favicon-32x32.png" color="#1a365d">
+    <meta name="msapplication-TileColor" content="#1a365d">
+    <meta name="msapplication-TileImage" content="icons/icon-144x144.png">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1a365d">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MyUB">
+    
+    <!-- OneSignal SDK -->
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://www.myub.online/">
+
+</head>
+<body>
+    <div class="loading" id="loadingScreen"><div class="loading-spinner"></div></div>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="dashboard.html" class="sidebar-logo">
+                <div class="myub-logo">
+                    <div class="ml-m-wrap">
+                        <div class="ml-cap">
+                            <svg viewBox="0 0 100 70">
+                                <polygon points="50,6 95,24 50,42 5,24" fill="#ffffff"/>
+                                <circle cx="50" cy="24" r="4.5" fill="#1a365d" stroke="#ffffff" stroke-width="1.5"/>
+                                <rect x="32" y="38" width="36" height="18" rx="2.5" fill="#ffffff"/>
+                                <circle cx="78" cy="24" r="4" fill="#c41e3a"/>
+                                <path d="M78 28 Q82 44 80 54" stroke="#c41e3a" stroke-width="3" fill="none" stroke-linecap="round"/>
+                                <ellipse cx="80" cy="57" rx="5" ry="8" fill="#c41e3a"/>
+                            </svg>
+                        </div>
+                        <span class="ml-m">M</span>
+                    </div>
+                    <span class="ml-ub">yUB</span>
+                </div>
+            </a>
+        </div>
+        <nav>
+            <div class="nav-section">
+                <div class="nav-section-title">Menu</div>
+                <a href="dashboard.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Dashboard</a>
+                <a href="gpa-calculator.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>GPA Calculator</a>
+                <a href="schedule.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>Schedule</a>
+                <a href="events.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>Events</a>
+                <a href="notes.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>Notes</a>
+                <a href="past-papers.html" class="nav-item">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    Past Papers
+                </a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Social</div>
+                <a href="study-groups.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>Study Groups</a>
+                <a href="messages.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>Messages<span class="badge" id="sidebarMsgBadge" style="display:none;">0</span></a>
+                <a href="friends.html" class="nav-item active"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>Friends<span class="badge" id="sidebarFriendsBadge" style="display:none;">0</span></a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Account</div>
+                <a href="profile.html" class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>Profile</a>
+                <button class="nav-item" onclick="handleLogout()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>Sign Out</button>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent" style="display: none;">
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Menu"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+                <h1 class="page-title">Friends</h1>
+            </div>
+            <div class="topbar-right">
+                <div class="notification-wrapper">
+                    <button class="icon-btn" id="notificationBell" onclick="toggleNotifications()">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                        <span class="notification-badge" id="notifBadge" style="display: none;">0</span>
+                    </button>
+                    <div class="notification-dropdown" id="notificationDropdown">
+                        <div class="notif-dropdown-header"><h3>Notifications</h3><button onclick="markAllNotificationsRead()">Mark all read</button></div>
+                        <div class="notif-dropdown-list" id="notifList"></div>
+                        <div class="notif-dropdown-footer"><a onclick="openNotificationsModal()" style="cursor:pointer;">View All Notifications</a></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="friends-page">
+            <div class="stats-bar">
+                <div class="stat-card"><div class="stat-value" id="totalFriends">0</div><div class="stat-label">Total Friends</div></div>
+                <div class="stat-card online"><div class="stat-value" id="onlineFriends">0</div><div class="stat-label">Online Now</div></div>
+                <div class="stat-card" style="cursor: pointer;" onclick="openBlockedModal()" title="View blocked users"><div class="stat-value" id="blockedCount">0</div><div class="stat-label">Blocked</div></div>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" data-tab="friends" onclick="switchTab('friends')">All Friends</button>
+                <button class="tab" data-tab="requests" onclick="switchTab('requests')">Requests<span class="count" id="requestsCount" style="display:none;">0</span></button>
+                <button class="tab" data-tab="find" onclick="switchTab('find')">Find Students</button>
+                <button class="tab" data-tab="discover" onclick="switchTab('discover')">Discover</button>
+            </div>
+
+            <div class="tab-content active" id="friendsTab">
+                <div class="search-container">
+                    <div class="search-input-wrapper">
+                        <svg class="search-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        <input type="text" class="search-input" id="friendsSearch" placeholder="Search your friends..." oninput="filterFriends()">
+                    </div>
+                </div>
+                <div id="friendsContainer"></div>
+            </div>
+
+            <div class="tab-content" id="requestsTab">
+                <div class="section-header"><div class="section-title">Incoming Requests</div><div class="section-count" id="incomingCount">0 requests</div></div>
+                <div id="incomingRequests"></div>
+                <div class="section-header" style="margin-top: 32px;"><div class="section-title">Sent Requests</div><div class="section-count" id="outgoingCount">0 pending</div></div>
+                <div id="outgoingRequests"></div>
+            </div>
+
+            <div class="tab-content" id="findTab">
+                <div class="search-container">
+                    <div class="search-input-wrapper">
+                        <svg class="search-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        <input type="text" class="search-input" id="findSearch" placeholder="Search by name or program...">
+                        <button class="search-btn" onclick="searchStudents()">Search</button>
+                    </div>
+                </div>
+                <div id="searchResults">
+                    <div class="empty-state">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        <h3>Find Students</h3>
+                        <p>Search for students by name or program to connect with them</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="discoverTab">
+                <div class="discover-header">
+                    <h3>Discover People on MyUB</h3>
+                    <p>Connect with other students at the University of Botswana</p>
+                </div>
+                <div class="discover-filters">
+                    <select class="filter-select" id="discoverFilter" onchange="loadDiscoverUsers()">
+                        <option value="all">All Users</option>
+                        <option value="online">Online Now</option>
+                        <option value="recent">Recently Active</option>
+                    </select>
+                </div>
+                <div id="discoverContainer">
+                    <div class="loading-state"><div class="loading-spinner-small"></div><p>Loading users...</p></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- All Notifications Modal -->
+    <div class="modal-overlay" id="notificationsModal" style="display:none;" onclick="if(event.target===this)closeNotificationsModal()">
+        <div class="modal" style="max-width:500px;max-height:80vh;display:flex;flex-direction:column;">
+            <div class="modal-header"><h3 class="modal-title">All Notifications</h3><button class="modal-close" onclick="closeNotificationsModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button></div>
+            <div style="display:flex;gap:10px;padding:16px 24px;border-bottom:1px solid var(--gray-200);">
+                <button class="btn btn-secondary" onclick="markAllNotificationsReadModal()">Mark All Read</button>
+                <button class="btn btn-danger" onclick="clearAllNotifications()">Clear All</button>
+            </div>
+            <div class="modal-body" id="allNotifList" style="flex:1;overflow-y:auto;padding:0;"></div>
+        </div>
+    </div>
+
+    <!-- Confirm Modal -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal" style="max-width: 360px;">
+            <div class="modal-header"><h3 class="modal-title" id="confirmTitle">Confirm</h3><button class="modal-close" onclick="closeConfirmModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button></div>
+            <div class="modal-body"><p id="confirmMessage" style="text-align: center; color: var(--gray-600);">Are you sure?</p></div>
+            <div class="modal-footer"><button class="btn btn-secondary" onclick="closeConfirmModal()">Cancel</button><button class="btn btn-danger" id="confirmBtn" onclick="confirmAction()">Confirm</button></div>
+        </div>
+    </div>
+
+    <!-- Profile Preview Modal -->
+    <div class="modal-overlay" id="profileModal">
+        <div class="modal" style="max-width: 420px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Profile</h3>
+                <button class="modal-close" onclick="closeProfileModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+            <div class="modal-body" id="profileModalBody">
+                <!-- Profile content loaded dynamically -->
+            </div>
+            <div class="modal-footer" id="profileModalFooter">
+                <!-- Actions loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Modal -->
+    <div class="modal-overlay" id="reportModal">
+        <div class="modal" style="max-width: 440px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Report User</h3>
+                <button class="modal-close" onclick="closeReportModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+            <div class="modal-body">
+                <p style="color: var(--gray-600); margin-bottom: 16px; font-size: 14px;">Help us keep MyUB safe. Reports are confidential and reviewed by our admin team.</p>
+                <div class="form-group">
+                    <label class="form-label">Reason for report</label>
+                    <select class="form-select" id="reportReason">
+                        <option value="">Select a reason...</option>
+                        <option value="spam">Spam or fake account</option>
+                        <option value="harassment">Harassment or bullying</option>
+                        <option value="hate_speech">Hate speech</option>
+                        <option value="inappropriate_content">Inappropriate content</option>
+                        <option value="impersonation">Impersonation</option>
+                        <option value="threatening_violence">Threatening violence</option>
+                        <option value="self_harm">Self-harm or suicide</option>
+                        <option value="illegal_activity">Illegal activity</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Additional details (optional)</label>
+                    <textarea class="form-textarea" id="reportDescription" placeholder="Provide any additional context..." rows="3"></textarea>
+                </div>
+                <input type="hidden" id="reportUserId">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeReportModal()">Cancel</button>
+                <button class="btn btn-danger" onclick="submitReport()">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    Submit Report
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Blocked Users Modal -->
+    <div class="modal-overlay" id="blockedModal">
+        <div class="modal" style="max-width: 480px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Blocked Users</h3>
+                <button class="modal-close" onclick="closeBlockedModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+            <div class="modal-body" id="blockedModalBody" style="max-height: 400px; overflow-y: auto;">
+                <!-- Blocked users loaded dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeBlockedModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg><span id="toastMessage">Success!</span></div>
+
+    <script>
+        const SUPABASE_URL = 'https://weuxtwmaqmbhskjpjdyi.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndldXh0d21hcW1iaHNranBqZHlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NTYzMTcsImV4cCI6MjA4MDMzMjMxN30.J-0Nd0MY6-g_ltbBNHwOulqZuQfb8mKIRgx0dAaJ76o';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let currentUser = null;
+        let friends = [];
+        let incomingRequests = [];
+        let outgoingRequests = [];
+        let notifications = [];
+        let blockedUsers = [];
+        let blockedByUsers = []; // Users who blocked current user
+        let discoverUsers = [];
+        let confirmCallback = null;
+        let selectedProfileUser = null;
+
+        async function init() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) { window.location.href = 'index.html'; return; }
+            currentUser = session.user;
+            
+            // Check if user is banned
+            const { data: profile } = await supabaseClient.from('profiles').select('is_banned').eq('id', currentUser.id).single();
+            if (profile && profile.is_banned) {
+                await supabaseClient.auth.signOut();
+                alert('Your account has been suspended. Please contact an administrator.');
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Initialize connection manager
+            if (window.MyUBUtils) {
+                const canConnect = await MyUBUtils.ConnectionManager.init(supabaseClient, currentUser.id);
+                if (!canConnect) {
+                    document.getElementById('loadingScreen').style.display = 'none';
+                    return;
+                }
+                MyUBUtils.SubscriptionManager.init(supabaseClient, currentUser.id);
+                MyUBUtils.SubscriptionManager.subscribe({
+                    messages: () => loadSidebarBadges(),
+                    notifications: () => loadNotifications(),
+                    friend_requests: () => { loadRequests(); loadSidebarBadges(); }
+                });
+            }
+            
+            if (localStorage.getItem('myub_darkMode') === 'true') {
+                document.body.classList.add('dark-mode');
+            }
+            await updateOnlineStatus(true);
+            await Promise.all([loadFriends(), loadRequests(), loadNotifications(), loadBlockedUsers()]);
+            await loadSidebarBadges();
+            subscribeToRealtime(); // Setup real-time subscriptions
+            startHeartbeat();
+            startNotificationPolling(); // Poll for notifications as fallback
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            document.addEventListener('click', (e) => { if (!e.target.closest('.notification-wrapper')) document.getElementById('notificationDropdown').classList.remove('show'); });
+        }
+        
+        function startNotificationPolling() {
+            setInterval(async () => {
+                const lastNotifId = notifications.length > 0 ? notifications[0].id : null;
+                const { data: newNotifs } = await supabaseClient.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(5);
+                if (newNotifs && newNotifs.length > 0 && (!lastNotifId || newNotifs[0].id !== lastNotifId)) {
+                    const existingIds = notifications.map(n => n.id);
+                    const trulyNew = newNotifs.filter(n => !existingIds.includes(n.id));
+                    if (trulyNew.length > 0) {
+                        trulyNew.forEach(n => notifications.unshift(n));
+                        renderNotifications();
+                        playNotificationSound();
+                        showToast(trulyNew[0].title || 'New notification', 'success');
+                    }
+                }
+            }, 30000);
+        }
+
+        async function updateOnlineStatus(isOnline) {
+            await supabaseClient.from('profiles').update({ is_online: isOnline, last_seen: new Date().toISOString() }).eq('id', currentUser.id);
+        }
+
+        function startHeartbeat() {
+            setInterval(() => updateOnlineStatus(true), 30000);
+            window.addEventListener('beforeunload', () => updateOnlineStatus(false));
+        }
+
+        async function loadFriends() {
+            const { data: f1 } = await supabaseClient.from('friendships').select('friend_id').eq('user_id', currentUser.id);
+            const { data: f2 } = await supabaseClient.from('friendships').select('user_id').eq('friend_id', currentUser.id);
+            const friendIds = [...(f1||[]).map(f => f.friend_id), ...(f2||[]).map(f => f.user_id)];
+            if (friendIds.length === 0) { friends = []; updateStats(); renderFriends(); return; }
+            const { data: profiles } = await supabaseClient.from('profiles').select('id, first_name, last_name, full_name, program_name, avatar_url, is_online, last_seen').in('id', friendIds);
+            friends = profiles || [];
+            updateStats();
+            renderFriends();
+        }
+
+        function renderFriends() {
+            const container = document.getElementById('friendsContainer');
+            const query = document.getElementById('friendsSearch').value.toLowerCase();
+            const filtered = friends.filter(f => {
+                const name = (f.full_name || `${f.first_name} ${f.last_name}`).toLowerCase();
+                return name.includes(query) || (f.program_name||'').toLowerCase().includes(query);
+            });
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="empty-state"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg><h3>${query ? 'No friends found' : 'No friends yet'}</h3><p>${query ? 'Try a different search' : 'Find students to connect with'}</p>${!query ? '<button class="btn btn-primary" onclick="switchTab(\'find\')">Find Students</button>' : ''}</div>`;
+                return;
+            }
+            filtered.sort((a, b) => { if (a.is_online && !b.is_online) return -1; if (!a.is_online && b.is_online) return 1; return (a.full_name||a.first_name).localeCompare(b.full_name||b.first_name); });
+            container.innerHTML = '<div class="friends-grid">' + filtered.map(f => {
+                const name = f.full_name || `${f.first_name} ${f.last_name}`;
+                const initials = getInitials(name);
+                const lastSeen = f.last_seen ? formatTimeAgo(f.last_seen) : 'Never';
+                return `<div class="friend-card">
+                    <div class="friend-avatar" onclick="openProfileModal('${f.id}')" style="cursor:pointer;">${f.avatar_url ? `<img src="${f.avatar_url}" alt="" loading="lazy" decoding="async">` : initials}<div class="online-indicator ${f.is_online ? '' : 'offline'}"></div></div>
+                    <div class="friend-info" onclick="openProfileModal('${f.id}')" style="cursor:pointer;">
+                        <div class="friend-name">${escapeHtml(name)}${f.is_online ? '<span class="online-text">● Online</span>' : `<span class="offline-text">● ${lastSeen}</span>`}</div>
+                        <div class="friend-program">${escapeHtml(f.program_name || 'Student')}</div>
+                    </div>
+                    <div class="friend-actions">
+                        <button class="btn btn-primary btn-sm" onclick="startMessage('${f.id}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>Message</button>
+                        <button class="btn btn-icon btn-danger" onclick="confirmRemoveFriend('${f.id}', '${escapeHtml(name)}')" title="Remove"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 7a4 4 0 11-8 0 4 4 0 018 0zM9 14a6 6 0 00-6 6v1h12v-1a6 6 0 00-6-6zM21 12h-6"/></svg></button>
+                    </div>
+                </div>`;
+            }).join('') + '</div>';
+        }
+
+        function filterFriends() { renderFriends(); }
+
+        async function loadRequests() {
+            const { data: incoming } = await supabaseClient.from('friend_requests').select('id, created_at, sender:profiles!friend_requests_sender_id_fkey(id, first_name, last_name, full_name, program_name, avatar_url, is_online)').eq('receiver_id', currentUser.id).eq('status', 'pending');
+            incomingRequests = incoming || [];
+            const { data: outgoing } = await supabaseClient.from('friend_requests').select('id, created_at, receiver:profiles!friend_requests_receiver_id_fkey(id, first_name, last_name, full_name, program_name, avatar_url)').eq('sender_id', currentUser.id).eq('status', 'pending');
+            outgoingRequests = outgoing || [];
+            updateStats();
+            renderRequests();
+        }
+
+        function renderRequests() {
+            const inContainer = document.getElementById('incomingRequests');
+            const inCountEl = document.getElementById('incomingCount');
+            if (inCountEl) inCountEl.textContent = `${incomingRequests.length} request${incomingRequests.length !== 1 ? 's' : ''}`;
+            if (inContainer) {
+                if (incomingRequests.length === 0) {
+                    inContainer.innerHTML = '<div class="empty-state" style="padding:30px;"><p>No incoming requests</p></div>';
+                } else {
+                    inContainer.innerHTML = incomingRequests.map(r => {
+                        const s = r.sender, name = s.full_name || `${s.first_name} ${s.last_name}`, initials = getInitials(name);
+                        return `<div class="request-card"><div class="request-type">Friend Request</div><div class="request-header"><div class="friend-avatar" style="width:48px;height:48px;font-size:16px;">${s.avatar_url ? `<img src="${s.avatar_url}" loading="lazy" decoding="async">` : initials}<div class="online-indicator ${s.is_online ? '' : 'offline'}"></div></div><div class="friend-info"><div class="friend-name">${escapeHtml(name)}</div><div class="friend-program">${escapeHtml(s.program_name||'Student')}</div><div class="friend-meta">${formatTimeAgo(r.created_at)}</div></div></div><div class="request-actions"><button class="btn btn-success btn-sm" onclick="acceptRequest('${r.id}','${s.id}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>Accept</button><button class="btn btn-danger btn-sm" onclick="declineRequest('${r.id}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>Decline</button></div></div>`;
+                    }).join('');
+                }
+            }
+            const outContainer = document.getElementById('outgoingRequests');
+            const outCountEl = document.getElementById('outgoingCount');
+            if (outCountEl) outCountEl.textContent = `${outgoingRequests.length} pending`;
+            if (outContainer) {
+                if (outgoingRequests.length === 0) {
+                    outContainer.innerHTML = '<div class="empty-state" style="padding:30px;"><p>No pending sent requests</p></div>';
+                } else {
+                    outContainer.innerHTML = outgoingRequests.map(r => {
+                        const rec = r.receiver, name = rec.full_name || `${rec.first_name} ${rec.last_name}`, initials = getInitials(name);
+                        return `<div class="request-card outgoing"><div class="request-type">Sent Request</div><div class="request-header"><div class="friend-avatar" style="width:48px;height:48px;font-size:16px;">${rec.avatar_url ? `<img src="${rec.avatar_url}" loading="lazy" decoding="async">` : initials}</div><div class="friend-info"><div class="friend-name">${escapeHtml(name)}</div><div class="friend-program">${escapeHtml(rec.program_name||'Student')}</div><div class="friend-meta">Sent ${formatTimeAgo(r.created_at)}</div></div></div><div class="request-actions"><button class="btn btn-secondary btn-sm" onclick="cancelRequest('${r.id}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>Cancel</button></div></div>`;
+                    }).join('');
+                }
+            }
+            const count = incomingRequests.length;
+            const badge = document.getElementById('requestsCount');
+            const sbBadge = document.getElementById('sidebarFriendsBadge');
+            if (count > 0) { 
+                if (badge) { badge.textContent = count; badge.style.display = 'inline'; }
+                if (sbBadge) { sbBadge.textContent = count; sbBadge.style.display = 'inline'; } 
+            } else { 
+                if (badge) badge.style.display = 'none'; 
+                if (sbBadge) sbBadge.style.display = 'none'; 
+            }
+        }
+
+        async function acceptRequest(requestId, senderId) {
+            try {
+                await supabaseClient.from('friend_requests').update({ status: 'accepted', updated_at: new Date().toISOString() }).eq('id', requestId);
+                await supabaseClient.from('friendships').insert([{ user_id: currentUser.id, friend_id: senderId }, { user_id: senderId, friend_id: currentUser.id }]);
+                await createNotification(senderId, 'friend_accepted', 'Friend Request Accepted', 'accepted your friend request');
+                showToast('Friend request accepted!', 'success');
+                await loadFriends(); await loadRequests();
+            } catch (e) { showToast('Failed to accept', 'error'); }
+        }
+
+        async function declineRequest(requestId) {
+            await supabaseClient.from('friend_requests').update({ status: 'rejected' }).eq('id', requestId);
+            showToast('Request declined'); await loadRequests();
+        }
+
+        async function cancelRequest(requestId) {
+            await supabaseClient.from('friend_requests').delete().eq('id', requestId);
+            showToast('Request cancelled'); await loadRequests();
+        }
+
+        async function sendFriendRequest(userId, userName) {
+            // Check if already friends
+            const { data: friendship } = await supabaseClient.from('friendships').select('id').or(`and(user_id.eq.${currentUser.id},friend_id.eq.${userId}),and(user_id.eq.${userId},friend_id.eq.${currentUser.id})`).maybeSingle();
+            if (friendship) { showToast('Already friends!', 'error'); return; }
+            
+            // Check for existing pending request
+            const { data: existing } = await supabaseClient.from('friend_requests').select('id, status').or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${userId}),and(sender_id.eq.${userId},receiver_id.eq.${currentUser.id})`).maybeSingle();
+            
+            // If there's an existing request that's not pending (rejected/cancelled), delete it first
+            if (existing) {
+                if (existing.status === 'pending') {
+                    showToast('Request already pending', 'error'); 
+                    return;
+                }
+                // Delete old non-pending request
+                await supabaseClient.from('friend_requests').delete().eq('id', existing.id);
+            }
+            
+            await supabaseClient.from('friend_requests').insert({ sender_id: currentUser.id, receiver_id: userId });
+            await createNotification(userId, 'friend_request', 'New Friend Request', 'sent you a friend request');
+            showToast(`Request sent to ${userName}!`, 'success');
+            await loadRequests(); 
+            renderDiscoverUsers();
+            if (document.getElementById('findSearch')?.value) searchStudents();
+        }
+
+        function confirmRemoveFriend(friendId, name) {
+            document.getElementById('confirmTitle').textContent = 'Remove Friend';
+            document.getElementById('confirmMessage').textContent = `Remove ${name} from your friends?`;
+            confirmCallback = () => removeFriend(friendId);
+            document.getElementById('confirmModal').classList.add('show');
+        }
+
+        async function removeFriend(friendId) {
+            // Delete friendship
+            await supabaseClient.from('friendships').delete().or(`and(user_id.eq.${currentUser.id},friend_id.eq.${friendId}),and(user_id.eq.${friendId},friend_id.eq.${currentUser.id})`);
+            // Also delete any existing friend requests between both users so they can send new ones
+            await supabaseClient.from('friend_requests').delete().or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${friendId}),and(sender_id.eq.${friendId},receiver_id.eq.${currentUser.id})`);
+            showToast('Friend removed'); closeConfirmModal(); await loadFriends(); await loadRequests();
+        }
+
+        async function searchStudents() {
+            const query = document.getElementById('findSearch').value.trim();
+            const container = document.getElementById('searchResults');
+            if (!query) { container.innerHTML = '<div class="empty-state"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg><h3>Find Students</h3><p>Search by name or program</p></div>'; return; }
+            container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--gray-400);">Searching...</div>';
+            const { data: results } = await supabaseClient.from('profiles').select('id, first_name, last_name, full_name, program_name, avatar_url, is_online').or(`full_name.ilike.%${query}%,first_name.ilike.%${query}%,last_name.ilike.%${query}%,program_name.ilike.%${query}%`).neq('id', currentUser.id).limit(20);
+            if (!results || results.length === 0) { container.innerHTML = '<div class="empty-state"><h3>No students found</h3><p>Try a different search</p></div>'; return; }
+            
+            // Filter out blocked users (both directions)
+            const blockedIds = blockedUsers.map(b => b.blocked_id);
+            const filteredResults = results.filter(u => !blockedIds.includes(u.id) && !blockedByUsers.includes(u.id));
+            
+            if (filteredResults.length === 0) { container.innerHTML = '<div class="empty-state"><h3>No students found</h3><p>Try a different search</p></div>'; return; }
+            
+            const friendIds = friends.map(f => f.id);
+            const pendingOut = outgoingRequests.map(r => r.receiver.id);
+            const pendingIn = incomingRequests.map(r => r.sender.id);
+            container.innerHTML = '<div class="friends-grid">' + filteredResults.map(u => {
+                const name = u.full_name || `${u.first_name} ${u.last_name}`, initials = getInitials(name);
+                const isFriend = friendIds.includes(u.id), isPendingOut = pendingOut.includes(u.id), isPendingIn = pendingIn.includes(u.id);
+                let btn = '';
+                if (isFriend) btn = '<button class="btn btn-secondary btn-sm" disabled>Already Friends</button>';
+                else if (isPendingOut) btn = '<button class="btn btn-secondary btn-sm" disabled>Request Sent</button>';
+                else if (isPendingIn) btn = '<button class="btn btn-success btn-sm" onclick="switchTab(\'requests\')">Accept Request</button>';
+                else btn = `<button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); sendFriendRequest('${u.id}','${escapeHtml(name)}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>Add Friend</button>`;
+                return `<div class="friend-card" onclick="openProfileModal('${u.id}')" style="cursor:pointer;">
+                    <div class="friend-avatar">${u.avatar_url ? `<img src="${u.avatar_url}" loading="lazy" decoding="async">` : initials}<div class="online-indicator ${u.is_online ? '' : 'offline'}"></div></div>
+                    <div class="friend-info"><div class="friend-name">${escapeHtml(name)}</div><div class="friend-program">${escapeHtml(u.program_name||'Student')}</div></div>
+                    <div class="friend-actions" onclick="event.stopPropagation();">${btn}</div>
+                </div>`;
+            }).join('') + '</div>';
+        }
+        document.getElementById('findSearch')?.addEventListener('keypress', e => { if (e.key === 'Enter') searchStudents(); });
+
+        async function loadNotifications() {
+            const { data } = await supabaseClient.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(10);
+            notifications = data || [];
+            renderNotifications();
+            checkAnnouncementPopup();
+        }
+        
+        function checkAnnouncementPopup() {
+            const adminTypes = ['announcement', 'admin_warning', 'warning', 'ban', 'admin_message', 'admin_urgent', 'admin_success'];
+            const unreadAdmin = notifications.filter(n => adminTypes.includes(n.type) && !n.is_read);
+            if (unreadAdmin.length > 0) showAdminPopup(unreadAdmin[0]);
+        }
+        
+        function showAdminPopup(notification) {
+            if (document.querySelector('.announcement-overlay')) return;
+            const timeAgo = formatTimeAgo(notification.created_at);
+            const type = notification.type || 'announcement';
+            let config = { label: '📢 Admin Announcement', iconBg: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)', iconShadow: 'rgba(249, 115, 22, 0.4)', icon: '<path d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>', headerBg: 'linear-gradient(135deg, #1a365d 0%, #2c5282 100%)', labelColor: '#f97316' };
+            if (type === 'admin_warning' || type === 'warning') { config = { label: '⚠️ Admin Warning', iconBg: 'linear-gradient(135deg, #eab308 0%, #ca8a04 100%)', iconShadow: 'rgba(234, 179, 8, 0.4)', icon: '<path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>', headerBg: 'linear-gradient(135deg, #854d0e 0%, #a16207 100%)', labelColor: '#fde047' }; }
+            else if (type === 'admin_urgent' || type === 'ban') { config = { label: type === 'ban' ? '🚫 Account Suspended' : '🚨 Urgent Notice', iconBg: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)', iconShadow: 'rgba(220, 38, 38, 0.4)', icon: type === 'ban' ? '<path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>' : '<path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>', headerBg: 'linear-gradient(135deg, #991b1b 0%, #b91c1c 100%)', labelColor: '#fca5a5' }; }
+            else if (type === 'admin_success') { config = { label: '✅ Good News!', iconBg: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)', iconShadow: 'rgba(34, 197, 94, 0.4)', icon: '<path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>', headerBg: 'linear-gradient(135deg, #166534 0%, #15803d 100%)', labelColor: '#86efac' }; }
+            const overlay = document.createElement('div');
+            overlay.className = 'announcement-overlay';
+            overlay.innerHTML = `<div class="announcement-popup" style="background: ${config.headerBg};"><div class="announcement-header"><div class="announcement-icon" style="background: ${config.iconBg}; box-shadow: 0 4px 12px ${config.iconShadow};"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">${config.icon}</svg></div><div class="announcement-header-text"><div class="announcement-label" style="color: ${config.labelColor};">${config.label}</div><div class="announcement-title">${escapeHtml(notification.title)}</div></div></div><div class="announcement-body"><div class="announcement-message">${escapeHtml(notification.body || '')}</div><div class="announcement-time"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>${timeAgo}</div></div><div class="announcement-footer"><button class="announcement-btn" onclick="dismissAnnouncement('${notification.id}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>I Understand</button></div></div>`;
+            document.body.appendChild(overlay);
+            playNotificationSound();
+        }
+        
+        async function dismissAnnouncement(announcementId) {
+            const notification = notifications.find(n => n.id === announcementId);
+            const isBan = notification && notification.type === 'ban';
+            
+            await supabaseClient.from('notifications').update({ is_read: true }).eq('id', announcementId);
+            const idx = notifications.findIndex(n => n.id === announcementId);
+            if (idx !== -1) notifications[idx].is_read = true;
+            const overlay = document.querySelector('.announcement-overlay');
+            if (overlay) { overlay.style.animation = 'fadeIn 0.3s ease reverse'; setTimeout(() => overlay.remove(), 300); }
+            
+            if (isBan) {
+                await supabaseClient.auth.signOut();
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            renderNotifications();
+            setTimeout(checkAnnouncementPopup, 500);
+        }
+
+        function renderNotifications() {
+            const list = document.getElementById('notifList');
+            const badge = document.getElementById('notifBadge');
+            const unread = notifications.filter(n => !n.is_read).length;
+            if (unread > 0) { badge.textContent = unread > 9 ? '9+' : unread; badge.style.display = 'flex'; }
+            else { badge.style.display = 'none'; }
+            if (notifications.length === 0) { list.innerHTML = '<div class="notif-empty"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg><p>No notifications</p></div>'; return; }
+            list.innerHTML = notifications.map(n => {
+                const type = n.type || '';
+                const refId = n.reference_id || '';
+                const isGroupNotif = refId.startsWith('group:');
+                const iconClass = type.includes('friend') ? 'friend' : (isGroupNotif ? 'group' : (type.includes('message') ? 'message' : type.includes('warning') ? 'warning' : 'group'));
+                const iconSvg = iconClass === 'friend' ? '<path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>' : iconClass === 'message' ? '<path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>' : '<path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>';
+                return `<div class="notif-dropdown-item ${n.is_read ? '' : 'unread'}" onclick="handleNotifClick('${n.id}','${type}','${refId}')"><div class="notif-icon ${iconClass}"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">${iconSvg}</svg></div><div class="notif-content"><h4>${escapeHtml(n.title || 'Notification')}</h4><p>${escapeHtml(n.body||'')}</p><div class="time">${formatTimeAgo(n.created_at)}</div></div></div>`;
+            }).join('');
+        }
+
+        async function handleNotifClick(id, type, refId) {
+            await supabaseClient.from('notifications').update({ is_read: true }).eq('id', id);
+            const n = notifications.find(x => x.id === id); if (n) n.is_read = true;
+            renderNotifications();
+            document.getElementById('notificationDropdown').classList.remove('show');
+            // Handle group join request notifications
+            if (type === 'group_join_request' && n && n.reference_id) {
+                if (n.reference_id.startsWith('accepted:')) { window.location.href = 'study-groups.html?group=' + n.reference_id.replace('accepted:', ''); return; }
+                if (n.reference_id.startsWith('declined:')) { window.location.href = 'study-groups.html'; return; }
+                window.location.href = 'study-groups.html?join_request=' + encodeURIComponent(n.reference_id) + '&notif_id=' + id; return;
+            }
+            if (refId && refId.startsWith('group:')) { window.location.href = 'study-groups.html?id=' + refId.replace('group:', ''); return; }
+            if (type === 'friend_request' || type === 'friend_accept' || type === 'friend_accepted') switchTab('requests');
+            else if (type === 'message') window.location.href = 'messages.html';
+            else if (type === 'study_group') window.location.href = 'study-groups.html';
+            else if (type === 'admin_warning' || type === 'announcement') window.location.href = 'dashboard.html';
+        }
+
+        async function markAllNotificationsRead() {
+            await supabaseClient.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id);
+            notifications.forEach(n => n.is_read = true);
+            renderNotifications();
+            showToast('Marked all as read');
+        }
+
+        function toggleNotifications() { event.stopPropagation(); document.getElementById('notificationDropdown').classList.toggle('show'); }
+
+        async function createNotification(userId, type, title, body) {
+            // Insert into old notifications table
+            await supabaseClient.from('notifications').insert({ user_id: userId, type, title, body });
+            
+            // Send push notification via Cloudflare Worker
+            try {
+                const senderProfile = await supabaseClient.from('profiles').select('full_name').eq('id', currentUser.id).single();
+                const senderName = senderProfile.data?.full_name || 'Someone';
+                
+                await fetch('https://myub-push-notifications.futurifydesigns.workers.dev', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: userId,
+                        title: title,
+                        body: senderName + ' ' + body,
+                        data: {
+                            type: type,
+                            senderId: currentUser.id,
+                            url: type === 'friend_request' ? '/friends.html?tab=requests' : '/friends.html'
+                        }
+                    })
+                });
+                console.log('MyUB: Push notification sent for', type);
+            } catch (error) {
+                console.error('MyUB: Push notification error:', error);
+            }
+        }
+
+        // Notification sound
+        function playNotificationSound() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.frequency.value = 800;
+                osc.type = 'sine';
+                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.3);
+            } catch (e) { console.log('Sound error:', e); }
+        }
+
+        function subscribeToRealtime() {
+            // Listen for incoming friend requests
+            supabaseClient.channel('friend-requests-in').on('postgres_changes', { event: '*', schema: 'public', table: 'friend_requests', filter: `receiver_id=eq.${currentUser.id}` }, async (payload) => { 
+                loadRequests(); 
+                loadSidebarBadges(); 
+                playNotificationSound(); 
+                
+                // 🔔 TRIGGER PUSH NOTIFICATION for new friend request
+                try {
+                    if (window.MyUBNotificationTriggers && payload.eventType === 'INSERT') {
+                        const request = payload.new;
+                        const senderProfile = await supabaseClient
+                            .from('profiles')
+                            .select('full_name, avatar_url')
+                            .eq('id', request.sender_id)
+                            .single();
+                        
+                        const senderName = senderProfile.data?.full_name || 'Someone';
+                        const senderAvatar = senderProfile.data?.avatar_url || null;
+                        
+                        await MyUBNotificationTriggers.onFriendRequest(
+                            supabaseClient,
+                            request.sender_id,
+                            senderName,
+                            senderAvatar
+                        );
+                        console.log('MyUB: Friend request notification triggered');
+                    }
+                } catch (error) {
+                    console.error('MyUB: Error triggering friend request notification:', error);
+                }
+            }).subscribe();
+            // Listen for changes to our outgoing requests (when someone accepts/rejects)
+            supabaseClient.channel('friend-requests-out').on('postgres_changes', { event: '*', schema: 'public', table: 'friend_requests', filter: `sender_id=eq.${currentUser.id}` }, async (payload) => { 
+                loadRequests(); 
+                renderDiscoverUsers(); 
+                
+                // 🔔 TRIGGER PUSH NOTIFICATION when friend request is accepted
+                try {
+                    if (window.MyUBNotificationTriggers && payload.eventType === 'UPDATE' && payload.new.status === 'accepted') {
+                        const request = payload.new;
+                        const accepterProfile = await supabaseClient
+                            .from('profiles')
+                            .select('full_name, avatar_url')
+                            .eq('id', request.receiver_id)
+                            .single();
+                        
+                        const accepterName = accepterProfile.data?.full_name || 'Someone';
+                        const accepterAvatar = accepterProfile.data?.avatar_url || null;
+                        
+                        await MyUBNotificationTriggers.onFriendRequestAccepted(
+                            supabaseClient,
+                            request.receiver_id,
+                            accepterName,
+                            accepterAvatar
+                        );
+                        console.log('MyUB: Friend request accepted notification triggered');
+                    }
+                } catch (error) {
+                    console.error('MyUB: Error triggering friend accepted notification:', error);
+                }
+            }).subscribe();
+            // Listen for friendship changes
+            supabaseClient.channel('friendships').on('postgres_changes', { event: '*', schema: 'public', table: 'friendships' }, () => { loadFriends(); loadRequests(); }).subscribe();
+            supabaseClient.channel('notifications-friends-' + currentUser.id).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${currentUser.id}` }, (p) => { 
+                console.log('Friends page: New notification received:', p);
+                notifications.unshift(p.new); 
+                renderNotifications(); 
+                const adminTypes = ['announcement', 'admin_warning', 'warning', 'ban', 'admin_message', 'admin_urgent', 'admin_success'];
+                if (adminTypes.includes(p.new.type)) {
+                    showAdminPopup(p.new);
+                } else {
+                    playNotificationSound();
+                    showToast(p.new.title || 'New notification', 'success');
+                }
+            }).subscribe((status) => console.log('Friends notification subscription:', status));
+            supabaseClient.channel('online-status-friends-' + currentUser.id).on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, (p) => {
+                // Update friends list
+                const idx = friends.findIndex(f => f.id === p.new.id);
+                if (idx !== -1) { 
+                    const wasOff = !friends[idx].is_online;
+                    const lastSeen = friends[idx].last_seen ? new Date(friends[idx].last_seen) : null;
+                    const now = new Date();
+                    const offlineDuration = lastSeen ? (now - lastSeen) / 1000 : 999;
+                    
+                    friends[idx].is_online = p.new.is_online; 
+                    friends[idx].last_seen = p.new.last_seen; 
+                    renderFriends(); 
+                    updateStats(); 
+                    
+                    // Only show notification if they were offline for more than 30 seconds
+                    if (wasOff && p.new.is_online && offlineDuration > 30) {
+                        showFriendOnlineToast(friends[idx].full_name || friends[idx].first_name);
+                    }
+                }
+                // Update discover list
+                const discoverIdx = discoverUsers.findIndex(u => u.id === p.new.id);
+                if (discoverIdx !== -1) {
+                    discoverUsers[discoverIdx].is_online = p.new.is_online;
+                    discoverUsers[discoverIdx].last_seen = p.new.last_seen;
+                    renderDiscoverUsers();
+                }
+            }).subscribe();
+            
+            // Sidebar messages badge real-time
+            supabaseClient.channel('friends-messages-' + currentUser.id).on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: `receiver_id=eq.${currentUser.id}` }, () => loadSidebarBadges()).subscribe();
+        }
+
+        function showFriendOnlineToast(friendName) {
+            const existing = document.querySelector('.friend-online-toast');
+            if (existing) existing.remove();
+            const toast = document.createElement('div');
+            toast.className = 'friend-online-toast';
+            toast.innerHTML = `<div style="width:10px;height:10px;background:#22c55e;border-radius:50%;animation:pulse 1s infinite;"></div><span><strong>${friendName}</strong> is now online</span>`;
+            toast.style.cssText = 'position:fixed;top:80px;right:20px;background:linear-gradient(135deg,#065f46,#047857);color:white;padding:14px 20px;border-radius:12px;display:flex;align-items:center;gap:12px;z-index:9999;animation:slideInRight 0.3s ease;box-shadow:0 4px 20px rgba(4,120,87,0.4);font-size:14px;';
+            const style = document.createElement('style');
+            style.textContent = '@keyframes slideInRight{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}';
+            document.head.appendChild(style);
+            document.body.appendChild(toast);
+            playNotificationSound();
+            setTimeout(() => { toast.style.animation = 'slideInRight 0.3s ease reverse'; setTimeout(() => toast.remove(), 300); }, 4000);
+        }
+
+        async function loadSidebarBadges() {
+            const { count: msgCount } = await supabaseClient.from('messages').select('id', { count: 'exact' }).eq('receiver_id', currentUser.id).eq('is_read', false).eq('is_deleted', false);
+            updateSidebarBadge('sidebarMsgBadge', msgCount || 0);
+            const { count: reqCount } = await supabaseClient.from('friend_requests').select('id', { count: 'exact' }).eq('receiver_id', currentUser.id).eq('status', 'pending');
+            updateSidebarBadge('sidebarFriendsBadge', reqCount || 0);
+        }
+
+        function updateSidebarBadge(elementId, count) {
+            const badge = document.getElementById(elementId);
+            if (badge) {
+                if (count > 0) { badge.textContent = count > 99 ? '99+' : count; badge.style.display = 'inline'; }
+                else { badge.style.display = 'none'; }
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('totalFriends').textContent = friends.length;
+            document.getElementById('onlineFriends').textContent = friends.filter(f => f.is_online).length;
+            document.getElementById('blockedCount').textContent = blockedUsers.length;
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(`${tab}Tab`).classList.add('active');
+            
+            // Load discover users when switching to discover tab
+            if (tab === 'discover' && discoverUsers.length === 0) {
+                loadDiscoverUsers();
+            }
+        }
+
+        // =============================================
+        // DISCOVER USERS
+        // =============================================
+        async function loadDiscoverUsers() {
+            const container = document.getElementById('discoverContainer');
+            container.innerHTML = '<div class="loading-state"><div class="loading-spinner-small"></div><p>Loading users...</p></div>';
+
+            const filter = document.getElementById('discoverFilter').value;
+            
+            try {
+                let query = supabaseClient
+                    .from('profiles')
+                    .select('id, first_name, last_name, full_name, avatar_url, program_name, is_online, last_seen, created_at')
+                    .neq('id', currentUser.id)
+                    .limit(50);
+
+                if (filter === 'online') {
+                    query = query.eq('is_online', true);
+                } else if (filter === 'recent') {
+                    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+                    query = query.gte('last_seen', oneHourAgo);
+                }
+
+                query = query.order('is_online', { ascending: false }).order('last_seen', { ascending: false });
+
+                const { data: users, error } = await query;
+
+                if (error) throw error;
+
+                // Filter out blocked users
+                const blockedIds = blockedUsers.map(b => b.blocked_id);
+                discoverUsers = (users || []).filter(u => !blockedIds.includes(u.id) && !blockedByUsers.includes(u.id));
+
+                renderDiscoverUsers();
+            } catch (e) {
+                console.error('Error loading discover users:', e);
+                container.innerHTML = '<div class="empty-state"><p>Error loading users</p></div>';
+            }
+        }
+
+        function renderDiscoverUsers() {
+            const container = document.getElementById('discoverContainer');
+
+            if (discoverUsers.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                        <h3>No users found</h3>
+                        <p>Try a different filter</p>
+                    </div>`;
+                return;
+            }
+
+            // Get friend IDs and request IDs for button states
+            const friendIds = friends.map(f => f.id);
+            const outgoingIds = outgoingRequests.map(r => r.receiver?.id || r.receiver_id);
+            const incomingIds = incomingRequests.map(r => r.sender?.id || r.sender_id);
+
+            container.innerHTML = '<div class="discover-grid">' + discoverUsers.map(user => {
+                const name = user.full_name || `${user.first_name} ${user.last_name}`;
+                const initials = getInitials(name);
+                const isFriend = friendIds.includes(user.id);
+                const hasSentRequest = outgoingIds.includes(user.id);
+                const hasIncomingRequest = incomingIds.includes(user.id);
+
+                let actionButtons = '';
+                if (isFriend) {
+                    actionButtons = `<button class="btn btn-secondary" disabled>
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                        Friends
+                    </button>`;
+                } else if (hasSentRequest) {
+                    actionButtons = `<button class="btn btn-secondary" disabled>
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Pending
+                    </button>`;
+                } else if (hasIncomingRequest) {
+                    actionButtons = `<button class="btn btn-success" onclick="event.stopPropagation(); acceptRequestFromDiscover('${user.id}')">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                        Accept
+                    </button>`;
+                } else {
+                    actionButtons = `<button class="btn btn-primary" onclick="event.stopPropagation(); sendFriendRequest('${user.id}', '${escapeHtml(name)}')">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+                        Add Friend
+                    </button>`;
+                }
+
+                return `
+                    <div class="discover-card" onclick="openProfileModal('${user.id}')">
+                        <div class="discover-avatar">
+                            ${user.avatar_url ? `<img src="${user.avatar_url}" alt="" loading="lazy" decoding="async">` : initials}
+                            <div class="online-dot ${user.is_online ? '' : 'offline'}"></div>
+                        </div>
+                        <div class="discover-name">${escapeHtml(name)}</div>
+                        <div class="discover-program">${escapeHtml(user.program_name || 'Student')}</div>
+                        <div class="discover-status ${user.is_online ? '' : 'offline'}">
+                            <span class="dot"></span>
+                            ${user.is_online ? 'Online' : (user.last_seen ? formatTimeAgo(user.last_seen) : 'Offline')}
+                        </div>
+                        <div class="discover-actions">
+                            ${actionButtons}
+                            <button class="btn btn-secondary" onclick="event.stopPropagation(); messageUser('${user.id}')" title="Message">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                            </button>
+                        </div>
+                    </div>`;
+            }).join('') + '</div>';
+        }
+
+        async function acceptRequestFromDiscover(userId) {
+            const request = incomingRequests.find(r => (r.sender?.id || r.sender_id) === userId);
+            if (request) {
+                await acceptRequest(request.id, request.sender?.first_name || 'User');
+                await loadDiscoverUsers();
+            }
+        }
+
+        function messageUser(userId) {
+            window.location.href = `messages.html?user=${userId}`;
+        }
+
+        // =============================================
+        // BLOCKED USERS
+        // =============================================
+        async function loadBlockedUsers() {
+            // Users I blocked
+            const { data: blocked } = await supabaseClient
+                .from('blocked_users')
+                .select('blocked_id, created_at, blocked:profiles!blocked_users_blocked_id_fkey(id, first_name, last_name, full_name, avatar_url)')
+                .eq('blocker_id', currentUser.id);
+            blockedUsers = blocked || [];
+
+            // Users who blocked me
+            const { data: blockedBy } = await supabaseClient
+                .from('blocked_users')
+                .select('blocker_id')
+                .eq('blocked_id', currentUser.id);
+            blockedByUsers = (blockedBy || []).map(b => b.blocker_id);
+
+            updateStats();
+        }
+
+        function isBlocked(userId) {
+            return blockedUsers.some(b => b.blocked_id === userId);
+        }
+
+        function isBlockedBy(userId) {
+            return blockedByUsers.includes(userId);
+        }
+
+        async function blockUser(userId, userName) {
+            if (isBlocked(userId)) { showToast('User already blocked', 'error'); return; }
+            try {
+                await supabaseClient.from('blocked_users').insert({ blocker_id: currentUser.id, blocked_id: userId });
+                // Also remove friendship if exists
+                await supabaseClient.from('friendships').delete().or(`and(user_id.eq.${currentUser.id},friend_id.eq.${userId}),and(user_id.eq.${userId},friend_id.eq.${currentUser.id})`);
+                // Cancel any pending requests
+                await supabaseClient.from('friend_requests').delete().or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${userId}),and(sender_id.eq.${userId},receiver_id.eq.${currentUser.id})`);
+                showToast(`${userName} has been blocked`, 'success');
+                await Promise.all([loadBlockedUsers(), loadFriends(), loadRequests()]);
+                closeProfileModal();
+            } catch (e) { showToast('Failed to block user', 'error'); }
+        }
+
+        async function unblockUser(userId, userName) {
+            try {
+                await supabaseClient.from('blocked_users').delete().eq('blocker_id', currentUser.id).eq('blocked_id', userId);
+                showToast(`${userName} has been unblocked`, 'success');
+                await loadBlockedUsers();
+                renderBlockedModal();
+            } catch (e) { showToast('Failed to unblock user', 'error'); }
+        }
+
+        function openBlockedModal() {
+            renderBlockedModal();
+            document.getElementById('blockedModal').classList.add('show');
+        }
+
+        function closeBlockedModal() {
+            document.getElementById('blockedModal').classList.remove('show');
+        }
+
+        function renderBlockedModal() {
+            const container = document.getElementById('blockedModalBody');
+            if (blockedUsers.length === 0) {
+                container.innerHTML = '<div class="blocked-empty"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg><p>No blocked users</p></div>';
+                return;
+            }
+            container.innerHTML = blockedUsers.map(b => {
+                const user = b.blocked;
+                const name = user.full_name || `${user.first_name} ${user.last_name}`;
+                const initials = getInitials(name);
+                const blockedDate = new Date(b.created_at).toLocaleDateString();
+                return `<div class="blocked-user-item">
+                    <div class="blocked-user-avatar">${user.avatar_url ? `<img src="${user.avatar_url}" loading="lazy" decoding="async">` : initials}</div>
+                    <div class="blocked-user-info"><div class="blocked-user-name">${escapeHtml(name)}</div><div class="blocked-user-date">Blocked on ${blockedDate}</div></div>
+                    <button class="btn btn-sm btn-secondary" onclick="unblockUser('${user.id}', '${escapeHtml(name)}')">Unblock</button>
+                </div>`;
+            }).join('');
+        }
+
+        // =============================================
+        // REPORT USER
+        // =============================================
+        function openReportModal(userId) {
+            document.getElementById('reportUserId').value = userId;
+            document.getElementById('reportReason').value = '';
+            document.getElementById('reportDescription').value = '';
+            document.getElementById('reportModal').classList.add('show');
+        }
+
+        function closeReportModal() {
+            document.getElementById('reportModal').classList.remove('show');
+        }
+
+        async function submitReport() {
+            const userId = document.getElementById('reportUserId').value;
+            const reason = document.getElementById('reportReason').value;
+            const description = document.getElementById('reportDescription').value;
+
+            if (!reason) { showToast('Please select a reason', 'error'); return; }
+
+            try {
+                await supabaseClient.from('user_reports').insert({
+                    reporter_id: currentUser.id,
+                    reported_id: userId,
+                    report_type: 'user',
+                    reason: reason,
+                    description: description
+                });
+                showToast('Report submitted. Our team will review it.', 'success');
+                closeReportModal();
+                closeProfileModal();
+            } catch (e) {
+                console.error('Report error:', e);
+                showToast('Failed to submit report', 'error');
+            }
+        }
+
+        // =============================================
+        // PROFILE MODAL
+        // =============================================
+        async function openProfileModal(userId) {
+            // Fetch full user profile
+            const { data: user } = await supabaseClient
+                .from('profiles')
+                .select('id, first_name, last_name, full_name, program_name, year_of_study, bio, avatar_url, is_online, last_seen, created_at')
+                .eq('id', userId)
+                .single();
+
+            if (!user) { showToast('User not found', 'error'); return; }
+            selectedProfileUser = user;
+
+            const name = user.full_name || `${user.first_name} ${user.last_name}`;
+            const initials = getInitials(name);
+            const isFriend = friends.some(f => f.id === userId);
+            const isPendingOut = outgoingRequests.some(r => r.receiver.id === userId);
+            const isPendingIn = incomingRequests.some(r => r.sender.id === userId);
+            const blocked = isBlocked(userId);
+            const blockedBy = isBlockedBy(userId);
+            const lastSeen = user.last_seen ? formatTimeAgo(user.last_seen) : 'Unknown';
+            const memberSince = new Date(user.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+
+            // Modal body content
+            document.getElementById('profileModalBody').innerHTML = `
+                <div class="profile-modal-content">
+                    <div class="profile-modal-avatar">
+                        ${user.avatar_url ? `<img src="${user.avatar_url}" alt="" loading="lazy" decoding="async">` : initials}
+                        <div class="online-dot ${user.is_online ? '' : 'offline'}"></div>
+                    </div>
+                    <div class="profile-modal-name">${escapeHtml(name)}</div>
+                    <div class="profile-modal-program">${escapeHtml(user.program_name || 'Student')}${user.year_of_study ? ` • Year ${user.year_of_study}` : ''}</div>
+                    <div class="profile-modal-status ${user.is_online ? 'online' : 'offline'}">
+                        <span>●</span> ${user.is_online ? 'Online now' : `Last seen ${lastSeen}`}
+                    </div>
+                    ${user.bio ? `<div class="profile-modal-bio">${escapeHtml(user.bio)}</div>` : ''}
+                    <div class="profile-modal-meta">
+                        <div class="label">Member since</div>
+                        <div class="value">${memberSince}</div>
+                    </div>
+                </div>
+            `;
+
+            // Modal footer actions
+            let actionsHtml = '<div class="profile-modal-actions">';
+            if (blockedBy) {
+                actionsHtml += '<p style="text-align:center;color:var(--gray-500);font-size:14px;padding:16px 0;">You cannot interact with this user</p>';
+            } else if (blocked) {
+                actionsHtml += `<button class="btn btn-secondary" onclick="unblockUser('${userId}', '${escapeHtml(name)}')">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                    Unblock User
+                </button>`;
+            } else {
+                // Primary action button
+                if (isFriend) {
+                    actionsHtml += `<button class="btn btn-primary" onclick="startMessage('${userId}')">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                        Message
+                    </button>`;
+                    actionsHtml += `<button class="btn btn-danger" onclick="confirmRemoveFriend('${userId}', '${escapeHtml(name)}'); closeProfileModal();">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 7a4 4 0 11-8 0 4 4 0 018 0zM9 14a6 6 0 00-6 6v1h12v-1a6 6 0 00-6-6zM21 12h-6"/></svg>
+                        Remove Friend
+                    </button>`;
+                } else if (isPendingOut) {
+                    actionsHtml += `<button class="btn btn-secondary" disabled>
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Request Sent
+                    </button>`;
+                } else if (isPendingIn) {
+                    actionsHtml += `<button class="btn btn-success" onclick="acceptRequestFromModal('${userId}')">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                        Accept Request
+                    </button>`;
+                } else {
+                    actionsHtml += `<button class="btn btn-primary" onclick="sendFriendRequest('${userId}', '${escapeHtml(name)}'); closeProfileModal();">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+                        Add Friend
+                    </button>`;
+                }
+                
+                // Block and Report buttons
+                actionsHtml += `
+                    <div class="btn-row">
+                        <button class="btn btn-outline-danger" onclick="confirmBlockUser('${userId}', '${escapeHtml(name)}')">
+                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                            Block
+                        </button>
+                        <button class="btn btn-warning" onclick="openReportModal('${userId}')">
+                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                            Report
+                        </button>
+                    </div>`;
+            }
+            
+            // View Full Profile link
+            actionsHtml += `
+                <div class="profile-modal-link-container">
+                    <a href="profile.html?user=${userId}" class="profile-modal-link">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                        View Full Profile
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+                    </a>
+                </div>
+            </div>`;
+            
+            document.getElementById('profileModalFooter').innerHTML = actionsHtml;
+            document.getElementById('profileModal').classList.add('show');
+        }
+
+        function closeProfileModal() {
+            document.getElementById('profileModal').classList.remove('show');
+            selectedProfileUser = null;
+        }
+
+        function confirmBlockUser(userId, userName) {
+            document.getElementById('confirmTitle').textContent = 'Block User';
+            document.getElementById('confirmMessage').innerHTML = `Block <strong>${userName}</strong>?<br><br><small style="color:var(--gray-500);">They won't be able to send you messages or friend requests. You can unblock them anytime.</small>`;
+            document.getElementById('confirmBtn').textContent = 'Block';
+            confirmCallback = () => { blockUser(userId, userName); closeConfirmModal(); };
+            document.getElementById('confirmModal').classList.add('show');
+        }
+
+        async function acceptRequestFromModal(senderId) {
+            const req = incomingRequests.find(r => r.sender.id === senderId);
+            if (req) {
+                await acceptRequest(req.id, senderId);
+                closeProfileModal();
+            }
+        }
+
+        function getInitials(name) { return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2); }
+        function escapeHtml(t) { if (!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+        function formatTimeAgo(d) { const s = Math.floor((new Date() - new Date(d)) / 1000); if (s < 60) return 'Just now'; if (s < 3600) return `${Math.floor(s/60)}m ago`; if (s < 86400) return `${Math.floor(s/3600)}h ago`; return `${Math.floor(s/86400)}d ago`; }
+        function showToast(msg, type = '') { const t = document.getElementById('toast'); document.getElementById('toastMessage').textContent = msg; t.className = 'toast' + (type ? ` ${type}` : ''); t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
+        function startMessage(id) { window.location.href = `messages.html?user=${id}`; }
+        function closeConfirmModal() { document.getElementById('confirmModal').classList.remove('show'); confirmCallback = null; }
+        function confirmAction() { if (confirmCallback) confirmCallback(); }
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('show'); }
+        async function handleLogout() { await updateOnlineStatus(false); await supabaseClient.auth.signOut(); window.location.href = 'index.html'; }
+
+        // All Notifications Modal
+        async function openNotificationsModal() {
+            document.getElementById('notificationDropdown').classList.remove('show');
+            document.getElementById('notificationsModal').classList.add('show');
+            await loadAllNotifications();
+        }
+        function closeNotificationsModal() { document.getElementById('notificationsModal').classList.remove('show'); }
+        async function loadAllNotifications() {
+            const { data } = await supabaseClient.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(100);
+            const allNotifs = data || [];
+            const list = document.getElementById('allNotifList');
+            if (allNotifs.length === 0) { list.innerHTML = '<div class="notif-empty" style="padding:40px;text-align:center;color:var(--gray-400);"><p>No notifications</p></div>'; return; }
+            list.innerHTML = allNotifs.map(n => {
+                const type = n.type || '';
+                const refId = n.reference_id || '';
+                const isGroupNotif = refId.startsWith('group:');
+                const iconClass = type.includes('friend') ? 'friend' : (isGroupNotif ? 'group' : (type.includes('message') ? 'message' : type.includes('warning') ? 'warning' : 'group'));
+                const iconSvg = iconClass === 'friend' ? '<path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>' : iconClass === 'message' ? '<path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>' : '<path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>';
+                return `<div class="notif-dropdown-item ${n.is_read ? '' : 'unread'}" onclick="handleNotifClickModal('${n.id}','${type}','${refId}')"><div class="notif-icon ${iconClass}"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">${iconSvg}</svg></div><div class="notif-content"><h4>${escapeHtml(n.title || 'Notification')}</h4><p>${escapeHtml(n.body || '')}</p><div class="time">${formatTimeAgo(n.created_at)}</div></div></div>`;
+            }).join('');
+        }
+        async function handleNotifClickModal(id, type, refId) { const n = notifications.find(x => x.id === id); await supabaseClient.from('notifications').update({ is_read: true }).eq('id', id); closeNotificationsModal(); if (type === 'group_join_request' && n && n.reference_id) { if (n.reference_id.startsWith('accepted:')) { window.location.href = 'study-groups.html?group=' + n.reference_id.replace('accepted:', ''); return; } if (n.reference_id.startsWith('declined:')) { window.location.href = 'study-groups.html'; return; } window.location.href = 'study-groups.html?join_request=' + encodeURIComponent(n.reference_id) + '&notif_id=' + id; return; } if (refId && refId.startsWith('group:')) { window.location.href = 'study-groups.html?id=' + refId.replace('group:', ''); return; } if (type === 'friend_request' || type === 'friend_accept' || type === 'friend_accepted') switchTab('requests'); else if (type === 'message') window.location.href = 'messages.html'; else if (type === 'study_group') window.location.href = 'study-groups.html'; else if (type === 'admin_warning' || type === 'announcement') window.location.href = 'dashboard.html'; }
+        async function markAllNotificationsReadModal() { await supabaseClient.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id); notifications.forEach(n => n.is_read = true); renderNotifications(); await loadAllNotifications(); showToast('All marked as read'); }
+        async function clearAllNotifications() { if (!confirm('Clear all notifications?')) return; const { error } = await supabaseClient.from('notifications').delete().eq('user_id', currentUser.id); if (error) { console.error('Delete failed:', error); showToast('Failed to clear. Check database permissions.', 'error'); return; } notifications = []; renderNotifications(); loadAllNotifications(); closeNotificationsModal(); showToast('Notifications cleared'); }
+
+        init();
+        
+        // Initialize call notifications
+        if (window.MyUBCalls) {
+            MyUBCalls.init(supabaseClient);
+        }
+        
+        // Start heartbeat
+        if (window.MyUBHeartbeat && currentUser) {
+            MyUBHeartbeat.start(supabaseClient, currentUser);
+        }
+    </script>
+    
+    <!-- MyUB Heartbeat Script -->
+    <script src="myub-heartbeat.js"></script>
+
+    <!-- OneSignal handles service worker registration -->
+
+
+    <script>
+        (function() {
+            if (!document.querySelector('.bg-orbs')) {
+                const wrap = document.createElement('div');
+                wrap.className = 'bg-orbs';
+                wrap.setAttribute('aria-hidden','true');
+                wrap.innerHTML = '<div class="orb orb-1"></div><div class="orb orb-2"></div>';
+                document.body.appendChild(wrap);
+            }
+            function forceVisible() {
+                document.querySelectorAll('.topbar, .stat-card, .tabs, .friend-card, .request-card, .nav-item')
+                    .forEach(el => { el.style.opacity=''; el.style.transform=''; el.style.visibility=''; });
+            }
+            function runEntrance() {
+                const g = window.gsap;
+                if (!g) { forceVisible(); return; }
+                try {
+                    const tl = g.timeline({ defaults: { ease: 'power3.out' } });
+                    tl.fromTo('.topbar', { y:-18, opacity:0 }, { y:0, opacity:1, duration:0.6, clearProps:'all' })
+                      .fromTo('.stat-card', { y:20, opacity:0 }, { y:0, opacity:1, duration:0.55, stagger:0.08, clearProps:'all' }, '-=0.3')
+                      .fromTo('.tabs', { y:12, opacity:0 }, { y:0, opacity:1, duration:0.5, clearProps:'all' }, '-=0.3')
+                      .fromTo('.sidebar .nav-item', { x:-14, opacity:0 }, { x:0, opacity:1, duration:0.4, stagger:0.04, clearProps:'all' }, '-=0.5');
+                } catch(e) { forceVisible(); }
+            }
+            let attempts = 0;
+            const checkReady = setInterval(() => {
+                attempts++;
+                const main = document.getElementById('mainContent');
+                if (main && main.style.display !== 'none') {
+                    clearInterval(checkReady);
+                    runEntrance();
+                } else if (attempts > 60) {
+                    clearInterval(checkReady);
+                    forceVisible();
+                }
+            }, 100);
+            setTimeout(forceVisible, 8000);
+
+            // Stagger friend cards + request cards on render
+            setTimeout(() => {
+                ['friendsContainer','incomingRequests','outgoingRequests','searchResults','discoverContainer'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (!el) return;
+                    const mo = new MutationObserver(() => {
+                        const g = window.gsap;
+                        if (g) {
+                            const items = el.querySelectorAll('.friend-card, .request-card, .discover-card');
+                            if (items.length) {
+                                g.fromTo(items, { y:14, opacity:0 }, { y:0, opacity:1, duration:0.4, stagger:0.04, ease:'power2.out', clearProps:'all' });
+                            }
+                        }
+                        // Cursor spotlight on discover cards
+                        el.querySelectorAll('.discover-card').forEach(card => {
+                            if (card.dataset.glow) return;
+                            card.dataset.glow = '1';
+                            card.addEventListener('mousemove', (e) => {
+                                const rect = card.getBoundingClientRect();
+                                card.style.setProperty('--mx', (e.clientX - rect.left) + 'px');
+                                card.style.setProperty('--my', (e.clientY - rect.top) + 'px');
+                            });
+                        });
+                    });
+                    mo.observe(el, { childList: true, subtree: true });
+                });
+            }, 800);
+        })();
+    </script>
+</body>
+</html>

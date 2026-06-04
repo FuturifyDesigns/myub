@@ -1,0 +1,3460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content, maximum-scale=1.0, user-scalable=no">
+    <title>Admin Panel - MyUB</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="myub-security.js"></script>
+    <script src="myub-upload.js"></script>
+    <style>
+        /* ==========================================================
+           MyUB Admin Panel — dark navy/red theme
+           ========================================================== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --navy: #1a365d;
+            --navy-light: #2c5282;
+            --navy-lighter: #3a6fa8;
+            --navy-dark: #0f2744;
+            --navy-darker: #081726;
+            --navy-deepest: #050f1c;
+            --red: #c41e3a;
+            --red-light: #e63956;
+            --red-dark: #9a1730;
+            --white: #ffffff;
+            --blue: #60a5fa;
+            --green: #4ade80;
+            --purple: #a78bfa;
+            --orange: #fb923c;
+            --pink: #f472b6;
+            --yellow: #fbbf24;
+            --cyan: #22d3ee;
+
+            --text: #ffffff;
+            --text-soft: rgba(255, 255, 255, 0.72);
+            --text-muted: rgba(255, 255, 255, 0.5);
+            --text-dim: rgba(255, 255, 255, 0.35);
+            --surface-1: rgba(255, 255, 255, 0.03);
+            --surface-2: rgba(255, 255, 255, 0.05);
+            --surface-3: rgba(255, 255, 255, 0.08);
+            --surface-4: rgba(255, 255, 255, 0.12);
+            --border: rgba(255, 255, 255, 0.09);
+            --border-strong: rgba(255, 255, 255, 0.14);
+
+            --gray-50: rgba(255, 255, 255, 0.04);
+            --gray-100: rgba(255, 255, 255, 0.06);
+            --gray-200: rgba(255, 255, 255, 0.1);
+            --gray-300: rgba(255, 255, 255, 0.14);
+            --gray-400: rgba(255, 255, 255, 0.4);
+            --gray-500: rgba(255, 255, 255, 0.55);
+            --gray-600: rgba(255, 255, 255, 0.7);
+            --gray-700: rgba(255, 255, 255, 0.85);
+            --gray-800: rgba(255, 255, 255, 0.92);
+            --gray-900: #ffffff;
+
+            --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+            --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --sidebar-w: 260px;
+        }
+
+        html {
+            height: 100%;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        
+            background: var(--navy-deepest);
+        }
+        body {
+            font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            min-height: 100dvh;
+            background: var(--navy-deepest);
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        
+        }
+        button, input, select, textarea { font-family: inherit; }
+        input[type="text"], input[type="email"], input[type="password"], input[type="number"], input[type="search"], textarea {
+            cursor: text !important;
+            caret-color: var(--white);
+        }
+        button, select, input[type="checkbox"], input[type="radio"] { cursor: pointer !important; }
+        a { color: inherit; text-decoration: none; }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            background:
+                radial-gradient(circle at 15% 10%, rgba(58, 111, 168, 0.22) 0%, transparent 45%),
+                radial-gradient(circle at 88% 85%, rgba(196, 30, 58, 0.14) 0%, transparent 50%),
+                linear-gradient(160deg, #0a1929 0%, #0f2744 50%, #050f1c 100%);
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
+            background-size: 56px 56px;
+            mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.8), transparent 80%);
+            -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.8), transparent 80%);
+        }
+
+        /* ========== REAL MyUB LOGO ========== */
+        .myub-logo {
+            --logo-size: 36px;
+            position: relative;
+            display: inline-flex;
+            align-items: flex-end;
+            gap: calc(var(--logo-size) * 0.06);
+            font-family: 'Sora', 'Outfit', sans-serif;
+            line-height: 1;
+            user-select: none;
+        }
+        .myub-logo .ml-m-wrap { position: relative; display: inline-block; line-height: 0.82; }
+        .myub-logo .ml-m {
+            font-size: var(--logo-size);
+            font-weight: 800;
+            color: var(--white);
+            letter-spacing: -0.03em;
+            display: inline-block;
+            font-family: 'Cormorant Garamond', Georgia, serif;
+        }
+        .myub-logo .ml-cap {
+            position: absolute;
+            top: calc(var(--logo-size) * -0.34);
+            left: 50%;
+            transform: translateX(-50%) rotate(-6deg);
+            width: calc(var(--logo-size) * 0.78);
+            height: calc(var(--logo-size) * 0.55);
+            pointer-events: none;
+        }
+        .myub-logo .ml-cap svg { width: 100%; height: 100%; overflow: visible; }
+        .myub-logo .ml-ub {
+            font-size: calc(var(--logo-size) * 0.38);
+            font-weight: 800;
+            color: var(--white);
+            letter-spacing: 0.01em;
+            display: inline-block;
+            line-height: 0.85;
+            font-family: 'Cormorant Garamond', Georgia, serif;
+        }
+
+        /* ========== ACCESS DENIED ========== */
+        .access-denied {
+            position: fixed;
+            inset: 0;
+            z-index: 20000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .access-denied svg {
+            width: 88px;
+            height: 88px;
+            stroke: var(--red-light);
+            fill: none;
+            stroke-width: 1.5;
+            margin-bottom: 22px;
+            filter: drop-shadow(0 0 24px rgba(196, 30, 58, 0.4));
+            animation: accessPulse 2.5s ease-in-out infinite;
+        }
+        @keyframes accessPulse {
+            0%, 100% { filter: drop-shadow(0 0 24px rgba(196, 30, 58, 0.4)); }
+            50% { filter: drop-shadow(0 0 40px rgba(196, 30, 58, 0.7)); }
+        }
+        .access-denied h1 {
+            font-family: 'Sora', sans-serif;
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--white);
+            letter-spacing: -1px;
+            margin-bottom: 10px;
+        }
+        .access-denied p {
+            font-size: 15px;
+            color: var(--text-muted);
+            margin-bottom: 28px;
+            max-width: 380px;
+        }
+
+        /* ========== SIDEBAR ========== */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: var(--sidebar-w);
+            background: rgba(8, 20, 35, 0.85);
+            backdrop-filter: blur(20px) saturate(150%);
+            -webkit-backdrop-filter: blur(20px) saturate(150%);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            padding: 22px 14px 18px;
+            overflow-y: auto;
+            transition: transform 0.45s var(--ease-out-expo);
+        }
+        .sidebar::-webkit-scrollbar { width: 6px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 3px; }
+        .sidebar-header {
+            padding: 26px 14px 22px;
+            margin-bottom: 14px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        .sidebar-header::before {
+            content: 'ADMIN PANEL';
+            position: absolute;
+            top: 0;
+            left: 18px;
+            font-size: 9px;
+            letter-spacing: 2.5px;
+            color: var(--red-light);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .sidebar-logo {
+            display: inline-flex;
+            align-items: flex-end;
+            padding-top: 18px;
+            padding-left: 4px;
+        }
+        .sidebar-logo .myub-logo { --logo-size: 36px; }
+        .sidebar-logo-m-wrapper,
+        .sidebar-logo-cap,
+        .sidebar-logo-m,
+        .sidebar-logo-yub { display: none !important; }
+
+        .sidebar-nav {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar-nav li { list-style: none; }
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 14px;
+            border-radius: 10px;
+            color: var(--text-soft);
+            font-size: 14px;
+            font-weight: 500;
+            border: 1px solid transparent;
+            background: transparent;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s var(--ease-out-expo);
+        }
+        .sidebar-nav a svg {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            flex-shrink: 0;
+            transition: transform 0.3s var(--ease-out-expo);
+        }
+        .sidebar-nav a:hover {
+            background: var(--surface-2);
+            color: var(--white);
+            transform: translateX(3px);
+        }
+        .sidebar-nav a:hover svg { transform: scale(1.08); }
+        .sidebar-nav a.active {
+            background: linear-gradient(135deg, rgba(196, 30, 58, 0.4), rgba(154, 23, 48, 0.25));
+            color: var(--white);
+            border-color: rgba(196, 30, 58, 0.45);
+            box-shadow: 0 8px 24px -10px rgba(196, 30, 58, 0.55);
+        }
+        .sidebar-nav a.active::before {
+            content: '';
+            position: absolute;
+            left: -14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 24px;
+            background: var(--red);
+            border-radius: 0 3px 3px 0;
+            box-shadow: 0 0 12px rgba(196, 30, 58, 0.8);
+        }
+
+        /* ========== MAIN CONTENT ========== */
+        .main-content {
+            margin-left: var(--sidebar-w);
+            min-height: 100vh;
+            padding: 18px 28px 40px;
+        }
+
+        /* ========== TOP HEADER ========== */
+        .top-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 18px;
+            background: rgba(15, 39, 68, 0.72);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            backdrop-filter: blur(20px) saturate(140%);
+            -webkit-backdrop-filter: blur(20px) saturate(140%);
+            margin-bottom: 18px;
+            position: sticky;
+            top: 12px;
+            z-index: 50;
+        }
+        .top-header::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 24px;
+            background: var(--red);
+            border-radius: 0 3px 3px 0;
+            box-shadow: 0 0 12px rgba(196, 30, 58, 0.6);
+        }
+        .menu-toggle {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            color: var(--white);
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            flex-shrink: 0;
+        }
+        .menu-toggle svg {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+        }
+        .page-title {
+            font-family: 'Sora', 'Outfit', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--white);
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+        .page-title::after {
+            content: '';
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: var(--red);
+            border-radius: 50%;
+            margin-left: 4px;
+            box-shadow: 0 0 10px rgba(196, 30, 58, 0.8);
+            animation: dotPulse 2.5s ease-in-out infinite;
+        }
+        @keyframes dotPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.6; }
+        }
+        .admin-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 12px;
+            background: linear-gradient(135deg, var(--red), var(--red-dark));
+            color: var(--white);
+            border-radius: 999px;
+            font-family: 'Sora', sans-serif;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            box-shadow: 0 6px 18px -6px rgba(196, 30, 58, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            animation: badgeGlow 3s ease-in-out infinite;
+        }
+        @keyframes badgeGlow {
+            0%, 100% { box-shadow: 0 6px 18px -6px rgba(196, 30, 58, 0.6); }
+            50% { box-shadow: 0 6px 24px -4px rgba(196, 30, 58, 0.9); }
+        }
+
+        /* ========== ADMIN TABS ========== */
+        .admin-tabs {
+            display: flex;
+            gap: 4px;
+            padding: 4px;
+            background: rgba(15, 39, 68, 0.55);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            margin-bottom: 18px;
+            overflow-x: auto;
+        }
+        .admin-tabs::-webkit-scrollbar { display: none; }
+        .admin-tab {
+            flex: 1;
+            min-width: fit-content;
+            padding: 11px 18px;
+            background: transparent;
+            border: none;
+            color: var(--text-soft);
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.35s var(--ease-out-expo);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+        .admin-tab:hover:not(.active) {
+            background: var(--surface-2);
+            color: var(--white);
+        }
+        .admin-tab.active {
+            background: linear-gradient(135deg, var(--navy-light), var(--navy));
+            color: var(--white);
+            box-shadow: 0 8px 22px -10px rgba(44, 82, 130, 0.8);
+        }
+        .nav-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 6px;
+            background: var(--red);
+            color: var(--white);
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 700;
+            box-shadow: 0 4px 10px rgba(196, 30, 58, 0.4);
+        }
+
+        /* ========== TAB PANELS ========== */
+        .admin-content {
+            min-height: 300px;
+        }
+        .tab-panel { display: none; }
+        .tab-panel.active {
+            display: block;
+            animation: tabFadeIn 0.45s var(--ease-out-expo);
+        }
+        @keyframes tabFadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ========== STATS GRID ========== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+        .stat-card {
+            padding: 22px 24px;
+            background: rgba(15, 39, 68, 0.55);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.45s var(--ease-out-expo);
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--navy-lighter), var(--red));
+            opacity: 0.5;
+            transition: opacity 0.4s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--border-strong);
+            box-shadow: 0 22px 50px -18px rgba(0, 0, 0, 0.7);
+        }
+        .stat-card:hover::before { opacity: 1; }
+        .stat-card.highlight {
+            background: linear-gradient(135deg, rgba(44, 82, 130, 0.45), rgba(15, 39, 68, 0.6));
+            border-color: rgba(58, 111, 168, 0.35);
+        }
+        .stat-card.highlight::before {
+            background: linear-gradient(90deg, var(--red-light), var(--red-dark));
+            opacity: 1;
+        }
+        .stat-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 14px;
+            position: relative;
+            background: var(--surface-2);
+        }
+        .stat-icon svg {
+            width: 22px;
+            height: 22px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .stat-icon.blue {
+            background: rgba(96, 165, 250, 0.15);
+            color: var(--blue);
+            border: 1px solid rgba(96, 165, 250, 0.35);
+        }
+        .stat-icon.green {
+            background: rgba(74, 222, 128, 0.15);
+            color: var(--green);
+            border: 1px solid rgba(74, 222, 128, 0.35);
+        }
+        .stat-icon.purple {
+            background: rgba(167, 139, 250, 0.15);
+            color: var(--purple);
+            border: 1px solid rgba(167, 139, 250, 0.35);
+        }
+        .stat-icon.orange {
+            background: rgba(251, 146, 60, 0.15);
+            color: var(--orange);
+            border: 1px solid rgba(251, 146, 60, 0.35);
+        }
+        .stat-icon.cyan {
+            background: rgba(34, 211, 238, 0.15);
+            color: var(--cyan);
+            border: 1px solid rgba(34, 211, 238, 0.35);
+        }
+        .stat-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-dim);
+            margin-bottom: 6px;
+        }
+        .stat-value {
+            font-family: 'Sora', sans-serif;
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--white);
+            letter-spacing: -1px;
+            line-height: 1;
+        }
+        .stat-card.highlight .stat-value {
+            background: linear-gradient(135deg, var(--white) 0%, #ffb4c0 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* ========== ADMIN CARD ========== */
+        .admin-card {
+            background: rgba(15, 39, 68, 0.55);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            margin-bottom: 18px;
+            overflow: hidden;
+            transition: border-color 0.35s ease;
+        }
+        .admin-card:hover { border-color: var(--border-strong); }
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 22px;
+            border-bottom: 1px solid var(--border);
+        }
+        .card-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--white);
+            letter-spacing: -0.2px;
+        }
+        .card-title span {
+            color: var(--navy-lighter);
+            font-weight: 600;
+        }
+        .card-body {
+            padding: 20px 22px;
+        }
+
+        /* Empty state */
+        .empty-state {
+            padding: 50px 20px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+        .empty-state svg {
+            width: 56px;
+            height: 56px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 1.5;
+            margin: 0 auto 14px;
+            opacity: 0.3;
+        }
+        .empty-state h3 {
+            font-family: 'Sora', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-soft);
+            margin-bottom: 4px;
+        }
+        .empty-state p { font-size: 12.5px; }
+
+        /* ========== RECENT ACTIVITY LIST ========== */
+        #recentActivity {
+            padding: 10px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            background: rgba(0, 0, 0, 0.22);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            transition: all 0.35s var(--ease-out-expo);
+            position: relative;
+            overflow: hidden;
+        }
+        .activity-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, var(--navy-lighter), var(--navy));
+            opacity: 0;
+            transition: opacity 0.35s ease;
+        }
+        .activity-item:hover {
+            background: rgba(0, 0, 0, 0.32);
+            border-color: var(--border-strong);
+            transform: translateX(3px);
+        }
+        .activity-item:hover::before { opacity: 1; }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+            min-height: 40px;
+            max-width: 40px;
+            max-height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            position: relative;
+        }
+        .activity-icon svg {
+            width: 18px !important;
+            height: 18px !important;
+            max-width: 18px !important;
+            max-height: 18px !important;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .activity-icon.user {
+            background: rgba(96, 165, 250, 0.15);
+            color: var(--blue);
+            border: 1px solid rgba(96, 165, 250, 0.35);
+        }
+        .activity-icon.group {
+            background: rgba(167, 139, 250, 0.15);
+            color: var(--purple);
+            border: 1px solid rgba(167, 139, 250, 0.35);
+        }
+        .activity-icon.report {
+            background: rgba(251, 146, 60, 0.15);
+            color: var(--orange);
+            border: 1px solid rgba(251, 146, 60, 0.35);
+        }
+        .activity-icon.message {
+            background: rgba(74, 222, 128, 0.15);
+            color: var(--green);
+            border: 1px solid rgba(74, 222, 128, 0.35);
+        }
+
+        .activity-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .activity-text {
+            font-size: 13.5px;
+            color: var(--text-soft);
+            line-height: 1.45;
+            margin-bottom: 3px;
+        }
+        .activity-text strong {
+            color: var(--white);
+            font-family: 'Sora', sans-serif;
+            font-weight: 700;
+            letter-spacing: -0.1px;
+        }
+        .activity-time {
+            font-size: 11px;
+            color: var(--text-dim);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .activity-time::before {
+            content: '';
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--text-dim);
+            flex-shrink: 0;
+        }
+
+        /* ========== SEARCH + FILTERS ========== */
+        .search-filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+        .search-input {
+            flex: 1;
+            min-width: 240px;
+            padding: 12px 16px;
+            background: rgba(15, 39, 68, 0.55);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--white);
+            font-family: 'Outfit', sans-serif;
+            font-size: 13.5px;
+            outline: none;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            transition: all 0.3s ease;
+        }
+        .search-input::placeholder { color: var(--text-dim); }
+        .search-input:focus {
+            border-color: var(--navy-lighter);
+            background: rgba(15, 39, 68, 0.7);
+            box-shadow: 0 0 0 3px rgba(58, 111, 168, 0.18);
+        }
+        .filter-select {
+            padding: 12px 38px 12px 16px;
+            background: rgba(15, 39, 68, 0.55);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--white);
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            outline: none;
+            cursor: pointer;
+            min-width: 160px;
+            transition: all 0.3s ease;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='rgba(255,255,255,0.5)' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+        }
+        .filter-select:focus {
+            border-color: var(--navy-lighter);
+            box-shadow: 0 0 0 3px rgba(58, 111, 168, 0.18);
+        }
+        .filter-select option {
+            background: var(--navy-dark);
+            color: var(--white);
+        }
+
+        /* ========== DATA TABLE ========== */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .data-table thead {
+            background: rgba(0, 0, 0, 0.25);
+        }
+        .data-table th {
+            padding: 14px 22px;
+            text-align: left;
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-dim);
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+        .data-table td {
+            padding: 14px 22px;
+            color: var(--text-soft);
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+        .data-table tbody tr {
+            transition: background 0.25s ease;
+        }
+        .data-table tbody tr:hover {
+            background: var(--surface-2);
+        }
+        .data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* User info cell */
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .user-info-avatar {
+            width: 38px;
+            height: 38px;
+            min-width: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--navy-light), var(--navy));
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Sora', sans-serif;
+            font-weight: 700;
+            font-size: 13px;
+            flex-shrink: 0;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .user-info-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        .user-info-details {
+            min-width: 0;
+        }
+        .user-info-name {
+            font-family: 'Sora', sans-serif;
+            font-size: 13.5px;
+            font-weight: 600;
+            color: var(--white);
+            margin-bottom: 2px;
+            letter-spacing: -0.1px;
+        }
+        .user-info-email {
+            font-size: 11.5px;
+            color: var(--text-muted);
+        }
+
+        /* Status badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid transparent;
+            white-space: nowrap;
+        }
+        .status-badge.active {
+            background: rgba(74, 222, 128, 0.15);
+            color: var(--green);
+            border-color: rgba(74, 222, 128, 0.35);
+        }
+        .status-badge.banned {
+            background: rgba(196, 30, 58, 0.15);
+            color: var(--red-light);
+            border-color: rgba(196, 30, 58, 0.4);
+        }
+        .status-badge.pending {
+            background: rgba(251, 191, 36, 0.15);
+            color: var(--yellow);
+            border-color: rgba(251, 191, 36, 0.35);
+        }
+        .status-badge.reviewed {
+            background: rgba(96, 165, 250, 0.15);
+            color: var(--blue);
+            border-color: rgba(96, 165, 250, 0.35);
+        }
+        .status-badge.resolved {
+            background: rgba(74, 222, 128, 0.15);
+            color: var(--green);
+            border-color: rgba(74, 222, 128, 0.35);
+        }
+        .status-badge.dismissed {
+            background: var(--surface-3);
+            color: var(--text-muted);
+            border-color: var(--border);
+        }
+        .status-badge.user,
+        .status-badge.message,
+        .status-badge.group {
+            background: rgba(167, 139, 250, 0.15);
+            color: var(--purple);
+            border-color: rgba(167, 139, 250, 0.35);
+        }
+
+        /* Action buttons cell */
+        .action-buttons {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 9px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            color: var(--text-soft);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.25s var(--ease-out-expo);
+            padding: 0;
+            flex-shrink: 0;
+        }
+        .btn-icon svg {
+            width: 14px;
+            height: 14px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .btn-icon:hover {
+            background: var(--surface-3);
+            color: var(--white);
+            transform: translateY(-1px);
+            border-color: var(--border-strong);
+        }
+        .btn-icon.text-green:hover {
+            background: rgba(74, 222, 128, 0.15);
+            color: var(--green);
+            border-color: rgba(74, 222, 128, 0.4);
+        }
+        .btn-icon.text-red:hover {
+            background: rgba(196, 30, 58, 0.15);
+            color: var(--red-light);
+            border-color: rgba(196, 30, 58, 0.4);
+        }
+        .btn-icon.text-orange:hover {
+            background: rgba(251, 146, 60, 0.15);
+            color: var(--orange);
+            border-color: rgba(251, 146, 60, 0.4);
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            gap: 6px;
+            padding: 14px 22px;
+            border-top: 1px solid var(--border);
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .page-btn {
+            min-width: 36px;
+            height: 36px;
+            padding: 0 12px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            color: var(--text-soft);
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .page-btn:hover {
+            background: var(--surface-3);
+            color: var(--white);
+            transform: translateY(-1px);
+        }
+        .page-btn.active {
+            background: linear-gradient(135deg, var(--navy-light), var(--navy));
+            color: var(--white);
+            border-color: rgba(58, 111, 168, 0.45);
+            box-shadow: 0 6px 16px -8px rgba(44, 82, 130, 0.7);
+        }
+
+        /* ========== BUTTONS ========== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: transform 0.4s var(--ease-out-expo), background 0.4s ease, box-shadow 0.4s ease, color 0.3s ease, border-color 0.3s ease;
+            white-space: nowrap;
+        }
+        .btn svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            flex-shrink: 0;
+        }
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 11.5px;
+            border-radius: 8px;
+        }
+        .btn-sm svg { width: 13px; height: 13px; }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--navy-light) 0%, var(--navy) 100%);
+            color: var(--white);
+            box-shadow: 0 10px 28px -12px rgba(26, 54, 93, 0.8);
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 14px 34px -10px rgba(196, 30, 58, 0.5);
+        }
+        .btn-outline {
+            background: var(--surface-2);
+            color: var(--text-soft);
+            border-color: var(--border);
+        }
+        .btn-outline:hover {
+            background: var(--surface-3);
+            color: var(--white);
+            border-color: var(--border-strong);
+            transform: translateY(-1px);
+        }
+        .btn-secondary {
+            background: var(--surface-2);
+            color: var(--text-soft);
+            border-color: var(--border);
+        }
+        .btn-secondary:hover {
+            background: var(--surface-3);
+            color: var(--white);
+            border-color: var(--border-strong);
+            transform: translateY(-1px);
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
+            color: var(--white);
+            box-shadow: 0 10px 28px -12px rgba(196, 30, 58, 0.6);
+        }
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 34px -10px rgba(196, 30, 58, 0.7);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, var(--green), #16a34a);
+            color: var(--white);
+            box-shadow: 0 10px 28px -12px rgba(74, 222, 128, 0.5);
+        }
+        .btn-success:hover {
+            transform: translateY(-2px);
+        }
+
+        /* ========== SETTINGS TAB ========== */
+        .setting-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 18px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .setting-item:last-child { border-bottom: none; }
+        .setting-info h4 {
+            font-family: 'Sora', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 4px;
+            letter-spacing: -0.1px;
+        }
+        .setting-info p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Toggle switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 26px;
+            flex-shrink: 0;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background: var(--surface-3);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            transition: all 0.35s var(--ease-out-expo);
+        }
+        .toggle-slider::before {
+            content: '';
+            position: absolute;
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background: var(--white);
+            border-radius: 50%;
+            transition: all 0.35s var(--ease-out-expo);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+        }
+        .toggle-switch input:checked + .toggle-slider {
+            background: linear-gradient(135deg, var(--red), var(--red-dark));
+            border-color: rgba(196, 30, 58, 0.45);
+        }
+        .toggle-switch input:checked + .toggle-slider::before {
+            transform: translateX(22px);
+        }
+
+        /* ========== MODALS ========== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            background: rgba(5, 15, 28, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.show { display: flex !important; animation: modalFadeIn 0.35s ease; }
+        @keyframes modalFadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .modal {
+            background: rgba(15, 39, 68, 0.94);
+            backdrop-filter: blur(24px) saturate(140%);
+            -webkit-backdrop-filter: blur(24px) saturate(140%);
+            border: 1px solid var(--border-strong);
+            border-radius: 18px;
+            box-shadow: 0 30px 80px -10px rgba(0, 0, 0, 0.6);
+            width: min(540px, 100%);
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: modalUp 0.5s var(--ease-out-expo);
+        }
+        @keyframes modalUp {
+            from { opacity: 0; transform: translateY(24px) scale(0.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 22px;
+            border-bottom: 1px solid var(--border);
+        }
+        .modal-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--white) !important;
+            letter-spacing: -0.3px;
+        }
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 9px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            color: var(--text-soft);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 22px;
+            line-height: 1;
+            font-family: 'Outfit', sans-serif;
+            padding: 0;
+            transition: all 0.3s ease;
+        }
+        .modal-close svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+        }
+        .modal-close:hover {
+            background: var(--surface-3);
+            color: var(--white);
+        }
+        .modal-body {
+            padding: 22px;
+            overflow-y: auto;
+            flex: 1;
+            color: var(--text-soft);
+        }
+        .modal-body::-webkit-scrollbar { width: 6px; }
+        .modal-body::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 3px; }
+        .modal-body strong {
+            color: var(--white);
+            font-weight: 700;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 16px 22px;
+            border-top: 1px solid var(--border);
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        /* ========== FORM ELEMENTS ========== */
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group:last-child { margin-bottom: 0; }
+        .form-label {
+            display: block;
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-dim);
+            margin-bottom: 6px;
+        }
+        .form-input,
+        .form-textarea,
+        .form-select {
+            width: 100%;
+            padding: 12px 14px;
+            background: rgba(0, 0, 0, 0.28);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--white);
+            font-family: 'Outfit', sans-serif;
+            font-size: 13.5px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        .form-input::placeholder,
+        .form-textarea::placeholder {
+            color: var(--text-dim);
+        }
+        .form-select {
+            padding-right: 38px;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='rgba(255,255,255,0.5)' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+        }
+        .form-select option {
+            background: var(--navy-dark);
+            color: var(--white);
+        }
+        .form-textarea {
+            resize: vertical;
+            min-height: 110px;
+            line-height: 1.55;
+            font-family: 'Outfit', sans-serif;
+        }
+        .form-input:focus,
+        .form-textarea:focus,
+        .form-select:focus {
+            border-color: var(--navy-lighter);
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 0 0 3px rgba(58, 111, 168, 0.18);
+        }
+
+        /* ========== ANNOUNCEMENT LIST ========== */
+        .announcement-item {
+            padding: 16px 20px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            transition: all 0.35s var(--ease-out-expo);
+            position: relative;
+            overflow: hidden;
+        }
+        .announcement-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--navy-lighter);
+        }
+        .announcement-item[data-type="warning"]::before { background: var(--yellow); }
+        .announcement-item[data-type="urgent"]::before { background: var(--red); }
+        .announcement-item[data-type="success"]::before { background: var(--green); }
+        .announcement-item:hover {
+            background: var(--surface-3);
+            border-color: var(--border-strong);
+            transform: translateX(3px);
+        }
+
+        /* ========== TOAST ========== */
+        .toast-container {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 16000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+        .toast {
+            padding: 14px 20px;
+            background: rgba(15, 39, 68, 0.95);
+            border: 1px solid var(--border-strong);
+            border-radius: 12px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            color: var(--white);
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.6);
+            min-width: 240px;
+            max-width: 360px;
+            pointer-events: auto;
+            animation: toastIn 0.4s var(--ease-out-back);
+            position: relative;
+            overflow: hidden;
+        }
+        .toast::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--navy-lighter);
+        }
+        .toast.success::before { background: var(--green); }
+        .toast.error::before { background: var(--red); }
+        .toast.warning::before { background: var(--yellow); }
+        .toast.info::before { background: var(--blue); }
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(40px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* ========== OVERRIDES for inline-styled legacy values ========== */
+        [style*="color:var(--gray-500)"],
+        [style*="color: var(--gray-500)"] { color: var(--text-muted) !important; }
+        [style*="color:var(--gray-600)"],
+        [style*="color: var(--gray-600)"] { color: var(--text-soft) !important; }
+        [style*="color:var(--navy)"],
+        [style*="color: var(--navy)"] { color: var(--white) !important; }
+        [style*="background:var(--orange)"],
+        [style*="background: var(--orange)"] {
+            background: rgba(251, 146, 60, 0.15) !important;
+            color: var(--orange) !important;
+            border: 1px solid rgba(251, 146, 60, 0.4) !important;
+        }
+        [style*="background:var(--red)"],
+        [style*="background: var(--red)"] {
+            background: linear-gradient(135deg, var(--red), var(--red-dark)) !important;
+            color: var(--white) !important;
+        }
+        [style*="background: var(--gray-100)"],
+        [style*="background:var(--gray-100)"] {
+            background: rgba(0, 0, 0, 0.25) !important;
+            color: var(--text-soft) !important;
+            border: 1px solid var(--border) !important;
+        }
+
+        /* ========== BACKGROUND ORBS ========== */
+        .bg-orbs {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.36;
+            mix-blend-mode: screen;
+        }
+        .orb-1 {
+            width: 520px; height: 520px; top: -140px; left: -140px;
+            background: radial-gradient(circle, rgba(58, 111, 168, 0.68) 0%, transparent 60%);
+            animation: orbFloat1 26s ease-in-out infinite;
+        }
+        .orb-2 {
+            width: 440px; height: 440px; bottom: -120px; right: -100px;
+            background: radial-gradient(circle, rgba(196, 30, 58, 0.55) 0%, transparent 60%);
+            animation: orbFloat2 32s ease-in-out infinite;
+        }
+        @keyframes orbFloat1 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(90px, 50px) scale(1.08); }
+        }
+        @keyframes orbFloat2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-80px, -60px) scale(1.1); }
+        }
+
+        /* ========== MOBILE ========== */
+        @media (max-width: 900px) {
+            :root { --sidebar-w: 0px; }
+            .sidebar { transform: translateX(-100%); width: 260px; }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 14px 16px 30px; }
+            .menu-toggle { display: flex; }
+            .top-header { padding: 10px 14px; top: 10px; }
+            .page-title { font-size: 19px; }
+            .admin-badge { font-size: 9px; padding: 4px 9px; }
+
+            .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+            .stat-card { padding: 18px 18px; }
+            .stat-value { font-size: 26px; }
+
+            .search-filters { flex-direction: column; gap: 8px; }
+            .search-input, .filter-select { min-width: 0; width: 100%; }
+
+            .data-table th, .data-table td { padding: 12px 14px; }
+            .data-table { font-size: 12px; }
+
+            .toast-container { top: 14px; right: 14px; left: 14px; }
+            .toast { min-width: 0; max-width: none; }
+
+            .setting-item { flex-direction: column; align-items: flex-start; gap: 12px; }
+        }
+        @media (max-width: 640px) {
+            .main-content { padding: 12px; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .admin-tabs { padding: 3px; }
+            .admin-tab { padding: 9px 14px; font-size: 12px; }
+            .card-header { padding: 14px 16px; }
+            .card-body { padding: 16px; }
+            .modal-body { padding: 16px; }
+            .modal-footer { flex-direction: column-reverse; gap: 8px; }
+            .modal-footer .btn { width: 100%; }
+            .action-buttons { flex-wrap: wrap; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+            .orb, .admin-badge { animation: none !important; }
+        }
+    </style>
+    <!-- Primary Meta Tags -->
+    <meta name="title" content="Admin Panel - MyUB">
+    <meta name="description" content="MyUB Administration Panel">
+    <meta name="keywords" content="MyUB, University of Botswana, UB, student portal, GPA calculator, study groups, student companion, Botswana education, UB students">
+    <meta name="author" content="Futurify Designs">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.myub.online/">
+    <meta property="og:title" content="Admin Panel - MyUB">
+    <meta property="og:description" content="MyUB Administration Panel">
+    <meta property="og:image" content="https://www.myub.online/icons/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="1200">
+    <meta property="og:site_name" content="MyUB">
+    <meta property="og:locale" content="en_US">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://www.myub.online/">
+    <meta name="twitter:title" content="Admin Panel - MyUB">
+    <meta name="twitter:description" content="MyUB Administration Panel">
+    <meta name="twitter:image" content="https://www.myub.online/icons/og-image.jpg">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+    <link rel="mask-icon" href="icons/favicon-32x32.png" color="#1a365d">
+    <meta name="msapplication-TileColor" content="#1a365d">
+    <meta name="msapplication-TileImage" content="icons/icon-144x144.png">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1a365d">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MyUB">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://www.myub.online/">
+
+</head>
+<body>
+    <!-- Access Denied Screen (hidden by default) -->
+    <div id="accessDenied" class="access-denied" style="display: none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <h1>Access Denied</h1>
+        <p>You don't have permission to access the admin panel.</p>
+        <a href="dashboard.html" class="btn btn-primary">Back to Dashboard</a>
+    </div>
+
+    <!-- Admin Panel (hidden until verified) -->
+    <div id="adminPanel" style="display: none;">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="dashboard.html" class="sidebar-logo">
+                    <div class="myub-logo">
+                        <div class="ml-m-wrap">
+                            <div class="ml-cap">
+                                <svg viewBox="0 0 100 70">
+                                    <polygon points="50,6 95,24 50,42 5,24" fill="#ffffff"/>
+                                    <circle cx="50" cy="24" r="4.5" fill="#1a365d" stroke="#ffffff" stroke-width="1.5"/>
+                                    <rect x="32" y="38" width="36" height="18" rx="2.5" fill="#ffffff"/>
+                                    <circle cx="78" cy="24" r="4" fill="#c41e3a"/>
+                                    <path d="M78 28 Q82 44 80 54" stroke="#c41e3a" stroke-width="3" fill="none" stroke-linecap="round"/>
+                                    <ellipse cx="80" cy="57" rx="5" ry="8" fill="#c41e3a"/>
+                                </svg>
+                            </div>
+                            <span class="ml-m">M</span>
+                        </div>
+                        <span class="ml-ub">yUB</span>
+                    </div>
+                </a>
+            </div>
+            <nav>
+                <ul class="sidebar-nav">
+                    <li><a href="admin.html" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>Admin Panel</a></li>
+                    <li style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;"><a href="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Back to App</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-header">
+                <button class="menu-toggle" onclick="toggleSidebar()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                </button>
+                <div class="page-title">Admin Panel <span class="admin-badge">Admin</span></div>
+                <div class="header-actions"></div>
+            </header>
+
+            <!-- Admin Tabs -->
+            <div class="admin-tabs">
+                <button class="admin-tab active" onclick="switchTab('analytics')">Analytics</button>
+                <button class="admin-tab" onclick="switchTab('users')">Users</button>
+                <button class="admin-tab" onclick="switchTab('reports')">Reports <span id="reportsTabBadge" class="nav-badge" style="display:none;">0</span></button>
+                <button class="admin-tab" onclick="switchTab('groups')">Study Groups</button>
+                <button class="admin-tab" onclick="switchTab('content')">Content</button>
+                <button class="admin-tab" onclick="switchTab('papers')">Past Papers <span id="papersTabBadge" class="nav-badge" style="display:none;">0</span></button>
+                <button class="admin-tab" onclick="switchTab('events')">Events <span id="eventsTabBadge" class="nav-badge" style="display:none;">0</span></button>
+                <button class="admin-tab" onclick="switchTab('announcements')">Announcements</button>
+                <button class="admin-tab" onclick="switchTab('settings')">Settings</button>
+            </div>
+
+            <div class="admin-content">
+                <!-- Analytics Tab -->
+                <div id="tab-analytics" class="tab-panel active">
+                    <div class="stats-grid">
+                        <div class="stat-card highlight">
+                            <div class="stat-label">Total Users</div>
+                            <div class="stat-value" id="totalUsers">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon blue"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+                            <div class="stat-label">New This Week</div>
+                            <div class="stat-value" id="newUsersWeek">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon green"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+                            <div class="stat-label">Messages Sent</div>
+                            <div class="stat-value" id="totalMessages">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon purple"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+                            <div class="stat-label">Study Groups</div>
+                            <div class="stat-value" id="totalGroups">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon orange"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+                            <div class="stat-label">Notes Created</div>
+                            <div class="stat-value" id="totalNotes">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon cyan"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+                            <div class="stat-label">Events Scheduled</div>
+                            <div class="stat-value" id="totalSchedules">0</div>
+                        </div>
+                    </div>
+
+                    <div class="admin-card">
+                        <div class="card-header">
+                            <span class="card-title">Recent Activity</span>
+                        </div>
+                        <div class="card-body" id="recentActivity">
+                            <div class="empty-state">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                <h3>No recent activity</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Users Tab -->
+                <div id="tab-users" class="tab-panel">
+                    <div class="search-filters">
+                        <input type="text" class="search-input" id="userSearch" placeholder="Search users by name or email..." oninput="filterUsers()">
+                        <select class="filter-select" id="userStatusFilter" onchange="filterUsers()">
+                            <option value="all">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="banned">Banned</option>
+                        </select>
+                    </div>
+                    <div class="admin-card">
+                        <div class="card-header">
+                            <span class="card-title">All Users (<span id="userCount">0</span>)</span>
+                        </div>
+                        <div style="overflow-x: auto;">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Student ID</th>
+                                        <th>Joined</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usersTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="pagination" id="usersPagination"></div>
+                    </div>
+                </div>
+
+                <!-- Reports Tab -->
+                <div id="tab-reports" class="tab-panel">
+                    <div class="search-filters">
+                        <select class="filter-select" id="reportStatusFilter" onchange="filterReports()">
+                            <option value="all">All Reports</option>
+                            <option value="pending" selected>Pending</option>
+                            <option value="reviewed">Reviewed</option>
+                            <option value="resolved">Resolved</option>
+                            <option value="dismissed">Dismissed</option>
+                        </select>
+                        <select class="filter-select" id="reportTypeFilter" onchange="filterReports()">
+                            <option value="all">All Types</option>
+                            <option value="user">User Reports</option>
+                            <option value="message">Message Reports</option>
+                            <option value="group">Group Reports</option>
+                        </select>
+                    </div>
+                    <div class="admin-card">
+                        <div class="card-header">
+                            <span class="card-title">User Reports (<span id="reportCount">0</span>)</span>
+                        </div>
+                        <div style="overflow-x: auto;">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Reporter</th>
+                                        <th>Reported User</th>
+                                        <th>Type</th>
+                                        <th>Reason</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="reportsTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Study Groups Tab -->
+                <div id="tab-groups" class="tab-panel">
+                    <div class="search-filters">
+                        <input type="text" class="search-input" id="groupSearch" placeholder="Search groups..." oninput="filterGroups()">
+                    </div>
+                    <div class="admin-card">
+                        <div class="card-header">
+                            <span class="card-title">All Study Groups (<span id="groupCount">0</span>)</span>
+                        </div>
+                        <div style="overflow-x: auto;">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Group Name</th>
+                                        <th>Course</th>
+                                        <th>Members</th>
+                                        <th>Created</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="groupsTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Tab -->
+                <div id="tab-content" class="tab-panel">
+                    <div class="admin-card">
+                        <div class="card-header">
+                            <span class="card-title">Flagged Content</span>
+                        </div>
+                        <div class="card-body" id="flaggedContent">
+                            <div class="empty-state">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+                                <h3>No flagged content</h3>
+                                <p>All content looks good!</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="admin-card">
+                        <div class="card-header">
+                            <span class="card-title">Public Notes</span>
+                        </div>
+                        <div style="overflow-x: auto;">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Author</th>
+                                        <th>Created</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="notesTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Past Papers Moderation Tab -->
+                <div id="tab-papers" class="tab-panel">
+                    <div class="admin-card">
+                        <div class="card-header">
+                            <span class="card-title">Pending Review (deleted by uploaders)</span>
+                            <button class="btn btn-secondary" onclick="loadPendingPapers()" style="font-size:12px;padding:6px 12px;">Refresh</button>
+                        </div>
+                        <div class="card-body" id="pendingPapersBody">
+                            <div class="empty-state"><h3>Loading…</h3></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Events Moderation Tab -->
+                <div id="tab-events" class="tab-panel">
+                    <div class="admin-card">
+                        <div class="card-header">
+                            <span class="card-title">Pending Events</span>
+                            <button class="btn btn-secondary" onclick="loadPendingEvents()" style="font-size:12px;padding:6px 12px;">Refresh</button>
+                        </div>
+                        <div class="card-body" id="pendingEventsBody">
+                            <div class="empty-state"><h3>Loading…</h3></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Announcements Tab -->
+                <div id="tab-announcements" class="tab-panel">
+                    <div style="margin-bottom: 20px;">
+                        <button class="btn btn-primary" onclick="openAnnouncementModal()">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            New Announcement
+                        </button>
+                    </div>
+                    <div class="admin-card">
+                        <div class="card-header">
+                            <span class="card-title">Announcements</span>
+                        </div>
+                        <div class="card-body" id="announcementsList">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Tab -->
+                <div id="tab-settings" class="tab-panel">
+                    <div class="admin-card">
+                        <div class="card-header">
+                            <span class="card-title">App Settings</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <h4>Allow New Registrations</h4>
+                                    <p>Enable or disable new user sign-ups</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="allowRegistrations" checked onchange="saveSetting('allow_registrations', this.checked)">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <h4>Maintenance Mode</h4>
+                                    <p>Show maintenance page to all users</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="maintenanceMode" onchange="saveSetting('maintenance_mode', this.checked)">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <h4>Allow Public Notes</h4>
+                                    <p>Let users share notes publicly</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="allowPublicNotes" checked onchange="saveSetting('allow_public_notes', this.checked)">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <h4>Max Study Group Members</h4>
+                                    <p>Maximum members per study group</p>
+                                </div>
+                                <select class="form-select" style="width: 100px;" id="maxGroupMembers" onchange="saveSetting('max_group_members', this.value)">
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="50" selected>50</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Announcement Modal -->
+    <div class="modal-overlay" id="announcementModal">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title" id="announcementModalTitle">New Announcement</span>
+                <button class="modal-close" onclick="closeAnnouncementModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="announcementId">
+                <div class="form-group">
+                    <label class="form-label">Title *</label>
+                    <input type="text" class="form-input" id="announcementTitle" placeholder="Announcement title">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Message *</label>
+                    <textarea class="form-textarea" id="announcementMessage" placeholder="Write your announcement..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Type</label>
+                    <select class="form-select" id="announcementType">
+                        <option value="info">Info</option>
+                        <option value="warning">Warning</option>
+                        <option value="success">Success</option>
+                        <option value="urgent">Urgent</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeAnnouncementModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveAnnouncement()">Publish</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Details Modal -->
+    <div class="modal-overlay" id="userModal">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">User Details</span>
+                <button class="modal-close" onclick="closeUserModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="userModalBody">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" id="deleteUserBtn" onclick="confirmDeleteUser()">Delete User</button>
+                <button class="btn btn-outline" onclick="closeUserModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Warning Message Modal -->
+    <div class="modal-overlay" id="warningModal">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">Send Warning to User</span>
+                <button class="modal-close" onclick="closeWarningModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Sending warning to:</label>
+                    <p id="warningUserName" style="font-weight:600;color:var(--navy);"></p>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Warning Type</label>
+                    <select class="form-select" id="warningType">
+                        <option value="behavior">Inappropriate Behavior</option>
+                        <option value="content">Inappropriate Content</option>
+                        <option value="spam">Spam/Abuse</option>
+                        <option value="harassment">Harassment</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Warning Message *</label>
+                    <textarea class="form-textarea" id="warningMessage" placeholder="Enter the warning message to send to this user..." rows="4"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeWarningModal()">Cancel</button>
+                <button class="btn btn-primary" style="background:var(--red);" onclick="sendWarning()">Send Warning</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        const SUPABASE_URL = 'https://weuxtwmaqmbhskjpjdyi.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndldXh0d21hcW1iaHNranBqZHlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NTYzMTcsImV4cCI6MjA4MDMzMjMxN30.J-0Nd0MY6-g_ltbBNHwOulqZuQfb8mKIRgx0dAaJ76o';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // ADMIN USER ID - Only this user can access admin panel
+        const ADMIN_USER_ID = '80d10c97-c596-4739-aaa3-6dc2132e6304'; // Replace with your actual user ID
+
+        let currentUser = null;
+        let allUsers = [];
+        let allGroups = [];
+        let allNotes = [];
+        let announcements = [];
+        let currentPage = 1;
+        let currentViewedUser = null; // Track user being viewed in modal
+        const USERS_PER_PAGE = 10;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (!user) { window.location.href = 'index.html'; return; }
+            
+            // Check admin access
+            if (user.id !== ADMIN_USER_ID) {
+                document.getElementById('accessDenied').style.display = 'flex';
+                return;
+            }
+
+            currentUser = user;
+            document.getElementById('adminPanel').style.display = 'block';
+
+            // Load all data
+            await Promise.all([
+                loadAnalytics(),
+                loadUsers(),
+                loadReports(),
+                loadGroups(),
+                loadNotes(),
+                loadAnnouncements()
+            ]);
+            
+            loadSidebarBadges();
+            
+            // Setup real-time subscriptions for reports
+            setupRealtimeSubscriptions();
+        });
+
+        // Real-time subscriptions for new reports
+        function setupRealtimeSubscriptions() {
+            supabaseClient.channel('admin-reports')
+                .on('postgres_changes', {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'user_reports'
+                }, (payload) => {
+                    console.log('New report received:', payload);
+                    showToast('New report received!', 'info');
+                    loadReports();
+                    updateReportsBadge();
+                })
+                .on('postgres_changes', {
+                    event: 'UPDATE',
+                    schema: 'public',
+                    table: 'user_reports'
+                }, () => {
+                    loadReports();
+                })
+                .subscribe();
+            
+            // Real-time updates for analytics
+            supabaseClient.channel('admin-profiles')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => {
+                    loadAnalytics();
+                    loadUsers();
+                })
+                .subscribe();
+            
+            supabaseClient.channel('admin-groups')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'study_groups' }, () => {
+                    console.log('Study groups changed, reloading...');
+                    loadAnalytics();
+                    loadGroups();
+                })
+                .subscribe();
+            
+            // Also listen for member changes
+            supabaseClient.channel('admin-group-members')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'study_group_members' }, () => {
+                    console.log('Study group members changed, reloading...');
+                    loadGroups();
+                })
+                .subscribe();
+            
+            supabaseClient.channel('admin-notes')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'notes' }, () => {
+                    loadAnalytics();
+                    loadNotes();
+                })
+                .subscribe();
+            
+            supabaseClient.channel('admin-messages')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, () => {
+                    loadAnalytics();
+                })
+                .subscribe();
+            
+            supabaseClient.channel('admin-schedules')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'schedule_items' }, () => {
+                    loadAnalytics();
+                })
+                .subscribe();
+            
+            // Realtime for announcements
+            supabaseClient.channel('admin-announcements')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'announcements' }, () => {
+                    console.log('Announcements changed, reloading...');
+                    loadAnnouncements();
+                })
+                .subscribe();
+            
+            // Realtime for notifications (for analytics)
+            supabaseClient.channel('admin-notifications')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'notifications' }, () => {
+                    loadAnalytics();
+                })
+                .subscribe();
+            
+            // Realtime for friendships (for analytics)
+            supabaseClient.channel('admin-friendships')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'friendships' }, () => {
+                    loadAnalytics();
+                })
+                .subscribe();
+            
+            // Realtime for friend requests (for analytics)
+            supabaseClient.channel('admin-friend-requests')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'friend_requests' }, () => {
+                    loadAnalytics();
+                })
+                .subscribe();
+        }
+        
+        // Update reports badge
+        async function updateReportsBadge() {
+            try {
+                const { count } = await supabaseClient.from('user_reports')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('status', 'pending');
+                
+                const badge = document.getElementById('reportsTabBadge');
+                if (count > 0) {
+                    badge.textContent = count;
+                    badge.style.display = 'inline';
+                } else {
+                    badge.style.display = 'none';
+                }
+            } catch (e) {
+                console.error('Error updating reports badge:', e);
+            }
+        }
+
+        // Tab switching
+        function switchTab(tabId) {
+            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.querySelector(`[onclick="switchTab('${tabId}')"]`).classList.add('active');
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+            if (tabId === 'papers') loadPendingPapers();
+            if (tabId === 'events') loadPendingEvents();
+        }
+
+        // ===== Past papers moderation =====
+        let pendingPapers = [];
+        function escHtml(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+        async function loadPendingPapers() {
+            const body = document.getElementById('pendingPapersBody');
+            body.innerHTML = '<div class="empty-state"><h3>Loading…</h3></div>';
+            try {
+                const { data, error } = await supabaseClient
+                    .from('note_files')
+                    .select('id,title,description,course_code,kind,file_name,file_size,mime_type,r2_key,created_at,deleted_at,deleted_by,uploader_id')
+                    .eq('status', 'pending_review')
+                    .order('deleted_at', { ascending: false })
+                    .limit(200);
+                if (error) throw error;
+                pendingPapers = data || [];
+                // Update sidebar/tab badge
+                const badge = document.getElementById('papersTabBadge');
+                if (badge) {
+                    if (pendingPapers.length) { badge.style.display = 'inline'; badge.textContent = pendingPapers.length; }
+                    else badge.style.display = 'none';
+                }
+                renderPendingPapers();
+            } catch (e) {
+                body.innerHTML = `<div class="empty-state"><h3>Failed to load</h3><p>${escHtml(e.message || e)}</p></div>`;
+            }
+        }
+        function renderPendingPapers() {
+            const body = document.getElementById('pendingPapersBody');
+            if (!pendingPapers.length) {
+                body.innerHTML = '<div class="empty-state"><h3>Nothing pending</h3><p>No past papers awaiting review.</p></div>';
+                return;
+            }
+            body.innerHTML = `
+                <div style="overflow-x:auto;">
+                <table class="data-table">
+                    <thead><tr><th>Title</th><th>Course</th><th>Kind</th><th>Size</th><th>Deleted</th><th>Actions</th></tr></thead>
+                    <tbody>
+                    ${pendingPapers.map(r => {
+                        const url = window.MyUBUpload ? MyUBUpload.publicUrl(r.r2_key) : '#';
+                        const sizeKb = (r.file_size/1024).toFixed(0);
+                        const when = r.deleted_at ? new Date(r.deleted_at).toLocaleString() : '—';
+                        return `<tr>
+                            <td><a href="${url}" target="_blank" rel="noopener">${escHtml(r.title)}</a></td>
+                            <td>${escHtml(r.course_code || '—')}</td>
+                            <td>${escHtml(r.kind)}</td>
+                            <td>${sizeKb} KB</td>
+                            <td>${escHtml(when)}</td>
+                            <td>
+                                <button class="btn btn-secondary" style="font-size:11px;padding:4px 10px;" onclick="adminRestorePaper('${r.id}')">Restore</button>
+                                <button class="btn btn-secondary" style="font-size:11px;padding:4px 10px;background:#fee2e2;color:#991b1b;" onclick="adminPurgePaper('${r.id}')">Permanently delete</button>
+                            </td>
+                        </tr>`;
+                    }).join('')}
+                    </tbody>
+                </table>
+                </div>`;
+        }
+        async function adminRestorePaper(id) {
+            if (!confirm('Restore this past paper to the public list?')) return;
+            try {
+                await MyUBUpload.adminRestore(id);
+                pendingPapers = pendingPapers.filter(p => p.id !== id);
+                renderPendingPapers();
+            } catch (e) { alert('Restore failed: ' + (e.message || e)); }
+        }
+        async function adminPurgePaper(id) {
+            if (!confirm('PERMANENTLY delete this file from storage? This cannot be undone.')) return;
+            try {
+                await MyUBUpload.hardDelete(id);
+                pendingPapers = pendingPapers.filter(p => p.id !== id);
+                renderPendingPapers();
+            } catch (e) { alert('Purge failed: ' + (e.message || e)); }
+        }
+
+        // Analytics
+        async function loadAnalytics() {
+            try {
+                // Total users
+                const { count: usersCount } = await supabaseClient.from('profiles').select('*', { count: 'exact', head: true });
+                document.getElementById('totalUsers').textContent = usersCount || 0;
+
+                // New users this week
+                const weekAgo = new Date();
+                weekAgo.setDate(weekAgo.getDate() - 7);
+                const { count: newUsers } = await supabaseClient.from('profiles').select('*', { count: 'exact', head: true }).gte('created_at', weekAgo.toISOString());
+                document.getElementById('newUsersWeek').textContent = newUsers || 0;
+
+                // Total messages (try both tables)
+                let msgCount = 0;
+                try {
+                    const { count: dmCount } = await supabaseClient.from('messages').select('*', { count: 'exact', head: true });
+                    msgCount += dmCount || 0;
+                } catch(e) {}
+                try {
+                    const { count: groupMsgCount } = await supabaseClient.from('study_group_messages').select('*', { count: 'exact', head: true });
+                    msgCount += groupMsgCount || 0;
+                } catch(e) {}
+                document.getElementById('totalMessages').textContent = msgCount;
+
+                // Study groups
+                const { count: groupsCount } = await supabaseClient.from('study_groups').select('*', { count: 'exact', head: true });
+                document.getElementById('totalGroups').textContent = groupsCount || 0;
+
+                // Notes
+                const { count: notesCount } = await supabaseClient.from('notes').select('*', { count: 'exact', head: true });
+                document.getElementById('totalNotes').textContent = notesCount || 0;
+
+                // Schedules
+                const { count: schedulesCount } = await supabaseClient.from('schedules').select('*', { count: 'exact', head: true });
+                document.getElementById('totalSchedules').textContent = schedulesCount || 0;
+
+                // Recent activity
+                loadRecentActivity();
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+            }
+        }
+
+        async function loadRecentActivity() {
+            const container = document.getElementById('recentActivity');
+            const activities = [];
+
+            // Recent users
+            const { data: recentUsers } = await supabaseClient.from('profiles').select('*').order('created_at', { ascending: false }).limit(5);
+            if (recentUsers) {
+                recentUsers.forEach(u => {
+                    activities.push({
+                        type: 'user',
+                        text: `<strong>${escapeHtml(u.full_name || 'New User')}</strong> joined MyUB`,
+                        time: u.created_at
+                    });
+                });
+            }
+
+            // Recent groups
+            const { data: recentGroups } = await supabaseClient.from('study_groups').select('*, profiles(full_name)').order('created_at', { ascending: false }).limit(5);
+            if (recentGroups) {
+                recentGroups.forEach(g => {
+                    activities.push({
+                        type: 'group',
+                        text: `<strong>${escapeHtml(g.profiles?.full_name || 'Someone')}</strong> created group "${escapeHtml(g.name)}"`,
+                        time: g.created_at
+                    });
+                });
+            }
+
+            // Sort by time
+            activities.sort((a, b) => new Date(b.time) - new Date(a.time));
+
+            if (activities.length === 0) {
+                container.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><h3>No recent activity</h3></div>`;
+                return;
+            }
+
+            container.innerHTML = activities.slice(0, 10).map(a => `
+                <div class="activity-item">
+                    <div class="activity-icon ${a.type}">
+                        ${a.type === 'user' ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>' : 
+                          a.type === 'group' ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>' : ''}
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-text">${a.text}</div>
+                        <div class="activity-time">${formatTimeAgo(a.time)}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Reports Management
+        let allReports = [];
+        
+        async function loadReports() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('user_reports')
+                    .select(`
+                        *,
+                        reporter:reporter_id(id, full_name, avatar_url),
+                        reported:reported_id(id, full_name, avatar_url)
+                    `)
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                allReports = data || [];
+                document.getElementById('reportCount').textContent = allReports.length;
+                renderReportsTable();
+                updateReportsBadge();
+            } catch (e) {
+                console.error('Error loading reports:', e);
+                allReports = [];
+                renderReportsTable();
+            }
+        }
+        
+        function filterReports() {
+            renderReportsTable();
+        }
+        
+        function renderReportsTable() {
+            const statusFilter = document.getElementById('reportStatusFilter').value;
+            const typeFilter = document.getElementById('reportTypeFilter').value;
+            
+            let filtered = allReports.filter(r => {
+                const matchStatus = statusFilter === 'all' || r.status === statusFilter;
+                const matchType = typeFilter === 'all' || r.report_type === typeFilter;
+                return matchStatus && matchType;
+            });
+            
+            document.getElementById('reportCount').textContent = filtered.length;
+            
+            const tbody = document.getElementById('reportsTableBody');
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--gray-500);">No reports found</td></tr>';
+            } else {
+                tbody.innerHTML = filtered.map(r => `
+                    <tr>
+                        <td>
+                            <div class="user-info">
+                                <div class="user-info-avatar">
+                                    ${r.reporter?.avatar_url ? `<img src="${r.reporter.avatar_url}" alt="">` : (r.reporter?.full_name || 'U')[0].toUpperCase()}
+                                </div>
+                                <div class="user-info-details">
+                                    <div class="user-info-name">${escapeHtml(r.reporter?.full_name || 'Unknown')}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="user-info">
+                                <div class="user-info-avatar">
+                                    ${r.reported?.avatar_url ? `<img src="${r.reported.avatar_url}" alt="">` : (r.reported?.full_name || 'U')[0].toUpperCase()}
+                                </div>
+                                <div class="user-info-details">
+                                    <div class="user-info-name">${escapeHtml(r.reported?.full_name || 'Unknown')}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="status-badge ${r.report_type}">${r.report_type}</span></td>
+                        <td>${escapeHtml(r.reason || '-')}</td>
+                        <td><span class="status-badge ${r.status || 'pending'}">${r.status || 'pending'}</span></td>
+                        <td>${formatTimeAgo(r.created_at)}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-icon" title="View Details" onclick="viewReportDetails('${r.id}')">
+                                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                </button>
+                                <button class="btn-icon text-green" title="Mark Resolved" onclick="updateReportStatus('${r.id}', 'resolved')">
+                                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                                </button>
+                                <button class="btn-icon text-red" title="Dismiss" onclick="updateReportStatus('${r.id}', 'dismissed')">
+                                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                                </button>
+                                <button class="btn-icon text-orange" title="Warn User" onclick="openWarningModal('${r.reported?.id}', '${escapeHtml(r.reported?.full_name || 'User')}')">
+                                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+        
+        async function updateReportStatus(reportId, status) {
+            try {
+                const { error } = await supabaseClient
+                    .from('user_reports')
+                    .update({ status, reviewed_at: new Date().toISOString() })
+                    .eq('id', reportId);
+                
+                if (error) throw error;
+                showToast(`Report marked as ${status}`, 'success');
+                loadReports();
+            } catch (e) {
+                console.error('Error updating report:', e);
+                showToast('Failed to update report', 'error');
+            }
+        }
+        
+        function viewReportDetails(reportId) {
+            const report = allReports.find(r => r.id === reportId);
+            if (!report) return;
+            
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay show';
+            modal.id = 'reportDetailsModal';
+            modal.innerHTML = `
+                <div class="modal">
+                    <div class="modal-header">
+                        <h3 class="modal-title">Report Details</h3>
+                        <button class="modal-close" onclick="document.getElementById('reportDetailsModal').remove()">
+                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div style="margin-bottom: 16px;">
+                            <strong>Reporter:</strong> ${escapeHtml(report.reporter?.full_name || 'Unknown')}
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <strong>Reported User:</strong> ${escapeHtml(report.reported?.full_name || 'Unknown')}
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <strong>Type:</strong> <span class="status-badge ${report.report_type}">${report.report_type}</span>
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <strong>Reason:</strong> ${escapeHtml(report.reason || '-')}
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <strong>Description:</strong>
+                            <div style="background: var(--gray-100); padding: 12px; border-radius: 8px; margin-top: 8px; white-space: pre-wrap;">${escapeHtml(report.description || 'No additional details provided.')}</div>
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <strong>Status:</strong> <span class="status-badge ${report.status || 'pending'}">${report.status || 'pending'}</span>
+                        </div>
+                        <div>
+                            <strong>Submitted:</strong> ${new Date(report.created_at).toLocaleString()}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" onclick="document.getElementById('reportDetailsModal').remove()">Close</button>
+                        <button class="btn btn-success" onclick="updateReportStatus('${report.id}', 'resolved'); document.getElementById('reportDetailsModal').remove();">Mark Resolved</button>
+                        <button class="btn btn-danger" onclick="updateReportStatus('${report.id}', 'dismissed'); document.getElementById('reportDetailsModal').remove();">Dismiss</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Users Management
+        async function loadUsers() {
+            try {
+                console.log('Loading users...');
+                const { data, error } = await supabaseClient.from('profiles').select('*').order('created_at', { ascending: false });
+                if (error) {
+                    console.error('Error loading users:', error);
+                    allUsers = [];
+                } else {
+                    allUsers = data || [];
+                    console.log('Loaded users:', allUsers.length);
+                }
+                document.getElementById('userCount').textContent = allUsers.length;
+                renderUsersTable();
+            } catch (e) {
+                console.error('Error in loadUsers:', e);
+                allUsers = [];
+                document.getElementById('userCount').textContent = '0';
+                renderUsersTable();
+            }
+        }
+
+        function filterUsers() {
+            currentPage = 1;
+            renderUsersTable();
+        }
+
+        function renderUsersTable() {
+            const search = document.getElementById('userSearch').value.toLowerCase();
+            const status = document.getElementById('userStatusFilter').value;
+
+            let filtered = allUsers.filter(u => {
+                const matchSearch = !search || 
+                    (u.full_name && u.full_name.toLowerCase().includes(search)) ||
+                    (u.email && u.email.toLowerCase().includes(search)) ||
+                    (u.student_id && u.student_id.toLowerCase().includes(search));
+                const matchStatus = status === 'all' || 
+                    (status === 'banned' && u.is_banned) || 
+                    (status === 'active' && !u.is_banned);
+                return matchSearch && matchStatus;
+            });
+
+            document.getElementById('userCount').textContent = filtered.length;
+
+            const start = (currentPage - 1) * USERS_PER_PAGE;
+            const paginated = filtered.slice(start, start + USERS_PER_PAGE);
+
+            const tbody = document.getElementById('usersTableBody');
+            if (paginated.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--gray-500);">No users found</td></tr>';
+            } else {
+                tbody.innerHTML = paginated.map(u => `
+                    <tr>
+                        <td>
+                            <div class="user-info">
+                                <div class="user-info-avatar">
+                                    ${u.avatar_url ? `<img src="${u.avatar_url}" alt="">` : (u.full_name || 'U')[0].toUpperCase()}
+                                </div>
+                                <div class="user-info-details">
+                                    <div class="user-info-name">${escapeHtml(u.full_name || 'No Name')}</div>
+                                    <div class="user-info-email">${escapeHtml(u.email || '')}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>${escapeHtml(u.student_id || '-')}</td>
+                        <td>${formatDate(u.created_at)}</td>
+                        <td><span class="status-badge ${u.is_banned ? 'banned' : 'active'}">${u.is_banned ? 'Banned' : 'Active'}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline" onclick="viewUser('${u.id}')">View</button>
+                            ${u.id !== ADMIN_USER_ID ? `<button class="btn btn-sm" style="background:var(--orange);color:white;" onclick="openWarningModal('${u.id}', '${escapeHtml(u.full_name || 'User')}')">Warn</button>` : ''}
+                            ${u.id !== ADMIN_USER_ID ? `<button class="btn btn-sm ${u.is_banned ? 'btn-primary' : 'btn-danger'}" onclick="toggleBan('${u.id}', ${!u.is_banned})">${u.is_banned ? 'Unban' : 'Ban'}</button>` : ''}
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            // Pagination
+            const totalPages = Math.ceil(filtered.length / USERS_PER_PAGE);
+            const pagination = document.getElementById('usersPagination');
+            if (totalPages <= 1) {
+                pagination.innerHTML = '';
+            } else {
+                let pages = '';
+                for (let i = 1; i <= totalPages; i++) {
+                    pages += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+                }
+                pagination.innerHTML = pages;
+            }
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            renderUsersTable();
+        }
+
+        async function viewUser(userId) {
+            const user = allUsers.find(u => u.id === userId);
+            if (!user) return;
+            
+            currentViewedUser = user; // Track for delete functionality
+            
+            // Reset delete button state
+            const deleteBtn = document.getElementById('deleteUserBtn');
+            if (deleteBtn) {
+                deleteBtn.disabled = false;
+                deleteBtn.textContent = 'Delete User';
+            }
+
+            // Get additional stats
+            const { count: notesCount } = await supabaseClient.from('notes').select('*', { count: 'exact', head: true }).eq('user_id', userId);
+            const { count: groupsCount } = await supabaseClient.from('study_group_members').select('*', { count: 'exact', head: true }).eq('user_id', userId);
+
+            const modal = document.getElementById('userModal');
+            document.getElementById('userModalBody').innerHTML = `
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div class="user-info-avatar" style="width: 80px; height: 80px; font-size: 32px; margin: 0 auto 15px;">
+                        ${user.avatar_url ? `<img src="${user.avatar_url}" alt="">` : (user.full_name || 'U')[0].toUpperCase()}
+                    </div>
+                    <h3 style="color: var(--navy); margin-bottom: 5px;">${escapeHtml(user.full_name || 'No Name')}</h3>
+                    <p style="color: var(--gray-500);">${escapeHtml(user.email || '')}</p>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div style="padding: 15px; background: var(--gray-50); border-radius: 8px;">
+                        <div style="font-size: 12px; color: var(--gray-500); margin-bottom: 5px;">Student ID</div>
+                        <div style="font-weight: 500;">${escapeHtml(user.student_id || '-')}</div>
+                    </div>
+                    <div style="padding: 15px; background: var(--gray-50); border-radius: 8px;">
+                        <div style="font-size: 12px; color: var(--gray-500); margin-bottom: 5px;">Faculty</div>
+                        <div style="font-weight: 500;">${escapeHtml(user.faculty || '-')}</div>
+                    </div>
+                    <div style="padding: 15px; background: var(--gray-50); border-radius: 8px;">
+                        <div style="font-size: 12px; color: var(--gray-500); margin-bottom: 5px;">Program</div>
+                        <div style="font-weight: 500;">${escapeHtml(user.program || '-')}</div>
+                    </div>
+                    <div style="padding: 15px; background: var(--gray-50); border-radius: 8px;">
+                        <div style="font-size: 12px; color: var(--gray-500); margin-bottom: 5px;">Year</div>
+                        <div style="font-weight: 500;">${user.year_of_study ? 'Year ' + user.year_of_study : '-'}</div>
+                    </div>
+                    <div style="padding: 15px; background: var(--gray-50); border-radius: 8px;">
+                        <div style="font-size: 12px; color: var(--gray-500); margin-bottom: 5px;">Notes</div>
+                        <div style="font-weight: 500;">${notesCount || 0}</div>
+                    </div>
+                    <div style="padding: 15px; background: var(--gray-50); border-radius: 8px;">
+                        <div style="font-size: 12px; color: var(--gray-500); margin-bottom: 5px;">Groups</div>
+                        <div style="font-weight: 500;">${groupsCount || 0}</div>
+                    </div>
+                </div>
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--gray-200);">
+                    <div style="font-size: 12px; color: var(--gray-500); margin-bottom: 5px;">Joined</div>
+                    <div>${new Date(user.created_at).toLocaleString()}</div>
+                </div>
+                ${user.bio ? `<div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--gray-200);">
+                    <div style="font-size: 12px; color: var(--gray-500); margin-bottom: 5px;">Bio</div>
+                    <div>${escapeHtml(user.bio)}</div>
+                </div>` : ''}
+            `;
+            modal.classList.add('show');
+        }
+
+        function closeUserModal() {
+            document.getElementById('userModal').classList.remove('show');
+            currentViewedUser = null;
+        }
+        
+        function confirmDeleteUser() {
+            if (!currentViewedUser) return;
+            
+            const userName = currentViewedUser.full_name || currentViewedUser.email || 'this user';
+            if (!confirm(`⚠️ DELETE USER ⚠️\n\nAre you sure you want to permanently delete "${userName}"?\n\nThis will remove:\n• Their profile\n• All their messages\n• All their notes\n• All their courses\n• Group memberships\n• Friend connections\n• All other data\n\nThis action CANNOT be undone!`)) return;
+            
+            // Double confirmation for safety
+            const confirmText = prompt(`Type "DELETE ${currentViewedUser.student_id || 'USER'}" to confirm:`);
+            if (confirmText !== `DELETE ${currentViewedUser.student_id || 'USER'}`) {
+                showToast('Deletion cancelled - confirmation text did not match', 'error');
+                return;
+            }
+            
+            deleteUser(currentViewedUser.id);
+        }
+        
+        async function deleteUser(userId) {
+            const deleteBtn = document.getElementById('deleteUserBtn');
+            if (deleteBtn) {
+                deleteBtn.disabled = true;
+                deleteBtn.textContent = 'Deleting...';
+            }
+            
+            try {
+                // Delete in order to respect foreign key constraints
+                // 1. Delete active connections
+                await supabaseClient.from('active_connections').delete().eq('user_id', userId);
+                
+                // 2. Delete admin actions by this user
+                await supabaseClient.from('admin_actions').delete().eq('admin_id', userId);
+                
+                // 3. Delete blocked users (both directions)
+                await supabaseClient.from('blocked_users').delete().or(`blocker_id.eq.${userId},blocked_id.eq.${userId}`);
+                
+                // 4. Delete courses
+                await supabaseClient.from('courses').delete().eq('user_id', userId);
+                
+                // 5. Delete deleted conversations
+                await supabaseClient.from('deleted_conversations').delete().eq('user_id', userId);
+                
+                // 6. Delete friend requests (both directions)
+                await supabaseClient.from('friend_requests').delete().or(`sender_id.eq.${userId},receiver_id.eq.${userId}`);
+                
+                // 7. Delete friendships (both directions)
+                await supabaseClient.from('friendships').delete().or(`user_id.eq.${userId},friend_id.eq.${userId}`);
+                
+                // 8. Delete group join requests
+                await supabaseClient.from('group_join_requests').delete().eq('user_id', userId);
+                
+                // 9. Delete messages (both sent and received)
+                await supabaseClient.from('messages').delete().or(`sender_id.eq.${userId},receiver_id.eq.${userId}`);
+                
+                // 10. Delete notes
+                await supabaseClient.from('notes').delete().eq('user_id', userId);
+                
+                // 11. Delete notifications
+                await supabaseClient.from('notifications').delete().eq('user_id', userId);
+                
+                // 12. Delete schedules
+                await supabaseClient.from('schedules').delete().eq('user_id', userId);
+                
+                // 13. Delete study group members
+                await supabaseClient.from('study_group_members').delete().eq('user_id', userId);
+                
+                // 14. Delete study group messages
+                await supabaseClient.from('study_group_messages').delete().eq('sender_id', userId);
+                
+                // 15. Call the database function to delete the user completely
+                const { error: deleteError } = await supabaseClient.rpc('admin_delete_user', { p_user_id: userId });
+                
+                if (deleteError) {
+                    console.error('RPC delete failed:', deleteError);
+                    // Fallback: Just delete the profile directly
+                    const { error: profileError } = await supabaseClient.from('profiles').delete().eq('id', userId);
+                    if (profileError) throw profileError;
+                }
+                
+                // Update local data
+                allUsers = allUsers.filter(u => u.id !== userId);
+                
+                // Update all count displays
+                const userCountEl = document.getElementById('userCount');
+                if (userCountEl) userCountEl.textContent = allUsers.length;
+                
+                showToast('User deleted successfully', 'success');
+                closeUserModal();
+                renderUsersTable();
+                
+                // Refresh analytics to update all counts
+                loadAnalytics();
+                
+            } catch (err) {
+                console.error('Delete user error:', err);
+                showToast('Failed to delete user: ' + err.message, 'error');
+                if (deleteBtn) {
+                    deleteBtn.disabled = false;
+                    deleteBtn.textContent = 'Delete User';
+                }
+            }
+        }
+
+        async function toggleBan(userId, ban) {
+            if (!confirm(ban ? 'Ban this user? They will not be able to access MyUB.' : 'Unban this user?')) return;
+            
+            const { error } = await supabaseClient.from('profiles').update({ is_banned: ban }).eq('id', userId);
+            if (error) {
+                console.error('Failed to update ban status:', error);
+                showToast('Failed to update user status', 'error');
+                return;
+            }
+            
+            console.log('Ban status updated:', userId, ban);
+            
+            if (ban) {
+                // Send ban notification
+                const { error: notifError } = await supabaseClient.from('notifications').insert({
+                    user_id: userId,
+                    type: 'ban',
+                    title: 'Account Suspended',
+                    body: 'Your account has been suspended by an administrator. You will be logged out and cannot access MyUB until unbanned.'
+                });
+                if (notifError) {
+                    console.error('Failed to send ban notification:', notifError);
+                }
+            } else {
+                // Send unban notification
+                const { error: notifError } = await supabaseClient.from('notifications').insert({
+                    user_id: userId,
+                    type: 'unban',
+                    title: 'Account Restored',
+                    body: 'Good news! Your account has been restored. You can now access MyUB again. Welcome back!'
+                });
+                if (notifError) {
+                    console.error('Failed to send unban notification:', notifError);
+                }
+            }
+            
+            // Update local data immediately for instant UI update
+            const userIdx = allUsers.findIndex(u => u.id === userId);
+            if (userIdx !== -1) {
+                allUsers[userIdx].is_banned = ban;
+            }
+            
+            showToast(ban ? 'User banned' : 'User unbanned', 'success');
+            renderUsersTable(); // Re-render immediately
+        }
+
+        // Study Groups Management
+        async function loadGroups() {
+            try {
+                console.log('Loading study groups...');
+                
+                // Simple direct query - let's see what happens
+                const { data: groups, error: groupsError } = await supabaseClient
+                    .from('study_groups')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (groupsError) {
+                    console.error('Error loading groups:', groupsError.message || groupsError.code || JSON.stringify(groupsError));
+                    // Show error to admin
+                    showToast('Error loading groups: ' + (groupsError.message || 'Check console'), 'error');
+                    allGroups = [];
+                } else {
+                    console.log('Groups loaded successfully:', groups?.length || 0, groups);
+                    
+                    if (!groups || groups.length === 0) {
+                        allGroups = [];
+                    } else {
+                        // Get member counts for each group
+                        const groupsWithCounts = await Promise.all(groups.map(async (g) => {
+                            try {
+                                const { count } = await supabaseClient
+                                    .from('study_group_members')
+                                    .select('*', { count: 'exact', head: true })
+                                    .eq('group_id', g.id);
+                                
+                                // Try to get creator name
+                                let creatorName = 'Unknown';
+                                if (g.creator_id) {
+                                    const { data: profile } = await supabaseClient
+                                        .from('profiles')
+                                        .select('full_name')
+                                        .eq('id', g.creator_id)
+                                        .single();
+                                    if (profile) creatorName = profile.full_name || 'Unknown';
+                                }
+                                
+                                return { ...g, member_count: count || 0, creator_name: creatorName };
+                            } catch (e) {
+                                return { ...g, member_count: 0, creator_name: 'Unknown' };
+                            }
+                        }));
+                        allGroups = groupsWithCounts;
+                    }
+                }
+                
+                document.getElementById('groupCount').textContent = allGroups.length;
+                renderGroupsTable();
+            } catch (e) {
+                console.error('Exception in loadGroups:', e);
+                showToast('Exception loading groups: ' + e.message, 'error');
+                allGroups = [];
+                document.getElementById('groupCount').textContent = '0';
+                renderGroupsTable();
+            }
+        }
+
+        function filterGroups() {
+            renderGroupsTable();
+        }
+
+        function renderGroupsTable() {
+            const search = document.getElementById('groupSearch').value.toLowerCase();
+            let filtered = allGroups.filter(g => 
+                !search || 
+                g.name.toLowerCase().includes(search) || 
+                (g.course_code && g.course_code.toLowerCase().includes(search))
+            );
+
+            document.getElementById('groupCount').textContent = filtered.length;
+
+            const tbody = document.getElementById('groupsTableBody');
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--gray-500);">No study groups found</td></tr>';
+            } else {
+                tbody.innerHTML = filtered.map(g => `
+                    <tr>
+                        <td><strong>${escapeHtml(g.name)}</strong></td>
+                        <td>${escapeHtml(g.course_code || '-')}</td>
+                        <td>${g.member_count || 0} members</td>
+                        <td>${formatDate(g.created_at)}</td>
+                        <td>
+                            <button class="btn btn-sm btn-danger" onclick="deleteGroup('${g.id}', '${escapeHtml(g.name)}')">Delete</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        async function deleteGroup(groupId, groupName) {
+            if (!confirm(`Delete study group "${groupName}"? This cannot be undone.`)) return;
+            
+            const { error } = await supabaseClient.from('study_groups').delete().eq('id', groupId);
+            if (error) {
+                showToast('Failed to delete group', 'error');
+                return;
+            }
+            
+            showToast('Group deleted', 'success');
+            await loadGroups();
+            await loadAnalytics();
+        }
+
+        // Notes Management
+        async function loadNotes() {
+            try {
+                console.log('Loading notes...');
+                const { data, error } = await supabaseClient.from('notes').select('*, profiles(full_name)').order('created_at', { ascending: false });
+                if (error) {
+                    console.error('Error loading notes:', error);
+                    allNotes = [];
+                } else {
+                    allNotes = data || [];
+                    console.log('Loaded notes:', allNotes.length);
+                }
+                renderNotesTable();
+            } catch (e) {
+                console.error('Error in loadNotes:', e);
+                allNotes = [];
+                renderNotesTable();
+            }
+        }
+
+        function renderNotesTable() {
+            const tbody = document.getElementById('notesTableBody');
+            if (allNotes.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:40px;color:var(--gray-500);">No notes found</td></tr>';
+            } else {
+                tbody.innerHTML = allNotes.slice(0, 20).map(n => `
+                    <tr>
+                        <td><strong>${escapeHtml(n.title || 'Untitled')}</strong></td>
+                        <td>${escapeHtml(n.profiles?.full_name || 'Unknown')}</td>
+                        <td>${formatDate(n.created_at)}</td>
+                        <td>
+                            <button class="btn btn-sm btn-danger" onclick="deleteNote('${n.id}')">Delete</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        async function deleteNote(noteId) {
+            if (!confirm('Delete this note? This cannot be undone.')) return;
+            
+            const { error } = await supabaseClient.from('notes').delete().eq('id', noteId);
+            if (error) {
+                showToast('Failed to delete note', 'error');
+                return;
+            }
+            
+            showToast('Note deleted', 'success');
+            await loadNotes();
+            await loadAnalytics();
+        }
+
+        // Announcements
+        async function loadAnnouncements() {
+            try {
+                console.log('Loading announcements...');
+                const { data, error } = await supabaseClient.from('announcements').select('*').order('created_at', { ascending: false });
+                if (error) {
+                    console.error('Error loading announcements:', error);
+                    announcements = [];
+                } else {
+                    announcements = data || [];
+                    console.log('Loaded announcements:', announcements.length);
+                }
+                renderAnnouncements();
+            } catch (e) {
+                console.error('Error in loadAnnouncements:', e);
+                announcements = [];
+                renderAnnouncements();
+            }
+        }
+
+        function renderAnnouncements() {
+            const container = document.getElementById('announcementsList');
+            if (announcements.length === 0) {
+                container.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"/></svg><h3>No announcements</h3><p>Create your first announcement</p></div>`;
+                return;
+            }
+
+            container.innerHTML = announcements.map(a => `
+                <div class="announcement-item ${a.is_active ? 'active' : ''}">
+                    <div class="announcement-header">
+                        <span class="announcement-title">${escapeHtml(a.title)}</span>
+                        <span class="announcement-date">${formatDate(a.created_at)}</span>
+                    </div>
+                    <div class="announcement-content">${escapeHtml(a.message)}</div>
+                    <div class="announcement-actions">
+                        <button class="btn btn-sm btn-outline" onclick="editAnnouncement('${a.id}')"">Edit</button>
+                        <button class="btn btn-sm ${a.is_active ? 'btn-outline' : 'btn-primary'}" onclick="toggleAnnouncement('${a.id}', ${!a.is_active})">${a.is_active ? 'Deactivate' : 'Activate'}</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteAnnouncement('${a.id}')">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openAnnouncementModal() {
+            document.getElementById('announcementModalTitle').textContent = 'New Announcement';
+            document.getElementById('announcementId').value = '';
+            document.getElementById('announcementTitle').value = '';
+            document.getElementById('announcementMessage').value = '';
+            document.getElementById('announcementType').value = 'info';
+            document.getElementById('announcementModal').classList.add('show');
+        }
+
+        function closeAnnouncementModal() {
+            document.getElementById('announcementModal').classList.remove('show');
+        }
+
+        function editAnnouncement(id) {
+            const ann = announcements.find(a => a.id === id);
+            if (!ann) return;
+            
+            document.getElementById('announcementModalTitle').textContent = 'Edit Announcement';
+            document.getElementById('announcementId').value = ann.id;
+            document.getElementById('announcementTitle').value = ann.title;
+            document.getElementById('announcementMessage').value = ann.message;
+            document.getElementById('announcementType').value = ann.type || 'info';
+            document.getElementById('announcementModal').classList.add('show');
+        }
+
+        async function saveAnnouncement() {
+            const id = document.getElementById('announcementId').value;
+            const title = document.getElementById('announcementTitle').value.trim();
+            const message = document.getElementById('announcementMessage').value.trim();
+            const type = document.getElementById('announcementType').value;
+
+            if (!title || !message) {
+                showToast('Please fill in all fields', 'error');
+                return;
+            }
+
+            const data = { title, message, type, is_active: true };
+
+            let error;
+            if (id) {
+                error = (await supabaseClient.from('announcements').update(data).eq('id', id)).error;
+            } else {
+                error = (await supabaseClient.from('announcements').insert(data)).error;
+            }
+
+            if (error) {
+                showToast('Failed to save announcement', 'error');
+                console.error(error);
+                return;
+            }
+
+            showToast(id ? 'Announcement updated' : 'Announcement published', 'success');
+            closeAnnouncementModal();
+            await loadAnnouncements();
+            
+            // Send notification to all users with the announcement type
+            if (!id) {
+                broadcastNotification(title, message, type);
+            }
+        }
+
+        async function broadcastNotification(title, message, announcementType = 'info') {
+            // Get all user IDs
+            const { data: users, error: usersError } = await supabaseClient.from('profiles').select('id');
+            if (usersError) {
+                console.error('Failed to get users:', usersError);
+                return;
+            }
+            if (!users || users.length === 0) {
+                console.log('No users found');
+                return;
+            }
+            
+            console.log('Broadcasting to', users.length, 'users');
+            
+            // Map announcement type to notification type
+            let notifType = 'announcement';
+            if (announcementType === 'warning') notifType = 'admin_warning';
+            else if (announcementType === 'urgent') notifType = 'admin_urgent';
+            else if (announcementType === 'success') notifType = 'admin_success';
+            else notifType = 'announcement'; // info type
+
+            // Create notifications for all users - only include required fields
+            const notifs = users.map(u => ({
+                user_id: u.id,
+                type: notifType,
+                title: title,
+                body: message.substring(0, 100) + (message.length > 100 ? '...' : '')
+            }));
+            
+            console.log('Notification payload:', JSON.stringify(notifs[0]));
+
+            // Insert in batches
+            let successCount = 0;
+            for (let i = 0; i < notifs.length; i += 100) {
+                const batch = notifs.slice(i, i + 100);
+                const { data, error } = await supabaseClient.from('notifications').insert(batch).select();
+                if (error) {
+                    console.error('Failed to insert notifications batch:', error);
+                    console.error('Error details:', JSON.stringify(error));
+                    console.error('Batch data:', JSON.stringify(batch));
+                } else {
+                    successCount += batch.length;
+                    console.log('Inserted batch successfully:', data);
+                }
+            }
+            console.log('Successfully sent', successCount, 'notifications');
+        }
+
+        async function toggleAnnouncement(id, active) {
+            const { error } = await supabaseClient.from('announcements').update({ is_active: active }).eq('id', id);
+            if (error) {
+                showToast('Failed to update announcement', 'error');
+                return;
+            }
+            showToast(active ? 'Announcement activated' : 'Announcement deactivated', 'success');
+            await loadAnnouncements();
+        }
+
+        async function deleteAnnouncement(id) {
+            if (!confirm('Delete this announcement?')) return;
+            
+            const { error } = await supabaseClient.from('announcements').delete().eq('id', id);
+            if (error) {
+                showToast('Failed to delete announcement', 'error');
+                return;
+            }
+            showToast('Announcement deleted', 'success');
+            await loadAnnouncements();
+        }
+
+        // Settings
+        async function saveSetting(key, value) {
+            // For now, settings are stored in localStorage since we don't have a settings table
+            localStorage.setItem(`myub_setting_${key}`, JSON.stringify(value));
+            showToast('Setting saved', 'success');
+        }
+
+        // Load settings on init
+        function loadSettings() {
+            const settings = ['allow_registrations', 'maintenance_mode', 'allow_public_notes', 'max_group_members'];
+            settings.forEach(s => {
+                const val = localStorage.getItem(`myub_setting_${s}`);
+                if (val !== null) {
+                    const el = document.getElementById(s.replace(/_/g, '').replace(/([A-Z])/g, (m) => m.toLowerCase()));
+                    if (el) {
+                        if (el.type === 'checkbox') el.checked = JSON.parse(val);
+                        else el.value = JSON.parse(val);
+                    }
+                }
+            });
+        }
+
+        // Sidebar badges - not needed for admin panel
+        async function loadSidebarBadges() {
+            // Admin panel has simplified sidebar, no badges needed
+        }
+
+        // Utilities
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        function formatTimeAgo(dateStr) {
+            if (!dateStr) return '';
+            const diff = Date.now() - new Date(dateStr).getTime();
+            const mins = Math.floor(diff / 60000);
+            if (mins < 1) return 'Just now';
+            if (mins < 60) return `${mins}m ago`;
+            const hours = Math.floor(mins / 60);
+            if (hours < 24) return `${hours}h ago`;
+            const days = Math.floor(hours / 24);
+            if (days < 7) return `${days}d ago`;
+            return formatDate(dateStr);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        // ========== WARNING MESSAGE FUNCTIONS ==========
+        let warningTargetUserId = null;
+        
+        function openWarningModal(userId, userName) {
+            warningTargetUserId = userId;
+            document.getElementById('warningUserName').textContent = userName;
+            document.getElementById('warningType').value = 'behavior';
+            document.getElementById('warningMessage').value = '';
+            document.getElementById('warningModal').classList.add('show');
+        }
+        
+        function closeWarningModal() {
+            document.getElementById('warningModal').classList.remove('show');
+            warningTargetUserId = null;
+        }
+        
+        async function sendWarning() {
+            if (!warningTargetUserId) return;
+            
+            const warningType = document.getElementById('warningType').value;
+            const warningMessage = document.getElementById('warningMessage').value.trim();
+            
+            if (!warningMessage) {
+                showToast('Please enter a warning message', 'error');
+                return;
+            }
+            
+            if (warningMessage.length < 10) {
+                showToast('Warning message must be at least 10 characters', 'error');
+                return;
+            }
+            
+            try {
+                // Create a notification for the user
+                const { error } = await supabaseClient.from('notifications').insert({
+                    user_id: warningTargetUserId,
+                    type: 'admin_warning',
+                    title: '⚠️ Admin Warning: ' + warningType.charAt(0).toUpperCase() + warningType.slice(1),
+                    body: warningMessage,
+                    is_read: false
+                });
+                
+                if (error) throw error;
+                
+                showToast('Warning sent successfully', 'success');
+                closeWarningModal();
+            } catch (e) {
+                console.error('Error sending warning:', e);
+                showToast('Failed to send warning', 'error');
+            }
+        }
+
+        // Close sidebar on outside click (mobile)
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                const sidebar = document.getElementById('sidebar');
+                if (!e.target.closest('.sidebar') && !e.target.closest('.menu-toggle') && sidebar.classList.contains('open')) {
+                    sidebar.classList.remove('open');
+                }
+            }
+        });
+    </script>
+
+    <script>
+        (function() {
+            if (!document.querySelector('.bg-orbs')) {
+                const wrap = document.createElement('div');
+                wrap.className = 'bg-orbs';
+                wrap.setAttribute('aria-hidden','true');
+                wrap.innerHTML = '<div class="orb orb-1"></div><div class="orb orb-2"></div>';
+                document.body.appendChild(wrap);
+            }
+            function forceVisible() {
+                document.querySelectorAll('.top-header, .admin-tabs, .stat-card, .admin-card, .sidebar-nav a')
+                    .forEach(el => { el.style.opacity=''; el.style.transform=''; el.style.visibility=''; });
+            }
+            function runEntrance() {
+                const g = window.gsap;
+                if (!g) { forceVisible(); return; }
+                try {
+                    const tl = g.timeline({ defaults: { ease: 'power3.out' } });
+                    tl.fromTo('.top-header', { y:-18, opacity:0 }, { y:0, opacity:1, duration:0.6, clearProps:'all' })
+                      .fromTo('.admin-tabs', { y:-10, opacity:0 }, { y:0, opacity:1, duration:0.5, clearProps:'all' }, '-=0.35')
+                      .fromTo('.stat-card', { y:20, opacity:0 }, { y:0, opacity:1, duration:0.55, stagger:0.06, clearProps:'all' }, '-=0.3')
+                      .fromTo('.admin-card', { y:16, opacity:0 }, { y:0, opacity:1, duration:0.5, stagger:0.08, clearProps:'all' }, '-=0.3')
+                      .fromTo('.sidebar-nav a', { x:-14, opacity:0 }, { x:0, opacity:1, duration:0.4, stagger:0.06, clearProps:'all' }, '-=0.55');
+                } catch(e) { forceVisible(); }
+            }
+            let attempts = 0;
+            const checkReady = setInterval(() => {
+                attempts++;
+                const panel = document.getElementById('adminPanel');
+                if (panel && panel.style.display !== 'none') {
+                    clearInterval(checkReady);
+                    runEntrance();
+                } else if (attempts > 60) {
+                    clearInterval(checkReady);
+                    forceVisible();
+                }
+            }, 100);
+            setTimeout(forceVisible, 8000);
+
+            // Stagger table rows when they render
+            setTimeout(() => {
+                ['usersTableBody','reportsTableBody','groupsTableBody','notesTableBody','announcementsList'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (!el) return;
+                    const mo = new MutationObserver(() => {
+                        const g = window.gsap;
+                        if (!g) return;
+                        const items = el.querySelectorAll('tr, .announcement-item');
+                        if (!items.length) return;
+                        g.fromTo(items, { y:8, opacity:0 }, { y:0, opacity:1, duration:0.35, stagger:0.03, ease:'power2.out', clearProps:'all' });
+                    });
+                    mo.observe(el, { childList: true });
+                });
+            }, 800);
+        })();
+    </script>
+
+    <script>
+    // ===== Events moderation =====
+    (function(){
+        let pendingEvents = [];
+        function eEsc(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+        function fmt(iso){ return new Date(iso).toLocaleString(undefined,{dateStyle:'medium',timeStyle:'short'}); }
+        const CAT_LABEL = { academic:'📚 Academic', social:'🎉 Social', sports:'⚽ Sports', club:'🎭 Club', cultural:'🌍 Cultural', other:'✨ Other' };
+
+        window.loadPendingEvents = async function(){
+            const body = document.getElementById('pendingEventsBody');
+            if (!body) return;
+            body.innerHTML = '<div class="empty-state"><h3>Loading…</h3></div>';
+            try {
+                const { data, error } = await supabaseClient
+                    .from('events')
+                    .select('id,title,description,location,starts_at,ends_at,category,capacity,cover_r2_key,creator_id,created_at,status')
+                    .eq('status','pending')
+                    .order('created_at', { ascending: false })
+                    .limit(200);
+                if (error) throw error;
+                pendingEvents = data || [];
+
+                // Resolve creator profiles in one round-trip
+                const ids = [...new Set(pendingEvents.map(e=>e.creator_id))];
+                let profileMap = {};
+                if (ids.length){
+                    const { data: profs } = await supabaseClient.from('profiles').select('*').in('id', ids);
+                    (profs||[]).forEach(p => profileMap[p.id] = p);
+                }
+                pendingEvents.forEach(e => e._creator = profileMap[e.creator_id] || {});
+
+                const badge = document.getElementById('eventsTabBadge');
+                if (badge){
+                    if (pendingEvents.length){ badge.style.display='inline'; badge.textContent = pendingEvents.length; }
+                    else badge.style.display='none';
+                }
+                renderPendingEvents();
+            } catch(e){
+                body.innerHTML = `<div class="empty-state"><h3>Failed to load</h3><p>${eEsc(e.message||e)}</p></div>`;
+            }
+        };
+
+        function renderPendingEvents(){
+            const body = document.getElementById('pendingEventsBody');
+            if (!pendingEvents.length){
+                body.innerHTML = '<div class="empty-state"><h3>Nothing pending</h3><p>No events awaiting approval.</p></div>';
+                return;
+            }
+            body.innerHTML = pendingEvents.map(e => {
+                const c = e._creator || {};
+                const who = eEsc(
+                    c.username ? '@' + c.username :
+                    c.full_name ? c.full_name :
+                    c.display_name ? c.display_name :
+                    (c.first_name || c.last_name) ? ((c.first_name||'') + ' ' + (c.last_name||'')).trim() :
+                    c.email ? c.email :
+                    'Unknown'
+                );
+                const cover = e.cover_r2_key ? `https://files.myub.online/${eEsc(e.cover_r2_key)}` : '';
+                return `
+                <div style="border:1px solid var(--border); border-radius:12px; padding:18px; margin-bottom:14px; background:var(--surface-2);">
+                    <div style="display:flex; gap:16px; align-items:flex-start;">
+                        ${cover ? `<img src="${cover}" style="width:140px; aspect-ratio:16/9; object-fit:cover; border-radius:8px; flex-shrink:0;" loading="lazy">` : `<div style="width:140px; aspect-ratio:16/9; background:var(--surface-3); border-radius:8px; display:flex;align-items:center;justify-content:center; font-size:24px; flex-shrink:0;">${eEsc(CAT_LABEL[e.category]||'').split(' ')[0]}</div>`}
+                        <div style="flex:1; min-width:0;">
+                            <div style="font-size:17px; font-weight:600; color:var(--text); margin-bottom:6px;">${eEsc(e.title)}</div>
+                            <div style="font-size:13px; color:var(--text-muted); margin-bottom:10px;">
+                                ${eEsc(CAT_LABEL[e.category]||'')} &middot; by ${who} &middot; submitted ${fmt(e.created_at)}
+                            </div>
+                            <div style="font-size:13px; color:var(--text-soft); margin-bottom:6px;">📅 ${fmt(e.starts_at)} — ${fmt(e.ends_at)}</div>
+                            ${e.location?`<div style="font-size:13px; color:var(--text-soft); margin-bottom:6px;">📍 ${eEsc(e.location)}</div>`:''}
+                            ${e.capacity?`<div style="font-size:13px; color:var(--text-soft); margin-bottom:6px;">👥 Capacity: ${e.capacity}</div>`:''}
+                            ${e.description?`<div style="font-size:13px; color:var(--text-dim); margin-top:10px; white-space:pre-wrap; max-height:100px; overflow-y:auto;">${eEsc(e.description)}</div>`:''}
+                            <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">
+                                <button class="btn btn-primary" style="font-size:13px; padding:8px 16px;" onclick="approveEvent('${e.id}')">✓ Approve</button>
+                                <button class="btn btn-secondary" style="font-size:13px; padding:8px 16px;" onclick="rejectEvent('${e.id}')">✗ Reject</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        window.approveEvent = async function(id){
+            const row = pendingEvents.find(e=>e.id===id); if (!row) return;
+            if (!confirm(`Approve "${row.title}"?`)) return;
+            const { error } = await supabaseClient.from('events').update({ status: 'approved' }).eq('id', id);
+            if (error){ alert('Approve failed: ' + error.message); return; }
+            // Trigger events_log_status_change handles approved_at/approved_by + admin_actions audit
+            pendingEvents = pendingEvents.filter(e=>e.id!==id);
+            renderPendingEvents();
+            const badge = document.getElementById('eventsTabBadge');
+            if (badge){ if (pendingEvents.length){ badge.textContent = pendingEvents.length; } else { badge.style.display='none'; } }
+        };
+
+        window.rejectEvent = async function(id){
+            const row = pendingEvents.find(e=>e.id===id); if (!row) return;
+            const reason = prompt(`Reject "${row.title}"?\n\nOptional reason (shown to creator):`);
+            if (reason === null) return;
+            const { error } = await supabaseClient.from('events').update({
+                status: 'rejected',
+                rejection_reason: reason || null
+            }).eq('id', id);
+            if (error){ alert('Reject failed: ' + error.message); return; }
+            // Trigger events_log_status_change handles admin_actions audit
+            pendingEvents = pendingEvents.filter(e=>e.id!==id);
+            renderPendingEvents();
+            const badge = document.getElementById('eventsTabBadge');
+            if (badge){ if (pendingEvents.length){ badge.textContent = pendingEvents.length; } else { badge.style.display='none'; } }
+        };
+
+        // Prefetch badge count on page load so admins see the pending number without clicking the tab
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const { count } = await supabaseClient.from('events').select('id', { count:'exact', head:true }).eq('status','pending');
+                const badge = document.getElementById('eventsTabBadge');
+                if (badge && count){ badge.style.display='inline'; badge.textContent = count; }
+            } catch(_){}
+        });
+    })();
+    </script>
+
+</body>
+</html>

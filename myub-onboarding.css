@@ -5,8 +5,12 @@ html.myub-tour-active body {
     overscroll-behavior: none;
 }
 
-body.myub-tour-active {
+body.myub-tour-active:not(.myub-tour-positioning) {
     transition: top 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body.myub-tour-active.myub-tour-positioning {
+    transition: none !important;
 }
 
 [data-tour="notes-library"],
@@ -55,10 +59,15 @@ body.myub-tour-active {
 
 body.myub-tour-active .myub-tour-highlight {
     position: relative;
-    z-index: 2147483642 !important;
+    z-index: 2147483646 !important;
     filter: none !important;
     opacity: 1 !important;
     box-shadow: none !important;
+    isolation: isolate;
+}
+
+body.myub-tour-active .topbar .myub-tour-highlight {
+    z-index: 2147483646 !important;
 }
 
 body.myub-tour-active .myub-tour-nav-active {
@@ -73,6 +82,7 @@ body.myub-tour-active .myub-tour-nav-active {
     position: fixed;
     left: 50%;
     bottom: max(24px, env(safe-area-inset-bottom, 24px));
+    top: auto;
     transform: translateX(-50%);
     z-index: 2147483647;
     width: min(400px, calc(100vw - 32px));
@@ -88,6 +98,17 @@ body.myub-tour-active .myub-tour-nav-active {
     pointer-events: auto;
     animation: myubTourFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     isolation: isolate;
+}
+
+.myub-tour-tooltip.is-anchor {
+    bottom: auto;
+}
+
+.myub-tour-tooltip.is-bottom {
+    top: auto;
+    bottom: max(24px, env(safe-area-inset-bottom, 24px));
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 @keyframes myubTourFadeIn {

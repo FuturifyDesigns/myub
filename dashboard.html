@@ -23,8 +23,8 @@
     <script src="myub-utils.js"></script>
     <script src="myub-mobile.js"></script>
     <script src="myub-sidebar.js"></script>
-    <link rel="stylesheet" href="myub-onboarding.css?v=7">
-    <script src="myub-onboarding.js?v=7"></script>
+    <link rel="stylesheet" href="myub-onboarding.css?v=8">
+    <script src="myub-onboarding.js?v=8"></script>
     
     <!-- OneSignal Push Notifications -->
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
@@ -2267,8 +2267,8 @@
                     <input type="text" id="dashboardSearch" placeholder="Search..." oninput="handleDashboardSearch(this.value)" onkeydown="if(event.key==='Enter')performSearch()">
                 </div>
                 <div class="search-results-dropdown" id="searchResultsDropdown"></div>
-                <div class="notification-wrapper" data-tour="notifications">
-                    <button class="icon-btn" id="notificationBell" onclick="toggleNotifications(event)">
+                <div class="notification-wrapper">
+                    <button class="icon-btn" id="notificationBell" data-tour="notifications" onclick="toggleNotifications(event)">
                         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                         </svg>

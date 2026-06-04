@@ -5,8 +5,8 @@
     'use strict';
 
     var PAD = 0;
-    var MIN_HIGHLIGHT_H = 120;
-    var MIN_HIGHLIGHT_W = 80;
+    var LIBRARY_MIN_H = 160;
+    var COMPACT_MIN = 40;
     var cachedUserId = null;
     var active = false;
     var pageIndex = 0;
@@ -396,27 +396,28 @@
         return rect.width >= 2 && rect.height >= 2;
     }
 
+    function isLibraryTour(tourId) {
+        return tourId === 'notes-library' || tourId === 'papers-library' ||
+            tourId === 'events-feed' || tourId === 'groups-list';
+    }
+
+    function isCompactTour(tourId) {
+        return tourId === 'notes-new' || tourId === 'papers-upload' ||
+            tourId === 'search' || tourId === 'notifications';
+    }
+
     function findTarget(selector) {
         if (!selector) return null;
         var parts = selector.split(',').map(function (s) { return s.trim(); });
-        var best = null;
-        var bestArea = 0;
         for (var i = 0; i < parts.length; i++) {
             try {
                 var nodes = global.document.querySelectorAll(parts[i]);
                 for (var j = 0; j < nodes.length; j++) {
-                    var el = nodes[j];
-                    if (!isTourVisible(el)) continue;
-                    var rect = el.getBoundingClientRect();
-                    var area = rect.width * rect.height;
-                    if (!best || area > bestArea) {
-                        best = el;
-                        bestArea = area;
-                    }
+                    if (isTourVisible(nodes[j])) return nodes[j];
                 }
             } catch (_) {}
         }
-        return best;
+        return null;
     }
 
     function findFallbackInContainer(container, selectors) {
@@ -428,62 +429,146 @@
         return null;
     }
 
-    function resolveHighlightElement(el) {
+    function getTourFocusElement(el) {
         if (!el) return null;
-        var rect = el.getBoundingClientRect();
-        if (rect.width >= MIN_HIGHLIGHT_W && rect.height >= MIN_HIGHLIGHT_H) return el;
-
         var tourId = el.getAttribute && el.getAttribute('data-tour');
-        if (tourId === 'notes-library' || tourId === 'papers-library' || tourId === 'events-feed') {
-            var empty = findFallbackInContainer(el, ['#emptyState', '.empty-state', '#eventsEmpty']);
-            if (empty && isTourVisible(empty)) return empty;
+
+        if (tourId === 'notifications') {
+            return el.querySelector('#notificationBell, .icon-btn, button') || el;
         }
-
-        if (rect.width >= MIN_HIGHLIGHT_W && rect.height >= 24) return el;
-
-        var parent = el.parentElement;
-        for (var depth = 0; parent && depth < 4; depth++) {
-            var pr = parent.getBoundingClientRect();
-            if (pr.width >= MIN_HIGHLIGHT_W && pr.height >= MIN_HIGHLIGHT_H && isTourVisible(parent)) {
-                if (parent.contains(el)) return parent;
+        if (tourId === 'search') {
+            return el.matches && el.matches('.search-box') ? el : (el.querySelector('.search-box') || el);
+        }
+        if (el.closest && el.closest('.topbar')) {
+            if (el.matches('button, .icon-btn, .search-box, .notif-btn')) return el;
+            var topFocus = el.querySelector('button.icon-btn, button.notif-btn, .search-box, #notificationBell');
+            if (topFocus) return topFocus;
+            return el;
+        }
+        if (isLibraryTour(tourId)) {
+            var empty = findFallbackInContainer(el, ['#emptyState', '.empty-state', '#eventsEmpty']);
+            if (empty && isTourVisible(empty)) {
+                var er = empty.getBoundingClientRect();
+                if (er.height >= 80) return empty;
             }
-            parent = parent.parentElement;
         }
         return el;
     }
 
+    function expandRect(rect, minW, minH) {
+        var w = rect.width;
+        var h = rect.height;
+        var left = rect.left;
+        var top = rect.top;
+        if (w < minW) {
+            var cx = left + w / 2;
+            left = cx - minW / 2;
+            w = minW;
+        }
+        if (h < minH) {
+            h = minH;
+        }
+        return {
+            top: top,
+            left: left,
+            width: w,
+            height: h,
+            right: left + w,
+            bottom: top + h
+        };
+    }
+
     function getHighlightRect(el) {
-        var target = resolveHighlightElement(el) || el;
+        var target = getTourFocusElement(el) || el;
         var rect = target.getBoundingClientRect();
-        var minH = MIN_HIGHLIGHT_H;
-        var minW = MIN_HIGHLIGHT_W;
         var tourId = target.getAttribute && target.getAttribute('data-tour');
-        if (tourId === 'notes-new' || tourId === 'papers-upload') {
-            minH = 40;
-            minW = 40;
+
+        if (isCompactTour(tourId) || (target.closest && target.closest('.topbar'))) {
+            return expandRect(rect, COMPACT_MIN, COMPACT_MIN);
         }
-        if (rect.width < minW) {
-            var cx = rect.left + rect.width / 2;
-            rect = {
-                top: rect.top,
-                left: cx - minW / 2,
-                width: minW,
-                height: rect.height,
-                right: cx + minW / 2,
-                bottom: rect.bottom
-            };
+        if (isLibraryTour(tourId)) {
+            return expandRect(rect, 120, LIBRARY_MIN_H);
         }
-        if (rect.height < minH) {
-            rect = {
-                top: rect.top,
-                left: rect.left,
-                width: rect.width,
-                height: minH,
-                right: rect.right,
-                bottom: rect.top + minH
-            };
+        return {
+            top: rect.top,
+            left: rect.left,
+            width: rect.width,
+            height: rect.height,
+            right: rect.right,
+            bottom: rect.bottom
+        };
+    }
+
+    function closeTourDropdowns() {
+        global.document.querySelectorAll(
+            '.notification-dropdown.show, .notif-dropdown.show, .user-dropdown.show, .search-results-dropdown.show'
+        ).forEach(function (dd) {
+            dd.classList.remove('show');
+        });
+    }
+
+    function waitForLayoutSettled(callback) {
+        global.document.body.classList.add('myub-tour-positioning');
+        global.requestAnimationFrame(function () {
+            global.requestAnimationFrame(function () {
+                global.setTimeout(function () {
+                    global.document.body.classList.remove('myub-tour-positioning');
+                    if (callback) callback();
+                }, 48);
+            });
+        });
+    }
+
+    function positionTooltip(rect, el) {
+        if (!tooltipEl) return;
+        tooltipEl.classList.remove('is-anchor', 'is-bottom');
+        tooltipEl.style.top = '';
+        tooltipEl.style.bottom = '';
+        tooltipEl.style.left = '';
+        tooltipEl.style.right = '';
+        tooltipEl.style.transform = '';
+        tooltipEl.style.maxWidth = '';
+
+        var tipH = tooltipEl.offsetHeight || 200;
+        var tipW = Math.min(400, tooltipEl.offsetWidth || 400);
+        var gap = 16;
+        var vh = global.innerHeight;
+        var vw = global.innerWidth;
+        var inTop = isInTopbar(el);
+
+        if (inTop) {
+            var top = rect.bottom + gap;
+            if (top + tipH > vh - 16) {
+                top = Math.max(12, rect.top - tipH - gap);
+            }
+            var left = rect.left + rect.width / 2 - tipW / 2;
+            left = Math.max(12, Math.min(left, vw - tipW - 12));
+            tooltipEl.classList.add('is-anchor');
+            tooltipEl.style.top = top + 'px';
+            tooltipEl.style.left = left + 'px';
+            tooltipEl.style.transform = 'none';
+            tooltipEl.style.maxWidth = tipW + 'px';
+            return;
         }
-        return rect;
+
+        var spaceBelow = vh - rect.bottom - gap;
+        if (spaceBelow >= tipH + 20) {
+            tooltipEl.classList.add('is-anchor');
+            tooltipEl.style.top = (rect.bottom + gap) + 'px';
+            tooltipEl.style.left = '50%';
+            tooltipEl.style.transform = 'translateX(-50%)';
+            return;
+        }
+
+        tooltipEl.classList.add('is-bottom');
+    }
+
+    function updateStepLayout(el) {
+        if (!active || !el) return;
+        var focus = getTourFocusElement(el) || el;
+        var rect = getHighlightRect(el);
+        positionSpotlightOnRect(rect, focus);
+        positionTooltip(rect, focus);
     }
 
     function applySpotlightRadius(el) {
@@ -552,43 +637,56 @@
             return;
         }
 
-        var topMargin = isInTopbar(el) ? 16 : 72;
-        var bottomReserve = getTooltipBottomReserve();
+        var focus = getTourFocusElement(el) || el;
+        var inTop = isInTopbar(focus);
+        if (inTop) {
+            applyTourScroll(0);
+            waitForLayoutSettled(done);
+            return;
+        }
+
+        var topMargin = 64;
+        var bottomReserve = getTooltipBottomReserve() + 20;
         var viewportH = global.innerHeight;
+        var bandBottom = viewportH - bottomReserve;
+        var bandHeight = Math.max(120, bandBottom - topMargin);
         var rect = getHighlightRect(el);
         var scrollDelta = 0;
 
-        if (rect.top < topMargin) {
-            scrollDelta = rect.top - topMargin;
-        }
-        if (rect.bottom + bottomReserve > viewportH - 12) {
-            scrollDelta = Math.max(
-                scrollDelta,
-                rect.bottom + bottomReserve - viewportH + 16
-            );
+        if (rect.height <= bandHeight) {
+            var idealTop = topMargin + (bandHeight - rect.height) / 2;
+            scrollDelta = rect.top - idealTop;
+        } else {
+            if (rect.top < topMargin) scrollDelta = rect.top - topMargin;
+            if (rect.bottom > bandBottom) {
+                scrollDelta = Math.max(scrollDelta, rect.bottom - bandBottom);
+            }
         }
 
         if (Math.abs(scrollDelta) >= 1) {
             applyTourScroll(lockedScrollY + scrollDelta);
         }
 
-        global.requestAnimationFrame(function () {
+        waitForLayoutSettled(function () {
             if (!active || !el) {
                 if (done) done();
                 return;
             }
             var r2 = getHighlightRect(el);
             var fix = 0;
-            if (r2.top < topMargin) fix = r2.top - topMargin;
-            if (r2.bottom + bottomReserve > viewportH - 12) {
-                fix = Math.max(fix, r2.bottom + bottomReserve - viewportH + 16);
+            if (r2.height <= bandHeight) {
+                var ideal2 = topMargin + (bandHeight - r2.height) / 2;
+                fix = r2.top - ideal2;
+            } else {
+                if (r2.top < topMargin) fix = r2.top - topMargin;
+                if (r2.bottom > bandBottom) fix = Math.max(fix, r2.bottom - bandBottom);
             }
-            if (Math.abs(fix) >= 1) {
+            if (Math.abs(fix) >= 2) {
                 applyTourScroll(lockedScrollY + fix);
+                waitForLayoutSettled(done);
+            } else if (done) {
+                done();
             }
-            global.requestAnimationFrame(function () {
-                if (done) done();
-            });
         });
     }
 
@@ -649,7 +747,8 @@
 
     function positionSpotlight(el) {
         if (!el) return;
-        positionSpotlightOnRect(getHighlightRect(el), el);
+        var focus = getTourFocusElement(el) || el;
+        positionSpotlightOnRect(getHighlightRect(el), focus);
     }
 
     function getCurrentStep() {
@@ -749,6 +848,7 @@
         spotlightEl.style.display = 'none';
         hideSidebarBand();
         clearHighlight();
+        closeTourDropdowns();
         renderTooltip();
 
         if (backdropEl) backdropEl.style.display = 'none';
@@ -763,10 +863,11 @@
         var el = findTarget(step.selector);
         if (el) {
             highlightedEl = el;
-            highlightedEl.classList.add('myub-tour-highlight');
+            var focus = getTourFocusElement(el) || el;
+            focus.classList.add('myub-tour-highlight');
             scrollHighlightIntoView(highlightedEl, function () {
                 if (!active || highlightedEl !== el) return;
-                positionSpotlight(highlightedEl);
+                updateStepLayout(highlightedEl);
             });
         } else {
             spotlightEl.style.display = 'none';
@@ -783,7 +884,7 @@
             if (!active || !highlightedEl) return;
             scrollHighlightIntoView(highlightedEl, function () {
                 if (!active || !highlightedEl) return;
-                positionSpotlight(highlightedEl);
+                updateStepLayout(highlightedEl);
             });
         };
         global.addEventListener('resize', resizeHandler);

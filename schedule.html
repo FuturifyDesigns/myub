@@ -22,6 +22,7 @@
     <script src="myub-calls.js" defer></script>
     <script src="myub-utils.js"></script>
     <script src="myub-mobile.js"></script>
+    <script src="myub-sidebar.js"></script>
     <style>
         /* ==========================================================
            MyUB Schedule — dark navy/red theme
@@ -2203,11 +2204,15 @@
 
         async function loadSidebarBadges() {
             const { count: msgCount } = await supabaseClient.from('messages').select('*', { count: 'exact', head: true }).eq('receiver_id', currentUser.id).eq('is_read', false).neq('is_deleted', true);
-            const msgBadge = document.getElementById('msgBadge');
-            if (msgCount > 0) { msgBadge.textContent = msgCount; msgBadge.style.display = 'inline'; } else { msgBadge.style.display = 'none'; }
+            const msgBadge = document.getElementById('sidebarMsgBadge');
+            if (msgBadge) {
+                if (msgCount > 0) { msgBadge.textContent = msgCount; msgBadge.style.display = 'inline'; } else { msgBadge.style.display = 'none'; }
+            }
             const { count: friendCount } = await supabaseClient.from('friend_requests').select('*', { count: 'exact', head: true }).eq('receiver_id', currentUser.id).eq('status', 'pending');
-            const friendsBadge = document.getElementById('friendsBadge');
-            if (friendCount > 0) { friendsBadge.textContent = friendCount; friendsBadge.style.display = 'inline'; } else { friendsBadge.style.display = 'none'; }
+            const friendsBadge = document.getElementById('sidebarFriendsBadge');
+            if (friendsBadge) {
+                if (friendCount > 0) { friendsBadge.textContent = friendCount; friendsBadge.style.display = 'inline'; } else { friendsBadge.style.display = 'none'; }
+            }
         }
 
         function setView(view) {

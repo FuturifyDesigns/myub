@@ -18,25 +18,94 @@
     var highlightedEl = null;
     var resizeHandler = null;
 
-    /* Dashboard first (multiple steps), then one stop per app page */
     var TOUR_PAGES = [
         {
             file: 'dashboard.html',
             steps: [
-                { selector: '[data-tour="welcome-banner"]', title: 'Your dashboard', body: 'This is your home screen — your greeting, daily overview, and what is happening on campus.' },
-                { selector: '[data-tour="stats"]', title: 'At-a-glance stats', body: 'Courses, credits, study groups, and pending tasks update as you use MyUB.' },
-                { selector: '[data-tour="search"]', title: 'Quick search', body: 'Search pages, notes, friends, groups, and events from here.' }
+                { selector: '[data-tour="welcome-banner"]', title: 'Your dashboard', body: 'Your home screen — daily greeting, campus updates, and a snapshot of your day.' },
+                { selector: '[data-tour="stats"]', title: 'Quick stats', body: 'Track courses, credits earned, study groups, and pending tasks at a glance.' },
+                { selector: '.main-grid .quick-actions', title: 'Quick actions', body: 'Jump straight to GPA, notes, schedule, and other tools in one click.' },
+                { selector: '[data-tour="search"]', title: 'Search', body: 'Find pages, notes, friends, groups, and events across MyUB.' },
+                { selector: '[data-tour="notifications"]', title: 'Notifications', body: 'Friend requests, messages, and campus alerts show up here.' }
             ]
         },
-        { file: 'gpa-calculator.html', navTour: 'nav-gpa', selector: '.gpa-page', title: 'GPA Calculator', body: 'Add courses, enter grades, and track your GPA and progression automatically.' },
-        { file: 'schedule.html', navTour: 'nav-schedule', selector: '.main-content', title: 'Schedule', body: 'Build your weekly timetable and keep classes, labs, and study blocks organized.' },
-        { file: 'events.html', navTour: 'nav-events', selector: '#mainContent', title: 'Campus events', body: 'Browse UB events, RSVP, and never miss workshops or society meetups.' },
-        { file: 'notes.html', navTour: 'nav-notes', selector: '.main-content', title: 'Notes', body: 'Save and organize lecture notes by course for quick revision.' },
-        { file: 'past-papers.html', navTour: 'nav-papers', selector: '.main-content', title: 'Past papers', body: 'Find past exam papers to practice and prepare for assessments.' },
-        { file: 'study-groups.html', navTour: 'nav-groups', selector: '.main-content', title: 'Study groups', body: 'Join or create groups to collaborate and prepare for exams together.' },
-        { file: 'messages.html', navTour: 'nav-messages', selector: '.main-content', title: 'Messages', body: 'Chat with friends and group members in real time.' },
-        { file: 'friends.html', navTour: 'nav-friends', selector: '.main-content', title: 'Friends', body: 'Connect with classmates, send requests, and see who is online.' },
-        { file: 'profile.html', navTour: 'nav-profile', selector: '.profile-page', title: 'Your profile', body: 'Update your details and photo. Replay this tour anytime under App tour.' }
+        {
+            file: 'gpa-calculator.html',
+            navTour: 'nav-gpa',
+            steps: [
+                { selector: '#progressionCard, .progression-card', title: 'Degree progression', body: 'See credits earned toward your program and how close you are to graduating.' },
+                { selector: '.tabs', title: 'GPA & predictor', body: 'Switch between calculating your current GPA and predicting grades for upcoming courses.' },
+                { selector: '#calculatorTab, .gpa-page', title: 'Add your courses', body: 'Enter course codes, credits, and grades — MyUB calculates your GPA automatically.' }
+            ]
+        },
+        {
+            file: 'schedule.html',
+            navTour: 'nav-schedule',
+            steps: [
+                { selector: '.schedule-header', title: 'Your timetable', body: 'View and manage your weekly class schedule in one place.' },
+                { selector: '.schedule-layout', title: 'Plan your week', body: 'Add classes, labs, and study blocks — drag to organize your time.' }
+            ]
+        },
+        {
+            file: 'events.html',
+            navTour: 'nav-events',
+            steps: [
+                { selector: '.events-header', title: 'Campus events', body: 'Discover what is happening at UB — workshops, sports, societies, and more.' },
+                { selector: '.events-grid, #eventsGrid', title: 'Browse & RSVP', body: 'Tap an event to see details and RSVP so you never miss out.' }
+            ]
+        },
+        {
+            file: 'notes.html',
+            navTour: 'nav-notes',
+            steps: [
+                { selector: '.topbar .btn-primary', title: 'Create notes', body: 'Start a new note or upload study files for your courses.' },
+                { selector: '.content-area .toolbar', title: 'Organize notes', body: 'Search, filter pinned notes, and switch between grid or list view.' },
+                { selector: '#notesGrid, #notesList', title: 'Your library', body: 'All your notes and uploaded files live here, sorted by course.' }
+            ]
+        },
+        {
+            file: 'past-papers.html',
+            navTour: 'nav-papers',
+            steps: [
+                { selector: '#uploadFileBtn', title: 'Upload papers', body: 'Share past exam papers and resources with classmates (PDF, images, DOCX).' },
+                { selector: '.content-area .toolbar', title: 'Find papers', body: 'Search and filter by type, date, or show only your uploads.' },
+                { selector: '#papersGrid', title: 'Paper library', body: 'Browse shared past papers and revision resources by course.' }
+            ]
+        },
+        {
+            file: 'study-groups.html',
+            navTour: 'nav-groups',
+            steps: [
+                { selector: '.groups-header', title: 'Study groups', body: 'Collaborate with classmates — join existing groups or create your own.' },
+                { selector: '.groups-tabs', title: 'My groups & discover', body: 'Switch between groups you belong to and groups you can join.' },
+                { selector: '#groupsPanel', title: 'Group workspace', body: 'Chat, share files, and coordinate study sessions with your group.' }
+            ]
+        },
+        {
+            file: 'messages.html',
+            navTour: 'nav-messages',
+            steps: [
+                { selector: '.conversations-panel', title: 'Conversations', body: 'All your chats in one list — search to find a friend or group quickly.' },
+                { selector: '.chat-panel', title: 'Real-time chat', body: 'Send messages, see online status, and stay connected with classmates.' }
+            ]
+        },
+        {
+            file: 'friends.html',
+            navTour: 'nav-friends',
+            steps: [
+                { selector: '.friends-page', title: 'Your network', body: 'See friends, pending requests, and who is online on campus.' },
+                { selector: '.friends-page .tabs', title: 'Friends & requests', body: 'Accept incoming requests or search for classmates to connect with.' }
+            ]
+        },
+        {
+            file: 'profile.html',
+            navTour: 'nav-profile',
+            steps: [
+                { selector: '.profile-header-card', title: 'Profile overview', body: 'Your photo, name, student ID, program, and online status.' },
+                { selector: '.profile-page > .card', title: 'Personal details', body: 'View and edit your name, email, year of study, program, and bio.' },
+                { selector: '.tour-replay-card', title: 'Replay this tour', body: 'Come back here anytime and tap Replay app tour to walk through MyUB again.' }
+            ]
+        }
     ];
 
     function getPageFile() {
@@ -265,6 +334,39 @@
         return null;
     }
 
+    function scrollToTop() {
+        try {
+            global.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+        } catch (_) {
+            global.scrollTo(0, 0);
+        }
+        global.document.documentElement.scrollTop = 0;
+        global.document.body.scrollTop = 0;
+        var main = findTarget('#mainContent, .main-content');
+        if (main) main.scrollTop = 0;
+    }
+
+    function closeMobileSidebar() {
+        if (!isNarrow()) return;
+        var sidebar = global.document.getElementById('sidebar');
+        if (sidebar && sidebar.classList.contains('open') && typeof global.toggleSidebar === 'function') {
+            global.toggleSidebar();
+        }
+    }
+
+    function destroyTourCompletely() {
+        teardown();
+        closeMobileSidebar();
+        if (rootEl && rootEl.parentNode) {
+            rootEl.parentNode.removeChild(rootEl);
+        }
+        rootEl = null;
+        backdropEl = null;
+        sidebarBandEl = null;
+        spotlightEl = null;
+        tooltipEl = null;
+    }
+
     function hideSidebarBand() {
         if (sidebarBandEl) {
             sidebarBandEl.style.display = 'none';
@@ -404,7 +506,7 @@
 
         clearHighlight();
         renderTooltip();
-        backdropEl.style.display = 'block';
+        if (backdropEl) backdropEl.style.display = 'none';
 
         var navTour = step.navTour || page.navTour;
         var onDashboard = page.file === 'dashboard.html';
@@ -419,17 +521,19 @@
 
         var el = findTarget(step.selector);
         if (el) {
-            if (onDashboard) {
-                el.classList.add('myub-tour-highlight');
-                highlightedEl = el;
+            el.classList.add('myub-tour-highlight');
+            highlightedEl = el;
+            if (stepIndex === 0) {
+                scrollToTop();
+            } else {
+                try {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+                } catch (_) {}
             }
-            try {
-                el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
-            } catch (_) {}
             global.setTimeout(function () {
                 if (!active) return;
                 positionSpotlight(el);
-            }, onDashboard ? 120 : 280);
+            }, stepIndex === 0 ? 80 : (navTour && !onDashboard ? 280 : 160));
         } else {
             spotlightEl.style.display = 'none';
         }
@@ -444,12 +548,8 @@
             if (page && page.file !== 'dashboard.html' && (step.navTour || page.navTour)) {
                 showSidebarBand(step.navTour || page.navTour);
             }
-            if (highlightedEl && page && page.file === 'dashboard.html') {
-                positionSpotlight(highlightedEl);
-            } else {
-                var el = step && findTarget(step.selector);
-                if (el) positionSpotlight(el);
-            }
+            var el = highlightedEl || (step && findTarget(step.selector));
+            if (el) positionSpotlight(el);
         };
         global.addEventListener('resize', resizeHandler);
         global.addEventListener('scroll', resizeHandler, true);
@@ -466,6 +566,7 @@
     function runTour() {
         ensureDom();
         active = true;
+        scrollToTop();
         rootEl.classList.add('active');
         rootEl.setAttribute('aria-hidden', 'false');
         global.document.body.classList.add('myub-tour-active');
@@ -479,11 +580,15 @@
         clearHighlight();
         hideSidebarBand();
         unbindResize();
-        if (rootEl) rootEl.classList.remove('active');
+        if (rootEl) {
+            rootEl.classList.remove('active');
+            rootEl.setAttribute('aria-hidden', 'true');
+        }
         if (backdropEl) backdropEl.style.display = 'none';
         if (spotlightEl) spotlightEl.style.display = 'none';
         global.document.body.classList.remove('myub-tour-active');
         global.document.body.style.overflow = '';
+        global.document.body.style.removeProperty('overflow');
     }
 
     function navigateToPage(idx, step) {
@@ -534,22 +639,24 @@
 
     function skip() {
         markSkipped();
-        teardown();
+        destroyTourCompletely();
         showPopup('info', 'Tour skipped', 'You can replay the full app tour anytime from Profile → App tour.', 'Got it');
     }
 
     function finish(completed) {
         if (completed) markCompleted();
         else setTourActive(false);
-        teardown();
+        destroyTourCompletely();
         if (completed) {
             showPopup('success', "You're all set!", "You've toured every main area of MyUB. Explore, connect, and make the most of your semester.", 'Start exploring');
         }
     }
 
     function showPopup(type, title, message, btnLabel) {
+        destroyTourCompletely();
         var overlay = global.document.createElement('div');
         overlay.className = 'myub-tour-popup-overlay';
+        overlay.setAttribute('data-myub-tour-popup', '1');
         var popup = global.document.createElement('div');
         popup.className = 'myub-tour-popup';
         var iconWrap = global.document.createElement('div');
@@ -565,7 +672,9 @@
         btn.textContent = btnLabel;
         function close() {
             overlay.remove();
+            global.document.body.classList.remove('myub-tour-active');
             global.document.body.style.overflow = '';
+            global.document.body.style.removeProperty('overflow');
         }
         btn.addEventListener('click', close);
         overlay.addEventListener('click', function (e) { if (e.target === overlay) close(); });
@@ -575,7 +684,6 @@
         popup.appendChild(btn);
         overlay.appendChild(popup);
         global.document.body.appendChild(overlay);
-        global.document.body.style.overflow = 'hidden';
     }
 
     function waitForPageReady(callback, attempts) {
@@ -585,6 +693,7 @@
         var main = findTarget('#mainContent, .main-content, .gpa-page, .profile-page');
         var mainOk = main && (main.offsetWidth > 0 || main.offsetHeight > 0);
         if ((loadingDone && mainOk) || attempts > 80) {
+            scrollToTop();
             global.setTimeout(callback, 200);
             return;
         }

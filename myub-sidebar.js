@@ -60,9 +60,22 @@
     }
 
     function init() {
-        var nav = document.querySelector('#sidebar nav');
-        if (!nav) return;
+        var sidebar = document.getElementById('sidebar');
+        if (!sidebar) return;
+
+        // Strip broken/duplicate blocks from legacy markup (e.g. repeated MENU sections)
+        sidebar.querySelectorAll('.nav-section').forEach(function (el) {
+            el.remove();
+        });
+
+        var nav = sidebar.querySelector('nav');
+        if (!nav) {
+            nav = document.createElement('nav');
+            sidebar.appendChild(nav);
+        }
+
         nav.innerHTML = renderNav(getActivePageId());
+        sidebar.setAttribute('data-myub-sidebar', 'ready');
     }
 
     function signOut() {

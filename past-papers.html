@@ -24,8 +24,8 @@
     <script src="myub-utils.js"></script>
     <script src="myub-mobile.js"></script>
     <script src="myub-sidebar.js"></script>
-    <link rel="stylesheet" href="myub-onboarding.css?v=5">
-    <script src="myub-onboarding.js?v=5"></script>
+    <link rel="stylesheet" href="myub-onboarding.css?v=7">
+    <script src="myub-onboarding.js?v=7"></script>
     <script src="myub-upload.js"></script>
     <style>
         /* ==========================================================
@@ -1962,14 +1962,14 @@
                     <button class="notif-btn" onclick="toggleNotifications(event)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg><span class="badge" id="notifBadge">0</span></button>
                     <div class="notif-dropdown" id="notifDropdown"><div class="notif-header"><h3>Notifications</h3><button onclick="markAllRead()">Mark all read</button></div><div class="notif-list" id="notifList"></div><div class="notif-footer"><a onclick="openNotificationsModal()">View All Notifications</a></div></div>
                 </div>
-                <button class="btn-primary" id="uploadFileBtn"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5-5m0 0l5 5m-5-5v12"/></svg>Upload Past Paper</button>
+                <button class="btn-primary" id="uploadFileBtn" data-tour="papers-upload"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5-5m0 0l5 5m-5-5v12"/></svg>Upload Past Paper</button>
             </div>
         </div>
         <div class="upload-hint-line" style="padding:0 28px;margin-top:-4px;font-size:12px;color:var(--text-muted,rgba(255,255,255,.5));">
             Accepted: PDF, JPG, PNG, DOCX · Max 10&nbsp;MB per file
         </div>
         <div class="content-area">
-            <div class="toolbar">
+            <div class="toolbar" data-tour="papers-toolbar">
                 <div class="search-box"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg><input type="text" id="searchInput" placeholder="Search by title or course code..." oninput="renderPapers()"></div>
                 <select id="kindFilter" onchange="renderPapers()" class="filter-btn" style="cursor:pointer;">
                     <option value="">All types</option>
@@ -1985,12 +1985,14 @@
                 </label>
             </div>
 
+            <div class="papers-library" data-tour="papers-library">
             <div id="papersGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:8px;"></div>
 
             <div class="empty-state" id="emptyState" style="display:none;">
                 <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 <h3>No past papers yet</h3>
                 <p>Be the first to share — click "Upload Past Paper" to get started.<br><span style="font-size:12px;color:var(--text-muted,rgba(255,255,255,.5));">PDF, JPG, PNG, DOCX · up to 10&nbsp;MB each</span></p>
+            </div>
             </div>
         </div>
     </main>

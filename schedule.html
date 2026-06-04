@@ -23,8 +23,8 @@
     <script src="myub-utils.js"></script>
     <script src="myub-mobile.js"></script>
     <script src="myub-sidebar.js"></script>
-    <link rel="stylesheet" href="myub-onboarding.css?v=5">
-    <script src="myub-onboarding.js?v=5"></script>
+    <link rel="stylesheet" href="myub-onboarding.css?v=7">
+    <script src="myub-onboarding.js?v=7"></script>
     <style>
         /* ==========================================================
            MyUB Schedule — dark navy/red theme
@@ -1893,7 +1893,7 @@
         </header>
 
         <main class="page-content">
-            <div class="schedule-header">
+            <div class="schedule-header" data-tour="schedule-header">
                 <div class="schedule-header-left">
                     <div class="view-toggle">
                         <button class="active" data-view="month" onclick="setView('month')">Month</button>
@@ -1910,7 +1910,7 @@
                 <button class="add-event-btn" onclick="openEventModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>Add Event</button>
             </div>
 
-            <div class="schedule-layout">
+            <div class="schedule-layout" data-tour="schedule-layout">
                 <div class="calendar-container" id="calendarContainer">
                     <div class="month-view-content">
                         <div class="calendar-header">

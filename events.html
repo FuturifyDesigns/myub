@@ -28,8 +28,8 @@
     <script src="myub-utils.js"></script>
     <script src="myub-mobile.js"></script>
     <script src="myub-sidebar.js"></script>
-    <link rel="stylesheet" href="myub-onboarding.css?v=5">
-    <script src="myub-onboarding.js?v=5"></script>
+    <link rel="stylesheet" href="myub-onboarding.css?v=7">
+    <script src="myub-onboarding.js?v=7"></script>
     
     <!-- OneSignal Push Notifications -->
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
@@ -2503,7 +2503,7 @@
         <!-- Dashboard Content -->
         <div class="dashboard events-page">
             <!-- Events Header -->
-            <div class="events-header">
+            <div class="events-header" data-tour="events-header">
                 <div class="event-tabs">
                     <button class="event-tab active" data-tab="upcoming" onclick="switchTab('upcoming')">Upcoming</button>
                     <button class="event-tab" data-tab="myRsvps" onclick="switchTab('myRsvps')">My RSVPs</button>
@@ -2514,10 +2514,12 @@
                     Create Event
                 </button>
             </div>
+            <div class="events-feed" data-tour="events-feed">
             <div class="events-grid" id="eventsGrid"></div>
             <div class="empty-state" id="eventsEmpty" style="display:none;">
                 <div class="empty-icon">📅</div>
                 <p id="eventsEmptyText">No upcoming events yet.</p>
+            </div>
             </div>
             <div class="events-loading" id="eventsLoading"><div class="spinner"></div></div>
         </div>

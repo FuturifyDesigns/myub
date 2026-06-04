@@ -4,7 +4,9 @@
 (function (global) {
     'use strict';
 
-    var PAD = 8;
+    var PAD = 0;
+    var MIN_HIGHLIGHT_H = 120;
+    var MIN_HIGHLIGHT_W = 80;
     var cachedUserId = null;
     var active = false;
     var pageIndex = 0;
@@ -27,7 +29,7 @@
             steps: [
                 { selector: '[data-tour="welcome-banner"]', title: 'Your dashboard', body: 'Your home screen — daily greeting, campus updates, and a snapshot of your day.' },
                 { selector: '[data-tour="stats"]', title: 'Quick stats', body: 'Track courses, credits earned, study groups, and pending tasks at a glance.' },
-                { selector: '.main-grid .quick-actions', title: 'Quick actions', body: 'Jump straight to GPA, notes, schedule, and other tools in one click.' },
+                { selector: '[data-tour="quick-actions"]', title: 'Quick actions', body: 'Jump straight to GPA, notes, schedule, and other tools in one click.' },
                 { selector: '[data-tour="search"]', title: 'Search', body: 'Find pages, notes, friends, groups, and events across MyUB.' },
                 { selector: '[data-tour="notifications"]', title: 'Notifications', body: 'Friend requests, messages, and campus alerts show up here.' }
             ]
@@ -36,78 +38,78 @@
             file: 'gpa-calculator.html',
             navTour: 'nav-gpa',
             steps: [
-                { selector: '#progressionCard, .progression-card', title: 'Degree progression', body: 'See credits earned toward your program and how close you are to graduating.' },
-                { selector: '.tabs', title: 'GPA & predictor', body: 'Switch between calculating your current GPA and predicting grades for upcoming courses.' },
-                { selector: '.gpa-summary', title: 'Your GPA summary', body: 'See cumulative GPA, total credits, course count, and degree classification at a glance.' },
-                { selector: '#calculatorTab .card', title: 'Manage semesters', body: 'Add semesters, enter courses with grades, and MyUB calculates your GPA automatically.' }
+                { selector: '[data-tour="gpa-progression"]', title: 'Degree progression', body: 'See credits earned toward your program and how close you are to graduating.' },
+                { selector: '[data-tour="gpa-tabs"]', title: 'GPA & predictor', body: 'Switch between calculating your current GPA and predicting grades for upcoming courses.' },
+                { selector: '[data-tour="gpa-summary"]', title: 'Your GPA summary', body: 'See cumulative GPA, total credits, course count, and degree classification at a glance.' },
+                { selector: '[data-tour="gpa-semesters"]', title: 'Manage semesters', body: 'Add semesters, enter courses with grades, and MyUB calculates your GPA automatically.' }
             ]
         },
         {
             file: 'schedule.html',
             navTour: 'nav-schedule',
             steps: [
-                { selector: '.schedule-header', title: 'Your timetable', body: 'View and manage your weekly class schedule in one place.' },
-                { selector: '.schedule-layout', title: 'Plan your week', body: 'Add classes, labs, and study blocks — drag to organize your time.' }
+                { selector: '[data-tour="schedule-header"]', title: 'Your timetable', body: 'View and manage your weekly class schedule in one place.' },
+                { selector: '[data-tour="schedule-layout"]', title: 'Plan your week', body: 'Add classes, labs, and study blocks — drag to organize your time.' }
             ]
         },
         {
             file: 'events.html',
             navTour: 'nav-events',
             steps: [
-                { selector: '.events-header', title: 'Campus events', body: 'Discover what is happening at UB — workshops, sports, societies, and more.' },
-                { selector: '.events-grid, #eventsGrid', title: 'Browse & RSVP', body: 'Tap an event to see details and RSVP so you never miss out.' }
+                { selector: '[data-tour="events-header"]', title: 'Campus events', body: 'Discover what is happening at UB — workshops, sports, societies, and more.' },
+                { selector: '[data-tour="events-feed"]', title: 'Browse & RSVP', body: 'Tap an event to see details and RSVP so you never miss out.' }
             ]
         },
         {
             file: 'notes.html',
             navTour: 'nav-notes',
             steps: [
-                { selector: '.topbar .btn-primary', title: 'Create notes', body: 'Start a new note or upload study files for your courses.' },
-                { selector: '.content-area .toolbar', title: 'Organize notes', body: 'Search, filter pinned notes, and switch between grid or list view.' },
-                { selector: '#notesGrid, #notesList', title: 'Your library', body: 'All your notes and uploaded files live here, sorted by course.' }
+                { selector: '[data-tour="notes-new"]', title: 'Create notes', body: 'Start a new note or upload study files for your courses.' },
+                { selector: '[data-tour="notes-toolbar"]', title: 'Organize notes', body: 'Search, filter pinned notes, and switch between grid or list view.' },
+                { selector: '[data-tour="notes-library"]', title: 'Your library', body: 'All your notes and uploaded files live here, sorted by course.' }
             ]
         },
         {
             file: 'past-papers.html',
             navTour: 'nav-papers',
             steps: [
-                { selector: '#uploadFileBtn', title: 'Upload papers', body: 'Share past exam papers and resources with classmates (PDF, images, DOCX).' },
-                { selector: '.content-area .toolbar', title: 'Find papers', body: 'Search and filter by type, date, or show only your uploads.' },
-                { selector: '#papersGrid', title: 'Paper library', body: 'Browse shared past papers and revision resources by course.' }
+                { selector: '[data-tour="papers-upload"]', title: 'Upload papers', body: 'Share past exam papers and resources with classmates (PDF, images, DOCX).' },
+                { selector: '[data-tour="papers-toolbar"]', title: 'Find papers', body: 'Search and filter by type, date, or show only your uploads.' },
+                { selector: '[data-tour="papers-library"]', title: 'Paper library', body: 'Browse shared past papers and revision resources by course.' }
             ]
         },
         {
             file: 'study-groups.html',
             navTour: 'nav-groups',
             steps: [
-                { selector: '.groups-header', title: 'Study groups', body: 'Collaborate with classmates — join existing groups or create your own.' },
-                { selector: '.groups-tabs', title: 'My groups & discover', body: 'Switch between groups you belong to and groups you can join.' },
-                { selector: '#groupsPanel', title: 'Group workspace', body: 'Chat, share files, and coordinate study sessions with your group.' }
+                { selector: '[data-tour="groups-panel"]', title: 'Study groups', body: 'Collaborate with classmates — join existing groups or create your own.' },
+                { selector: '[data-tour="groups-tabs"]', title: 'My groups & discover', body: 'Switch between groups you belong to and groups you can join.' },
+                { selector: '[data-tour="groups-list"]', title: 'Group workspace', body: 'Chat, share files, and coordinate study sessions with your group.' }
             ]
         },
         {
             file: 'messages.html',
             navTour: 'nav-messages',
             steps: [
-                { selector: '.conversations-panel', title: 'Conversations', body: 'All your chats in one list — search to find a friend or group quickly.' },
-                { selector: '.chat-panel', title: 'Real-time chat', body: 'Send messages, see online status, and stay connected with classmates.' }
+                { selector: '[data-tour="messages-list"]', title: 'Conversations', body: 'All your chats in one list — search to find a friend or group quickly.' },
+                { selector: '[data-tour="messages-chat"]', title: 'Real-time chat', body: 'Send messages, see online status, and stay connected with classmates.' }
             ]
         },
         {
             file: 'friends.html',
             navTour: 'nav-friends',
             steps: [
-                { selector: '.friends-page', title: 'Your network', body: 'See friends, pending requests, and who is online on campus.' },
-                { selector: '.friends-page .tabs', title: 'Friends & requests', body: 'Accept incoming requests or search for classmates to connect with.' }
+                { selector: '[data-tour="friends-stats"]', title: 'Your network', body: 'See friends, pending requests, and who is online on campus.' },
+                { selector: '[data-tour="friends-tabs"]', title: 'Friends & requests', body: 'Accept incoming requests or search for classmates to connect with.' }
             ]
         },
         {
             file: 'profile.html',
             navTour: 'nav-profile',
             steps: [
-                { selector: '.profile-header-card', title: 'Profile overview', body: 'Your photo, name, student ID, program, and online status.' },
-                { selector: '.profile-page > .card', title: 'Personal details', body: 'View and edit your name, email, year of study, program, and bio.' },
-                { selector: '.tour-replay-card', title: 'Replay this tour', body: 'Come back here anytime and tap Replay app tour to walk through MyUB again.' }
+                { selector: '[data-tour="profile-header"]', title: 'Profile overview', body: 'Your photo, name, student ID, program, and online status.' },
+                { selector: '[data-tour="profile-details"]', title: 'Personal details', body: 'View and edit your name, email, year of study, program, and bio.' },
+                { selector: '[data-tour="profile-replay"]', title: 'Replay this tour', body: 'Come back here anytime and tap Replay app tour to walk through MyUB again.' }
             ]
         }
     ];
@@ -383,19 +385,124 @@
         });
     }
 
+    function isTourVisible(el) {
+        if (!el || !el.getBoundingClientRect) return false;
+        try {
+            var style = global.getComputedStyle(el);
+            if (style.display === 'none' || style.visibility === 'hidden') return false;
+            if (parseFloat(style.opacity) < 0.05) return false;
+        } catch (_) {}
+        var rect = el.getBoundingClientRect();
+        return rect.width >= 2 && rect.height >= 2;
+    }
+
     function findTarget(selector) {
         if (!selector) return null;
         var parts = selector.split(',').map(function (s) { return s.trim(); });
+        var best = null;
+        var bestArea = 0;
         for (var i = 0; i < parts.length; i++) {
             try {
-                var el = global.document.querySelector(parts[i]);
-                if (el) return el;
+                var nodes = global.document.querySelectorAll(parts[i]);
+                for (var j = 0; j < nodes.length; j++) {
+                    var el = nodes[j];
+                    if (!isTourVisible(el)) continue;
+                    var rect = el.getBoundingClientRect();
+                    var area = rect.width * rect.height;
+                    if (!best || area > bestArea) {
+                        best = el;
+                        bestArea = area;
+                    }
+                }
             } catch (_) {}
+        }
+        return best;
+    }
+
+    function findFallbackInContainer(container, selectors) {
+        if (!container) return null;
+        for (var i = 0; i < selectors.length; i++) {
+            var el = container.querySelector(selectors[i]);
+            if (el && isTourVisible(el)) return el;
         }
         return null;
     }
 
+    function resolveHighlightElement(el) {
+        if (!el) return null;
+        var rect = el.getBoundingClientRect();
+        if (rect.width >= MIN_HIGHLIGHT_W && rect.height >= MIN_HIGHLIGHT_H) return el;
+
+        var tourId = el.getAttribute && el.getAttribute('data-tour');
+        if (tourId === 'notes-library' || tourId === 'papers-library' || tourId === 'events-feed') {
+            var empty = findFallbackInContainer(el, ['#emptyState', '.empty-state', '#eventsEmpty']);
+            if (empty && isTourVisible(empty)) return empty;
+        }
+
+        if (rect.width >= MIN_HIGHLIGHT_W && rect.height >= 24) return el;
+
+        var parent = el.parentElement;
+        for (var depth = 0; parent && depth < 4; depth++) {
+            var pr = parent.getBoundingClientRect();
+            if (pr.width >= MIN_HIGHLIGHT_W && pr.height >= MIN_HIGHLIGHT_H && isTourVisible(parent)) {
+                if (parent.contains(el)) return parent;
+            }
+            parent = parent.parentElement;
+        }
+        return el;
+    }
+
+    function getHighlightRect(el) {
+        var target = resolveHighlightElement(el) || el;
+        var rect = target.getBoundingClientRect();
+        var minH = MIN_HIGHLIGHT_H;
+        var minW = MIN_HIGHLIGHT_W;
+        var tourId = target.getAttribute && target.getAttribute('data-tour');
+        if (tourId === 'notes-new' || tourId === 'papers-upload') {
+            minH = 40;
+            minW = 40;
+        }
+        if (rect.width < minW) {
+            var cx = rect.left + rect.width / 2;
+            rect = {
+                top: rect.top,
+                left: cx - minW / 2,
+                width: minW,
+                height: rect.height,
+                right: cx + minW / 2,
+                bottom: rect.bottom
+            };
+        }
+        if (rect.height < minH) {
+            rect = {
+                top: rect.top,
+                left: rect.left,
+                width: rect.width,
+                height: minH,
+                right: rect.right,
+                bottom: rect.top + minH
+            };
+        }
+        return rect;
+    }
+
+    function applySpotlightRadius(el) {
+        if (!spotlightEl || !el) return;
+        var radius = '12px';
+        try {
+            var style = global.getComputedStyle(el);
+            var tl = parseFloat(style.borderTopLeftRadius) || 0;
+            var tr = parseFloat(style.borderTopRightRadius) || 0;
+            var br = parseFloat(style.borderBottomRightRadius) || 0;
+            var bl = parseFloat(style.borderBottomLeftRadius) || 0;
+            var maxR = Math.max(tl, tr, br, bl);
+            if (maxR > 0) radius = style.borderRadius || (maxR + 'px');
+        } catch (_) {}
+        spotlightEl.style.borderRadius = radius;
+    }
+
     function scrollToTop() {
+        applyTourScroll(0);
         try {
             global.scrollTo({ top: 0, left: 0, behavior: 'auto' });
         } catch (_) {
@@ -405,6 +512,84 @@
         global.document.body.scrollTop = 0;
         var main = findTarget('#mainContent, .main-content');
         if (main) main.scrollTop = 0;
+    }
+
+    function getMaxTourScroll() {
+        var doc = global.document.documentElement;
+        var body = global.document.body;
+        var h = Math.max(
+            doc.scrollHeight,
+            body.scrollHeight,
+            doc.offsetHeight,
+            body.offsetHeight
+        );
+        return Math.max(0, h - global.innerHeight);
+    }
+
+    function applyTourScroll(y) {
+        lockedScrollY = Math.max(0, Math.min(y, getMaxTourScroll()));
+        if (global.document.body.classList.contains('myub-tour-active')) {
+            global.document.body.style.top = '-' + lockedScrollY + 'px';
+        }
+    }
+
+    function getTooltipBottomReserve() {
+        if (!tooltipEl) return 280;
+        var h = tooltipEl.offsetHeight;
+        if (!h && tooltipEl.getBoundingClientRect) {
+            h = tooltipEl.getBoundingClientRect().height;
+        }
+        return Math.max(220, (h || 200) + 40);
+    }
+
+    function isInTopbar(el) {
+        return !!(el && el.closest && el.closest('.topbar'));
+    }
+
+    function scrollHighlightIntoView(el, done) {
+        if (!el || !active) {
+            if (done) done();
+            return;
+        }
+
+        var topMargin = isInTopbar(el) ? 16 : 72;
+        var bottomReserve = getTooltipBottomReserve();
+        var viewportH = global.innerHeight;
+        var rect = getHighlightRect(el);
+        var scrollDelta = 0;
+
+        if (rect.top < topMargin) {
+            scrollDelta = rect.top - topMargin;
+        }
+        if (rect.bottom + bottomReserve > viewportH - 12) {
+            scrollDelta = Math.max(
+                scrollDelta,
+                rect.bottom + bottomReserve - viewportH + 16
+            );
+        }
+
+        if (Math.abs(scrollDelta) >= 1) {
+            applyTourScroll(lockedScrollY + scrollDelta);
+        }
+
+        global.requestAnimationFrame(function () {
+            if (!active || !el) {
+                if (done) done();
+                return;
+            }
+            var r2 = getHighlightRect(el);
+            var fix = 0;
+            if (r2.top < topMargin) fix = r2.top - topMargin;
+            if (r2.bottom + bottomReserve > viewportH - 12) {
+                fix = Math.max(fix, r2.bottom + bottomReserve - viewportH + 16);
+            }
+            if (Math.abs(fix) >= 1) {
+                applyTourScroll(lockedScrollY + fix);
+            }
+            global.requestAnimationFrame(function () {
+                if (done) done();
+            });
+        });
     }
 
     function closeMobileSidebar() {
@@ -441,20 +626,30 @@
         if (nav) nav.classList.add('myub-tour-nav-active');
     }
 
-    function positionSpotlightOnRect(rect) {
+    function positionSpotlightOnRect(rect, el) {
         if (rect.width < 2 || rect.height < 2) {
             spotlightEl.style.display = 'none';
             return;
         }
         spotlightEl.style.display = 'block';
-        spotlightEl.style.top = Math.max(4, rect.top - PAD) + 'px';
-        spotlightEl.style.left = Math.max(4, rect.left - PAD) + 'px';
-        spotlightEl.style.width = (rect.width + PAD * 2) + 'px';
-        spotlightEl.style.height = (rect.height + PAD * 2) + 'px';
+        var top = Math.max(4, rect.top - PAD);
+        var left = Math.max(4, rect.left - PAD);
+        var width = rect.width + PAD * 2;
+        var height = rect.height + PAD * 2;
+        var maxRight = global.innerWidth - 4;
+        var maxBottom = global.innerHeight - 4;
+        if (left + width > maxRight) width = maxRight - left;
+        if (top + height > maxBottom) height = maxBottom - top;
+        spotlightEl.style.top = top + 'px';
+        spotlightEl.style.left = left + 'px';
+        spotlightEl.style.width = Math.max(2, width) + 'px';
+        spotlightEl.style.height = Math.max(2, height) + 'px';
+        applySpotlightRadius(el);
     }
 
     function positionSpotlight(el) {
-        positionSpotlightOnRect(el.getBoundingClientRect());
+        if (!el) return;
+        positionSpotlightOnRect(getHighlightRect(el), el);
     }
 
     function getCurrentStep() {
@@ -568,8 +763,9 @@
         var el = findTarget(step.selector);
         if (el) {
             highlightedEl = el;
-            global.requestAnimationFrame(function () {
-                if (!active || !highlightedEl) return;
+            highlightedEl.classList.add('myub-tour-highlight');
+            scrollHighlightIntoView(highlightedEl, function () {
+                if (!active || highlightedEl !== el) return;
                 positionSpotlight(highlightedEl);
             });
         } else {
@@ -585,7 +781,10 @@
         unbindResize();
         resizeHandler = function () {
             if (!active || !highlightedEl) return;
-            positionSpotlight(highlightedEl);
+            scrollHighlightIntoView(highlightedEl, function () {
+                if (!active || !highlightedEl) return;
+                positionSpotlight(highlightedEl);
+            });
         };
         global.addEventListener('resize', resizeHandler);
     }

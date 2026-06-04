@@ -23,8 +23,8 @@
     <script src="myub-utils.js"></script>
     <script src="myub-mobile.js"></script>
     <script src="myub-sidebar.js"></script>
-    <link rel="stylesheet" href="myub-onboarding.css?v=5">
-    <script src="myub-onboarding.js?v=5"></script>
+    <link rel="stylesheet" href="myub-onboarding.css?v=7">
+    <script src="myub-onboarding.js?v=7"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
     <style>
         /* ==========================================================
@@ -1794,7 +1794,7 @@
         </header>
 
         <div class="profile-page">
-            <div class="profile-header-card">
+            <div class="profile-header-card" data-tour="profile-header">
                 <div class="profile-header-content">
                     <div class="profile-avatar-wrapper">
                         <div class="profile-avatar" id="profileAvatar">--</div>
@@ -1817,7 +1817,7 @@
                 </div>
             </div>
 
-            <div class="card">
+            <div class="card" data-tour="profile-details">
                 <div class="card-header">
                     <div>
                         <h2 class="card-title">Profile Information</h2>
@@ -1919,7 +1919,7 @@
                 </form>
             </div>
 
-            <div class="card tour-replay-card">
+            <div class="card tour-replay-card" data-tour="profile-replay">
                 <div class="card-header">
                     <div>
                         <h2 class="card-title">App tour</h2>

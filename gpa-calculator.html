@@ -24,8 +24,8 @@
     <script src="myub-utils.js"></script>
     <script src="myub-mobile.js"></script>
     <script src="myub-sidebar.js"></script>
-    <link rel="stylesheet" href="myub-onboarding.css?v=5">
-    <script src="myub-onboarding.js?v=5"></script>
+    <link rel="stylesheet" href="myub-onboarding.css?v=7">
+    <script src="myub-onboarding.js?v=7"></script>
     <style>
         /* ==========================================================
            MyUB GPA Calculator — dark navy/red theme
@@ -2414,7 +2414,7 @@
         </header>
 
         <div class="gpa-page">
-            <div class="tabs">
+            <div class="tabs" data-tour="gpa-tabs">
                 <button class="tab active" onclick="switchTab('calculator')">GPA Calculator</button>
                 <button class="tab" onclick="switchTab('predictor')">Grade Predictor</button>
             </div>
@@ -2422,7 +2422,7 @@
             <!-- GPA Calculator Tab -->
             <div class="tab-content active" id="calculatorTab">
                 <!-- Progression Tracker -->
-                <div class="progression-card" id="progressionCard">
+                <div class="progression-card" id="progressionCard" data-tour="gpa-progression">
                     <div class="progression-header">
                         <div>
                             <div class="progression-title">Program Progress</div>
@@ -2451,7 +2451,7 @@
                     </div>
                 </div>
 
-                <div class="gpa-summary">
+                <div class="gpa-summary" data-tour="gpa-summary">
                     <div class="summary-card gpa"><div class="summary-label">Cumulative GPA</div><div class="summary-value" id="cumulativeGPA">0.00</div><div class="summary-sub">out of 5.00</div></div>
                     <div class="summary-card credits"><div class="summary-label">Total Credits</div><div class="summary-value" id="totalCredits">0</div><div class="summary-sub">credits earned</div></div>
                     <div class="summary-card courses"><div class="summary-label">Courses</div><div class="summary-value" id="totalCourses">0</div><div class="summary-sub">completed</div></div>
@@ -2478,7 +2478,7 @@
                     </div>
                 </div>
 
-                <div class="card">
+                <div class="card" data-tour="gpa-semesters">
                     <div class="card-header">
                         <div><h2 class="card-title">My Semesters</h2><p class="card-subtitle">Organize your courses by semester</p></div>
                         <div class="card-actions"><button class="btn btn-primary" onclick="openSemesterModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>Add Semester</button></div>

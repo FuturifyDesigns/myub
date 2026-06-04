@@ -17,6 +17,9 @@
     var tooltipEl = null;
     var highlightedEl = null;
     var resizeHandler = null;
+    var scrollLockHandler = null;
+    var keyLockHandler = null;
+    var lockedScrollY = 0;
 
     var TOUR_PAGES = [
         {
@@ -35,7 +38,8 @@
             steps: [
                 { selector: '#progressionCard, .progression-card', title: 'Degree progression', body: 'See credits earned toward your program and how close you are to graduating.' },
                 { selector: '.tabs', title: 'GPA & predictor', body: 'Switch between calculating your current GPA and predicting grades for upcoming courses.' },
-                { selector: '#calculatorTab, .gpa-page', title: 'Add your courses', body: 'Enter course codes, credits, and grades — MyUB calculates your GPA automatically.' }
+                { selector: '.gpa-summary', title: 'Your GPA summary', body: 'See cumulative GPA, total credits, course count, and degree classification at a glance.' },
+                { selector: '#calculatorTab .card', title: 'Manage semesters', body: 'Add semesters, enter courses with grades, and MyUB calculates your GPA automatically.' }
             ]
         },
         {
@@ -290,6 +294,63 @@
         global.document.body.appendChild(rootEl);
     }
 
+    function lockScroll() {
+        lockedScrollY = global.scrollY || global.pageYOffset || 0;
+        global.document.documentElement.classList.add('myub-tour-active');
+        global.document.body.classList.add('myub-tour-active');
+        global.document.body.style.overflow = 'hidden';
+        global.document.body.style.position = 'fixed';
+        global.document.body.style.top = '-' + lockedScrollY + 'px';
+        global.document.body.style.left = '0';
+        global.document.body.style.right = '0';
+        global.document.body.style.width = '100%';
+        var main = findTarget('#mainContent, .main-content');
+        if (main) {
+            main.style.overflow = 'hidden';
+            main.style.touchAction = 'none';
+        }
+        scrollLockHandler = function (e) {
+            e.preventDefault();
+        };
+        global.addEventListener('wheel', scrollLockHandler, { passive: false, capture: true });
+        global.addEventListener('touchmove', scrollLockHandler, { passive: false, capture: true });
+        keyLockHandler = function (e) {
+            if (!active) return;
+            var keys = ['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '];
+            if (keys.indexOf(e.key) !== -1) e.preventDefault();
+        };
+        global.addEventListener('keydown', keyLockHandler, true);
+    }
+
+    function unlockScroll() {
+        if (scrollLockHandler) {
+            global.removeEventListener('wheel', scrollLockHandler, { capture: true });
+            global.removeEventListener('touchmove', scrollLockHandler, { capture: true });
+            scrollLockHandler = null;
+        }
+        if (keyLockHandler) {
+            global.removeEventListener('keydown', keyLockHandler, true);
+            keyLockHandler = null;
+        }
+        global.document.documentElement.classList.remove('myub-tour-active');
+        global.document.body.classList.remove('myub-tour-active');
+        global.document.body.style.overflow = '';
+        global.document.body.style.position = '';
+        global.document.body.style.top = '';
+        global.document.body.style.left = '';
+        global.document.body.style.right = '';
+        global.document.body.style.width = '';
+        global.document.body.style.removeProperty('overflow');
+        global.document.body.style.removeProperty('position');
+        global.document.body.style.removeProperty('top');
+        var main = findTarget('#mainContent, .main-content');
+        if (main) {
+            main.style.overflow = '';
+            main.style.touchAction = '';
+        }
+        global.scrollTo(0, lockedScrollY);
+    }
+
     function isNarrow() {
         return global.innerWidth <= 900;
     }
@@ -317,8 +378,8 @@
             highlightedEl.classList.remove('myub-tour-highlight');
             highlightedEl = null;
         }
-        global.document.querySelectorAll('.myub-tour-highlight').forEach(function (el) {
-            el.classList.remove('myub-tour-highlight');
+        global.document.querySelectorAll('.myub-tour-highlight, .myub-tour-nav-active').forEach(function (el) {
+            el.classList.remove('myub-tour-highlight', 'myub-tour-nav-active');
         });
     }
 
@@ -374,24 +435,10 @@
         }
     }
 
-    function showSidebarBand(navTour) {
-        ensureSidebarOpen();
-        var w = getSidebarWidth();
-        sidebarBandEl.style.display = 'block';
-        sidebarBandEl.classList.add('show');
-        sidebarBandEl.style.width = w + 'px';
-        sidebarBandEl.style.left = '0';
-        sidebarBandEl.style.top = '0';
-        sidebarBandEl.style.height = '100vh';
-        sidebarBandEl.style.height = '100dvh';
-
-        if (navTour) {
-            var nav = findTarget('[data-tour="' + navTour + '"]');
-            if (nav) {
-                nav.classList.add('myub-tour-highlight');
-                highlightedEl = nav;
-            }
-        }
+    function markActiveNav(navTour) {
+        if (!navTour) return;
+        var nav = findTarget('[data-tour="' + navTour + '"]');
+        if (nav) nav.classList.add('myub-tour-nav-active');
     }
 
     function positionSpotlightOnRect(rect) {
@@ -504,55 +551,43 @@
             return;
         }
 
+        spotlightEl.style.display = 'none';
+        hideSidebarBand();
         clearHighlight();
         renderTooltip();
+
         if (backdropEl) backdropEl.style.display = 'none';
 
         var navTour = step.navTour || page.navTour;
-        var onDashboard = page.file === 'dashboard.html';
+        markActiveNav(navTour);
 
-        if (onDashboard) {
-            hideSidebarBand();
-        } else if (navTour) {
-            showSidebarBand(navTour);
-        } else {
-            hideSidebarBand();
+        if (stepIndex === 0) {
+            scrollToTop();
         }
 
         var el = findTarget(step.selector);
         if (el) {
-            el.classList.add('myub-tour-highlight');
             highlightedEl = el;
-            if (stepIndex === 0) {
-                scrollToTop();
-            } else {
-                try {
-                    el.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
-                } catch (_) {}
-            }
-            global.setTimeout(function () {
-                if (!active) return;
-                positionSpotlight(el);
-            }, stepIndex === 0 ? 80 : (navTour && !onDashboard ? 280 : 160));
+            global.requestAnimationFrame(function () {
+                if (!active || !highlightedEl) return;
+                positionSpotlight(highlightedEl);
+            });
         } else {
             spotlightEl.style.display = 'none';
+        }
+
+        if (rootEl && tooltipEl && tooltipEl.parentNode === rootEl) {
+            rootEl.appendChild(tooltipEl);
         }
     }
 
     function bindResize() {
         unbindResize();
         resizeHandler = function () {
-            if (!active) return;
-            var step = getCurrentStep();
-            var page = getCurrentPage();
-            if (page && page.file !== 'dashboard.html' && (step.navTour || page.navTour)) {
-                showSidebarBand(step.navTour || page.navTour);
-            }
-            var el = highlightedEl || (step && findTarget(step.selector));
-            if (el) positionSpotlight(el);
+            if (!active || !highlightedEl) return;
+            positionSpotlight(highlightedEl);
         };
         global.addEventListener('resize', resizeHandler);
-        global.addEventListener('scroll', resizeHandler, true);
     }
 
     function unbindResize() {
@@ -567,10 +602,9 @@
         ensureDom();
         active = true;
         scrollToTop();
+        lockScroll();
         rootEl.classList.add('active');
         rootEl.setAttribute('aria-hidden', 'false');
-        global.document.body.classList.add('myub-tour-active');
-        global.document.body.style.overflow = 'hidden';
         bindResize();
         showStep();
     }
@@ -580,15 +614,13 @@
         clearHighlight();
         hideSidebarBand();
         unbindResize();
+        unlockScroll();
         if (rootEl) {
             rootEl.classList.remove('active');
             rootEl.setAttribute('aria-hidden', 'true');
         }
         if (backdropEl) backdropEl.style.display = 'none';
         if (spotlightEl) spotlightEl.style.display = 'none';
-        global.document.body.classList.remove('myub-tour-active');
-        global.document.body.style.overflow = '';
-        global.document.body.style.removeProperty('overflow');
     }
 
     function navigateToPage(idx, step) {
@@ -672,9 +704,7 @@
         btn.textContent = btnLabel;
         function close() {
             overlay.remove();
-            global.document.body.classList.remove('myub-tour-active');
-            global.document.body.style.overflow = '';
-            global.document.body.style.removeProperty('overflow');
+            unlockScroll();
         }
         btn.addEventListener('click', close);
         overlay.addEventListener('click', function (e) { if (e.target === overlay) close(); });

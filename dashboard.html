@@ -23,8 +23,8 @@
     <script src="myub-utils.js"></script>
     <script src="myub-mobile.js"></script>
     <script src="myub-sidebar.js"></script>
-    <link rel="stylesheet" href="myub-onboarding.css">
-    <script src="myub-onboarding.js"></script>
+    <link rel="stylesheet" href="myub-onboarding.css?v=2">
+    <script src="myub-onboarding.js?v=2"></script>
     
     <!-- OneSignal Push Notifications -->
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
@@ -2133,7 +2133,7 @@
                 </div>
             </div>
             <div class="welcome-modal-footer">
-                <button class="welcome-start-btn" onclick="dismissWelcomeModal()">
+                <button type="button" class="welcome-start-btn" id="welcomeStartBtn">
                     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20" height="20" style="vertical-align:middle;margin-right:6px;"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>Let's Get Started!
                 </button>
             </div>
@@ -2647,11 +2647,7 @@
             document.getElementById('loadingScreen').style.display = 'none';
             document.getElementById('mainContent').style.display = 'block';
 
-            checkFirstTimeUser();
-
-            if (window.MyUBOnboarding) {
-                MyUBOnboarding.checkReplayFromUrl();
-            }
+            whenOnboardingReady(() => checkFirstTimeUser());
             
             // Initialize OneSignal for push notifications
             initOneSignal();
@@ -3691,6 +3687,26 @@
         }
 
         // =============================================
+        // ONBOARDING (ensure script is loaded before calls)
+        // =============================================
+        function whenOnboardingReady(fn, maxAttempts = 60) {
+            if (window.MyUBOnboarding) {
+                fn();
+                return;
+            }
+            let attempts = 0;
+            const timer = setInterval(() => {
+                attempts++;
+                if (window.MyUBOnboarding) {
+                    clearInterval(timer);
+                    fn();
+                } else if (attempts >= maxAttempts) {
+                    clearInterval(timer);
+                }
+            }, 50);
+        }
+
+        // =============================================
         // FIRST-TIME USER WELCOME MODAL
         // =============================================
         function checkFirstTimeUser() {
@@ -3698,8 +3714,8 @@
             
             if (!hasSeenWelcome) {
                 setTimeout(() => showWelcomeModal(), 500);
-            } else if (window.MyUBOnboarding && MyUBOnboarding.shouldAutoStart()) {
-                MyUBOnboarding.waitForSidebarThenStart({ auto: true }, 900);
+            } else if (window.MyUBOnboarding && !MyUBOnboarding.isCompleted()) {
+                MyUBOnboarding.waitForSidebarThenStart({ afterWelcome: true }, 900);
             }
         }
         
@@ -3713,18 +3729,21 @@
         
         function dismissWelcomeModal() {
             const modal = document.getElementById('welcomeModal');
-            if (modal) {
-                modal.style.animation = 'fadeIn 0.3s ease reverse';
-                setTimeout(() => {
-                    modal.style.display = 'none';
-                    document.body.style.overflow = '';
-                    localStorage.setItem('myub_welcome_seen_' + currentUser.id, 'true');
-                    if (window.MyUBOnboarding && MyUBOnboarding.shouldAutoStart()) {
-                        MyUBOnboarding.waitForSidebarThenStart({ auto: true }, 500);
-                    }
-                }, 300);
-            }
+            if (!modal || !currentUser) return;
+            modal.style.animation = 'fadeIn 0.3s ease reverse';
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.body.style.overflow = '';
+                localStorage.setItem('myub_welcome_seen_' + currentUser.id, 'true');
+                if (window.MyUBOnboarding) {
+                    MyUBOnboarding.waitForSidebarThenStart({ afterWelcome: true }, 350);
+                } else if (typeof startMyUBTour === 'function') {
+                    startMyUBTour(true);
+                }
+            }, 300);
         }
+
+        document.getElementById('welcomeStartBtn')?.addEventListener('click', dismissWelcomeModal);
 
         // =============================================
         // APP BADGE API

@@ -2942,6 +2942,13 @@
         }
 
         function replayAppTour() {
+            try {
+                const uid = currentUser?.id;
+                if (uid) {
+                    localStorage.removeItem('myub_tour_skipped_' + uid);
+                    localStorage.removeItem('myub_tour_completed_' + uid);
+                }
+            } catch (_) {}
             window.location.href = 'dashboard.html?replayTour=1';
         }
 

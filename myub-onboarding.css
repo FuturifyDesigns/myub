@@ -2,7 +2,7 @@
 .myub-tour-root {
     position: fixed;
     inset: 0;
-    z-index: 100000;
+    z-index: 2147483000;
     pointer-events: none;
 }
 
@@ -10,42 +10,52 @@
     pointer-events: auto;
 }
 
+.myub-tour-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 18, 38, 0.82);
+    z-index: 1;
+    pointer-events: auto;
+}
+
 .myub-tour-spotlight {
     position: fixed;
     border-radius: 10px;
-    box-shadow: 0 0 0 9999px rgba(8, 18, 38, 0.82);
-    border: 2px solid rgba(196, 30, 58, 0.85);
-    z-index: 100001;
+    box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.9), 0 0 0 9999px rgba(8, 18, 38, 0.45);
+    background: transparent;
+    z-index: 2;
     pointer-events: none;
-    transition: top 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-                left 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-                width 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-                height 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: top 0.3s ease, left 0.3s ease, width 0.3s ease, height 0.3s ease;
 }
 
-.myub-tour-highlight {
+body.myub-tour-active .myub-tour-highlight {
     position: relative;
-    z-index: 100002 !important;
+    z-index: 2147483002 !important;
 }
 
 .myub-tour-tooltip {
     position: fixed;
-    z-index: 100003;
-    width: min(360px, calc(100vw - 32px));
+    left: 50%;
+    bottom: max(24px, env(safe-area-inset-bottom, 24px));
+    transform: translateX(-50%);
+    z-index: 3;
+    width: min(400px, calc(100vw - 32px));
+    max-height: min(70vh, 520px);
+    overflow-y: auto;
     background: linear-gradient(145deg, #1a365d 0%, #122a4a 100%);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: 14px;
     padding: 20px 22px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
-    font-family: 'Outfit', sans-serif;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
     color: #e8edf5;
     pointer-events: auto;
     animation: myubTourFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes myubTourFadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
 .myub-tour-step-label {
@@ -58,7 +68,7 @@
 }
 
 .myub-tour-title {
-    font-family: 'Cormorant Garamond', serif;
+    font-family: 'Cormorant Garamond', Georgia, serif;
     font-size: 22px;
     font-weight: 700;
     color: #fff;
@@ -94,11 +104,6 @@
     border-radius: 8px;
     padding: 9px 16px;
     cursor: pointer;
-    transition: background 0.2s, transform 0.15s;
-}
-
-.myub-tour-btn:active {
-    transform: scale(0.98);
 }
 
 .myub-tour-btn-primary {
@@ -111,54 +116,44 @@
 }
 
 .myub-tour-btn-secondary {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.12);
     color: #e8edf5;
-}
-
-.myub-tour-btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.16);
 }
 
 .myub-tour-btn-ghost {
     background: transparent;
-    color: rgba(232, 237, 245, 0.65);
+    color: rgba(232, 237, 245, 0.7);
     padding: 9px 10px;
-}
-
-.myub-tour-btn-ghost:hover {
-    color: #fff;
 }
 
 .myub-tour-progress {
     display: flex;
     gap: 5px;
     margin-top: 14px;
+    justify-content: center;
 }
 
 .myub-tour-dot {
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.2);
-    transition: background 0.2s, transform 0.2s;
+    background: rgba(255, 255, 255, 0.25);
 }
 
 .myub-tour-dot.active {
     background: #c41e3a;
-    transform: scale(1.2);
+    transform: scale(1.25);
 }
 
-/* Result popups (complete / skip) */
 .myub-tour-popup-overlay {
     position: fixed;
     inset: 0;
-    z-index: 100010;
-    background: rgba(8, 18, 38, 0.75);
+    z-index: 2147483646;
+    background: rgba(8, 18, 38, 0.78);
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 24px;
-    animation: myubTourFadeIn 0.3s ease;
 }
 
 .myub-tour-popup {
@@ -192,7 +187,7 @@
 }
 
 .myub-tour-popup h3 {
-    font-family: 'Cormorant Garamond', serif;
+    font-family: 'Cormorant Garamond', Georgia, serif;
     font-size: 26px;
     color: #fff;
     margin-bottom: 10px;
@@ -203,17 +198,4 @@
     line-height: 1.6;
     color: rgba(232, 237, 245, 0.85);
     margin-bottom: 22px;
-}
-
-.myub-tour-popup .myub-tour-btn-primary {
-    min-width: 140px;
-}
-
-@media (max-width: 768px) {
-    .myub-tour-tooltip {
-        left: 16px !important;
-        right: 16px !important;
-        width: auto !important;
-        max-width: none;
-    }
 }

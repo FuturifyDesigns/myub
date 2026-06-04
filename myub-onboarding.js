@@ -103,7 +103,27 @@
 
     function getUserId() {
         if (global.currentUser && global.currentUser.id) return global.currentUser.id;
+        if (global.userProfile && global.userProfile.id) return global.userProfile.id;
         return null;
+    }
+
+    function getUserIdAsync(callback) {
+        var id = getUserId();
+        if (id) {
+            callback(id);
+            return;
+        }
+        var client = global.supabaseClient || (global.window && global.window.supabaseClient);
+        if (!client || !client.auth) {
+            callback(null);
+            return;
+        }
+        client.auth.getSession().then(function (res) {
+            var user = res.data && res.data.session && res.data.session.user;
+            callback(user ? user.id : null);
+        }).catch(function () {
+            callback(null);
+        });
     }
 
     function storageKey(suffix) {
@@ -312,26 +332,30 @@
     function start(opts) {
         opts = opts || {};
         if (active) return;
-        if (!getUserId()) {
-            console.warn('MyUBOnboarding: no user id');
-            return;
-        }
         if (!opts.replay && !opts.auto) return;
-        if (opts.auto && !shouldAutoStart()) return;
 
-        if (document.getElementById('welcomeModal') &&
-            document.getElementById('welcomeModal').style.display === 'flex') {
-            return;
-        }
+        getUserIdAsync(function (userId) {
+            if (!userId) {
+                console.warn('MyUBOnboarding: no user id');
+                return;
+            }
+            if (!global.currentUser) {
+                global.currentUser = { id: userId };
+            }
+            if (opts.auto && !shouldAutoStart()) return;
 
-        ensureDom();
-        active = true;
-        stepIndex = 0;
-        rootEl.classList.add('active');
-        rootEl.setAttribute('aria-hidden', 'false');
-        document.body.style.overflow = 'hidden';
-        bindResize();
-        showStep();
+            var welcome = document.getElementById('welcomeModal');
+            if (welcome && welcome.style.display === 'flex') return;
+
+            ensureDom();
+            active = true;
+            stepIndex = 0;
+            rootEl.classList.add('active');
+            rootEl.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+            bindResize();
+            showStep();
+        });
     }
 
     function teardown() {
@@ -420,15 +444,24 @@
             if (params.get('replayTour') === '1') {
                 var clean = global.location.pathname + global.location.hash;
                 global.history.replaceState(null, '', clean);
-                setTimeout(function () {
-                    start({ replay: true });
-                }, 700);
+                waitForSidebarThenStart({ replay: true }, 1200);
             }
         } catch (_) {}
     }
 
+    function waitForSidebarThenStart(opts, delayMs) {
+        delayMs = delayMs || 900;
+        setTimeout(function () {
+            if (global.MyUBSidebar && typeof global.MyUBSidebar.init === 'function') {
+                global.MyUBSidebar.init();
+            }
+            start(opts);
+        }, delayMs);
+    }
+
     global.MyUBOnboarding = {
         start: start,
+        waitForSidebarThenStart: waitForSidebarThenStart,
         shouldAutoStart: shouldAutoStart,
         isCompleted: isCompleted,
         isSkipped: isSkipped,

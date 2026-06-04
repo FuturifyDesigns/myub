@@ -102,6 +102,8 @@ body.myub-tour-active .myub-tour-nav-active {
 
 .myub-tour-tooltip.is-anchor {
     bottom: auto;
+    max-height: min(45vh, 400px);
+    animation: myubTourFadeInAnchor 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .myub-tour-tooltip.is-bottom {
@@ -114,6 +116,11 @@ body.myub-tour-active .myub-tour-nav-active {
 @keyframes myubTourFadeIn {
     from { opacity: 0; transform: translateX(-50%) translateY(12px); }
     to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+@keyframes myubTourFadeInAnchor {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: none; }
 }
 
 .myub-tour-step-label {

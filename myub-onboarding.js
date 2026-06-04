@@ -7,6 +7,7 @@
     var PAD = 0;
     var LIBRARY_MIN_H = 160;
     var COMPACT_MIN = 40;
+    var VIEWPORT_PAD = 16;
     var cachedUserId = null;
     var active = false;
     var pageIndex = 0;
@@ -582,6 +583,65 @@
         });
     }
 
+    function getViewportPad() {
+        var top = VIEWPORT_PAD;
+        var bottom = VIEWPORT_PAD;
+        var left = VIEWPORT_PAD;
+        var right = VIEWPORT_PAD;
+        try {
+            var vv = global.visualViewport;
+            if (vv) {
+                top = Math.max(top, vv.offsetTop + 8);
+                left = Math.max(left, vv.offsetLeft + 8);
+                bottom = Math.max(bottom, global.innerHeight - vv.height - vv.offsetTop + 8);
+                right = Math.max(right, global.innerWidth - vv.width - vv.offsetLeft + 8);
+            }
+        } catch (_) {}
+        var topbar = global.document.querySelector('.topbar, header.topbar');
+        if (topbar) {
+            var tb = topbar.getBoundingClientRect();
+            if (tb.bottom > top) top = Math.ceil(tb.bottom) + 8;
+        }
+        return { top: top, bottom: bottom, left: left, right: right };
+    }
+
+    function forceTooltipBottom() {
+        if (!tooltipEl) return;
+        tooltipEl.classList.remove('is-anchor');
+        tooltipEl.classList.add('is-bottom');
+        tooltipEl.style.top = 'auto';
+        tooltipEl.style.bottom = '';
+        tooltipEl.style.left = '50%';
+        tooltipEl.style.right = 'auto';
+        tooltipEl.style.transform = 'translateX(-50%)';
+        tooltipEl.style.maxWidth = '';
+    }
+
+    function clampTooltipInViewport() {
+        if (!tooltipEl) return;
+        var pad = getViewportPad();
+        var tr = tooltipEl.getBoundingClientRect();
+        var vh = global.innerHeight;
+        var vw = global.innerWidth;
+        if (!tr.height) return;
+
+        if (tr.top < pad.top || tr.bottom > vh - pad.bottom || tr.left < pad.left || tr.right > vw - pad.right) {
+            forceTooltipBottom();
+            tr = tooltipEl.getBoundingClientRect();
+        }
+        if (tr.top < pad.top) {
+            tooltipEl.classList.remove('is-bottom');
+            tooltipEl.classList.add('is-anchor');
+            tooltipEl.style.bottom = 'auto';
+            tooltipEl.style.top = pad.top + 'px';
+            tooltipEl.style.left = '50%';
+            tooltipEl.style.transform = 'translateX(-50%)';
+        }
+        if (tr.bottom > vh - pad.bottom) {
+            forceTooltipBottom();
+        }
+    }
+
     function positionTooltip(rect, el) {
         if (!tooltipEl) return;
         tooltipEl.classList.remove('is-anchor', 'is-bottom');
@@ -592,63 +652,73 @@
         tooltipEl.style.transform = '';
         tooltipEl.style.maxWidth = '';
 
+        var pad = getViewportPad();
         var tipH = tooltipEl.offsetHeight || 200;
-        var tipW = Math.min(400, tooltipEl.offsetWidth || 400);
         var gap = 16;
         var vh = global.innerHeight;
-        var vw = global.innerWidth;
         var inTop = isInTopbar(el);
+        var nearTop = rect.top < vh * 0.28;
+        var nearBottom = rect.bottom > vh * 0.72;
 
-        if (inTop) {
-            var top = rect.bottom + gap;
-            if (top + tipH > vh - 16) {
-                top = Math.max(12, rect.top - tipH - gap);
-            }
-            var left = rect.left + rect.width / 2 - tipW / 2;
-            left = Math.max(12, Math.min(left, vw - tipW - 12));
-            tooltipEl.classList.add('is-anchor');
-            tooltipEl.style.top = top + 'px';
-            tooltipEl.style.left = left + 'px';
-            tooltipEl.style.transform = 'none';
-            tooltipEl.style.maxWidth = tipW + 'px';
+        if (inTop || nearTop || nearBottom) {
+            forceTooltipBottom();
             return;
         }
 
-        var spaceBelow = vh - rect.bottom - gap;
-        var spaceAbove = rect.top - gap;
-        var preferAbove = rect.top > vh * 0.42;
+        var spaceBelow = vh - pad.bottom - rect.bottom - gap;
+        var spaceAbove = rect.top - pad.top - gap;
 
-        if (preferAbove && spaceAbove >= tipH + 20) {
-            tooltipEl.classList.add('is-anchor');
-            tooltipEl.style.top = Math.max(12, rect.top - tipH - gap) + 'px';
-            tooltipEl.style.left = '50%';
-            tooltipEl.style.transform = 'translateX(-50%)';
-            return;
-        }
-        if (spaceBelow >= tipH + 20) {
+        if (spaceBelow >= tipH + 12) {
             tooltipEl.classList.add('is-anchor');
             tooltipEl.style.top = (rect.bottom + gap) + 'px';
             tooltipEl.style.left = '50%';
             tooltipEl.style.transform = 'translateX(-50%)';
             return;
         }
-        if (spaceAbove >= tipH + 20) {
+        if (spaceAbove >= tipH + 12) {
             tooltipEl.classList.add('is-anchor');
-            tooltipEl.style.top = Math.max(12, rect.top - tipH - gap) + 'px';
+            tooltipEl.style.top = Math.max(pad.top, rect.top - tipH - gap) + 'px';
             tooltipEl.style.left = '50%';
             tooltipEl.style.transform = 'translateX(-50%)';
             return;
         }
 
-        tooltipEl.classList.add('is-bottom');
+        forceTooltipBottom();
+    }
+
+    function clipRectToViewport(rect) {
+        var pad = getViewportPad();
+        var vh = global.innerHeight;
+        var vw = global.innerWidth;
+        var top = Math.max(pad.top, rect.top);
+        var left = Math.max(pad.left, rect.left);
+        var right = Math.min(vw - pad.right, rect.right);
+        var bottom = Math.min(vh - pad.bottom, rect.bottom);
+        var width = right - left;
+        var height = bottom - top;
+        if (width < 2 || height < 2) return null;
+        return {
+            top: top,
+            left: left,
+            width: width,
+            height: height,
+            right: right,
+            bottom: bottom
+        };
     }
 
     function updateStepLayout(el) {
         if (!active || !el) return;
         var focus = getTourFocusElement(el) || el;
         var rect = getHighlightRect(el);
-        positionSpotlightOnRect(rect, focus);
+        var clipped = clipRectToViewport(rect);
+        if (clipped) {
+            positionSpotlightOnRect(clipped, focus);
+        } else if (spotlightEl) {
+            spotlightEl.style.display = 'none';
+        }
         positionTooltip(rect, focus);
+        clampTooltipInViewport();
     }
 
     function applySpotlightRadius(el) {
@@ -739,8 +809,9 @@
 
         var focus = getTourFocusElement(el) || el;
         var inTop = isInTopbar(focus);
-        var topMargin = inTop ? 12 : 64;
-        var bottomReserve = getTooltipBottomReserve() + 24;
+        var pad = getViewportPad();
+        var topMargin = inTop ? pad.top : Math.max(64, pad.top + 8);
+        var bottomReserve = getTooltipBottomReserve() + pad.bottom + 16;
         var viewportH = global.innerHeight;
         var bandBottom = viewportH - bottomReserve;
 
@@ -817,19 +888,24 @@
     }
 
     function positionSpotlightOnRect(rect, el) {
-        if (rect.width < 2 || rect.height < 2) {
+        if (!rect || rect.width < 2 || rect.height < 2) {
             spotlightEl.style.display = 'none';
             return;
         }
+        var pad = getViewportPad();
         spotlightEl.style.display = 'block';
-        var top = Math.max(4, rect.top - PAD);
-        var left = Math.max(4, rect.left - PAD);
+        var top = Math.max(pad.top, rect.top - PAD);
+        var left = Math.max(pad.left, rect.left - PAD);
         var width = rect.width + PAD * 2;
         var height = rect.height + PAD * 2;
-        var maxRight = global.innerWidth - 4;
-        var maxBottom = global.innerHeight - 4;
+        var maxRight = global.innerWidth - pad.right;
+        var maxBottom = global.innerHeight - pad.bottom;
         if (left + width > maxRight) width = maxRight - left;
         if (top + height > maxBottom) height = maxBottom - top;
+        if (width < 2 || height < 2) {
+            spotlightEl.style.display = 'none';
+            return;
+        }
         spotlightEl.style.top = top + 'px';
         spotlightEl.style.left = left + 'px';
         spotlightEl.style.width = Math.max(2, width) + 'px';

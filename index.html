@@ -1443,10 +1443,8 @@
                     <!-- Login Form -->
                     <form class="form" id="loginForm" onsubmit="handleLogin(event)">
                         <div class="form-group">
-                            <label>UB Email <span class="required">*</span></label>
-                            <input type="email" id="loginEmail" placeholder="202103457@ub.ac.bw" required autocomplete="email" oninput="validateUbEmailInput(this, 'loginEmailError')">
-                            <p class="hint">University email: 4-digit year + 5-digit ID @ub.ac.bw</p>
-                            <p class="error-msg" id="loginEmailError"></p>
+                            <label>Email <span class="required">*</span></label>
+                            <input type="email" id="loginEmail" placeholder="Enter your email" required autocomplete="email">
                         </div>
                         <div class="form-group">
                             <label>Password <span class="required">*</span></label>
@@ -1853,11 +1851,11 @@
             hideAlert();
 
             const loginEmailInput = document.getElementById('loginEmail');
-            if (!validateUbEmailInput(loginEmailInput, 'loginEmailError')) {
-                showAlert(document.getElementById('loginEmailError').textContent || 'Please enter a valid UB email.');
+            const email = loginEmailInput.value.trim().toLowerCase();
+            if (!email) {
+                showAlert('Please enter your email.');
                 return;
             }
-            const email = loginEmailInput.value.trim().toLowerCase();
             const password = document.getElementById('loginPassword').value;
             setLoading('loginBtn', true);
             const rememberMe = document.getElementById('rememberMe').checked;
@@ -2038,12 +2036,8 @@
         async function forgotPassword(e) {
             e.preventDefault();
             const loginEmailInput = document.getElementById('loginEmail');
-            if (!loginEmailInput.value.trim()) { showAlert('Enter your UB email first'); return; }
-            if (!validateUbEmailInput(loginEmailInput, 'loginEmailError')) {
-                showAlert(document.getElementById('loginEmailError').textContent || 'Please enter a valid UB email.');
-                return;
-            }
             const email = loginEmailInput.value.trim().toLowerCase();
+            if (!email) { showAlert('Enter your email first'); return; }
             
             // Show loading state
             const forgotLink = document.querySelector('.forgot');

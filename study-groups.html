@@ -26,8 +26,8 @@
     <script src="myub-utils.js"></script>
     <script src="myub-mobile.js"></script>
     <script src="myub-sidebar.js"></script>
-    <link rel="stylesheet" href="myub-onboarding.css?v=8">
-    <script src="myub-onboarding.js?v=8"></script>
+    <link rel="stylesheet" href="myub-onboarding.css?v=9">
+    <script src="myub-onboarding.js?v=9"></script>
         <style>
         /* ==========================================================
            MyUB Study Groups — dark navy/red theme
@@ -3706,7 +3706,7 @@
         </header>
         
         <!-- Groups Container -->
-        <div class="groups-container">
+        <div class="groups-container" data-tour="groups-container">
             <!-- Groups Panel -->
             <div class="groups-panel" id="groupsPanel" data-tour="groups-panel">
                 <div class="groups-header">
@@ -3720,11 +3720,11 @@
                     <input type="text" class="search-input" id="searchInput" placeholder="Search groups..." oninput="filterGroups()">
                 </div>
                 <div class="groups-limit" id="groupsLimit">You can create up to 3 groups (0/3 used)</div>
-                <div class="groups-list" id="groupsList" data-tour="groups-list"></div>
+                <div class="groups-list" id="groupsList"></div>
             </div>
             
             <!-- Chat Panel -->
-            <div class="chat-panel" id="chatPanel">
+            <div class="chat-panel" id="chatPanel" data-tour="groups-chat">
                 <div class="chat-empty" id="chatEmpty">
                     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                     <h3>Select a group</h3>

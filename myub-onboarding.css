@@ -5,19 +5,18 @@ html.myub-tour-active body {
     overscroll-behavior: none;
 }
 
-body.myub-tour-active:not(.myub-tour-positioning) {
-    transition: top 0.32s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
 body.myub-tour-active.myub-tour-positioning {
     transition: none !important;
 }
 
 [data-tour="notes-library"],
 [data-tour="papers-library"],
-[data-tour="events-feed"],
-[data-tour="groups-list"] {
+[data-tour="events-feed"] {
     min-height: 180px;
+}
+
+[data-tour="groups-chat"] {
+    min-height: 280px;
 }
 
 .myub-tour-root {
@@ -73,8 +72,9 @@ body.myub-tour-active .topbar .myub-tour-highlight {
 body.myub-tour-active .myub-tour-nav-active {
     position: relative;
     z-index: 2147483642 !important;
-    outline: 2px solid #c41e3a;
-    outline-offset: 2px;
+    background: rgba(196, 30, 58, 0.12) !important;
+    outline: none !important;
+    box-shadow: inset 3px 0 0 #c41e3a;
     border-radius: 8px;
 }
 

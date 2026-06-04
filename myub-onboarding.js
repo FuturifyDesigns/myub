@@ -49,7 +49,7 @@
             navTour: 'nav-schedule',
             steps: [
                 { selector: '[data-tour="schedule-header"]', title: 'Your timetable', body: 'View and manage your weekly class schedule in one place.' },
-                { selector: '[data-tour="schedule-layout"]', title: 'Plan your week', body: 'Add classes, labs, and study blocks — drag to organize your time.' }
+                { selector: '[data-tour="schedule-calendar"]', title: 'Plan your week', body: 'Add classes, labs, and study blocks — drag to organize your time.' }
             ]
         },
         {
@@ -82,9 +82,9 @@
             file: 'study-groups.html',
             navTour: 'nav-groups',
             steps: [
-                { selector: '[data-tour="groups-panel"]', title: 'Study groups', body: 'Collaborate with classmates — join existing groups or create your own.' },
+                { selector: '[data-tour="groups-container"]', title: 'Study groups', body: 'Collaborate with classmates — join existing groups or create your own.' },
                 { selector: '[data-tour="groups-tabs"]', title: 'My groups & discover', body: 'Switch between groups you belong to and groups you can join.' },
-                { selector: '[data-tour="groups-list"]', title: 'Group workspace', body: 'Chat, share files, and coordinate study sessions with your group.' }
+                { selector: '[data-tour="groups-chat"]', title: 'Group workspace', body: 'Select a group, then chat, share files, and coordinate study sessions here.' }
             ]
         },
         {
@@ -300,19 +300,11 @@
         lockedScrollY = global.scrollY || global.pageYOffset || 0;
         global.document.documentElement.classList.add('myub-tour-active');
         global.document.body.classList.add('myub-tour-active');
+        global.document.documentElement.style.overflow = 'hidden';
         global.document.body.style.overflow = 'hidden';
-        global.document.body.style.position = 'fixed';
-        global.document.body.style.top = '-' + lockedScrollY + 'px';
-        global.document.body.style.left = '0';
-        global.document.body.style.right = '0';
-        global.document.body.style.width = '100%';
-        var main = findTarget('#mainContent, .main-content');
-        if (main) {
-            main.style.overflow = 'hidden';
-            main.style.touchAction = 'none';
-        }
         scrollLockHandler = function (e) {
             e.preventDefault();
+            global.scrollTo(0, lockedScrollY);
         };
         global.addEventListener('wheel', scrollLockHandler, { passive: false, capture: true });
         global.addEventListener('touchmove', scrollLockHandler, { passive: false, capture: true });
@@ -336,20 +328,8 @@
         }
         global.document.documentElement.classList.remove('myub-tour-active');
         global.document.body.classList.remove('myub-tour-active');
+        global.document.documentElement.style.overflow = '';
         global.document.body.style.overflow = '';
-        global.document.body.style.position = '';
-        global.document.body.style.top = '';
-        global.document.body.style.left = '';
-        global.document.body.style.right = '';
-        global.document.body.style.width = '';
-        global.document.body.style.removeProperty('overflow');
-        global.document.body.style.removeProperty('position');
-        global.document.body.style.removeProperty('top');
-        var main = findTarget('#mainContent, .main-content');
-        if (main) {
-            main.style.overflow = '';
-            main.style.touchAction = '';
-        }
         global.scrollTo(0, lockedScrollY);
     }
 
@@ -406,16 +386,68 @@
             tourId === 'search' || tourId === 'notifications';
     }
 
+    function isInSidebar(el) {
+        return !!(el && el.closest && el.closest('#sidebar, .sidebar, aside.sidebar'));
+    }
+
+    function getPageScopes() {
+        var seen = [];
+        var scopes = [];
+        var selectors = [
+            'main.main-content',
+            'main',
+            '.gpa-page',
+            '.dashboard',
+            '.profile-page',
+            '.friends-page',
+            '.groups-container',
+            '.page-content',
+            '.events-page'
+        ];
+        selectors.forEach(function (sel) {
+            global.document.querySelectorAll(sel).forEach(function (node) {
+                if (seen.indexOf(node) === -1) {
+                    seen.push(node);
+                    scopes.push(node);
+                }
+            });
+        });
+        return scopes;
+    }
+
     function findTarget(selector) {
         if (!selector) return null;
         var parts = selector.split(',').map(function (s) { return s.trim(); });
+        var scopes = getPageScopes();
+        var s;
         for (var i = 0; i < parts.length; i++) {
+            for (s = 0; s < scopes.length; s++) {
+                try {
+                    var scoped = scopes[s].querySelector(parts[i]);
+                    if (scoped && isTourVisible(scoped) && !isInSidebar(scoped)) return scoped;
+                } catch (_) {}
+            }
             try {
                 var nodes = global.document.querySelectorAll(parts[i]);
                 for (var j = 0; j < nodes.length; j++) {
-                    if (isTourVisible(nodes[j])) return nodes[j];
+                    if (isTourVisible(nodes[j]) && !isInSidebar(nodes[j])) return nodes[j];
                 }
             } catch (_) {}
+        }
+        return null;
+    }
+
+    function getScrollableParent(el) {
+        var node = el;
+        while (node && node !== global.document.body && node !== global.document.documentElement) {
+            try {
+                var style = global.getComputedStyle(node);
+                var overflowY = style.overflowY;
+                if ((overflowY === 'auto' || overflowY === 'scroll') && node.scrollHeight > node.clientHeight + 2) {
+                    return node;
+                }
+            } catch (_) {}
+            node = node.parentElement;
         }
         return null;
     }
@@ -434,10 +466,37 @@
         var tourId = el.getAttribute && el.getAttribute('data-tour');
 
         if (tourId === 'notifications') {
-            return el.querySelector('#notificationBell, .icon-btn, button') || el;
+            return global.document.querySelector('#notificationBell[data-tour="notifications"], [data-tour="notifications"]#notificationBell, [data-tour="notifications"] .icon-btn, [data-tour="notifications"] button') || el;
         }
         if (tourId === 'search') {
             return el.matches && el.matches('.search-box') ? el : (el.querySelector('.search-box') || el);
+        }
+        if (tourId === 'gpa-semesters') {
+            return el.querySelector('[data-tour="gpa-semesters-body"]') || el;
+        }
+        if (tourId === 'gpa-summary') {
+            return el;
+        }
+        if (tourId === 'gpa-progression') {
+            return el;
+        }
+        if (tourId === 'groups-chat') {
+            return el;
+        }
+        if (tourId === 'messages-list') {
+            return el;
+        }
+        if (tourId === 'messages-chat') {
+            return el;
+        }
+        if (tourId === 'profile-header') {
+            return el;
+        }
+        if (tourId === 'profile-details') {
+            return el;
+        }
+        if (tourId === 'quick-actions') {
+            return el;
         }
         if (el.closest && el.closest('.topbar')) {
             if (el.matches('button, .icon-btn, .search-box, .notif-btn')) return el;
@@ -482,12 +541,16 @@
         var target = getTourFocusElement(el) || el;
         var rect = target.getBoundingClientRect();
         var tourId = target.getAttribute && target.getAttribute('data-tour');
+        if (!tourId && el) tourId = el.getAttribute && el.getAttribute('data-tour');
 
-        if (isCompactTour(tourId) || (target.closest && target.closest('.topbar'))) {
+        if (isCompactTour(tourId) || (target.closest && target.closest('.topbar, header.topbar'))) {
             return expandRect(rect, COMPACT_MIN, COMPACT_MIN);
         }
         if (isLibraryTour(tourId)) {
             return expandRect(rect, 120, LIBRARY_MIN_H);
+        }
+        if (rect.width < 2 || rect.height < 2) {
+            return expandRect(rect, 80, 80);
         }
         return {
             top: rect.top,
@@ -552,9 +615,26 @@
         }
 
         var spaceBelow = vh - rect.bottom - gap;
+        var spaceAbove = rect.top - gap;
+        var preferAbove = rect.top > vh * 0.42;
+
+        if (preferAbove && spaceAbove >= tipH + 20) {
+            tooltipEl.classList.add('is-anchor');
+            tooltipEl.style.top = Math.max(12, rect.top - tipH - gap) + 'px';
+            tooltipEl.style.left = '50%';
+            tooltipEl.style.transform = 'translateX(-50%)';
+            return;
+        }
         if (spaceBelow >= tipH + 20) {
             tooltipEl.classList.add('is-anchor');
             tooltipEl.style.top = (rect.bottom + gap) + 'px';
+            tooltipEl.style.left = '50%';
+            tooltipEl.style.transform = 'translateX(-50%)';
+            return;
+        }
+        if (spaceAbove >= tipH + 20) {
+            tooltipEl.classList.add('is-anchor');
+            tooltipEl.style.top = Math.max(12, rect.top - tipH - gap) + 'px';
             tooltipEl.style.left = '50%';
             tooltipEl.style.transform = 'translateX(-50%)';
             return;
@@ -613,9 +693,29 @@
 
     function applyTourScroll(y) {
         lockedScrollY = Math.max(0, Math.min(y, getMaxTourScroll()));
-        if (global.document.body.classList.contains('myub-tour-active')) {
-            global.document.body.style.top = '-' + lockedScrollY + 'px';
+        try {
+            global.scrollTo({ top: lockedScrollY, left: 0, behavior: 'auto' });
+        } catch (_) {
+            global.scrollTo(0, lockedScrollY);
         }
+    }
+
+    function scrollParentForElement(el, topMargin, bandBottom) {
+        var focus = getTourFocusElement(el) || el;
+        var parent = getScrollableParent(focus);
+        if (!parent) return;
+        var rect = focus.getBoundingClientRect();
+        var parentRect = parent.getBoundingClientRect();
+        var relTop = rect.top - parentRect.top + parent.scrollTop;
+        var relBottom = relTop + rect.height;
+        var viewH = parent.clientHeight;
+        var targetScroll = parent.scrollTop;
+        if (rect.top < parentRect.top + topMargin) {
+            targetScroll = relTop - topMargin;
+        } else if (rect.bottom > parentRect.top + bandBottom - parentRect.top) {
+            targetScroll = relBottom - (bandBottom - parentRect.top);
+        }
+        parent.scrollTop = Math.max(0, targetScroll);
     }
 
     function getTooltipBottomReserve() {
@@ -628,7 +728,7 @@
     }
 
     function isInTopbar(el) {
-        return !!(el && el.closest && el.closest('.topbar'));
+        return !!(el && el.closest && el.closest('.topbar, header.topbar'));
     }
 
     function scrollHighlightIntoView(el, done) {
@@ -639,54 +739,46 @@
 
         var focus = getTourFocusElement(el) || el;
         var inTop = isInTopbar(focus);
+        var topMargin = inTop ? 12 : 64;
+        var bottomReserve = getTooltipBottomReserve() + 24;
+        var viewportH = global.innerHeight;
+        var bandBottom = viewportH - bottomReserve;
+
+        function alignWindow() {
+            var rect = getHighlightRect(el);
+            var bandHeight = Math.max(120, bandBottom - topMargin);
+            var scrollDelta = 0;
+            if (rect.height <= bandHeight) {
+                var idealTop = topMargin + (bandHeight - rect.height) / 2;
+                scrollDelta = rect.top - idealTop;
+            } else {
+                if (rect.top < topMargin) scrollDelta = rect.top - topMargin;
+                if (rect.bottom > bandBottom) {
+                    scrollDelta = Math.max(scrollDelta, rect.bottom - bandBottom);
+                }
+            }
+            if (Math.abs(scrollDelta) >= 1) {
+                applyTourScroll(lockedScrollY + scrollDelta);
+            }
+            scrollParentForElement(el, topMargin, bandBottom);
+        }
+
         if (inTop) {
             applyTourScroll(0);
+            var scrollParent = getScrollableParent(focus);
+            if (scrollParent) scrollParent.scrollTop = 0;
             waitForLayoutSettled(done);
             return;
         }
 
-        var topMargin = 64;
-        var bottomReserve = getTooltipBottomReserve() + 20;
-        var viewportH = global.innerHeight;
-        var bandBottom = viewportH - bottomReserve;
-        var bandHeight = Math.max(120, bandBottom - topMargin);
-        var rect = getHighlightRect(el);
-        var scrollDelta = 0;
-
-        if (rect.height <= bandHeight) {
-            var idealTop = topMargin + (bandHeight - rect.height) / 2;
-            scrollDelta = rect.top - idealTop;
-        } else {
-            if (rect.top < topMargin) scrollDelta = rect.top - topMargin;
-            if (rect.bottom > bandBottom) {
-                scrollDelta = Math.max(scrollDelta, rect.bottom - bandBottom);
-            }
-        }
-
-        if (Math.abs(scrollDelta) >= 1) {
-            applyTourScroll(lockedScrollY + scrollDelta);
-        }
-
+        alignWindow();
         waitForLayoutSettled(function () {
             if (!active || !el) {
                 if (done) done();
                 return;
             }
-            var r2 = getHighlightRect(el);
-            var fix = 0;
-            if (r2.height <= bandHeight) {
-                var ideal2 = topMargin + (bandHeight - r2.height) / 2;
-                fix = r2.top - ideal2;
-            } else {
-                if (r2.top < topMargin) fix = r2.top - topMargin;
-                if (r2.bottom > bandBottom) fix = Math.max(fix, r2.bottom - bandBottom);
-            }
-            if (Math.abs(fix) >= 2) {
-                applyTourScroll(lockedScrollY + fix);
-                waitForLayoutSettled(done);
-            } else if (done) {
-                done();
-            }
+            alignWindow();
+            waitForLayoutSettled(done);
         });
     }
 
@@ -719,8 +811,8 @@
     }
 
     function markActiveNav(navTour) {
-        if (!navTour) return;
-        var nav = findTarget('[data-tour="' + navTour + '"]');
+        if (!navTour || stepIndex > 0) return;
+        var nav = global.document.querySelector('#sidebar [data-tour="' + navTour + '"], .sidebar [data-tour="' + navTour + '"]');
         if (nav) nav.classList.add('myub-tour-nav-active');
     }
 
@@ -854,8 +946,6 @@
         if (backdropEl) backdropEl.style.display = 'none';
 
         var navTour = step.navTour || page.navTour;
-        markActiveNav(navTour);
-
         if (stepIndex === 0) {
             scrollToTop();
         }

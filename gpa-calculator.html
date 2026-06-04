@@ -24,8 +24,8 @@
     <script src="myub-utils.js"></script>
     <script src="myub-mobile.js"></script>
     <script src="myub-sidebar.js"></script>
-    <link rel="stylesheet" href="myub-onboarding.css?v=8">
-    <script src="myub-onboarding.js?v=8"></script>
+    <link rel="stylesheet" href="myub-onboarding.css?v=9">
+    <script src="myub-onboarding.js?v=9"></script>
     <style>
         /* ==========================================================
            MyUB GPA Calculator — dark navy/red theme
@@ -2478,12 +2478,16 @@
                     </div>
                 </div>
 
-                <div class="card" data-tour="gpa-semesters">
+                <div class="card">
+                    <div data-tour="gpa-semesters">
+                    <div class="gpa-semesters-tour" data-tour="gpa-semesters-body">
                     <div class="card-header">
                         <div><h2 class="card-title">My Semesters</h2><p class="card-subtitle">Organize your courses by semester</p></div>
                         <div class="card-actions"><button class="btn btn-primary" onclick="openSemesterModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>Add Semester</button></div>
                     </div>
                     <div id="semestersContainer"></div>
+                    </div>
+                    </div>
                     <div class="grading-info">
                         <div class="grading-info-title"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>UB Grading Scale</div>
                         <div class="grading-grid" style="grid-template-columns: repeat(4, 1fr);">

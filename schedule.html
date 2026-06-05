@@ -23,8 +23,8 @@
     <script src="myub-utils.js"></script>
     <script src="myub-mobile.js"></script>
     <script src="myub-sidebar.js"></script>
-    <link rel="stylesheet" href="myub-onboarding.css?v=19">
-    <script src="myub-onboarding.js?v=19"></script>
+    <link rel="stylesheet" href="myub-onboarding.css?v=20">
+    <script src="myub-onboarding.js?v=20"></script>
     <style>
         /* ==========================================================
            MyUB Schedule — dark navy/red theme
@@ -2727,6 +2727,13 @@
             }
 
             function runEntrance() {
+                if ((window.MyUBOnboarding && window.MyUBOnboarding.shouldSkipEntrance && window.MyUBOnboarding.shouldSkipEntrance()) ||
+                    document.documentElement.classList.contains('myub-tour-active') ||
+                    document.documentElement.classList.contains('myub-tour-prep') ||
+                    /[?&]tour=1/.test(location.search)) {
+                    forceVisible();
+                    return;
+                }
                 const g = window.gsap;
                 if (!g) { forceVisible(); return; }
                 try {

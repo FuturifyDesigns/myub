@@ -1,4 +1,48 @@
 /* MyUB onboarding tour — simplified */
+html.myub-tour-prep .topbar,
+html.myub-tour-prep .sidebar,
+html.myub-tour-prep .welcome-banner,
+html.myub-tour-prep .stat-card,
+html.myub-tour-prep .card,
+html.myub-tour-prep .quick-action,
+html.myub-tour-prep .nav-item,
+html.myub-tour-prep .groups-panel,
+html.myub-tour-prep .chat-panel,
+html.myub-tour-prep .conversations-panel,
+html.myub-tour-prep .messages-container,
+html.myub-tour-prep .friends-main,
+html.myub-tour-prep .profile-header-card,
+html.myub-tour-prep .progression-card,
+html.myub-tour-prep .schedule-header,
+html.myub-tour-prep .events-header,
+html.myub-tour-prep .notes-header,
+html.myub-tour-prep .toolbar,
+html.myub-tour-prep .tabs,
+html.myub-tour-active .topbar,
+html.myub-tour-active .sidebar,
+html.myub-tour-active .welcome-banner,
+html.myub-tour-active .stat-card,
+html.myub-tour-active .card,
+html.myub-tour-active .quick-action,
+html.myub-tour-active .nav-item,
+html.myub-tour-active .groups-panel,
+html.myub-tour-active .chat-panel,
+html.myub-tour-active .conversations-panel,
+html.myub-tour-active .messages-container,
+html.myub-tour-active .friends-main,
+html.myub-tour-active .profile-header-card,
+html.myub-tour-active .progression-card,
+html.myub-tour-active .schedule-header,
+html.myub-tour-active .events-header,
+html.myub-tour-active .notes-header,
+html.myub-tour-active .toolbar,
+html.myub-tour-active .tabs {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    animation: none !important;
+}
+
 html.myub-tour-active,
 html.myub-tour-active body {
     overflow: hidden !important;
@@ -41,12 +85,12 @@ html.myub-tour-active body {
     pointer-events: none;
     opacity: 0;
     transition:
-        top 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-        left 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-        width 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-        height 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-        opacity 0.4s ease,
-        border-radius 0.45s ease;
+        top 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+        left 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+        width 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+        height 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.25s ease,
+        border-radius 0.35s ease;
     will-change: top, left, width, height;
 }
 

@@ -9,7 +9,13 @@
     var TOOLTIP_RESERVE = 260;
     var MIN_SPOTLIGHT_H = 72;
     var TOUR_TOP_PAD = 72;
-    var LAYOUT_SETTLE_MS = 120;
+    var LAYOUT_SETTLE_MS = 80;
+    var TOUR_SESSION_KEY = 'myub_tour_session';
+    var TOUR_FORCE_VISIBLE = '.topbar, .sidebar, .welcome-banner, .stat-card, .card, .quick-action, .nav-item, ' +
+        '.groups-panel, .chat-panel, .groups-container, .conversations-panel, .messages-container, ' +
+        '.friends-main, .profile-header-card, .progression-card, .gpa-summary, .schedule-header, ' +
+        '.events-header, .notes-header, .toolbar, .tabs, .stat-value, .gpa-value, .page-content, ' +
+        '.main-content, .dashboard, .gpa-page, .conversation-item, .friend-card, .request-card';
     var cachedUserId = null;
     var active = false;
     var pageIndex = 0;
@@ -26,6 +32,7 @@
     var keyLockHandler = null;
     var lockedScrollY = 0;
     var stepTargetRetryTimer = null;
+    var lastTooltipPageIndex = -1;
 
     var TOUR_PAGES = [
         {
@@ -183,8 +190,82 @@
     function setTourActive(on) {
         var k = storageKey('active');
         if (!k) return;
-        if (on) global.localStorage.setItem(k, '1');
-        else global.localStorage.removeItem(k);
+        if (on) {
+            global.localStorage.setItem(k, '1');
+            try { global.sessionStorage.setItem(TOUR_SESSION_KEY, '1'); } catch (_) {}
+            markTourPrep();
+        } else {
+            global.localStorage.removeItem(k);
+            clearTourPrep();
+        }
+    }
+
+    function isTourSession() {
+        try {
+            if (/[?&]tour=1/.test(global.location.search)) return true;
+            if (global.sessionStorage.getItem(TOUR_SESSION_KEY) === '1') return true;
+        } catch (_) {}
+        return isTourActive();
+    }
+
+    function markTourPrep() {
+        try {
+            global.document.documentElement.classList.add('myub-tour-prep');
+        } catch (_) {}
+    }
+
+    function clearTourPrep() {
+        try {
+            global.document.documentElement.classList.remove('myub-tour-prep');
+            global.sessionStorage.removeItem(TOUR_SESSION_KEY);
+        } catch (_) {}
+    }
+
+    var tourPrepGuardTimer = null;
+
+    function forceAllTourContentVisible() {
+        try {
+            if (global.gsap) {
+                global.gsap.globalTimeline.pause();
+                global.gsap.killTweensOf(TOUR_FORCE_VISIBLE);
+            }
+        } catch (_) {}
+        try {
+            global.document.querySelectorAll(TOUR_FORCE_VISIBLE).forEach(function (el) {
+                if (el.tagName === 'IMG') {
+                    el.style.opacity = '1';
+                    el.style.visibility = 'visible';
+                    return;
+                }
+                el.style.opacity = '1';
+                el.style.visibility = 'visible';
+                el.style.transform = 'none';
+            });
+        } catch (_) {}
+    }
+
+    function startTourPrepGuard() {
+        if (tourPrepGuardTimer) {
+            global.clearInterval(tourPrepGuardTimer);
+            tourPrepGuardTimer = null;
+        }
+        forceAllTourContentVisible();
+        var runs = 0;
+        tourPrepGuardTimer = global.setInterval(function () {
+            forceAllTourContentVisible();
+            runs += 1;
+            if (runs >= 8) {
+                global.clearInterval(tourPrepGuardTimer);
+                tourPrepGuardTimer = null;
+            }
+        }, 80);
+    }
+
+    function stopTourPrepGuard() {
+        if (tourPrepGuardTimer) {
+            global.clearInterval(tourPrepGuardTimer);
+            tourPrepGuardTimer = null;
+        }
     }
 
     function getStoredPageIndex() {
@@ -224,12 +305,16 @@
         var s = storageKey('skipped');
         if (c) global.localStorage.setItem(c, 'true');
         if (s) global.localStorage.removeItem(s);
+        stopTourPrepGuard();
+        clearTourPrep();
         setTourActive(false);
     }
 
     function markSkipped() {
         var s = storageKey('skipped');
         if (s) global.localStorage.setItem(s, 'true');
+        stopTourPrepGuard();
+        clearTourPrep();
         setTourActive(false);
     }
 
@@ -403,31 +488,12 @@
     }
 
     function stabilizePageForTour(el) {
-        try {
-            if (global.gsap && global.gsap.globalTimeline) {
-                global.gsap.globalTimeline.pause();
-            }
-        } catch (_) {}
+        forceAllTourContentVisible();
         if (!el) return;
-        var node = el;
-        while (node && node !== global.document.body) {
-            if (node.tagName !== 'IMG') {
-                node.style.transform = '';
-                node.style.opacity = '1';
-                node.style.visibility = 'visible';
-            }
-            node = node.parentElement;
-        }
         try {
-            el.querySelectorAll('.quick-action, .stat-card, .stat-value, img').forEach(function (child) {
-                if (child.tagName === 'IMG') {
-                    child.style.opacity = '1';
-                    child.style.visibility = 'visible';
-                    return;
-                }
-                child.style.transform = '';
-                child.style.opacity = '1';
-                child.style.visibility = 'visible';
+            el.querySelectorAll('img').forEach(function (img) {
+                img.style.opacity = '1';
+                img.style.visibility = 'visible';
             });
         } catch (_) {}
     }
@@ -692,28 +758,21 @@
         var smooth = !!(step && (step.fit || step.panels));
         var needsScroll = targetNeedsScroll(el);
         scrollToTarget(el);
-        var scrollDelay = smooth && needsScroll ? 420 : (smooth ? 140 : 0);
-        waitForLayoutSettled(function () {
+        var scrollDelay = smooth && needsScroll ? 280 : 0;
+        global.setTimeout(function () {
             if (!active || highlightedEl !== el) {
                 if (done) done();
                 return;
             }
-            global.setTimeout(function () {
+            waitForLayoutSettled(function () {
                 if (!active || highlightedEl !== el) {
                     if (done) done();
                     return;
                 }
                 updateStepLayout(el);
-                global.setTimeout(function () {
-                    if (!active || highlightedEl !== el) {
-                        if (done) done();
-                        return;
-                    }
-                    updateStepLayout(el);
-                    if (done) done();
-                }, LAYOUT_SETTLE_MS);
-            }, scrollDelay);
-        });
+                if (done) done();
+            });
+        }, scrollDelay);
     }
 
     function closeMobileSidebar() {
@@ -845,6 +904,7 @@
 
     function retryFindStepTarget(attempts) {
         if (!active) return;
+        forceAllTourContentVisible();
         var step = getCurrentStep();
         if (!step) return;
         var el = findTarget(step.selector);
@@ -868,18 +928,25 @@
             return;
         }
 
+        forceAllTourContentVisible();
         cancelStepTargetRetry();
         hideSidebarBand();
         clearHighlight();
         closeTourDropdowns();
         renderTooltip();
         if (tooltipEl) {
-            tooltipEl.classList.remove('is-entering');
-            void tooltipEl.offsetWidth;
-            tooltipEl.classList.add('is-entering');
+            if (pageIndex !== lastTooltipPageIndex) {
+                tooltipEl.classList.remove('is-entering');
+                void tooltipEl.offsetWidth;
+                tooltipEl.classList.add('is-entering');
+                lastTooltipPageIndex = pageIndex;
+            } else {
+                tooltipEl.classList.remove('is-entering');
+            }
         }
 
         if (backdropEl) backdropEl.style.display = 'none';
+        if (spotlightEl) spotlightEl.classList.remove('is-visible');
 
         if (stepIndex === 0) {
             scrollToTop();
@@ -889,7 +956,10 @@
         if (el) {
             applyStepHighlight(el);
         } else {
-            spotlightEl.style.display = 'none';
+            if (spotlightEl) {
+                spotlightEl.classList.remove('is-visible');
+                spotlightEl.style.display = 'none';
+            }
             positionTooltipBottom();
             retryFindStepTarget(0);
         }
@@ -915,6 +985,8 @@
     }
 
     function runTour() {
+        stopTourPrepGuard();
+        forceAllTourContentVisible();
         ensureDom();
         active = true;
         scrollToTop();
@@ -951,12 +1023,15 @@
         var pages = getPagesNormalized();
         if (idx < 0 || idx >= pages.length) return;
         step = typeof step === 'number' ? step : 0;
+        markTourPrep();
+        startTourPrepGuard();
         teardown();
         setStoredPageIndex(idx);
         setStoredStepIndex(step);
         setTourActive(true);
         pageIndex = idx;
         stepIndex = step;
+        lastTooltipPageIndex = -1;
         var target = pages[idx].file;
         if (getPageFile() === target) {
             waitForPageReady(runTour);
@@ -1099,14 +1174,29 @@
         return loadingDone && isMainContentVisible() && isFriendsTourReady() && isProfileTourReady();
     }
 
+    function isCurrentStepTargetReady() {
+        var step = getCurrentStep();
+        if (!step || !step.selector) return true;
+        var el = findTarget(step.selector);
+        if (!el) return false;
+        var rect = getTargetRect(el);
+        return !!(rect && rect.width >= 12 && rect.height >= 12);
+    }
+
     function waitForPageReady(callback, attempts) {
         attempts = attempts || 0;
-        if (isPageReadyForTour() || attempts > 200) {
+        if (isTourSession()) {
+            markTourPrep();
+            forceAllTourContentVisible();
+        }
+        var ready = isPageReadyForTour() && isCurrentStepTargetReady();
+        if (ready || attempts > 100) {
+            forceAllTourContentVisible();
             scrollToTop();
-            global.setTimeout(callback, 200);
+            waitForLayoutSettled(callback);
             return;
         }
-        global.setTimeout(function () { waitForPageReady(callback, attempts + 1); }, 100);
+        global.setTimeout(function () { waitForPageReady(callback, attempts + 1); }, 40);
     }
 
     function syncToStoredProgress() {
@@ -1195,11 +1285,18 @@
         global.setTimeout(function () { beginTour(opts); }, delayMs || 400);
     }
 
+    function shouldSkipEntrance() {
+        return isTourSession() ||
+            global.document.documentElement.classList.contains('myub-tour-active') ||
+            global.document.documentElement.classList.contains('myub-tour-prep');
+    }
+
     global.MyUBOnboarding = {
         start: start,
         beginTour: beginTour,
         waitForSidebarThenStart: waitForSidebarThenStart,
         shouldAutoStart: shouldAutoStart,
+        shouldSkipEntrance: shouldSkipEntrance,
         isCompleted: isCompleted,
         isSkipped: isSkipped,
         resumeIfActive: resumeIfActive,
@@ -1211,7 +1308,16 @@
     };
 
     function boot() {
+        if (isTourSession()) {
+            markTourPrep();
+            startTourPrepGuard();
+        }
         resumeIfActive();
+    }
+
+    if (isTourSession()) {
+        markTourPrep();
+        startTourPrepGuard();
     }
 
     if (global.document.readyState === 'loading') {

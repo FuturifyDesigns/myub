@@ -1986,18 +1986,29 @@
             opacity: 0.4;
         }
         .search-placeholder p { font-size: 13px; }
+        .search-loading,
+        .search-empty {
+            padding: 32px 20px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
         /* User search result items (rendered dynamically by searchUsers) */
-        .user-result-item {
+        .user-search-item {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 10px 12px;
+            padding: 10px 14px;
             border-radius: 10px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: background 0.25s ease, transform 0.25s ease;
         }
-        .user-result-item:hover { background: var(--surface-2); transform: translateX(3px); }
-        .user-result-avatar {
+        .user-search-item:hover {
+            background: var(--surface-2);
+            transform: translateX(3px);
+        }
+        .user-search-avatar {
+            position: relative;
             width: 42px;
             height: 42px;
             border-radius: 50%;
@@ -2012,7 +2023,55 @@
             flex-shrink: 0;
             overflow: hidden;
         }
-        .user-result-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .user-search-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        .user-search-avatar .online-indicator {
+            position: absolute;
+            bottom: 1px;
+            right: 1px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--green);
+            border: 2px solid var(--navy-dark);
+        }
+        .user-search-avatar .online-indicator.offline {
+            background: var(--text-dim);
+        }
+        .user-search-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .user-search-name {
+            font-family: 'Sora', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .user-search-program {
+            font-size: 12px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .user-search-status {
+            flex-shrink: 0;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--green);
+        }
+        .user-search-status.offline {
+            color: transparent;
+        }
 
         /* Forward user list item */
         .forward-user-item {
@@ -2707,7 +2766,7 @@
         <div class="modal" style="max-width: 480px;">
             <div class="modal-header"><h3 class="modal-title">New Chat</h3><button class="modal-close" onclick="closeNewChatModal()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button></div>
             <div class="modal-body" style="padding: 0;">
-                <div class="new-chat-search"><input type="text" class="search-input" id="userSearchInput" placeholder="Search users by name or program..." oninput="searchUsers()"></div>
+                <div class="new-chat-search"><input type="text" class="search-input" id="userSearchInput" name="myub-messages-user-search" placeholder="Search users by name or program..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other" oninput="searchUsers()"></div>
                 <div class="new-chat-results" id="userSearchResults"><div class="search-placeholder"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg><p>Search for users to start a conversation</p></div></div>
             </div>
         </div>
@@ -3735,10 +3794,16 @@
         let reportingUserId = null;
 
         function openNewChatModal() {
-            document.getElementById('userSearchInput').value = '';
+            const input = document.getElementById('userSearchInput');
+            input.value = '';
+            input.setAttribute('autocomplete', 'off');
             document.getElementById('userSearchResults').innerHTML = '<div class="search-placeholder"><svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg><p>Search for users to start a conversation</p></div>';
             document.getElementById('newChatModal').classList.add('show');
-            setTimeout(() => document.getElementById('userSearchInput').focus(), 100);
+            setTimeout(function () {
+                input.setAttribute('readonly', 'readonly');
+                input.focus();
+                input.removeAttribute('readonly');
+            }, 100);
         }
 
         function closeNewChatModal() {

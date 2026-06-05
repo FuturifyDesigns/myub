@@ -69,8 +69,10 @@ body.myub-tour-active .myub-tour-highlight {
 
 [data-tour="groups-container"],
 [data-tour="schedule-main"],
-[data-tour="messages-list"] {
-    min-height: 320px;
+[data-tour="messages-main"],
+[data-tour="friends-page"],
+[data-tour="profile-header"] {
+    min-height: 280px;
 }
 
 .myub-tour-step-label {

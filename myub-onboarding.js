@@ -21,6 +21,7 @@
     var scrollLockHandler = null;
     var keyLockHandler = null;
     var lockedScrollY = 0;
+    var stepTargetRetryTimer = null;
 
     var TOUR_PAGES = [
         {
@@ -69,19 +70,19 @@
         {
             file: 'messages.html',
             steps: [
-                { selector: '[data-tour="messages-list"]', title: 'Messages', body: 'Pick a conversation on the left, then read and send messages on the right.' }
+                { selector: '[data-tour="messages-main"]', title: 'Messages', body: 'Pick a conversation on the left, then read and send messages on the right.' }
             ]
         },
         {
             file: 'friends.html',
             steps: [
-                { selector: '[data-tour="friends-tabs"]', title: 'Friends', body: 'See your friends, handle requests, and search for students to connect with.' }
+                { selector: '[data-tour="friends-page"]', title: 'Friends', body: 'See your friends, handle requests, and search for students to connect with.' }
             ]
         },
         {
             file: 'profile.html',
             steps: [
-                { selector: '[data-tour="profile-replay"]', title: 'Profile & tour', body: 'Update your details above anytime. Replay this guided tour from here whenever you need a refresher.' }
+                { selector: '[data-tour="profile-header"]', title: 'Profile & tour', body: 'Update your photo and details here. Replay this guided tour anytime from the App tour card below.' }
             ]
         }
     ];
@@ -354,7 +355,7 @@
 
     function findTarget(selector) {
         if (!selector) return null;
-        var scopes = ['main.main-content', 'main.page-content', 'main', '.gpa-page', '.dashboard', '.groups-container', '.profile-page', '.friends-page'];
+        var scopes = ['main.main-content', 'main.page-content', 'main', '.gpa-page', '.dashboard', '.groups-container', '.messages-container', '.profile-page', '.friends-page'];
         var i;
         for (i = 0; i < scopes.length; i++) {
             try {
@@ -437,12 +438,12 @@
         var width = Math.min(rect.width + PAD * 2, vw - margin * 2);
         var height = rect.height + PAD * 2;
         if (top + height > maxBottom) {
-            top = Math.max(margin, maxBottom - height);
+            height = Math.max(8, maxBottom - top);
         }
         if (left + width > vw - margin) {
             left = Math.max(margin, vw - margin - width);
         }
-        if (width < 8 || height < 8 || top < margin) {
+        if (width < 8 || height < 8) {
             spotlightEl.style.display = 'none';
         } else {
             spotlightEl.style.display = 'block';
@@ -638,6 +639,36 @@
         tooltipEl.appendChild(actions);
     }
 
+    function cancelStepTargetRetry() {
+        if (stepTargetRetryTimer) {
+            global.clearTimeout(stepTargetRetryTimer);
+            stepTargetRetryTimer = null;
+        }
+    }
+
+    function applyStepHighlight(el) {
+        if (!active || !el) return;
+        highlightedEl = el;
+        el.classList.add('myub-tour-highlight');
+        layoutStep(highlightedEl);
+    }
+
+    function retryFindStepTarget(attempts) {
+        if (!active) return;
+        var step = getCurrentStep();
+        if (!step) return;
+        var el = findTarget(step.selector);
+        if (el) {
+            applyStepHighlight(el);
+            return;
+        }
+        if (attempts < 150) {
+            stepTargetRetryTimer = global.setTimeout(function () {
+                retryFindStepTarget(attempts + 1);
+            }, 100);
+        }
+    }
+
     function showStep() {
         if (!active) return;
         var step = getCurrentStep();
@@ -647,6 +678,7 @@
             return;
         }
 
+        cancelStepTargetRetry();
         spotlightEl.style.display = 'none';
         hideSidebarBand();
         clearHighlight();
@@ -661,12 +693,11 @@
 
         var el = findTarget(step.selector);
         if (el) {
-            highlightedEl = el;
-            el.classList.add('myub-tour-highlight');
-            layoutStep(highlightedEl);
+            applyStepHighlight(el);
         } else {
             spotlightEl.style.display = 'none';
             positionTooltipBottom();
+            retryFindStepTarget(0);
         }
 
         ensureTourOnTop();
@@ -702,6 +733,7 @@
 
     function teardown() {
         active = false;
+        cancelStepTargetRetry();
         clearHighlight();
         hideSidebarBand();
         unbindResize();
@@ -807,13 +839,39 @@
         global.document.body.appendChild(overlay);
     }
 
+    function getLoadingEl() {
+        return global.document.getElementById('loadingScreen') || global.document.getElementById('loadingState');
+    }
+
+    function isMainContentVisible() {
+        var main = global.document.getElementById('mainContent');
+        if (!main) {
+            main = global.document.querySelector('main.main-content, main.page-content, .gpa-page');
+        }
+        if (!main) return false;
+        try {
+            var style = global.getComputedStyle(main);
+            if (style.display === 'none' || style.visibility === 'hidden') return false;
+        } catch (_) {}
+        return main.offsetWidth > 0 || main.offsetHeight > 0;
+    }
+
+    function isPageReadyForTour() {
+        var loading = getLoadingEl();
+        var loadingDone = !loading;
+        if (loading) {
+            try {
+                loadingDone = loading.style.display === 'none' || global.getComputedStyle(loading).display === 'none';
+            } catch (_) {
+                loadingDone = true;
+            }
+        }
+        return loadingDone && isMainContentVisible();
+    }
+
     function waitForPageReady(callback, attempts) {
         attempts = attempts || 0;
-        var loading = global.document.getElementById('loadingScreen');
-        var loadingDone = !loading || loading.style.display === 'none' || global.getComputedStyle(loading).display === 'none';
-        var main = findTarget('#mainContent, .main-content, .gpa-page, .profile-page');
-        var mainOk = main && (main.offsetWidth > 0 || main.offsetHeight > 0);
-        if ((loadingDone && mainOk) || attempts > 80) {
+        if (isPageReadyForTour() || attempts > 200) {
             scrollToTop();
             global.setTimeout(callback, 200);
             return;

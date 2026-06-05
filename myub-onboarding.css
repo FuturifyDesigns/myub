@@ -8,7 +8,7 @@ html.myub-tour-active body {
 .myub-tour-root {
     position: fixed;
     inset: 0;
-    z-index: 2147483640;
+    z-index: 2147483646;
     pointer-events: none;
     isolation: isolate;
 }
@@ -30,24 +30,25 @@ html.myub-tour-active body {
     outline: 3px solid #c41e3a;
     outline-offset: 0;
     box-shadow: 0 0 0 9999px rgba(8, 18, 38, 0.72);
-    z-index: 2147483641;
+    z-index: 1;
     pointer-events: none;
 }
 
 body.myub-tour-active .myub-tour-highlight {
-    position: relative;
-    z-index: 2147483642 !important;
+    /* Do not raise z-index — page content must stay under the tour overlay */
+    outline: none !important;
+    box-shadow: none !important;
 }
 
 .myub-tour-tooltip {
     position: fixed;
     left: 50%;
     bottom: max(24px, env(safe-area-inset-bottom, 24px));
-    top: auto;
+    top: auto !important;
     transform: translateX(-50%);
-    z-index: 2147483647;
+    z-index: 2;
     width: min(400px, calc(100vw - 32px));
-    max-height: min(55vh, 420px);
+    max-height: min(50vh, 380px);
     overflow-y: auto;
     background: linear-gradient(145deg, #1a365d 0%, #122a4a 100%);
     border: 1px solid rgba(255, 255, 255, 0.14);
@@ -57,6 +58,19 @@ body.myub-tour-active .myub-tour-highlight {
     font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
     color: #e8edf5;
     pointer-events: auto;
+}
+
+.myub-tour-tooltip.is-bottom {
+    top: auto !important;
+    bottom: max(24px, env(safe-area-inset-bottom, 24px)) !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+}
+
+[data-tour="groups-container"],
+[data-tour="schedule-main"],
+[data-tour="messages-list"] {
+    min-height: 320px;
 }
 
 .myub-tour-step-label {
@@ -130,7 +144,7 @@ body.myub-tour-active .myub-tour-highlight {
 .myub-tour-popup-overlay {
     position: fixed;
     inset: 0;
-    z-index: 2147483646;
+    z-index: 2147483647;
     background: rgba(8, 18, 38, 0.78);
     display: flex;
     align-items: center;

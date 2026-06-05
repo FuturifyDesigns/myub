@@ -39,7 +39,7 @@
         {
             file: 'schedule.html',
             steps: [
-                { selector: '[data-tour="schedule-calendar"]', title: 'Schedule', body: 'Your calendar lives here — switch views, add classes, and see what is coming up.' }
+                { selector: '[data-tour="schedule-main"]', title: 'Schedule', body: 'Your calendar and upcoming events live here — switch views and add classes from the toolbar above.' }
             ]
         },
         {
@@ -354,11 +354,31 @@
 
     function findTarget(selector) {
         if (!selector) return null;
+        var scopes = ['main.main-content', 'main.page-content', 'main', '.gpa-page', '.dashboard', '.groups-container', '.profile-page', '.friends-page'];
+        var i;
+        for (i = 0; i < scopes.length; i++) {
+            try {
+                var scope = global.document.querySelector(scopes[i]);
+                if (scope) {
+                    var scoped = scope.querySelector(selector);
+                    if (scoped && isTourVisible(scoped) && !isInSidebar(scoped)) return scoped;
+                }
+            } catch (_) {}
+        }
         try {
             var el = global.document.querySelector(selector);
             if (el && isTourVisible(el) && !isInSidebar(el)) return el;
         } catch (_) {}
         return null;
+    }
+
+    function getTooltipHeight() {
+        if (!tooltipEl) return TOOLTIP_RESERVE;
+        var h = tooltipEl.offsetHeight;
+        if (!h && tooltipEl.getBoundingClientRect) {
+            h = tooltipEl.getBoundingClientRect().height;
+        }
+        return Math.max(TOOLTIP_RESERVE, (h || 200) + 32);
     }
 
     function closeTourDropdowns() {
@@ -377,8 +397,18 @@
         });
     }
 
+    function ensureTourOnTop() {
+        if (rootEl && rootEl.parentNode !== global.document.body) {
+            global.document.body.appendChild(rootEl);
+        }
+        if (tooltipEl && rootEl && tooltipEl.parentNode === rootEl) {
+            rootEl.appendChild(tooltipEl);
+        }
+    }
+
     function positionTooltipBottom() {
         if (!tooltipEl) return;
+        ensureTourOnTop();
         tooltipEl.classList.remove('is-anchor');
         tooltipEl.classList.add('is-bottom');
         tooltipEl.style.top = 'auto';
@@ -390,6 +420,7 @@
 
     function updateStepLayout(el) {
         if (!active || !el || !spotlightEl) return;
+        ensureTourOnTop();
         var rect = el.getBoundingClientRect();
         if (rect.width < 4 || rect.height < 4) {
             spotlightEl.style.display = 'none';
@@ -399,13 +430,19 @@
         var vh = global.innerHeight;
         var vw = global.innerWidth;
         var margin = 12;
+        var reserve = getTooltipHeight() + 16;
+        var maxBottom = vh - reserve;
         var top = Math.max(margin, rect.top - PAD);
         var left = Math.max(margin, rect.left - PAD);
-        var width = rect.width + PAD * 2;
+        var width = Math.min(rect.width + PAD * 2, vw - margin * 2);
         var height = rect.height + PAD * 2;
-        if (left + width > vw - margin) width = vw - margin - left;
-        if (top + height > vh - TOOLTIP_RESERVE - margin) height = vh - TOOLTIP_RESERVE - margin - top;
-        if (width < 8 || height < 8) {
+        if (top + height > maxBottom) {
+            top = Math.max(margin, maxBottom - height);
+        }
+        if (left + width > vw - margin) {
+            left = Math.max(margin, vw - margin - width);
+        }
+        if (width < 8 || height < 8 || top < margin) {
             spotlightEl.style.display = 'none';
         } else {
             spotlightEl.style.display = 'block';
@@ -460,9 +497,16 @@
     function scrollToTarget(el) {
         if (!el) return;
         var rect = el.getBoundingClientRect();
-        var offset = 80;
-        var y = global.scrollY + rect.top - offset;
-        applyTourScroll(Math.max(0, Math.min(y, getMaxTourScroll())));
+        var reserve = getTooltipHeight() + 24;
+        var topPad = 72;
+        var scrollY = global.scrollY || 0;
+        if (rect.top < topPad) {
+            scrollY += rect.top - topPad;
+        }
+        if (rect.bottom > global.innerHeight - reserve) {
+            scrollY += rect.bottom - (global.innerHeight - reserve);
+        }
+        applyTourScroll(Math.max(0, Math.min(scrollY, getMaxTourScroll())));
     }
 
     function layoutStep(el, done) {
@@ -625,9 +669,7 @@
             positionTooltipBottom();
         }
 
-        if (rootEl && tooltipEl && tooltipEl.parentNode === rootEl) {
-            rootEl.appendChild(tooltipEl);
-        }
+        ensureTourOnTop();
     }
 
     function bindResize() {

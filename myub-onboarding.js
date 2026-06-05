@@ -42,7 +42,7 @@
         {
             file: 'schedule.html',
             steps: [
-                { selector: '[data-tour="schedule-calendar"]', title: 'Schedule', body: 'Your calendar and upcoming events live here — switch views and add classes from the toolbar above.' }
+                { selector: '[data-tour="schedule-page"]', title: 'Schedule', body: 'Your calendar and upcoming events live here — switch views and add classes from the toolbar above.', fullHeight: true }
             ]
         },
         {
@@ -54,25 +54,25 @@
         {
             file: 'notes.html',
             steps: [
-                { selector: '[data-tour="notes-toolbar"]', title: 'Notes', body: 'Create notes with New Note, search and filter here, and your library fills in below.' }
+                { selector: '[data-tour="notes-header"]', title: 'Notes', body: 'Create notes with New Note, upload files, then search and filter your library below.' }
             ]
         },
         {
             file: 'past-papers.html',
             steps: [
-                { selector: '[data-tour="papers-upload"]', title: 'Past Papers', body: 'Upload exam papers for classmates, then search and browse shared resources below.' }
+                { selector: '[data-tour="papers-upload"]', title: 'Past Papers', body: 'Upload exam papers for classmates, then search and browse shared resources below.', compact: true }
             ]
         },
         {
             file: 'study-groups.html',
             steps: [
-                { selector: '[data-tour="groups-panel"]', title: 'Study Groups', body: 'Find or create groups on the left, then chat and share files in the workspace on the right.' }
+                { selector: '[data-tour="groups-container"]', title: 'Study Groups', body: 'Find or create groups on the left, then chat and share files in the workspace on the right.', fullHeight: true }
             ]
         },
         {
             file: 'messages.html',
             steps: [
-                { selector: '[data-tour="messages-main"]', title: 'Messages', body: 'Pick a conversation on the left, then read and send messages on the right.' }
+                { selector: '[data-tour="messages-main"]', title: 'Messages', body: 'Pick a conversation on the left, then read and send messages on the right.', fullHeight: true }
             ]
         },
         {
@@ -357,7 +357,7 @@
 
     function findTarget(selector) {
         if (!selector) return null;
-        var scopes = ['main.main-content', 'main.page-content', 'main', '.gpa-page', '.dashboard', '.groups-container', '.groups-panel', '.messages-container', '.profile-page', '.friends-page', '.friends-main', '.calendar-container'];
+        var scopes = ['main.main-content', 'main.page-content', 'main', '.gpa-page', '.dashboard', '.groups-container', '.groups-panel', '.messages-container', '.profile-page', '.friends-page', '.friends-main', '.calendar-container', '.notes-header'];
         var i;
         for (i = 0; i < scopes.length; i++) {
             try {
@@ -408,19 +408,38 @@
         } catch (_) {}
         global.document.querySelectorAll(
             '[data-tour], .welcome-banner, .card, .quick-action, .progression-card, ' +
-            '.schedule-header, .calendar-container, .groups-panel, .groups-container, ' +
+            '.schedule-header, .schedule-layout, .calendar-container, .groups-panel, .groups-container, ' +
             '.friends-page, .stats-bar, .tabs, .messages-container, .profile-header-card, ' +
-            '.topbar, .main-grid > .card'
+            '.profile-avatar-wrapper, .profile-avatar, .topbar, .main-grid > .card, .notes-header'
         ).forEach(function (el) {
+            if (el.tagName === 'IMG') return;
             el.style.transform = '';
-            el.style.opacity = '';
-            el.style.visibility = '';
+            el.style.opacity = '1';
+            el.style.visibility = 'visible';
         });
     }
 
-    function getMaxSpotlightHeight() {
+    function ensureHighlightedMedia(el) {
+        if (!el || !el.querySelectorAll) return;
+        el.querySelectorAll('img').forEach(function (img) {
+            img.loading = 'eager';
+            img.style.opacity = '1';
+            img.style.visibility = 'visible';
+            if (!img.complete && img.src) {
+                var src = img.src;
+                img.src = '';
+                img.src = src;
+            }
+        });
+    }
+
+    function getMaxSpotlightHeight(top, maxBottom) {
         var vh = global.innerHeight;
         var reserve = getTooltipHeight() + 24;
+        var step = getCurrentStep();
+        if (step && step.fullHeight) {
+            return Math.max(MIN_SPOTLIGHT_H, maxBottom - Math.max(12, top));
+        }
         return Math.max(MIN_SPOTLIGHT_H, Math.min(420, Math.floor(vh * 0.45), vh - reserve - TOUR_TOP_PAD));
     }
 
@@ -448,6 +467,7 @@
     function updateStepLayout(el) {
         if (!active || !el || !spotlightEl) return;
         ensureTourOnTop();
+        ensureHighlightedMedia(el);
         el.offsetHeight;
         var rect = el.getBoundingClientRect();
         if (rect.width < 4 || rect.height < 4) {
@@ -455,24 +475,37 @@
             positionTooltipBottom();
             return;
         }
+        var step = getCurrentStep();
         var vh = global.innerHeight;
         var vw = global.innerWidth;
         var margin = 12;
         var reserve = getTooltipHeight() + 16;
         var maxBottom = vh - reserve;
-        var maxSpotH = getMaxSpotlightHeight();
         var top = Math.max(margin, rect.top - PAD);
         var left = Math.max(margin, rect.left - PAD);
-        var width = Math.min(rect.width + PAD * 2, vw - margin * 2);
-        var height = Math.min(rect.height + PAD * 2, maxSpotH);
-        if (top + height > maxBottom) {
-            height = Math.max(MIN_SPOTLIGHT_H, maxBottom - top);
-        }
-        if (height < MIN_SPOTLIGHT_H && rect.height >= 24) {
-            height = Math.min(maxSpotH, Math.max(MIN_SPOTLIGHT_H, maxBottom - top));
+        var width;
+        var height;
+        if (step && step.compact) {
+            width = rect.width + PAD * 2;
+            height = rect.height + PAD * 2;
+            top = rect.top - PAD;
+            left = rect.left - PAD;
+        } else {
+            var maxSpotH = getMaxSpotlightHeight(top, maxBottom);
+            width = Math.min(rect.width + PAD * 2, vw - margin * 2);
+            height = Math.min(rect.height + PAD * 2, maxSpotH);
+            if (top + height > maxBottom) {
+                height = Math.max(MIN_SPOTLIGHT_H, maxBottom - top);
+            }
+            if (height < MIN_SPOTLIGHT_H && rect.height >= 24) {
+                height = Math.min(maxSpotH, Math.max(MIN_SPOTLIGHT_H, maxBottom - top));
+            }
         }
         if (left + width > vw - margin) {
             left = Math.max(margin, vw - margin - width);
+        }
+        if (top + height > maxBottom) {
+            height = Math.max(MIN_SPOTLIGHT_H, maxBottom - top);
         }
         if (width < 8 || height < 8) {
             spotlightEl.style.display = 'none';
@@ -484,9 +517,13 @@
             spotlightEl.style.height = height + 'px';
             try {
                 var br = global.getComputedStyle(el).borderRadius;
-                spotlightEl.style.borderRadius = br && br !== '0px' ? br : '12px';
+                if (step && step.compact) {
+                    spotlightEl.style.borderRadius = '10px';
+                } else {
+                    spotlightEl.style.borderRadius = br && br !== '0px' ? br : '12px';
+                }
             } catch (_) {
-                spotlightEl.style.borderRadius = '12px';
+                spotlightEl.style.borderRadius = step && step.compact ? '10px' : '12px';
             }
         }
         positionTooltipBottom();
@@ -894,6 +931,16 @@
         return main.offsetWidth > 0 || main.offsetHeight > 0;
     }
 
+    function isProfileTourReady() {
+        if (getPageFile() !== 'profile.html') return true;
+        var name = global.document.getElementById('profileName');
+        var avatar = global.document.getElementById('profileAvatar');
+        if (!name || !avatar) return false;
+        if (!name.textContent || !name.textContent.trim()) return false;
+        if (avatar.textContent === '--' && !avatar.querySelector('img')) return false;
+        return true;
+    }
+
     function isPageReadyForTour() {
         var loading = getLoadingEl();
         var loadingDone = !loading;
@@ -904,7 +951,7 @@
                 loadingDone = true;
             }
         }
-        return loadingDone && isMainContentVisible();
+        return loadingDone && isMainContentVisible() && isProfileTourReady();
     }
 
     function waitForPageReady(callback, attempts) {

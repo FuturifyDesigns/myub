@@ -23,8 +23,8 @@
     <script src="myub-utils.js"></script>
     <script src="myub-mobile.js"></script>
     <script src="myub-sidebar.js"></script>
-    <link rel="stylesheet" href="myub-onboarding.css?v=14">
-    <script src="myub-onboarding.js?v=14"></script>
+    <link rel="stylesheet" href="myub-onboarding.css?v=15">
+    <script src="myub-onboarding.js?v=15"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
     <style>
         /* ==========================================================
@@ -2457,7 +2457,7 @@
             const avatarEl = document.getElementById('profileAvatar');
             if (avatarEl) {
                 if (user.avatar_url) {
-                    avatarEl.innerHTML = `<img src="${user.avatar_url}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" loading="lazy" decoding="async">`;
+                    avatarEl.innerHTML = `<img src="${user.avatar_url}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" loading="eager" decoding="async" fetchpriority="high">`;
                 } else {
                     avatarEl.innerHTML = initials;
                 }
@@ -2598,7 +2598,7 @@
 
             const avatar = document.getElementById('profileAvatar');
             if (p.avatar_url) {
-                avatar.innerHTML = `<img src="${p.avatar_url}" alt="Avatar" loading="lazy" decoding="async">`;
+                avatar.innerHTML = `<img src="${p.avatar_url}" alt="Avatar" loading="eager" decoding="async" fetchpriority="high">`;
             } else {
                 avatar.textContent = getInitials(p.first_name, p.last_name);
             }

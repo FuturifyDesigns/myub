@@ -24,8 +24,8 @@
     <script src="myub-utils.js"></script>
     <script src="myub-mobile.js"></script>
     <script src="myub-sidebar.js"></script>
-    <link rel="stylesheet" href="myub-onboarding.css?v=14">
-    <script src="myub-onboarding.js?v=14"></script>
+    <link rel="stylesheet" href="myub-onboarding.css?v=15">
+    <script src="myub-onboarding.js?v=15"></script>
     <script src="myub-upload.js"></script>
     <style>
         /* ==========================================================
@@ -626,6 +626,13 @@
             box-shadow: 0 14px 34px -10px rgba(196, 30, 58, 0.5);
         }
         .topbar-right
+
+        .notes-header {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 22px;
+        }
 
         /* ========== CONTENT AREA ========== */
         .content-area {
@@ -1958,6 +1965,7 @@
         </nav>
     </aside>
     <main class="main-content">
+        <div class="notes-header" data-tour="notes-header">
         <div class="topbar">
             <div class="topbar-left">
                 <button class="menu-toggle" onclick="toggleSidebar()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
@@ -1975,7 +1983,6 @@
         <div class="upload-hint-line" style="padding:0 28px;margin-top:-4px;font-size:12px;color:var(--text-muted,rgba(255,255,255,.5));">
             Accepted: PDF, JPG, PNG, DOCX · Max 10&nbsp;MB per file
         </div>
-        <div class="content-area">
             <div class="toolbar" data-tour="notes-toolbar">
                 <div class="search-box"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg><input type="text" id="searchInput" placeholder="Search notes..." oninput="filterNotes()"></div>
                 <button class="filter-btn" id="pinnedFilter" onclick="toggleFilter('pinned')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>Pinned</button>
@@ -1984,6 +1991,8 @@
                     <button class="view-btn" id="listViewBtn" onclick="setView('list')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg></button>
                 </div>
             </div>
+        </div>
+        <div class="content-area">
             <div class="notes-library" data-tour="notes-library">
             <div class="notes-grid active" id="notesGrid"></div>
             <div class="notes-list" id="notesList"></div>

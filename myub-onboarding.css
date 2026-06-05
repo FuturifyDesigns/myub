@@ -67,14 +67,19 @@ body.myub-tour-active .myub-tour-highlight {
     transform: translateX(-50%) !important;
 }
 
-[data-tour="groups-panel"],
-[data-tour="schedule-calendar"],
+[data-tour="groups-container"],
+[data-tour="schedule-page"],
 [data-tour="messages-main"],
 [data-tour="friends-main"],
 [data-tour="profile-header"],
+[data-tour="notes-header"],
 [data-tour="quick-actions"],
 [data-tour="gpa-progression"] {
     min-height: 120px;
+}
+
+[data-tour="papers-upload"] {
+    min-height: 0;
 }
 
 .myub-tour-step-label {

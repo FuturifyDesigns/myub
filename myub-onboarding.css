@@ -67,12 +67,14 @@ body.myub-tour-active .myub-tour-highlight {
     transform: translateX(-50%) !important;
 }
 
-[data-tour="groups-container"],
-[data-tour="schedule-main"],
+[data-tour="groups-panel"],
+[data-tour="schedule-calendar"],
 [data-tour="messages-main"],
-[data-tour="friends-page"],
-[data-tour="profile-header"] {
-    min-height: 280px;
+[data-tour="friends-main"],
+[data-tour="profile-header"],
+[data-tour="quick-actions"],
+[data-tour="gpa-progression"] {
+    min-height: 120px;
 }
 
 .myub-tour-step-label {

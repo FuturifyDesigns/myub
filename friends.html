@@ -24,8 +24,8 @@
     <script src="myub-utils.js"></script>
     <script src="myub-mobile.js"></script>
     <script src="myub-sidebar.js"></script>
-    <link rel="stylesheet" href="myub-onboarding.css?v=13">
-    <script src="myub-onboarding.js?v=13"></script>
+    <link rel="stylesheet" href="myub-onboarding.css?v=14">
+    <script src="myub-onboarding.js?v=14"></script>
     <style>
         /* ==========================================================
            MyUB Friends — dark navy/red theme
@@ -558,6 +558,12 @@
             gap: 22px;
             max-width: 1200px;
             margin: 0 auto;
+        }
+
+        .friends-main {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
         }
 
         /* Stats bar */
@@ -2388,18 +2394,20 @@
             </div>
         </header>
 
-        <div class="friends-page" data-tour="friends-page">
-            <div class="stats-bar" data-tour="friends-stats">
-                <div class="stat-card"><div class="stat-value" id="totalFriends">0</div><div class="stat-label">Total Friends</div></div>
-                <div class="stat-card online"><div class="stat-value" id="onlineFriends">0</div><div class="stat-label">Online Now</div></div>
-                <div class="stat-card" style="cursor: pointer;" onclick="openBlockedModal()" title="View blocked users"><div class="stat-value" id="blockedCount">0</div><div class="stat-label">Blocked</div></div>
-            </div>
+        <div class="friends-page">
+            <div class="friends-main" data-tour="friends-main">
+                <div class="stats-bar" data-tour="friends-stats">
+                    <div class="stat-card"><div class="stat-value" id="totalFriends">0</div><div class="stat-label">Total Friends</div></div>
+                    <div class="stat-card online"><div class="stat-value" id="onlineFriends">0</div><div class="stat-label">Online Now</div></div>
+                    <div class="stat-card" style="cursor: pointer;" onclick="openBlockedModal()" title="View blocked users"><div class="stat-value" id="blockedCount">0</div><div class="stat-label">Blocked</div></div>
+                </div>
 
-            <div class="tabs" data-tour="friends-tabs">
-                <button class="tab active" data-tab="friends" onclick="switchTab('friends')">All Friends</button>
-                <button class="tab" data-tab="requests" onclick="switchTab('requests')">Requests<span class="count" id="requestsCount" style="display:none;">0</span></button>
-                <button class="tab" data-tab="find" onclick="switchTab('find')">Find Students</button>
-                <button class="tab" data-tab="discover" onclick="switchTab('discover')">Discover</button>
+                <div class="tabs" data-tour="friends-tabs">
+                    <button class="tab active" data-tab="friends" onclick="switchTab('friends')">All Friends</button>
+                    <button class="tab" data-tab="requests" onclick="switchTab('requests')">Requests<span class="count" id="requestsCount" style="display:none;">0</span></button>
+                    <button class="tab" data-tab="find" onclick="switchTab('find')">Find Students</button>
+                    <button class="tab" data-tab="discover" onclick="switchTab('discover')">Discover</button>
+                </div>
             </div>
 
             <div class="tab-content active" id="friendsTab">

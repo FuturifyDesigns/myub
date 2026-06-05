@@ -17,11 +17,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="myub-security.js"></script>
+    <script src="myub-calls.js" defer></script>
     <script src="myub-utils.js"></script>
     <script src="myub-mobile.js"></script>
     <script src="myub-sidebar.js?v=2"></script>
-    <link rel="stylesheet" href="myub-onboarding.css?v=13">
-    <script src="myub-onboarding.js?v=13"></script>
+    <link rel="stylesheet" href="myub-onboarding.css?v=14">
+    <script src="myub-onboarding.js?v=14"></script>
     <style>
         /* ==========================================================
            MyUB Messages — dark navy/red theme
@@ -2798,17 +2799,10 @@
             if (!session) { window.location.href = 'index.html'; return; }
             currentUser = session.user;
             
-            // Initialize MyUBCalls after user session is confirmed
-            console.log('[DEBUG] Initializing MyUBCalls...');
-            if (window.MyUBCalls) {
-                try {
-                    window.MyUBCalls.init(supabaseClient);
-                    console.log('[DEBUG] MyUBCalls initialized successfully');
-                } catch (error) {
-                    console.error('[DEBUG] MyUBCalls initialization error:', error);
-                }
-            } else {
-                console.error('[DEBUG] MyUBCalls not found on window object');
+            if (window.ensureMyUBCalls) {
+                ensureMyUBCalls(supabaseClient);
+            } else if (window.MyUBCalls) {
+                MyUBCalls.init(supabaseClient);
             }
             
             // Check if user is banned
@@ -4152,9 +4146,6 @@
         init();
     </script>
 
-    <!-- MyUB Calls Script -->
-    <script src="myub-calls.js" defer></script>
-    
     <!-- MyUB Heartbeat Script -->
     <script src="myub-heartbeat.js"></script>
     <script>

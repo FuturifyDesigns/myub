@@ -6,6 +6,8 @@
 
     var PAD = 6;
     var TOOLTIP_RESERVE = 260;
+    var MIN_SPOTLIGHT_H = 72;
+    var TOUR_TOP_PAD = 72;
     var cachedUserId = null;
     var active = false;
     var pageIndex = 0;
@@ -40,7 +42,7 @@
         {
             file: 'schedule.html',
             steps: [
-                { selector: '[data-tour="schedule-main"]', title: 'Schedule', body: 'Your calendar and upcoming events live here — switch views and add classes from the toolbar above.' }
+                { selector: '[data-tour="schedule-calendar"]', title: 'Schedule', body: 'Your calendar and upcoming events live here — switch views and add classes from the toolbar above.' }
             ]
         },
         {
@@ -64,7 +66,7 @@
         {
             file: 'study-groups.html',
             steps: [
-                { selector: '[data-tour="groups-container"]', title: 'Study Groups', body: 'Find or create groups on the left, then chat and share files in the workspace on the right.' }
+                { selector: '[data-tour="groups-panel"]', title: 'Study Groups', body: 'Find or create groups on the left, then chat and share files in the workspace on the right.' }
             ]
         },
         {
@@ -76,7 +78,7 @@
         {
             file: 'friends.html',
             steps: [
-                { selector: '[data-tour="friends-page"]', title: 'Friends', body: 'See your friends, handle requests, and search for students to connect with.' }
+                { selector: '[data-tour="friends-main"]', title: 'Friends', body: 'See your friends, handle requests, and search for students to connect with.' }
             ]
         },
         {
@@ -355,7 +357,7 @@
 
     function findTarget(selector) {
         if (!selector) return null;
-        var scopes = ['main.main-content', 'main.page-content', 'main', '.gpa-page', '.dashboard', '.groups-container', '.messages-container', '.profile-page', '.friends-page'];
+        var scopes = ['main.main-content', 'main.page-content', 'main', '.gpa-page', '.dashboard', '.groups-container', '.groups-panel', '.messages-container', '.profile-page', '.friends-page', '.friends-main', '.calendar-container'];
         var i;
         for (i = 0; i < scopes.length; i++) {
             try {
@@ -398,6 +400,30 @@
         });
     }
 
+    function stabilizePageForTour() {
+        try {
+            if (global.gsap && global.gsap.globalTimeline) {
+                global.gsap.globalTimeline.pause();
+            }
+        } catch (_) {}
+        global.document.querySelectorAll(
+            '[data-tour], .welcome-banner, .card, .quick-action, .progression-card, ' +
+            '.schedule-header, .calendar-container, .groups-panel, .groups-container, ' +
+            '.friends-page, .stats-bar, .tabs, .messages-container, .profile-header-card, ' +
+            '.topbar, .main-grid > .card'
+        ).forEach(function (el) {
+            el.style.transform = '';
+            el.style.opacity = '';
+            el.style.visibility = '';
+        });
+    }
+
+    function getMaxSpotlightHeight() {
+        var vh = global.innerHeight;
+        var reserve = getTooltipHeight() + 24;
+        return Math.max(MIN_SPOTLIGHT_H, Math.min(420, Math.floor(vh * 0.45), vh - reserve - TOUR_TOP_PAD));
+    }
+
     function ensureTourOnTop() {
         if (rootEl && rootEl.parentNode !== global.document.body) {
             global.document.body.appendChild(rootEl);
@@ -422,6 +448,7 @@
     function updateStepLayout(el) {
         if (!active || !el || !spotlightEl) return;
         ensureTourOnTop();
+        el.offsetHeight;
         var rect = el.getBoundingClientRect();
         if (rect.width < 4 || rect.height < 4) {
             spotlightEl.style.display = 'none';
@@ -433,12 +460,16 @@
         var margin = 12;
         var reserve = getTooltipHeight() + 16;
         var maxBottom = vh - reserve;
+        var maxSpotH = getMaxSpotlightHeight();
         var top = Math.max(margin, rect.top - PAD);
         var left = Math.max(margin, rect.left - PAD);
         var width = Math.min(rect.width + PAD * 2, vw - margin * 2);
-        var height = rect.height + PAD * 2;
+        var height = Math.min(rect.height + PAD * 2, maxSpotH);
         if (top + height > maxBottom) {
-            height = Math.max(8, maxBottom - top);
+            height = Math.max(MIN_SPOTLIGHT_H, maxBottom - top);
+        }
+        if (height < MIN_SPOTLIGHT_H && rect.height >= 24) {
+            height = Math.min(maxSpotH, Math.max(MIN_SPOTLIGHT_H, maxBottom - top));
         }
         if (left + width > vw - margin) {
             left = Math.max(margin, vw - margin - width);
@@ -498,15 +529,7 @@
     function scrollToTarget(el) {
         if (!el) return;
         var rect = el.getBoundingClientRect();
-        var reserve = getTooltipHeight() + 24;
-        var topPad = 72;
-        var scrollY = global.scrollY || 0;
-        if (rect.top < topPad) {
-            scrollY += rect.top - topPad;
-        }
-        if (rect.bottom > global.innerHeight - reserve) {
-            scrollY += rect.bottom - (global.innerHeight - reserve);
-        }
+        var scrollY = (global.scrollY || 0) + rect.top - TOUR_TOP_PAD;
         applyTourScroll(Math.max(0, Math.min(scrollY, getMaxTourScroll())));
     }
 
@@ -515,6 +538,7 @@
             if (done) done();
             return;
         }
+        stabilizePageForTour();
         scrollToTarget(el);
         waitForLayoutSettled(function () {
             if (!active || highlightedEl !== el) {
@@ -522,7 +546,20 @@
                 return;
             }
             updateStepLayout(el);
-            if (done) done();
+            global.setTimeout(function () {
+                if (!active || highlightedEl !== el) {
+                    if (done) done();
+                    return;
+                }
+                stabilizePageForTour();
+                scrollToTarget(el);
+                waitForLayoutSettled(function () {
+                    if (active && highlightedEl === el) {
+                        updateStepLayout(el);
+                    }
+                    if (done) done();
+                });
+            }, 380);
         });
     }
 
@@ -691,6 +728,7 @@
             scrollToTop();
         }
 
+        stabilizePageForTour();
         var el = findTarget(step.selector);
         if (el) {
             applyStepHighlight(el);

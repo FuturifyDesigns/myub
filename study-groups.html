@@ -4249,7 +4249,9 @@
                 initGroupCallPeerJS(); // Initialize PeerJS for group calls
                 subscribeToGroupCallSignals(); // Listen for group call notifications
                 // Initialize unified call handler for 1-on-1 call notifications
-                if (window.MyUBCalls) {
+                if (window.ensureMyUBCalls) {
+                    ensureMyUBCalls(supabaseClient);
+                } else if (window.MyUBCalls) {
                     MyUBCalls.init(supabaseClient);
                 }
                 setupEmojiPicker();
@@ -4403,6 +4405,10 @@
         async function loadMyGroups() {
             try {
                 var result = await supabaseClient.from('study_group_members').select('group_id, role, study_groups(*)').eq('user_id', currentUser.id).neq('role', 'banned');
+                if (result.error) {
+                    console.error('loadMyGroups error:', result.error.message || result.error);
+                    return;
+                }
                 if (result.data) {
                     myGroups = result.data.map(function(m) {
                         if (!m.study_groups) return null;
@@ -4425,10 +4431,11 @@
                         return bT - aT;
                     });
                 }
-                document.getElementById('myGroupsCount').textContent = myGroups.length;
+                var countEl = document.getElementById('myGroupsCount');
+                if (countEl) countEl.textContent = myGroups.length;
                 updateCreatedCount();
                 renderGroups();
-            } catch(e) { console.error('loadMyGroups error:', e); }
+            } catch(e) { console.error('loadMyGroups error:', e && e.message ? e.message : e); }
         }
         
         async function loadDiscoverGroups() {
@@ -4633,7 +4640,8 @@
             var container = document.getElementById('groupsList');
             var activeTab = document.querySelector('.tab-btn.active');
             var tab = activeTab ? activeTab.dataset.tab : 'my';
-            var query = document.getElementById('searchInput').value.toLowerCase();
+            var searchInput = document.getElementById('searchInput');
+            var query = searchInput ? searchInput.value.toLowerCase() : '';
             var groups = tab === 'my' ? myGroups : discoverGroups;
             
             if (query) {
@@ -5293,8 +5301,12 @@
         
         function updateCreatedCount() {
             createdCount = myGroups.filter(function(g) { return g.creator_id === currentUser.id; }).length;
-            document.getElementById('groupsLimit').textContent = 'You can create up to ' + MAX_GROUPS + ' groups (' + createdCount + '/' + MAX_GROUPS + ' used)';
-            document.getElementById('createBtn').disabled = createdCount >= MAX_GROUPS;
+            var limitEl = document.getElementById('groupsLimit');
+            if (limitEl) {
+                limitEl.textContent = 'You can create up to ' + MAX_GROUPS + ' groups (' + createdCount + '/' + MAX_GROUPS + ' used)';
+            }
+            var createBtn = document.getElementById('createBtn');
+            if (createBtn) createBtn.disabled = createdCount >= MAX_GROUPS;
             var topbarBtn = document.getElementById('createBtnTopbar');
             if (topbarBtn) topbarBtn.disabled = createdCount >= MAX_GROUPS;
         }

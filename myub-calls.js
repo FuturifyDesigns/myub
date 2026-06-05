@@ -933,4 +933,16 @@
         toggleVideo: toggleVideo
     };
 
+    window.ensureMyUBCalls = function (client, attempts) {
+        if (!client) return;
+        attempts = attempts || 0;
+        if (window.MyUBCalls && typeof window.MyUBCalls.init === 'function') {
+            window.MyUBCalls.init(client);
+            return;
+        }
+        if (attempts < 60) {
+            setTimeout(function () { window.ensureMyUBCalls(client, attempts + 1); }, 100);
+        }
+    };
+
 })();

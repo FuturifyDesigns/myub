@@ -29,8 +29,8 @@
         {
             file: 'dashboard.html',
             steps: [
-                { selector: '[data-tour="welcome-banner"]', title: 'Dashboard', body: 'Your home screen — stats up top, quick actions below, and search plus notifications in the header.' },
-                { selector: '[data-tour="quick-actions"]', title: 'Quick actions', body: 'One-tap shortcuts to GPA, notes, schedule, messages, and more.' }
+                { selector: '[data-tour="welcome-banner"]', title: 'Dashboard', body: 'Your home screen — stats up top, quick actions below, and search plus notifications in the header.', fit: true },
+                { selector: '[data-tour="quick-actions"]', title: 'Quick actions', body: 'One-tap shortcuts to GPA, notes, schedule, messages, and more.', fit: true }
             ]
         },
         {
@@ -42,7 +42,7 @@
         {
             file: 'schedule.html',
             steps: [
-                { selector: '[data-tour="schedule-page"]', title: 'Schedule', body: 'Your calendar and upcoming events live here — switch views and add classes from the toolbar above.', fullHeight: true }
+                { selector: '[data-tour="schedule-header"]', title: 'Schedule', body: 'Switch between month, week, and list views, navigate dates, and add events from here.', fit: true }
             ]
         },
         {
@@ -78,7 +78,7 @@
         {
             file: 'friends.html',
             steps: [
-                { selector: '[data-tour="friends-main"]', title: 'Friends', body: 'See your friends, handle requests, and search for students to connect with.' }
+                { selector: '[data-tour="friends-main"]', title: 'Friends', body: 'See your friends, handle requests, and search for students to connect with.', fit: true }
             ]
         },
         {
@@ -410,13 +410,52 @@
             '[data-tour], .welcome-banner, .card, .quick-action, .progression-card, ' +
             '.schedule-header, .schedule-layout, .calendar-container, .groups-panel, .groups-container, ' +
             '.friends-page, .stats-bar, .tabs, .messages-container, .profile-header-card, ' +
-            '.profile-avatar-wrapper, .profile-avatar, .topbar, .main-grid > .card, .notes-header'
+            '.profile-avatar-wrapper, .profile-avatar, .topbar, .main-grid, .main-grid > .card, .notes-header, ' +
+            '.stat-card, .stat-value, .groups-panel, .chat-panel, .conversations-panel'
         ).forEach(function (el) {
             if (el.tagName === 'IMG') return;
             el.style.transform = '';
             el.style.opacity = '1';
             el.style.visibility = 'visible';
         });
+    }
+
+    function getTargetRect(el) {
+        if (!el || !el.getBoundingClientRect) return null;
+        var rect = el.getBoundingClientRect();
+        var step = getCurrentStep();
+        if (step && step.fullHeight && el.children && el.children.length >= 2) {
+            var union = null;
+            var i;
+            for (i = 0; i < el.children.length; i++) {
+                var child = el.children[i];
+                if (!child || !child.getBoundingClientRect) continue;
+                try {
+                    if (global.getComputedStyle(child).display === 'none') continue;
+                } catch (_) {}
+                var cr = child.getBoundingClientRect();
+                if (cr.width < 2 || cr.height < 2) continue;
+                if (!union) {
+                    union = { top: cr.top, left: cr.left, right: cr.right, bottom: cr.bottom };
+                } else {
+                    union.top = Math.min(union.top, cr.top);
+                    union.left = Math.min(union.left, cr.left);
+                    union.right = Math.max(union.right, cr.right);
+                    union.bottom = Math.max(union.bottom, cr.bottom);
+                }
+            }
+            if (union) {
+                return {
+                    top: union.top,
+                    left: union.left,
+                    width: union.right - union.left,
+                    height: union.bottom - union.top,
+                    right: union.right,
+                    bottom: union.bottom
+                };
+            }
+        }
+        return rect;
     }
 
     function ensureHighlightedMedia(el) {
@@ -469,8 +508,8 @@
         ensureTourOnTop();
         ensureHighlightedMedia(el);
         el.offsetHeight;
-        var rect = el.getBoundingClientRect();
-        if (rect.width < 4 || rect.height < 4) {
+        var rect = getTargetRect(el);
+        if (!rect || rect.width < 4 || rect.height < 4) {
             spotlightEl.style.display = 'none';
             positionTooltipBottom();
             return;
@@ -485,11 +524,19 @@
         var left = Math.max(margin, rect.left - PAD);
         var width;
         var height;
-        if (step && step.compact) {
+        if (step && step.fullHeight) {
+            top = Math.max(margin, rect.top - PAD);
+            left = Math.max(margin, rect.left - PAD);
+            width = Math.min(rect.width + PAD * 2, vw - margin * 2);
+            height = Math.max(MIN_SPOTLIGHT_H, maxBottom - top);
+        } else if (step && (step.compact || step.fit)) {
             width = rect.width + PAD * 2;
             height = rect.height + PAD * 2;
             top = rect.top - PAD;
             left = rect.left - PAD;
+            if (top + height > maxBottom) {
+                top = Math.max(margin, maxBottom - height);
+            }
         } else {
             var maxSpotH = getMaxSpotlightHeight(top, maxBottom);
             width = Math.min(rect.width + PAD * 2, vw - margin * 2);
@@ -519,6 +566,8 @@
                 var br = global.getComputedStyle(el).borderRadius;
                 if (step && step.compact) {
                     spotlightEl.style.borderRadius = '10px';
+                } else if (step && step.fit) {
+                    spotlightEl.style.borderRadius = br && br !== '0px' ? br : '18px';
                 } else {
                     spotlightEl.style.borderRadius = br && br !== '0px' ? br : '12px';
                 }
@@ -565,8 +614,30 @@
 
     function scrollToTarget(el) {
         if (!el) return;
+        var step = getCurrentStep();
         var rect = el.getBoundingClientRect();
-        var scrollY = (global.scrollY || 0) + rect.top - TOUR_TOP_PAD;
+        var scrollY = global.scrollY || 0;
+        var reserve = getTooltipHeight() + 24;
+        var vh = global.innerHeight;
+
+        rect = getTargetRect(el) || rect;
+        if (step && step.fullHeight) {
+            if (rect.bottom > vh - reserve) {
+                scrollY += rect.bottom - (vh - reserve);
+            }
+            if (rect.top < TOUR_TOP_PAD) {
+                scrollY += rect.top - TOUR_TOP_PAD;
+            }
+        } else if (step && step.fit) {
+            if (rect.bottom > vh - reserve) {
+                scrollY += rect.bottom - (vh - reserve);
+            }
+            if (rect.top < TOUR_TOP_PAD) {
+                scrollY += rect.top - TOUR_TOP_PAD;
+            }
+        } else {
+            scrollY += rect.top - TOUR_TOP_PAD;
+        }
         applyTourScroll(Math.max(0, Math.min(scrollY, getMaxTourScroll())));
     }
 
@@ -882,6 +953,20 @@
         }
     }
 
+    function getPopupIconSvg(type) {
+        if (type === 'success') {
+            return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+                '<path d="M22 10v6"/>' +
+                '<path d="M2 10l10-6 10 6-10 6-10-6z"/>' +
+                '<path d="M6 12v5c0 1.5 2.7 3 6 3s6-1.5 6-3v-5"/>' +
+                '</svg>';
+        }
+        return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+            '<circle cx="12" cy="12" r="10"/>' +
+            '<polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>' +
+            '</svg>';
+    }
+
     function showPopup(type, title, message, btnLabel) {
         destroyTourCompletely();
         var overlay = global.document.createElement('div');
@@ -891,7 +976,7 @@
         popup.className = 'myub-tour-popup';
         var iconWrap = global.document.createElement('div');
         iconWrap.className = 'myub-tour-popup-icon ' + type;
-        iconWrap.textContent = type === 'success' ? '🎓' : '💡';
+        iconWrap.innerHTML = getPopupIconSvg(type);
         var h3 = global.document.createElement('h3');
         h3.textContent = title;
         var p = global.document.createElement('p');
@@ -931,6 +1016,11 @@
         return main.offsetWidth > 0 || main.offsetHeight > 0;
     }
 
+    function isFriendsTourReady() {
+        if (getPageFile() !== 'friends.html') return true;
+        return global.document.body.getAttribute('data-friends-stats-ready') === '1';
+    }
+
     function isProfileTourReady() {
         if (getPageFile() !== 'profile.html') return true;
         var name = global.document.getElementById('profileName');
@@ -951,7 +1041,7 @@
                 loadingDone = true;
             }
         }
-        return loadingDone && isMainContentVisible() && isProfileTourReady();
+        return loadingDone && isMainContentVisible() && isFriendsTourReady() && isProfileTourReady();
     }
 
     function waitForPageReady(callback, attempts) {

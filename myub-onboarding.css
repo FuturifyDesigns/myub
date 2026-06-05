@@ -68,14 +68,18 @@ body.myub-tour-active .myub-tour-highlight {
 }
 
 [data-tour="groups-container"],
-[data-tour="schedule-page"],
-[data-tour="messages-main"],
+[data-tour="messages-main"] {
+    min-height: calc(100vh - 220px);
+    min-height: calc(100dvh - 220px);
+}
+
+[data-tour="schedule-header"],
 [data-tour="friends-main"],
 [data-tour="profile-header"],
 [data-tour="notes-header"],
 [data-tour="quick-actions"],
 [data-tour="gpa-progression"] {
-    min-height: 120px;
+    min-height: 0;
 }
 
 [data-tour="papers-upload"] {
@@ -180,15 +184,21 @@ body.myub-tour-active .myub-tour-highlight {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 28px;
+}
+
+.myub-tour-popup-icon svg {
+    width: 28px;
+    height: 28px;
 }
 
 .myub-tour-popup-icon.success {
     background: rgba(34, 197, 94, 0.2);
+    color: #4ade80;
 }
 
 .myub-tour-popup-icon.info {
     background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
 }
 
 .myub-tour-popup h3 {

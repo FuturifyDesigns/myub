@@ -24,8 +24,8 @@
     <script src="myub-utils.js"></script>
     <script src="myub-mobile.js"></script>
     <script src="myub-sidebar.js"></script>
-    <link rel="stylesheet" href="myub-onboarding.css?v=15">
-    <script src="myub-onboarding.js?v=15"></script>
+    <link rel="stylesheet" href="myub-onboarding.css?v=16">
+    <script src="myub-onboarding.js?v=16"></script>
     <style>
         /* ==========================================================
            MyUB Friends — dark navy/red theme
@@ -2608,6 +2608,7 @@
                 document.body.classList.add('dark-mode');
             }
             await updateOnlineStatus(true);
+            document.body.removeAttribute('data-friends-stats-ready');
             await Promise.all([loadFriends(), loadRequests(), loadNotifications(), loadBlockedUsers()]);
             await loadSidebarBadges();
             subscribeToRealtime(); // Setup real-time subscriptions
@@ -3110,6 +3111,7 @@
             document.getElementById('totalFriends').textContent = friends.length;
             document.getElementById('onlineFriends').textContent = friends.filter(f => f.is_online).length;
             document.getElementById('blockedCount').textContent = blockedUsers.length;
+            document.body.setAttribute('data-friends-stats-ready', '1');
         }
 
         function switchTab(tab) {
@@ -3563,6 +3565,10 @@
                     .forEach(el => { el.style.opacity=''; el.style.transform=''; el.style.visibility=''; });
             }
             function runEntrance() {
+                if (document.documentElement.classList.contains('myub-tour-active')) {
+                    forceVisible();
+                    return;
+                }
                 const g = window.gsap;
                 if (!g) { forceVisible(); return; }
                 try {

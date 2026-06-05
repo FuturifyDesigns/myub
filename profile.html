@@ -989,6 +989,11 @@
         .other-profile-actions-row .btn {
             width: 100%;
         }
+        .other-profile-actions .btn svg {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
 
         /* ========== BUTTONS ========== */
         .btn {
@@ -1008,6 +1013,9 @@
             white-space: nowrap;
         }
         .btn svg {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
             stroke: currentColor;
             fill: none;
             stroke-width: 2;
@@ -1047,6 +1055,17 @@
         .btn-secondary:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+        }
+        .btn-outline {
+            background: var(--surface-1);
+            color: var(--text-soft);
+            border-color: var(--border);
+        }
+        .btn-outline:hover {
+            background: var(--surface-2);
+            color: var(--white);
+            border-color: var(--border-strong);
+            transform: translateY(-1px);
         }
         .btn-danger {
             background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);

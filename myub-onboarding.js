@@ -28,6 +28,7 @@
     var tooltipEl = null;
     var highlightedEl = null;
     var resizeHandler = null;
+    var viewportHandler = null;
     var scrollLockHandler = null;
     var keyLockHandler = null;
     var lockedScrollY = 0;
@@ -544,6 +545,15 @@
             var panelUnion = unionRects(panels);
             if (panelUnion) return panelUnion;
         }
+        if (step && step.fit) {
+            var fitParts = [el];
+            var ci;
+            for (ci = 0; ci < el.children.length; ci++) {
+                fitParts.push(el.children[ci]);
+            }
+            var fitUnion = unionRects(fitParts);
+            if (fitUnion) return fitUnion;
+        }
         return el.getBoundingClientRect();
     }
 
@@ -624,14 +634,11 @@
             height = rect.height + edge * 2;
             top = rect.top - edge;
             left = rect.left - edge;
-            if (top < margin) {
-                height -= (margin - top);
-                top = margin;
+            if (left < margin) {
+                var leftShift = margin - left;
+                left = margin;
+                width = Math.max(8, width - leftShift);
             }
-            if (top + height > maxBottom) {
-                top = Math.max(margin, maxBottom - height);
-            }
-            if (left < margin) left = margin;
             if (left + width > vw - margin) {
                 width = Math.max(8, vw - margin - left);
             }
@@ -723,14 +730,15 @@
         var scrollY = global.scrollY || 0;
         var reserve = getTooltipHeight() + 24;
         var vh = global.innerHeight;
-        var smooth = !!(step && (step.fit || step.panels));
+        var edge = FIT_PAD;
+        var smooth = !!(step && step.panels);
 
         if (step && (step.fit || step.panels)) {
-            if (rect.bottom > vh - reserve) {
-                scrollY += rect.bottom - (vh - reserve);
+            if (rect.bottom + edge > vh - reserve) {
+                scrollY += rect.bottom + edge - (vh - reserve);
             }
-            if (rect.top < TOUR_TOP_PAD) {
-                scrollY += rect.top - TOUR_TOP_PAD;
+            if (rect.top - edge < TOUR_TOP_PAD) {
+                scrollY += rect.top - edge - TOUR_TOP_PAD;
             }
         } else {
             scrollY += rect.top - TOUR_TOP_PAD;
@@ -745,7 +753,8 @@
         var rect = getTargetRect(el) || el.getBoundingClientRect();
         var reserve = getTooltipHeight() + 24;
         var vh = global.innerHeight;
-        return rect.bottom > vh - reserve || rect.top < TOUR_TOP_PAD;
+        var edge = FIT_PAD;
+        return rect.bottom + edge > vh - reserve || rect.top - edge < TOUR_TOP_PAD;
     }
 
     function layoutStep(el, done) {
@@ -755,10 +764,9 @@
         }
         stabilizePageForTour(el);
         var step = getCurrentStep();
-        var smooth = !!(step && (step.fit || step.panels));
         var needsScroll = targetNeedsScroll(el);
         scrollToTarget(el);
-        var scrollDelay = smooth && needsScroll ? 280 : 0;
+        var scrollDelay = needsScroll ? (step && step.panels ? 280 : 48) : 16;
         global.setTimeout(function () {
             if (!active || highlightedEl !== el) {
                 if (done) done();
@@ -770,7 +778,16 @@
                     return;
                 }
                 updateStepLayout(el);
-                if (done) done();
+                global.setTimeout(function () {
+                    if (!active || highlightedEl !== el) {
+                        if (done) done();
+                        return;
+                    }
+                    if (step && step.fit) {
+                        updateStepLayout(el);
+                    }
+                    if (done) done();
+                }, step && step.fit ? LAYOUT_SETTLE_MS : 0);
             });
         }, scrollDelay);
     }
@@ -971,9 +988,16 @@
         unbindResize();
         resizeHandler = function () {
             if (!active || !highlightedEl) return;
+            stabilizePageForTour(highlightedEl);
+            scrollToTarget(highlightedEl);
             layoutStep(highlightedEl);
         };
         global.addEventListener('resize', resizeHandler);
+        if (global.visualViewport) {
+            viewportHandler = resizeHandler;
+            global.visualViewport.addEventListener('resize', viewportHandler);
+            global.visualViewport.addEventListener('scroll', viewportHandler);
+        }
     }
 
     function unbindResize() {
@@ -981,6 +1005,11 @@
             global.removeEventListener('resize', resizeHandler);
             global.removeEventListener('scroll', resizeHandler, true);
             resizeHandler = null;
+        }
+        if (viewportHandler && global.visualViewport) {
+            global.visualViewport.removeEventListener('resize', viewportHandler);
+            global.visualViewport.removeEventListener('scroll', viewportHandler);
+            viewportHandler = null;
         }
     }
 

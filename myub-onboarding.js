@@ -5,9 +5,11 @@
     'use strict';
 
     var PAD = 6;
+    var FIT_PAD = 4;
     var TOOLTIP_RESERVE = 260;
     var MIN_SPOTLIGHT_H = 72;
     var TOUR_TOP_PAD = 72;
+    var LAYOUT_SETTLE_MS = 120;
     var cachedUserId = null;
     var active = false;
     var pageIndex = 0;
@@ -66,13 +68,13 @@
         {
             file: 'study-groups.html',
             steps: [
-                { selector: '[data-tour="groups-container"]', title: 'Study Groups', body: 'Find or create groups on the left, then chat and share files in the workspace on the right.', fullHeight: true }
+                { selector: '[data-tour="groups-container"]', title: 'Study Groups', body: 'Find or create groups on the left, then chat and share files in the workspace on the right.', panels: true }
             ]
         },
         {
             file: 'messages.html',
             steps: [
-                { selector: '[data-tour="messages-main"]', title: 'Messages', body: 'Pick a conversation on the left, then read and send messages on the right.', fullHeight: true }
+                { selector: '[data-tour="messages-main"]', title: 'Messages', body: 'Pick a conversation on the left, then read and send messages on the right.', panels: true }
             ]
         },
         {
@@ -400,62 +402,83 @@
         });
     }
 
-    function stabilizePageForTour() {
+    function stabilizePageForTour(el) {
         try {
             if (global.gsap && global.gsap.globalTimeline) {
                 global.gsap.globalTimeline.pause();
             }
         } catch (_) {}
-        global.document.querySelectorAll(
-            '[data-tour], .welcome-banner, .card, .quick-action, .progression-card, ' +
-            '.schedule-header, .schedule-layout, .calendar-container, .groups-panel, .groups-container, ' +
-            '.friends-page, .stats-bar, .tabs, .messages-container, .profile-header-card, ' +
-            '.profile-avatar-wrapper, .profile-avatar, .topbar, .main-grid, .main-grid > .card, .notes-header, ' +
-            '.stat-card, .stat-value, .groups-panel, .chat-panel, .conversations-panel'
-        ).forEach(function (el) {
-            if (el.tagName === 'IMG') return;
-            el.style.transform = '';
-            el.style.opacity = '1';
-            el.style.visibility = 'visible';
-        });
+        if (!el) return;
+        var node = el;
+        while (node && node !== global.document.body) {
+            if (node.tagName !== 'IMG') {
+                node.style.transform = '';
+                node.style.opacity = '1';
+                node.style.visibility = 'visible';
+            }
+            node = node.parentElement;
+        }
+        try {
+            el.querySelectorAll('.quick-action, .stat-card, .stat-value, img').forEach(function (child) {
+                if (child.tagName === 'IMG') {
+                    child.style.opacity = '1';
+                    child.style.visibility = 'visible';
+                    return;
+                }
+                child.style.transform = '';
+                child.style.opacity = '1';
+                child.style.visibility = 'visible';
+            });
+        } catch (_) {}
+    }
+
+    function unionRects(nodes) {
+        var union = null;
+        var i;
+        for (i = 0; i < nodes.length; i++) {
+            var child = nodes[i];
+            if (!child || !child.getBoundingClientRect) continue;
+            try {
+                if (global.getComputedStyle(child).display === 'none') continue;
+            } catch (_) {}
+            var cr = child.getBoundingClientRect();
+            if (cr.width < 2 || cr.height < 2) continue;
+            if (!union) {
+                union = { top: cr.top, left: cr.left, right: cr.right, bottom: cr.bottom };
+            } else {
+                union.top = Math.min(union.top, cr.top);
+                union.left = Math.min(union.left, cr.left);
+                union.right = Math.max(union.right, cr.right);
+                union.bottom = Math.max(union.bottom, cr.bottom);
+            }
+        }
+        if (!union) return null;
+        return {
+            top: union.top,
+            left: union.left,
+            width: union.right - union.left,
+            height: union.bottom - union.top,
+            right: union.right,
+            bottom: union.bottom
+        };
     }
 
     function getTargetRect(el) {
         if (!el || !el.getBoundingClientRect) return null;
-        var rect = el.getBoundingClientRect();
         var step = getCurrentStep();
-        if (step && step.fullHeight && el.children && el.children.length >= 2) {
-            var union = null;
-            var i;
-            for (i = 0; i < el.children.length; i++) {
-                var child = el.children[i];
-                if (!child || !child.getBoundingClientRect) continue;
-                try {
-                    if (global.getComputedStyle(child).display === 'none') continue;
-                } catch (_) {}
-                var cr = child.getBoundingClientRect();
-                if (cr.width < 2 || cr.height < 2) continue;
-                if (!union) {
-                    union = { top: cr.top, left: cr.left, right: cr.right, bottom: cr.bottom };
-                } else {
-                    union.top = Math.min(union.top, cr.top);
-                    union.left = Math.min(union.left, cr.left);
-                    union.right = Math.max(union.right, cr.right);
-                    union.bottom = Math.max(union.bottom, cr.bottom);
-                }
+        if (step && step.panels) {
+            var containerRect = el.getBoundingClientRect();
+            if (containerRect.width >= 4 && containerRect.height >= 4) {
+                return containerRect;
             }
-            if (union) {
-                return {
-                    top: union.top,
-                    left: union.left,
-                    width: union.right - union.left,
-                    height: union.bottom - union.top,
-                    right: union.right,
-                    bottom: union.bottom
-                };
+            var panels = el.querySelectorAll('.groups-panel, .chat-panel, .conversations-panel');
+            if (panels.length < 2) {
+                panels = el.children;
             }
+            var panelUnion = unionRects(panels);
+            if (panelUnion) return panelUnion;
         }
-        return rect;
+        return el.getBoundingClientRect();
     }
 
     function ensureHighlightedMedia(el) {
@@ -475,11 +498,15 @@
     function getMaxSpotlightHeight(top, maxBottom) {
         var vh = global.innerHeight;
         var reserve = getTooltipHeight() + 24;
-        var step = getCurrentStep();
-        if (step && step.fullHeight) {
-            return Math.max(MIN_SPOTLIGHT_H, maxBottom - Math.max(12, top));
-        }
         return Math.max(MIN_SPOTLIGHT_H, Math.min(420, Math.floor(vh * 0.45), vh - reserve - TOUR_TOP_PAD));
+    }
+
+    function revealSpotlight() {
+        if (!spotlightEl) return;
+        spotlightEl.style.display = 'block';
+        global.requestAnimationFrame(function () {
+            if (spotlightEl) spotlightEl.classList.add('is-visible');
+        });
     }
 
     function ensureTourOnTop() {
@@ -510,6 +537,7 @@
         el.offsetHeight;
         var rect = getTargetRect(el);
         if (!rect || rect.width < 4 || rect.height < 4) {
+            spotlightEl.classList.remove('is-visible');
             spotlightEl.style.display = 'none';
             positionTooltipBottom();
             return;
@@ -520,24 +548,30 @@
         var margin = 12;
         var reserve = getTooltipHeight() + 16;
         var maxBottom = vh - reserve;
-        var top = Math.max(margin, rect.top - PAD);
-        var left = Math.max(margin, rect.left - PAD);
+        var edge = (step && (step.compact || step.fit || step.panels)) ? FIT_PAD : PAD;
+        var top;
+        var left;
         var width;
         var height;
-        if (step && step.fullHeight) {
-            top = Math.max(margin, rect.top - PAD);
-            left = Math.max(margin, rect.left - PAD);
-            width = Math.min(rect.width + PAD * 2, vw - margin * 2);
-            height = Math.max(MIN_SPOTLIGHT_H, maxBottom - top);
-        } else if (step && (step.compact || step.fit)) {
-            width = rect.width + PAD * 2;
-            height = rect.height + PAD * 2;
-            top = rect.top - PAD;
-            left = rect.left - PAD;
+        if (step && (step.compact || step.fit || step.panels)) {
+            width = rect.width + edge * 2;
+            height = rect.height + edge * 2;
+            top = rect.top - edge;
+            left = rect.left - edge;
+            if (top < margin) {
+                height -= (margin - top);
+                top = margin;
+            }
             if (top + height > maxBottom) {
                 top = Math.max(margin, maxBottom - height);
             }
+            if (left < margin) left = margin;
+            if (left + width > vw - margin) {
+                width = Math.max(8, vw - margin - left);
+            }
         } else {
+            top = Math.max(margin, rect.top - PAD);
+            left = Math.max(margin, rect.left - PAD);
             var maxSpotH = getMaxSpotlightHeight(top, maxBottom);
             width = Math.min(rect.width + PAD * 2, vw - margin * 2);
             height = Math.min(rect.height + PAD * 2, maxSpotH);
@@ -548,16 +582,18 @@
                 height = Math.min(maxSpotH, Math.max(MIN_SPOTLIGHT_H, maxBottom - top));
             }
         }
-        if (left + width > vw - margin) {
-            left = Math.max(margin, vw - margin - width);
-        }
-        if (top + height > maxBottom) {
-            height = Math.max(MIN_SPOTLIGHT_H, maxBottom - top);
+        if (!(step && (step.compact || step.fit || step.panels))) {
+            if (left + width > vw - margin) {
+                left = Math.max(margin, vw - margin - width);
+            }
+            if (top + height > maxBottom) {
+                height = Math.max(MIN_SPOTLIGHT_H, maxBottom - top);
+            }
         }
         if (width < 8 || height < 8) {
+            spotlightEl.classList.remove('is-visible');
             spotlightEl.style.display = 'none';
         } else {
-            spotlightEl.style.display = 'block';
             spotlightEl.style.top = top + 'px';
             spotlightEl.style.left = left + 'px';
             spotlightEl.style.width = width + 'px';
@@ -566,14 +602,15 @@
                 var br = global.getComputedStyle(el).borderRadius;
                 if (step && step.compact) {
                     spotlightEl.style.borderRadius = '10px';
-                } else if (step && step.fit) {
-                    spotlightEl.style.borderRadius = br && br !== '0px' ? br : '18px';
+                } else if (step && (step.fit || step.panels)) {
+                    spotlightEl.style.borderRadius = br && br !== '0px' ? br : '16px';
                 } else {
                     spotlightEl.style.borderRadius = br && br !== '0px' ? br : '12px';
                 }
             } catch (_) {
                 spotlightEl.style.borderRadius = step && step.compact ? '10px' : '12px';
             }
+            revealSpotlight();
         }
         positionTooltipBottom();
     }
@@ -603,10 +640,11 @@
         return Math.max(0, h - global.innerHeight);
     }
 
-    function applyTourScroll(y) {
+    function applyTourScroll(y, smooth) {
         lockedScrollY = Math.max(0, Math.min(y, getMaxTourScroll()));
+        var behavior = smooth ? 'smooth' : 'auto';
         try {
-            global.scrollTo({ top: lockedScrollY, left: 0, behavior: 'auto' });
+            global.scrollTo({ top: lockedScrollY, left: 0, behavior: behavior });
         } catch (_) {
             global.scrollTo(0, lockedScrollY);
         }
@@ -615,20 +653,13 @@
     function scrollToTarget(el) {
         if (!el) return;
         var step = getCurrentStep();
-        var rect = el.getBoundingClientRect();
+        var rect = getTargetRect(el) || el.getBoundingClientRect();
         var scrollY = global.scrollY || 0;
         var reserve = getTooltipHeight() + 24;
         var vh = global.innerHeight;
+        var smooth = !!(step && (step.fit || step.panels));
 
-        rect = getTargetRect(el) || rect;
-        if (step && step.fullHeight) {
-            if (rect.bottom > vh - reserve) {
-                scrollY += rect.bottom - (vh - reserve);
-            }
-            if (rect.top < TOUR_TOP_PAD) {
-                scrollY += rect.top - TOUR_TOP_PAD;
-            }
-        } else if (step && step.fit) {
+        if (step && (step.fit || step.panels)) {
             if (rect.bottom > vh - reserve) {
                 scrollY += rect.bottom - (vh - reserve);
             }
@@ -638,7 +669,17 @@
         } else {
             scrollY += rect.top - TOUR_TOP_PAD;
         }
-        applyTourScroll(Math.max(0, Math.min(scrollY, getMaxTourScroll())));
+        applyTourScroll(Math.max(0, Math.min(scrollY, getMaxTourScroll())), smooth);
+    }
+
+    function targetNeedsScroll(el) {
+        if (!el) return false;
+        var step = getCurrentStep();
+        if (!(step && (step.fit || step.panels))) return true;
+        var rect = getTargetRect(el) || el.getBoundingClientRect();
+        var reserve = getTooltipHeight() + 24;
+        var vh = global.innerHeight;
+        return rect.bottom > vh - reserve || rect.top < TOUR_TOP_PAD;
     }
 
     function layoutStep(el, done) {
@@ -646,28 +687,32 @@
             if (done) done();
             return;
         }
-        stabilizePageForTour();
+        stabilizePageForTour(el);
+        var step = getCurrentStep();
+        var smooth = !!(step && (step.fit || step.panels));
+        var needsScroll = targetNeedsScroll(el);
         scrollToTarget(el);
+        var scrollDelay = smooth && needsScroll ? 420 : (smooth ? 140 : 0);
         waitForLayoutSettled(function () {
             if (!active || highlightedEl !== el) {
                 if (done) done();
                 return;
             }
-            updateStepLayout(el);
             global.setTimeout(function () {
                 if (!active || highlightedEl !== el) {
                     if (done) done();
                     return;
                 }
-                stabilizePageForTour();
-                scrollToTarget(el);
-                waitForLayoutSettled(function () {
-                    if (active && highlightedEl === el) {
-                        updateStepLayout(el);
+                updateStepLayout(el);
+                global.setTimeout(function () {
+                    if (!active || highlightedEl !== el) {
+                        if (done) done();
+                        return;
                     }
+                    updateStepLayout(el);
                     if (done) done();
-                });
-            }, 380);
+                }, LAYOUT_SETTLE_MS);
+            }, scrollDelay);
         });
     }
 
@@ -824,11 +869,15 @@
         }
 
         cancelStepTargetRetry();
-        spotlightEl.style.display = 'none';
         hideSidebarBand();
         clearHighlight();
         closeTourDropdowns();
         renderTooltip();
+        if (tooltipEl) {
+            tooltipEl.classList.remove('is-entering');
+            void tooltipEl.offsetWidth;
+            tooltipEl.classList.add('is-entering');
+        }
 
         if (backdropEl) backdropEl.style.display = 'none';
 
@@ -836,7 +885,6 @@
             scrollToTop();
         }
 
-        stabilizePageForTour();
         var el = findTarget(step.selector);
         if (el) {
             applyStepHighlight(el);
@@ -873,6 +921,9 @@
         lockScroll();
         rootEl.classList.add('active');
         rootEl.setAttribute('aria-hidden', 'false');
+        global.requestAnimationFrame(function () {
+            if (rootEl) rootEl.classList.add('is-ready');
+        });
         bindResize();
         showStep();
     }
@@ -889,7 +940,11 @@
             rootEl.setAttribute('aria-hidden', 'true');
         }
         if (backdropEl) backdropEl.style.display = 'none';
-        if (spotlightEl) spotlightEl.style.display = 'none';
+        if (spotlightEl) {
+            spotlightEl.classList.remove('is-visible');
+            spotlightEl.style.display = 'none';
+        }
+        if (rootEl) rootEl.classList.remove('is-ready');
     }
 
     function navigateToPage(idx, step) {

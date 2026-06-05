@@ -3,6 +3,7 @@ html.myub-tour-active,
 html.myub-tour-active body {
     overflow: hidden !important;
     overscroll-behavior: none;
+    scroll-behavior: smooth;
 }
 
 .myub-tour-root {
@@ -11,6 +12,12 @@ html.myub-tour-active body {
     z-index: 2147483646;
     pointer-events: none;
     isolation: isolate;
+    opacity: 0;
+    transition: opacity 0.45s ease;
+}
+
+.myub-tour-root.active.is-ready {
+    opacity: 1;
 }
 
 .myub-tour-root.active {
@@ -32,6 +39,19 @@ html.myub-tour-active body {
     box-shadow: 0 0 0 9999px rgba(8, 18, 38, 0.72);
     z-index: 1;
     pointer-events: none;
+    opacity: 0;
+    transition:
+        top 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+        left 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+        width 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+        height 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.4s ease,
+        border-radius 0.45s ease;
+    will-change: top, left, width, height;
+}
+
+.myub-tour-spotlight.is-visible {
+    opacity: 1;
 }
 
 body.myub-tour-active .myub-tour-highlight {
@@ -67,10 +87,36 @@ body.myub-tour-active .myub-tour-highlight {
     transform: translateX(-50%) !important;
 }
 
-[data-tour="groups-container"],
-[data-tour="messages-main"] {
-    min-height: calc(100vh - 220px);
-    min-height: calc(100dvh - 220px);
+.myub-tour-tooltip.is-entering {
+    animation: myubTourTooltipIn 0.48s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes myubTourTooltipIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(14px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+html.myub-tour-active [data-tour="groups-container"],
+html.myub-tour-active [data-tour="messages-main"] {
+    display: flex !important;
+    align-items: stretch !important;
+    flex: 1 1 auto !important;
+    min-height: calc(100vh - 200px);
+    min-height: calc(100dvh - 200px);
+}
+
+html.myub-tour-active [data-tour="groups-container"] > .groups-panel,
+html.myub-tour-active [data-tour="groups-container"] > .chat-panel,
+html.myub-tour-active [data-tour="messages-main"] > .conversations-panel,
+html.myub-tour-active [data-tour="messages-main"] > .chat-panel {
+    align-self: stretch;
+    min-height: 100%;
 }
 
 [data-tour="schedule-header"],
@@ -132,6 +178,7 @@ body.myub-tour-active .myub-tour-highlight {
     border-radius: 8px;
     padding: 9px 16px;
     cursor: pointer;
+    transition: background 0.25s ease, color 0.25s ease, transform 0.2s ease;
 }
 
 .myub-tour-btn-primary {
@@ -163,6 +210,12 @@ body.myub-tour-active .myub-tour-highlight {
     align-items: center;
     justify-content: center;
     padding: 24px;
+    animation: myubTourOverlayIn 0.4s ease;
+}
+
+@keyframes myubTourOverlayIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 .myub-tour-popup {
@@ -174,6 +227,18 @@ body.myub-tour-active .myub-tour-highlight {
     text-align: center;
     font-family: 'Outfit', sans-serif;
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+    animation: myubTourPopupIn 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes myubTourPopupIn {
+    from {
+        opacity: 0;
+        transform: translateY(16px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .myub-tour-popup-icon {
@@ -213,4 +278,23 @@ body.myub-tour-active .myub-tour-highlight {
     line-height: 1.6;
     color: rgba(232, 237, 245, 0.85);
     margin-bottom: 22px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html.myub-tour-active,
+    html.myub-tour-active body {
+        scroll-behavior: auto;
+    }
+
+    .myub-tour-root,
+    .myub-tour-spotlight,
+    .myub-tour-btn {
+        transition: none !important;
+    }
+
+    .myub-tour-tooltip.is-entering,
+    .myub-tour-popup-overlay,
+    .myub-tour-popup {
+        animation: none !important;
+    }
 }

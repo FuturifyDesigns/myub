@@ -1,22 +1,8 @@
-/* MyUB onboarding tour */
+/* MyUB onboarding tour — simplified */
 html.myub-tour-active,
 html.myub-tour-active body {
     overflow: hidden !important;
     overscroll-behavior: none;
-}
-
-body.myub-tour-active.myub-tour-positioning {
-    transition: none !important;
-}
-
-[data-tour="notes-library"],
-[data-tour="papers-library"],
-[data-tour="events-feed"] {
-    min-height: 180px;
-}
-
-[data-tour="groups-chat"] {
-    min-height: 280px;
 }
 
 .myub-tour-root {
@@ -31,10 +17,7 @@ body.myub-tour-active.myub-tour-positioning {
     pointer-events: auto;
 }
 
-.myub-tour-backdrop {
-    display: none !important;
-}
-
+.myub-tour-backdrop,
 .myub-tour-sidebar-band {
     display: none !important;
 }
@@ -49,33 +32,11 @@ body.myub-tour-active.myub-tour-positioning {
     box-shadow: 0 0 0 9999px rgba(8, 18, 38, 0.72);
     z-index: 2147483641;
     pointer-events: none;
-    transition: top 0.32s cubic-bezier(0.16, 1, 0.3, 1),
-        left 0.32s cubic-bezier(0.16, 1, 0.3, 1),
-        width 0.32s cubic-bezier(0.16, 1, 0.3, 1),
-        height 0.32s cubic-bezier(0.16, 1, 0.3, 1),
-        border-radius 0.2s ease;
 }
 
 body.myub-tour-active .myub-tour-highlight {
     position: relative;
-    z-index: 2147483646 !important;
-    filter: none !important;
-    opacity: 1 !important;
-    box-shadow: none !important;
-    isolation: isolate;
-}
-
-body.myub-tour-active .topbar .myub-tour-highlight {
-    z-index: 2147483646 !important;
-}
-
-body.myub-tour-active .myub-tour-nav-active {
-    position: relative;
     z-index: 2147483642 !important;
-    background: rgba(196, 30, 58, 0.12) !important;
-    outline: none !important;
-    box-shadow: inset 3px 0 0 #c41e3a;
-    border-radius: 8px;
 }
 
 .myub-tour-tooltip {
@@ -86,7 +47,7 @@ body.myub-tour-active .myub-tour-nav-active {
     transform: translateX(-50%);
     z-index: 2147483647;
     width: min(400px, calc(100vw - 32px));
-    max-height: min(70vh, 520px);
+    max-height: min(55vh, 420px);
     overflow-y: auto;
     background: linear-gradient(145deg, #1a365d 0%, #122a4a 100%);
     border: 1px solid rgba(255, 255, 255, 0.14);
@@ -96,31 +57,6 @@ body.myub-tour-active .myub-tour-nav-active {
     font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
     color: #e8edf5;
     pointer-events: auto;
-    animation: myubTourFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-    isolation: isolate;
-}
-
-.myub-tour-tooltip.is-anchor {
-    bottom: auto;
-    max-height: min(45vh, 400px);
-    animation: myubTourFadeInAnchor 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.myub-tour-tooltip.is-bottom {
-    top: auto;
-    bottom: max(24px, env(safe-area-inset-bottom, 24px));
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-@keyframes myubTourFadeIn {
-    from { opacity: 0; transform: translateX(-50%) translateY(12px); }
-    to { opacity: 1; transform: translateX(-50%) translateY(0); }
-}
-
-@keyframes myubTourFadeInAnchor {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: none; }
 }
 
 .myub-tour-step-label {

@@ -4,10 +4,8 @@
 (function (global) {
     'use strict';
 
-    var PAD = 0;
-    var LIBRARY_MIN_H = 160;
-    var COMPACT_MIN = 40;
-    var VIEWPORT_PAD = 16;
+    var PAD = 6;
+    var TOOLTIP_RESERVE = 260;
     var cachedUserId = null;
     var active = false;
     var pageIndex = 0;
@@ -28,89 +26,62 @@
         {
             file: 'dashboard.html',
             steps: [
-                { selector: '[data-tour="welcome-banner"]', title: 'Your dashboard', body: 'Your home screen — daily greeting, campus updates, and a snapshot of your day.' },
-                { selector: '[data-tour="stats"]', title: 'Quick stats', body: 'Track courses, credits earned, study groups, and pending tasks at a glance.' },
-                { selector: '[data-tour="quick-actions"]', title: 'Quick actions', body: 'Jump straight to GPA, notes, schedule, and other tools in one click.' },
-                { selector: '[data-tour="search"]', title: 'Search', body: 'Find pages, notes, friends, groups, and events across MyUB.' },
-                { selector: '[data-tour="notifications"]', title: 'Notifications', body: 'Friend requests, messages, and campus alerts show up here.' }
+                { selector: '[data-tour="welcome-banner"]', title: 'Dashboard', body: 'Your home screen — stats up top, quick actions below, and search plus notifications in the header.' },
+                { selector: '[data-tour="quick-actions"]', title: 'Quick actions', body: 'One-tap shortcuts to GPA, notes, schedule, messages, and more.' }
             ]
         },
         {
             file: 'gpa-calculator.html',
-            navTour: 'nav-gpa',
             steps: [
-                { selector: '[data-tour="gpa-progression"]', title: 'Degree progression', body: 'See credits earned toward your program and how close you are to graduating.' },
-                { selector: '[data-tour="gpa-tabs"]', title: 'GPA & predictor', body: 'Switch between calculating your current GPA and predicting grades for upcoming courses.' },
-                { selector: '[data-tour="gpa-summary"]', title: 'Your GPA summary', body: 'See cumulative GPA, total credits, course count, and degree classification at a glance.' },
-                { selector: '[data-tour="gpa-semesters"]', title: 'Manage semesters', body: 'Add semesters, enter courses with grades, and MyUB calculates your GPA automatically.' }
+                { selector: '[data-tour="gpa-progression"]', title: 'GPA Calculator', body: 'Track degree progress, view your GPA summary, and add semesters with course grades below.' }
             ]
         },
         {
             file: 'schedule.html',
-            navTour: 'nav-schedule',
             steps: [
-                { selector: '[data-tour="schedule-header"]', title: 'Your timetable', body: 'View and manage your weekly class schedule in one place.' },
-                { selector: '[data-tour="schedule-calendar"]', title: 'Plan your week', body: 'Add classes, labs, and study blocks — drag to organize your time.' }
+                { selector: '[data-tour="schedule-calendar"]', title: 'Schedule', body: 'Your calendar lives here — switch views, add classes, and see what is coming up.' }
             ]
         },
         {
             file: 'events.html',
-            navTour: 'nav-events',
             steps: [
-                { selector: '[data-tour="events-header"]', title: 'Campus events', body: 'Discover what is happening at UB — workshops, sports, societies, and more.' },
-                { selector: '[data-tour="events-feed"]', title: 'Browse & RSVP', body: 'Tap an event to see details and RSVP so you never miss out.' }
+                { selector: '[data-tour="events-header"]', title: 'Events', body: 'Browse campus events, RSVP, and create your own from the tabs above the list.' }
             ]
         },
         {
             file: 'notes.html',
-            navTour: 'nav-notes',
             steps: [
-                { selector: '[data-tour="notes-new"]', title: 'Create notes', body: 'Start a new note or upload study files for your courses.' },
-                { selector: '[data-tour="notes-toolbar"]', title: 'Organize notes', body: 'Search, filter pinned notes, and switch between grid or list view.' },
-                { selector: '[data-tour="notes-library"]', title: 'Your library', body: 'All your notes and uploaded files live here, sorted by course.' }
+                { selector: '[data-tour="notes-toolbar"]', title: 'Notes', body: 'Create notes with New Note, search and filter here, and your library fills in below.' }
             ]
         },
         {
             file: 'past-papers.html',
-            navTour: 'nav-papers',
             steps: [
-                { selector: '[data-tour="papers-upload"]', title: 'Upload papers', body: 'Share past exam papers and resources with classmates (PDF, images, DOCX).' },
-                { selector: '[data-tour="papers-toolbar"]', title: 'Find papers', body: 'Search and filter by type, date, or show only your uploads.' },
-                { selector: '[data-tour="papers-library"]', title: 'Paper library', body: 'Browse shared past papers and revision resources by course.' }
+                { selector: '[data-tour="papers-upload"]', title: 'Past Papers', body: 'Upload exam papers for classmates, then search and browse shared resources below.' }
             ]
         },
         {
             file: 'study-groups.html',
-            navTour: 'nav-groups',
             steps: [
-                { selector: '[data-tour="groups-container"]', title: 'Study groups', body: 'Collaborate with classmates — join existing groups or create your own.' },
-                { selector: '[data-tour="groups-tabs"]', title: 'My groups & discover', body: 'Switch between groups you belong to and groups you can join.' },
-                { selector: '[data-tour="groups-chat"]', title: 'Group workspace', body: 'Select a group, then chat, share files, and coordinate study sessions here.' }
+                { selector: '[data-tour="groups-container"]', title: 'Study Groups', body: 'Find or create groups on the left, then chat and share files in the workspace on the right.' }
             ]
         },
         {
             file: 'messages.html',
-            navTour: 'nav-messages',
             steps: [
-                { selector: '[data-tour="messages-list"]', title: 'Conversations', body: 'All your chats in one list — search to find a friend or group quickly.' },
-                { selector: '[data-tour="messages-chat"]', title: 'Real-time chat', body: 'Send messages, see online status, and stay connected with classmates.' }
+                { selector: '[data-tour="messages-list"]', title: 'Messages', body: 'Pick a conversation on the left, then read and send messages on the right.' }
             ]
         },
         {
             file: 'friends.html',
-            navTour: 'nav-friends',
             steps: [
-                { selector: '[data-tour="friends-stats"]', title: 'Your network', body: 'See friends, pending requests, and who is online on campus.' },
-                { selector: '[data-tour="friends-tabs"]', title: 'Friends & requests', body: 'Accept incoming requests or search for classmates to connect with.' }
+                { selector: '[data-tour="friends-tabs"]', title: 'Friends', body: 'See your friends, handle requests, and search for students to connect with.' }
             ]
         },
         {
             file: 'profile.html',
-            navTour: 'nav-profile',
             steps: [
-                { selector: '[data-tour="profile-header"]', title: 'Profile overview', body: 'Your photo, name, student ID, program, and online status.' },
-                { selector: '[data-tour="profile-details"]', title: 'Personal details', body: 'View and edit your name, email, year of study, program, and bio.' },
-                { selector: '[data-tour="profile-replay"]', title: 'Replay this tour', body: 'Come back here anytime and tap Replay app tour to walk through MyUB again.' }
+                { selector: '[data-tour="profile-replay"]', title: 'Profile & tour', body: 'Update your details above anytime. Replay this guided tour from here whenever you need a refresher.' }
             ]
         }
     ];
@@ -377,190 +348,17 @@
         return rect.width >= 2 && rect.height >= 2;
     }
 
-    function isLibraryTour(tourId) {
-        return tourId === 'notes-library' || tourId === 'papers-library' ||
-            tourId === 'events-feed' || tourId === 'groups-list';
-    }
-
-    function isCompactTour(tourId) {
-        return tourId === 'notes-new' || tourId === 'papers-upload' ||
-            tourId === 'search' || tourId === 'notifications';
-    }
-
     function isInSidebar(el) {
         return !!(el && el.closest && el.closest('#sidebar, .sidebar, aside.sidebar'));
     }
 
-    function getPageScopes() {
-        var seen = [];
-        var scopes = [];
-        var selectors = [
-            'main.main-content',
-            'main',
-            '.gpa-page',
-            '.dashboard',
-            '.profile-page',
-            '.friends-page',
-            '.groups-container',
-            '.page-content',
-            '.events-page'
-        ];
-        selectors.forEach(function (sel) {
-            global.document.querySelectorAll(sel).forEach(function (node) {
-                if (seen.indexOf(node) === -1) {
-                    seen.push(node);
-                    scopes.push(node);
-                }
-            });
-        });
-        return scopes;
-    }
-
     function findTarget(selector) {
         if (!selector) return null;
-        var parts = selector.split(',').map(function (s) { return s.trim(); });
-        var scopes = getPageScopes();
-        var s;
-        for (var i = 0; i < parts.length; i++) {
-            for (s = 0; s < scopes.length; s++) {
-                try {
-                    var scoped = scopes[s].querySelector(parts[i]);
-                    if (scoped && isTourVisible(scoped) && !isInSidebar(scoped)) return scoped;
-                } catch (_) {}
-            }
-            try {
-                var nodes = global.document.querySelectorAll(parts[i]);
-                for (var j = 0; j < nodes.length; j++) {
-                    if (isTourVisible(nodes[j]) && !isInSidebar(nodes[j])) return nodes[j];
-                }
-            } catch (_) {}
-        }
+        try {
+            var el = global.document.querySelector(selector);
+            if (el && isTourVisible(el) && !isInSidebar(el)) return el;
+        } catch (_) {}
         return null;
-    }
-
-    function getScrollableParent(el) {
-        var node = el;
-        while (node && node !== global.document.body && node !== global.document.documentElement) {
-            try {
-                var style = global.getComputedStyle(node);
-                var overflowY = style.overflowY;
-                if ((overflowY === 'auto' || overflowY === 'scroll') && node.scrollHeight > node.clientHeight + 2) {
-                    return node;
-                }
-            } catch (_) {}
-            node = node.parentElement;
-        }
-        return null;
-    }
-
-    function findFallbackInContainer(container, selectors) {
-        if (!container) return null;
-        for (var i = 0; i < selectors.length; i++) {
-            var el = container.querySelector(selectors[i]);
-            if (el && isTourVisible(el)) return el;
-        }
-        return null;
-    }
-
-    function getTourFocusElement(el) {
-        if (!el) return null;
-        var tourId = el.getAttribute && el.getAttribute('data-tour');
-
-        if (tourId === 'notifications') {
-            return global.document.querySelector('#notificationBell[data-tour="notifications"], [data-tour="notifications"]#notificationBell, [data-tour="notifications"] .icon-btn, [data-tour="notifications"] button') || el;
-        }
-        if (tourId === 'search') {
-            return el.matches && el.matches('.search-box') ? el : (el.querySelector('.search-box') || el);
-        }
-        if (tourId === 'gpa-semesters') {
-            return el.querySelector('[data-tour="gpa-semesters-body"]') || el;
-        }
-        if (tourId === 'gpa-summary') {
-            return el;
-        }
-        if (tourId === 'gpa-progression') {
-            return el;
-        }
-        if (tourId === 'groups-chat') {
-            return el;
-        }
-        if (tourId === 'messages-list') {
-            return el;
-        }
-        if (tourId === 'messages-chat') {
-            return el;
-        }
-        if (tourId === 'profile-header') {
-            return el;
-        }
-        if (tourId === 'profile-details') {
-            return el;
-        }
-        if (tourId === 'quick-actions') {
-            return el;
-        }
-        if (el.closest && el.closest('.topbar')) {
-            if (el.matches('button, .icon-btn, .search-box, .notif-btn')) return el;
-            var topFocus = el.querySelector('button.icon-btn, button.notif-btn, .search-box, #notificationBell');
-            if (topFocus) return topFocus;
-            return el;
-        }
-        if (isLibraryTour(tourId)) {
-            var empty = findFallbackInContainer(el, ['#emptyState', '.empty-state', '#eventsEmpty']);
-            if (empty && isTourVisible(empty)) {
-                var er = empty.getBoundingClientRect();
-                if (er.height >= 80) return empty;
-            }
-        }
-        return el;
-    }
-
-    function expandRect(rect, minW, minH) {
-        var w = rect.width;
-        var h = rect.height;
-        var left = rect.left;
-        var top = rect.top;
-        if (w < minW) {
-            var cx = left + w / 2;
-            left = cx - minW / 2;
-            w = minW;
-        }
-        if (h < minH) {
-            h = minH;
-        }
-        return {
-            top: top,
-            left: left,
-            width: w,
-            height: h,
-            right: left + w,
-            bottom: top + h
-        };
-    }
-
-    function getHighlightRect(el) {
-        var target = getTourFocusElement(el) || el;
-        var rect = target.getBoundingClientRect();
-        var tourId = target.getAttribute && target.getAttribute('data-tour');
-        if (!tourId && el) tourId = el.getAttribute && el.getAttribute('data-tour');
-
-        if (isCompactTour(tourId) || (target.closest && target.closest('.topbar, header.topbar'))) {
-            return expandRect(rect, COMPACT_MIN, COMPACT_MIN);
-        }
-        if (isLibraryTour(tourId)) {
-            return expandRect(rect, 120, LIBRARY_MIN_H);
-        }
-        if (rect.width < 2 || rect.height < 2) {
-            return expandRect(rect, 80, 80);
-        }
-        return {
-            top: rect.top,
-            left: rect.left,
-            width: rect.width,
-            height: rect.height,
-            right: rect.right,
-            bottom: rect.bottom
-        };
     }
 
     function closeTourDropdowns() {
@@ -572,40 +370,14 @@
     }
 
     function waitForLayoutSettled(callback) {
-        global.document.body.classList.add('myub-tour-positioning');
         global.requestAnimationFrame(function () {
             global.requestAnimationFrame(function () {
-                global.setTimeout(function () {
-                    global.document.body.classList.remove('myub-tour-positioning');
-                    if (callback) callback();
-                }, 48);
+                if (callback) callback();
             });
         });
     }
 
-    function getViewportPad() {
-        var top = VIEWPORT_PAD;
-        var bottom = VIEWPORT_PAD;
-        var left = VIEWPORT_PAD;
-        var right = VIEWPORT_PAD;
-        try {
-            var vv = global.visualViewport;
-            if (vv) {
-                top = Math.max(top, vv.offsetTop + 8);
-                left = Math.max(left, vv.offsetLeft + 8);
-                bottom = Math.max(bottom, global.innerHeight - vv.height - vv.offsetTop + 8);
-                right = Math.max(right, global.innerWidth - vv.width - vv.offsetLeft + 8);
-            }
-        } catch (_) {}
-        var topbar = global.document.querySelector('.topbar, header.topbar');
-        if (topbar) {
-            var tb = topbar.getBoundingClientRect();
-            if (tb.bottom > top) top = Math.ceil(tb.bottom) + 8;
-        }
-        return { top: top, bottom: bottom, left: left, right: right };
-    }
-
-    function forceTooltipBottom() {
+    function positionTooltipBottom() {
         if (!tooltipEl) return;
         tooltipEl.classList.remove('is-anchor');
         tooltipEl.classList.add('is-bottom');
@@ -614,126 +386,41 @@
         tooltipEl.style.left = '50%';
         tooltipEl.style.right = 'auto';
         tooltipEl.style.transform = 'translateX(-50%)';
-        tooltipEl.style.maxWidth = '';
-    }
-
-    function clampTooltipInViewport() {
-        if (!tooltipEl) return;
-        var pad = getViewportPad();
-        var tr = tooltipEl.getBoundingClientRect();
-        var vh = global.innerHeight;
-        var vw = global.innerWidth;
-        if (!tr.height) return;
-
-        if (tr.top < pad.top || tr.bottom > vh - pad.bottom || tr.left < pad.left || tr.right > vw - pad.right) {
-            forceTooltipBottom();
-            tr = tooltipEl.getBoundingClientRect();
-        }
-        if (tr.top < pad.top) {
-            tooltipEl.classList.remove('is-bottom');
-            tooltipEl.classList.add('is-anchor');
-            tooltipEl.style.bottom = 'auto';
-            tooltipEl.style.top = pad.top + 'px';
-            tooltipEl.style.left = '50%';
-            tooltipEl.style.transform = 'translateX(-50%)';
-        }
-        if (tr.bottom > vh - pad.bottom) {
-            forceTooltipBottom();
-        }
-    }
-
-    function positionTooltip(rect, el) {
-        if (!tooltipEl) return;
-        tooltipEl.classList.remove('is-anchor', 'is-bottom');
-        tooltipEl.style.top = '';
-        tooltipEl.style.bottom = '';
-        tooltipEl.style.left = '';
-        tooltipEl.style.right = '';
-        tooltipEl.style.transform = '';
-        tooltipEl.style.maxWidth = '';
-
-        var pad = getViewportPad();
-        var tipH = tooltipEl.offsetHeight || 200;
-        var gap = 16;
-        var vh = global.innerHeight;
-        var inTop = isInTopbar(el);
-        var nearTop = rect.top < vh * 0.28;
-        var nearBottom = rect.bottom > vh * 0.72;
-
-        if (inTop || nearTop || nearBottom) {
-            forceTooltipBottom();
-            return;
-        }
-
-        var spaceBelow = vh - pad.bottom - rect.bottom - gap;
-        var spaceAbove = rect.top - pad.top - gap;
-
-        if (spaceBelow >= tipH + 12) {
-            tooltipEl.classList.add('is-anchor');
-            tooltipEl.style.top = (rect.bottom + gap) + 'px';
-            tooltipEl.style.left = '50%';
-            tooltipEl.style.transform = 'translateX(-50%)';
-            return;
-        }
-        if (spaceAbove >= tipH + 12) {
-            tooltipEl.classList.add('is-anchor');
-            tooltipEl.style.top = Math.max(pad.top, rect.top - tipH - gap) + 'px';
-            tooltipEl.style.left = '50%';
-            tooltipEl.style.transform = 'translateX(-50%)';
-            return;
-        }
-
-        forceTooltipBottom();
-    }
-
-    function clipRectToViewport(rect) {
-        var pad = getViewportPad();
-        var vh = global.innerHeight;
-        var vw = global.innerWidth;
-        var top = Math.max(pad.top, rect.top);
-        var left = Math.max(pad.left, rect.left);
-        var right = Math.min(vw - pad.right, rect.right);
-        var bottom = Math.min(vh - pad.bottom, rect.bottom);
-        var width = right - left;
-        var height = bottom - top;
-        if (width < 2 || height < 2) return null;
-        return {
-            top: top,
-            left: left,
-            width: width,
-            height: height,
-            right: right,
-            bottom: bottom
-        };
     }
 
     function updateStepLayout(el) {
-        if (!active || !el) return;
-        var focus = getTourFocusElement(el) || el;
-        var rect = getHighlightRect(el);
-        var clipped = clipRectToViewport(rect);
-        if (clipped) {
-            positionSpotlightOnRect(clipped, focus);
-        } else if (spotlightEl) {
+        if (!active || !el || !spotlightEl) return;
+        var rect = el.getBoundingClientRect();
+        if (rect.width < 4 || rect.height < 4) {
             spotlightEl.style.display = 'none';
+            positionTooltipBottom();
+            return;
         }
-        positionTooltip(rect, focus);
-        clampTooltipInViewport();
-    }
-
-    function applySpotlightRadius(el) {
-        if (!spotlightEl || !el) return;
-        var radius = '12px';
-        try {
-            var style = global.getComputedStyle(el);
-            var tl = parseFloat(style.borderTopLeftRadius) || 0;
-            var tr = parseFloat(style.borderTopRightRadius) || 0;
-            var br = parseFloat(style.borderBottomRightRadius) || 0;
-            var bl = parseFloat(style.borderBottomLeftRadius) || 0;
-            var maxR = Math.max(tl, tr, br, bl);
-            if (maxR > 0) radius = style.borderRadius || (maxR + 'px');
-        } catch (_) {}
-        spotlightEl.style.borderRadius = radius;
+        var vh = global.innerHeight;
+        var vw = global.innerWidth;
+        var margin = 12;
+        var top = Math.max(margin, rect.top - PAD);
+        var left = Math.max(margin, rect.left - PAD);
+        var width = rect.width + PAD * 2;
+        var height = rect.height + PAD * 2;
+        if (left + width > vw - margin) width = vw - margin - left;
+        if (top + height > vh - TOOLTIP_RESERVE - margin) height = vh - TOOLTIP_RESERVE - margin - top;
+        if (width < 8 || height < 8) {
+            spotlightEl.style.display = 'none';
+        } else {
+            spotlightEl.style.display = 'block';
+            spotlightEl.style.top = top + 'px';
+            spotlightEl.style.left = left + 'px';
+            spotlightEl.style.width = width + 'px';
+            spotlightEl.style.height = height + 'px';
+            try {
+                var br = global.getComputedStyle(el).borderRadius;
+                spotlightEl.style.borderRadius = br && br !== '0px' ? br : '12px';
+            } catch (_) {
+                spotlightEl.style.borderRadius = '12px';
+            }
+        }
+        positionTooltipBottom();
     }
 
     function scrollToTop() {
@@ -770,86 +457,27 @@
         }
     }
 
-    function scrollParentForElement(el, topMargin, bandBottom) {
-        var focus = getTourFocusElement(el) || el;
-        var parent = getScrollableParent(focus);
-        if (!parent) return;
-        var rect = focus.getBoundingClientRect();
-        var parentRect = parent.getBoundingClientRect();
-        var relTop = rect.top - parentRect.top + parent.scrollTop;
-        var relBottom = relTop + rect.height;
-        var viewH = parent.clientHeight;
-        var targetScroll = parent.scrollTop;
-        if (rect.top < parentRect.top + topMargin) {
-            targetScroll = relTop - topMargin;
-        } else if (rect.bottom > parentRect.top + bandBottom - parentRect.top) {
-            targetScroll = relBottom - (bandBottom - parentRect.top);
-        }
-        parent.scrollTop = Math.max(0, targetScroll);
+    function scrollToTarget(el) {
+        if (!el) return;
+        var rect = el.getBoundingClientRect();
+        var offset = 80;
+        var y = global.scrollY + rect.top - offset;
+        applyTourScroll(Math.max(0, Math.min(y, getMaxTourScroll())));
     }
 
-    function getTooltipBottomReserve() {
-        if (!tooltipEl) return 280;
-        var h = tooltipEl.offsetHeight;
-        if (!h && tooltipEl.getBoundingClientRect) {
-            h = tooltipEl.getBoundingClientRect().height;
-        }
-        return Math.max(220, (h || 200) + 40);
-    }
-
-    function isInTopbar(el) {
-        return !!(el && el.closest && el.closest('.topbar, header.topbar'));
-    }
-
-    function scrollHighlightIntoView(el, done) {
+    function layoutStep(el, done) {
         if (!el || !active) {
             if (done) done();
             return;
         }
-
-        var focus = getTourFocusElement(el) || el;
-        var inTop = isInTopbar(focus);
-        var pad = getViewportPad();
-        var topMargin = inTop ? pad.top : Math.max(64, pad.top + 8);
-        var bottomReserve = getTooltipBottomReserve() + pad.bottom + 16;
-        var viewportH = global.innerHeight;
-        var bandBottom = viewportH - bottomReserve;
-
-        function alignWindow() {
-            var rect = getHighlightRect(el);
-            var bandHeight = Math.max(120, bandBottom - topMargin);
-            var scrollDelta = 0;
-            if (rect.height <= bandHeight) {
-                var idealTop = topMargin + (bandHeight - rect.height) / 2;
-                scrollDelta = rect.top - idealTop;
-            } else {
-                if (rect.top < topMargin) scrollDelta = rect.top - topMargin;
-                if (rect.bottom > bandBottom) {
-                    scrollDelta = Math.max(scrollDelta, rect.bottom - bandBottom);
-                }
-            }
-            if (Math.abs(scrollDelta) >= 1) {
-                applyTourScroll(lockedScrollY + scrollDelta);
-            }
-            scrollParentForElement(el, topMargin, bandBottom);
-        }
-
-        if (inTop) {
-            applyTourScroll(0);
-            var scrollParent = getScrollableParent(focus);
-            if (scrollParent) scrollParent.scrollTop = 0;
-            waitForLayoutSettled(done);
-            return;
-        }
-
-        alignWindow();
+        scrollToTarget(el);
         waitForLayoutSettled(function () {
-            if (!active || !el) {
+            if (!active || highlightedEl !== el) {
                 if (done) done();
                 return;
             }
-            alignWindow();
-            waitForLayoutSettled(done);
+            updateStepLayout(el);
+            if (done) done();
         });
     }
 
@@ -879,44 +507,6 @@
             sidebarBandEl.style.display = 'none';
             sidebarBandEl.classList.remove('show');
         }
-    }
-
-    function markActiveNav(navTour) {
-        if (!navTour || stepIndex > 0) return;
-        var nav = global.document.querySelector('#sidebar [data-tour="' + navTour + '"], .sidebar [data-tour="' + navTour + '"]');
-        if (nav) nav.classList.add('myub-tour-nav-active');
-    }
-
-    function positionSpotlightOnRect(rect, el) {
-        if (!rect || rect.width < 2 || rect.height < 2) {
-            spotlightEl.style.display = 'none';
-            return;
-        }
-        var pad = getViewportPad();
-        spotlightEl.style.display = 'block';
-        var top = Math.max(pad.top, rect.top - PAD);
-        var left = Math.max(pad.left, rect.left - PAD);
-        var width = rect.width + PAD * 2;
-        var height = rect.height + PAD * 2;
-        var maxRight = global.innerWidth - pad.right;
-        var maxBottom = global.innerHeight - pad.bottom;
-        if (left + width > maxRight) width = maxRight - left;
-        if (top + height > maxBottom) height = maxBottom - top;
-        if (width < 2 || height < 2) {
-            spotlightEl.style.display = 'none';
-            return;
-        }
-        spotlightEl.style.top = top + 'px';
-        spotlightEl.style.left = left + 'px';
-        spotlightEl.style.width = Math.max(2, width) + 'px';
-        spotlightEl.style.height = Math.max(2, height) + 'px';
-        applySpotlightRadius(el);
-    }
-
-    function positionSpotlight(el) {
-        if (!el) return;
-        var focus = getTourFocusElement(el) || el;
-        positionSpotlightOnRect(getHighlightRect(el), focus);
     }
 
     function getCurrentStep() {
@@ -951,7 +541,7 @@
 
         var label = global.document.createElement('div');
         label.className = 'myub-tour-step-label';
-        label.textContent = 'Page ' + (pageIndex + 1) + ' of ' + TOUR_PAGES.length + ' · Step ' + gStep + ' of ' + total;
+        label.textContent = 'Step ' + gStep + ' of ' + total;
 
         var title = global.document.createElement('h2');
         title.className = 'myub-tour-title';
@@ -1021,7 +611,6 @@
 
         if (backdropEl) backdropEl.style.display = 'none';
 
-        var navTour = step.navTour || page.navTour;
         if (stepIndex === 0) {
             scrollToTop();
         }
@@ -1029,14 +618,11 @@
         var el = findTarget(step.selector);
         if (el) {
             highlightedEl = el;
-            var focus = getTourFocusElement(el) || el;
-            focus.classList.add('myub-tour-highlight');
-            scrollHighlightIntoView(highlightedEl, function () {
-                if (!active || highlightedEl !== el) return;
-                updateStepLayout(highlightedEl);
-            });
+            el.classList.add('myub-tour-highlight');
+            layoutStep(highlightedEl);
         } else {
             spotlightEl.style.display = 'none';
+            positionTooltipBottom();
         }
 
         if (rootEl && tooltipEl && tooltipEl.parentNode === rootEl) {
@@ -1048,10 +634,7 @@
         unbindResize();
         resizeHandler = function () {
             if (!active || !highlightedEl) return;
-            scrollHighlightIntoView(highlightedEl, function () {
-                if (!active || !highlightedEl) return;
-                updateStepLayout(highlightedEl);
-            });
+            layoutStep(highlightedEl);
         };
         global.addEventListener('resize', resizeHandler);
     }

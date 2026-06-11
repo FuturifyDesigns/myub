@@ -49,7 +49,7 @@
         {
             file: 'gpa-calculator.html',
             steps: [
-                { selector: '[data-tour="gpa-progression"]', title: 'GPA Calculator', body: 'Track degree progress, view your GPA summary, and add semesters with course grades below.' }
+                { selector: '[data-tour="gpa-progression"]', title: 'GPA Calculator', body: 'Track degree progress, view your GPA summary, and add semesters with course grades below.', fit: true }
             ]
         },
         {
@@ -97,7 +97,7 @@
         {
             file: 'profile.html',
             steps: [
-                { selector: '[data-tour="profile-header"]', title: 'Profile & tour', body: 'Update your photo and details here. Replay this guided tour anytime from the App tour card below.' }
+                { selector: '[data-tour="profile-header"]', title: 'Profile & tour', body: 'Update your photo and details here. Replay this guided tour anytime from the App tour card below.', fit: true }
             ]
         }
     ];
@@ -563,19 +563,34 @@
         } catch (_) {}
     }
 
-    function unionRects(nodes) {
+    function syncTourScroll() {
+        try {
+            global.scrollTo(0, lockedScrollY);
+        } catch (_) {
+            global.scrollTo(0, lockedScrollY);
+        }
+    }
+
+    function getViewportSpotlightOffset() {
+        if (!isNarrow()) return { top: 0, left: 0 };
+        var vp = getTourViewport();
+        return { top: vp.offsetTop || 0, left: vp.offsetLeft || 0 };
+    }
+
+    function unionRects(nodes, panelsOnly) {
+        panelsOnly = !!panelsOnly;
         var union = null;
         var i;
         var vp = getTourViewport();
         for (i = 0; i < nodes.length; i++) {
             var child = nodes[i];
             if (!child || !child.getBoundingClientRect) continue;
-            if (isNarrow() && !isPanelVisibleOnMobile(child)) continue;
+            if (panelsOnly && isNarrow() && !isPanelVisibleOnMobile(child)) continue;
             try {
                 if (global.getComputedStyle(child).display === 'none') continue;
             } catch (_) {}
             var cr = child.getBoundingClientRect();
-            if (!isRectInTourViewport(cr, vp.width, vp.height)) continue;
+            if (panelsOnly && !isRectInTourViewport(cr, vp.width, vp.height)) continue;
             if (cr.width < 2 || cr.height < 2) continue;
             if (!union) {
                 union = { top: cr.top, left: cr.left, right: cr.right, bottom: cr.bottom };
@@ -597,6 +612,13 @@
         };
     }
 
+    function measureTargetRect(el) {
+        if (!el || !el.getBoundingClientRect) return null;
+        syncTourScroll();
+        el.offsetHeight;
+        return getTargetRect(el);
+    }
+
     function getTargetRect(el) {
         if (!el || !el.getBoundingClientRect) return null;
         var step = getCurrentStep();
@@ -605,7 +627,7 @@
             if (panels.length < 2) {
                 panels = el.children;
             }
-            var panelUnion = unionRects(panels);
+            var panelUnion = unionRects(panels, true);
             if (panelUnion) return panelUnion;
             if (isNarrow()) {
                 var pi;
@@ -620,14 +642,11 @@
                 return containerRect;
             }
         }
-        if (step && step.fit) {
-            var fitParts = [el];
-            var ci;
-            for (ci = 0; ci < el.children.length; ci++) {
-                fitParts.push(el.children[ci]);
+        if ((step && step.fit) || (isNarrow() && !(step && step.panels))) {
+            var fitRect = el.getBoundingClientRect();
+            if (fitRect.width >= 4 && fitRect.height >= 4) {
+                return fitRect;
             }
-            var fitUnion = unionRects(fitParts);
-            if (fitUnion) return fitUnion;
         }
         return el.getBoundingClientRect();
     }
@@ -685,8 +704,7 @@
         if (!active || !el || !spotlightEl) return;
         ensureTourOnTop();
         ensureHighlightedMedia(el);
-        el.offsetHeight;
-        var rect = getTargetRect(el);
+        var rect = measureTargetRect(el);
         if (!rect || rect.width < 4 || rect.height < 4) {
             spotlightEl.classList.remove('is-visible');
             spotlightEl.style.display = 'none';
@@ -700,12 +718,13 @@
         var margin = getTourMargin();
         var reserve = getTooltipHeight() + (isNarrow() ? 12 : 16);
         var maxBottom = vh - reserve;
-        var edge = (step && (step.compact || step.fit || step.panels)) ? (isNarrow() ? 5 : FIT_PAD) : PAD;
+        var fullFrame = !!(step && (step.compact || step.fit || step.panels)) || isNarrow();
+        var edge = fullFrame ? (isNarrow() ? 5 : FIT_PAD) : PAD;
         var top;
         var left;
         var width;
         var height;
-        if (step && (step.compact || step.fit || step.panels)) {
+        if (fullFrame) {
             width = rect.width + edge * 2;
             height = rect.height + edge * 2;
             top = rect.top - edge;
@@ -731,7 +750,7 @@
                 height = Math.min(maxSpotH, Math.max(MIN_SPOTLIGHT_H, maxBottom - top));
             }
         }
-        if (!(step && (step.compact || step.fit || step.panels))) {
+        if (!fullFrame) {
             if (left + width > vw - margin) {
                 left = Math.max(margin, vw - margin - width);
             }
@@ -743,15 +762,16 @@
             spotlightEl.classList.remove('is-visible');
             spotlightEl.style.display = 'none';
         } else {
-            spotlightEl.style.top = top + 'px';
-            spotlightEl.style.left = left + 'px';
+            var vo = getViewportSpotlightOffset();
+            spotlightEl.style.top = (top + vo.top) + 'px';
+            spotlightEl.style.left = (left + vo.left) + 'px';
             spotlightEl.style.width = width + 'px';
             spotlightEl.style.height = height + 'px';
             try {
                 var br = global.getComputedStyle(el).borderRadius;
                 if (step && step.compact) {
                     spotlightEl.style.borderRadius = '10px';
-                } else if (step && (step.fit || step.panels)) {
+                } else if (fullFrame) {
                     spotlightEl.style.borderRadius = br && br !== '0px' ? br : '16px';
                 } else {
                     spotlightEl.style.borderRadius = br && br !== '0px' ? br : '12px';
@@ -845,7 +865,9 @@
         var step = getCurrentStep();
         var needsScroll = targetNeedsScroll(el);
         scrollToTarget(el);
-        var scrollDelay = isNarrow() ? (needsScroll ? 32 : 0) : (needsScroll ? (step && step.panels ? 280 : 48) : 16);
+        var scrollDelay = isNarrow()
+            ? (needsScroll ? 100 : 24)
+            : (needsScroll ? (step && step.panels ? 280 : 48) : 16);
         global.setTimeout(function () {
             if (!active || highlightedEl !== el) {
                 if (done) done();
@@ -857,7 +879,10 @@
                     return;
                 }
                 updateStepLayout(el);
-                if (isNarrow()) {
+                var settleMs = isNarrow()
+                    ? LAYOUT_SETTLE_MS
+                    : (step && step.fit ? LAYOUT_SETTLE_MS : 0);
+                if (!settleMs) {
                     if (done) done();
                     return;
                 }
@@ -866,11 +891,15 @@
                         if (done) done();
                         return;
                     }
-                    if (step && step.fit) {
+                    waitForLayoutSettled(function () {
+                        if (!active || highlightedEl !== el) {
+                            if (done) done();
+                            return;
+                        }
                         updateStepLayout(el);
-                    }
-                    if (done) done();
-                }, step && step.fit ? LAYOUT_SETTLE_MS : 0);
+                        if (done) done();
+                    });
+                }, settleMs);
             });
         }, scrollDelay);
     }
@@ -1097,6 +1126,7 @@
         if (global.visualViewport) {
             viewportHandler = handleTourResize;
             global.visualViewport.addEventListener('resize', viewportHandler);
+            global.visualViewport.addEventListener('scroll', viewportHandler);
         }
     }
 
@@ -1112,6 +1142,7 @@
         }
         if (viewportHandler && global.visualViewport) {
             global.visualViewport.removeEventListener('resize', viewportHandler);
+            global.visualViewport.removeEventListener('scroll', viewportHandler);
             viewportHandler = null;
         }
     }

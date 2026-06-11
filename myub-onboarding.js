@@ -243,7 +243,9 @@
                 }
                 el.style.opacity = '1';
                 el.style.visibility = 'visible';
-                el.style.transform = 'none';
+                if (el.id !== 'sidebar' && !(el.classList && el.classList.contains('sidebar'))) {
+                    el.style.transform = 'none';
+                }
             });
         } catch (_) {}
     }
@@ -506,7 +508,7 @@
 
     function findTarget(selector) {
         if (!selector) return null;
-        var scopes = ['main.main-content', 'main.page-content', 'main', '.gpa-page', '.dashboard', '.groups-container', '.groups-panel', '.messages-container', '.profile-page', '.friends-page', '.friends-main', '.calendar-container', '.notes-header'];
+        var scopes = ['.dashboard', 'main.main-content', 'main.page-content', 'main', '.gpa-page', '.groups-container', '.groups-panel', '.messages-container', '.profile-page', '.friends-page', '.friends-main', '.calendar-container', '.notes-header'];
         var i;
         for (i = 0; i < scopes.length; i++) {
             try {
@@ -876,8 +878,12 @@
     function closeMobileSidebar() {
         if (!isNarrow()) return;
         var sidebar = global.document.getElementById('sidebar');
-        if (sidebar && sidebar.classList.contains('open') && typeof global.toggleSidebar === 'function') {
-            global.toggleSidebar();
+        var overlay = global.document.getElementById('sidebarOverlay');
+        if (sidebar) {
+            sidebar.classList.remove('open');
+        }
+        if (overlay) {
+            overlay.classList.remove('show');
         }
     }
 
@@ -1340,9 +1346,20 @@
         }
     }
 
+    function abandonIfFinished() {
+        if (isCompleted() || isSkipped()) {
+            stopTourPrepGuard();
+            clearTourPrep();
+            setTourActive(false);
+            return true;
+        }
+        return false;
+    }
+
     function resumeIfActive() {
         resolveUserId(function (userId) {
             if (!userId) return;
+            if (abandonIfFinished()) return;
             var qs = new URLSearchParams(global.location.search);
             var tourQs = qs.get('tour') === '1';
             var replayQs = qs.get('replayTour') === '1';
@@ -1357,7 +1374,7 @@
                 stepIndex = 0;
             } else if (!isTourActive() && !tourQs) {
                 return;
-            } else if (tourQs && !isTourActive()) {
+            } else if (tourQs && !isTourActive() && shouldAutoStart()) {
                 resetTourProgress();
             }
 
@@ -1388,12 +1405,23 @@
         opts = opts || {};
         resolveUserId(function (userId) {
             if (!userId) return;
-            if (opts.afterWelcome && !opts.force && isCompleted()) return;
+            if (!opts.force && !shouldAutoStart()) return;
             if (!opts.force && !opts.afterWelcome && isWelcomeOpen()) return;
 
-            resetTourProgress();
-            pageIndex = 0;
-            stepIndex = 0;
+            markTourPrep();
+            closeMobileSidebar();
+
+            if (opts.force) {
+                resetTourProgress();
+                pageIndex = 0;
+                stepIndex = 0;
+            } else if (!isTourActive()) {
+                resetTourProgress();
+                pageIndex = 0;
+                stepIndex = 0;
+            } else {
+                syncToStoredProgress();
+            }
 
             if (getPageFile() !== 'dashboard.html') {
                 global.location.href = 'dashboard.html?tour=1';
@@ -1430,6 +1458,7 @@
         shouldSkipEntrance: shouldSkipEntrance,
         isCompleted: isCompleted,
         isSkipped: isSkipped,
+        isTourActive: isTourActive,
         resumeIfActive: resumeIfActive,
         resetTourProgress: resetTourProgress
     };
@@ -1439,6 +1468,7 @@
     };
 
     function boot() {
+        if (abandonIfFinished()) return;
         if (isTourSession()) {
             markTourPrep();
             startTourPrepGuard();
@@ -1446,7 +1476,7 @@
         resumeIfActive();
     }
 
-    if (isTourSession()) {
+    if (!abandonIfFinished() && isTourSession()) {
         markTourPrep();
         startTourPrepGuard();
     }

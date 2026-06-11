@@ -324,6 +324,77 @@ html.myub-tour-active [data-tour="messages-main"] > .chat-panel {
     margin-bottom: 22px;
 }
 
+/* Mobile tour — match laptop highlights, less jank */
+@media (max-width: 900px) {
+    html.myub-tour-active [data-tour="groups-container"],
+    html.myub-tour-active [data-tour="messages-main"] {
+        min-height: 0 !important;
+        flex: 1 1 auto !important;
+    }
+
+    html.myub-tour-active [data-tour="groups-container"] > .groups-panel,
+    html.myub-tour-active [data-tour="groups-container"] > .chat-panel,
+    html.myub-tour-active [data-tour="messages-main"] > .conversations-panel,
+    html.myub-tour-active [data-tour="messages-main"] > .chat-panel {
+        min-height: 0 !important;
+    }
+
+    .myub-tour-root {
+        transition: opacity 0.25s ease;
+    }
+
+    .myub-tour-spotlight,
+    .myub-tour-mobile .myub-tour-spotlight {
+        transition: opacity 0.2s ease;
+        will-change: auto;
+    }
+
+    .myub-tour-tooltip {
+        width: calc(100vw - 20px);
+        max-width: none;
+        padding: 16px 16px;
+        max-height: min(40vh, 260px);
+        bottom: max(12px, env(safe-area-inset-bottom, 12px));
+        border-radius: 12px;
+    }
+
+    .myub-tour-tooltip.is-bottom {
+        bottom: max(12px, env(safe-area-inset-bottom, 12px)) !important;
+    }
+
+    .myub-tour-tooltip.is-entering {
+        animation: none;
+    }
+
+    .myub-tour-title {
+        font-size: 19px;
+        margin-bottom: 6px;
+    }
+
+    .myub-tour-body {
+        font-size: 13px;
+        line-height: 1.45;
+        margin-bottom: 14px;
+    }
+
+    .myub-tour-actions {
+        gap: 8px;
+    }
+
+    .myub-tour-btn {
+        padding: 9px 12px;
+        font-size: 12px;
+    }
+
+    .myub-tour-btn-ghost {
+        padding: 9px 8px;
+    }
+
+    .myub-tour-nav {
+        gap: 6px;
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
     html.myub-tour-active,
     html.myub-tour-active body {

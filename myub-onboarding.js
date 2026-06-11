@@ -10,6 +10,8 @@
     var MIN_SPOTLIGHT_H = 72;
     var TOUR_TOP_PAD = 72;
     var LAYOUT_SETTLE_MS = 80;
+    var MOBILE_BREAKPOINT = 900;
+    var RESIZE_DEBOUNCE_MS = 180;
     var TOUR_SESSION_KEY = 'myub_tour_session';
     var TOUR_FORCE_VISIBLE = '.topbar, .sidebar, .welcome-banner, .stat-card, .card, .quick-action, .nav-item, ' +
         '.groups-panel, .chat-panel, .groups-container, .conversations-panel, .messages-container, ' +
@@ -29,6 +31,7 @@
     var highlightedEl = null;
     var resizeHandler = null;
     var viewportHandler = null;
+    var resizeDebounceTimer = null;
     var scrollLockHandler = null;
     var keyLockHandler = null;
     var lockedScrollY = 0;
@@ -252,14 +255,16 @@
         }
         forceAllTourContentVisible();
         var runs = 0;
+        var maxRuns = isNarrow() ? 3 : 6;
+        var intervalMs = isNarrow() ? 120 : 80;
         tourPrepGuardTimer = global.setInterval(function () {
             forceAllTourContentVisible();
             runs += 1;
-            if (runs >= 8) {
+            if (runs >= maxRuns) {
                 global.clearInterval(tourPrepGuardTimer);
                 tourPrepGuardTimer = null;
             }
-        }, 80);
+        }, intervalMs);
     }
 
     function stopTourPrepGuard() {
@@ -397,7 +402,68 @@
     }
 
     function isNarrow() {
-        return global.innerWidth <= 900;
+        return global.innerWidth <= MOBILE_BREAKPOINT;
+    }
+
+    function getTourViewport() {
+        var vv = global.visualViewport;
+        if (vv) {
+            return {
+                width: vv.width,
+                height: vv.height,
+                offsetTop: vv.offsetTop || 0,
+                offsetLeft: vv.offsetLeft || 0
+            };
+        }
+        return {
+            width: global.innerWidth,
+            height: global.innerHeight,
+            offsetTop: 0,
+            offsetLeft: 0
+        };
+    }
+
+    function getTourTopPad() {
+        return isNarrow() ? 52 : TOUR_TOP_PAD;
+    }
+
+    function getTourMargin() {
+        return isNarrow() ? 8 : 12;
+    }
+
+    function isRectInTourViewport(rect, vw, vh) {
+        if (!rect || rect.width < 2 || rect.height < 2) return false;
+        return rect.right > 2 && rect.bottom > 2 && rect.left < vw - 2 && rect.top < vh - 2;
+    }
+
+    function isPanelVisibleOnMobile(el) {
+        if (!el || !el.getBoundingClientRect) return false;
+        try {
+            var style = global.getComputedStyle(el);
+            if (style.display === 'none' || style.visibility === 'hidden') return false;
+            if (parseFloat(style.opacity) < 0.05) return false;
+        } catch (_) {}
+        var rect = el.getBoundingClientRect();
+        var vp = getTourViewport();
+        if (!isRectInTourViewport(rect, vp.width, vp.height)) return false;
+        if (el.classList.contains('hidden')) return false;
+        return rect.width >= 12 && rect.height >= 12;
+    }
+
+    function syncTourMobileClass() {
+        if (!rootEl) return;
+        if (isNarrow()) {
+            rootEl.classList.add('myub-tour-mobile');
+            global.document.documentElement.classList.add('myub-tour-mobile');
+        } else {
+            rootEl.classList.remove('myub-tour-mobile');
+            global.document.documentElement.classList.remove('myub-tour-mobile');
+        }
+    }
+
+    function ensureMobileTourReady() {
+        closeMobileSidebar();
+        syncTourMobileClass();
     }
 
     function getSidebarWidth() {
@@ -411,11 +477,6 @@
 
     function ensureSidebarOpen() {
         if (!isNarrow()) return;
-        var sidebar = global.document.getElementById('sidebar');
-        if (!sidebar) return;
-        if (!sidebar.classList.contains('open') && typeof global.toggleSidebar === 'function') {
-            global.toggleSidebar();
-        }
     }
 
     function clearHighlight() {
@@ -464,12 +525,13 @@
     }
 
     function getTooltipHeight() {
-        if (!tooltipEl) return TOOLTIP_RESERVE;
+        var reserve = isNarrow() ? 200 : TOOLTIP_RESERVE;
+        if (!tooltipEl) return reserve;
         var h = tooltipEl.offsetHeight;
         if (!h && tooltipEl.getBoundingClientRect) {
             h = tooltipEl.getBoundingClientRect().height;
         }
-        return Math.max(TOOLTIP_RESERVE, (h || 200) + 32);
+        return Math.max(reserve, (h || (isNarrow() ? 160 : 200)) + (isNarrow() ? 20 : 32));
     }
 
     function closeTourDropdowns() {
@@ -502,13 +564,16 @@
     function unionRects(nodes) {
         var union = null;
         var i;
+        var vp = getTourViewport();
         for (i = 0; i < nodes.length; i++) {
             var child = nodes[i];
             if (!child || !child.getBoundingClientRect) continue;
+            if (isNarrow() && !isPanelVisibleOnMobile(child)) continue;
             try {
                 if (global.getComputedStyle(child).display === 'none') continue;
             } catch (_) {}
             var cr = child.getBoundingClientRect();
+            if (!isRectInTourViewport(cr, vp.width, vp.height)) continue;
             if (cr.width < 2 || cr.height < 2) continue;
             if (!union) {
                 union = { top: cr.top, left: cr.left, right: cr.right, bottom: cr.bottom };
@@ -534,16 +599,24 @@
         if (!el || !el.getBoundingClientRect) return null;
         var step = getCurrentStep();
         if (step && step.panels) {
-            var containerRect = el.getBoundingClientRect();
-            if (containerRect.width >= 4 && containerRect.height >= 4) {
-                return containerRect;
-            }
             var panels = el.querySelectorAll('.groups-panel, .chat-panel, .conversations-panel');
             if (panels.length < 2) {
                 panels = el.children;
             }
             var panelUnion = unionRects(panels);
             if (panelUnion) return panelUnion;
+            if (isNarrow()) {
+                var pi;
+                for (pi = 0; pi < panels.length; pi++) {
+                    if (isPanelVisibleOnMobile(panels[pi])) {
+                        return panels[pi].getBoundingClientRect();
+                    }
+                }
+            }
+            var containerRect = el.getBoundingClientRect();
+            if (containerRect.width >= 4 && containerRect.height >= 4) {
+                return containerRect;
+            }
         }
         if (step && step.fit) {
             var fitParts = [el];
@@ -619,12 +692,13 @@
             return;
         }
         var step = getCurrentStep();
-        var vh = global.innerHeight;
-        var vw = global.innerWidth;
-        var margin = 12;
-        var reserve = getTooltipHeight() + 16;
+        var vp = getTourViewport();
+        var vh = vp.height;
+        var vw = vp.width;
+        var margin = getTourMargin();
+        var reserve = getTooltipHeight() + (isNarrow() ? 12 : 16);
         var maxBottom = vh - reserve;
-        var edge = (step && (step.compact || step.fit || step.panels)) ? FIT_PAD : PAD;
+        var edge = (step && (step.compact || step.fit || step.panels)) ? (isNarrow() ? 5 : FIT_PAD) : PAD;
         var top;
         var left;
         var width;
@@ -728,20 +802,21 @@
         var step = getCurrentStep();
         var rect = getTargetRect(el) || el.getBoundingClientRect();
         var scrollY = global.scrollY || 0;
-        var reserve = getTooltipHeight() + 24;
-        var vh = global.innerHeight;
-        var edge = FIT_PAD;
-        var smooth = !!(step && step.panels);
+        var reserve = getTooltipHeight() + (isNarrow() ? 16 : 24);
+        var vh = getTourViewport().height;
+        var edge = isNarrow() ? 5 : FIT_PAD;
+        var topPad = getTourTopPad();
+        var smooth = !isNarrow() && !!(step && step.panels);
 
         if (step && (step.fit || step.panels)) {
             if (rect.bottom + edge > vh - reserve) {
                 scrollY += rect.bottom + edge - (vh - reserve);
             }
-            if (rect.top - edge < TOUR_TOP_PAD) {
-                scrollY += rect.top - edge - TOUR_TOP_PAD;
+            if (rect.top - edge < topPad) {
+                scrollY += rect.top - edge - topPad;
             }
         } else {
-            scrollY += rect.top - TOUR_TOP_PAD;
+            scrollY += rect.top - topPad;
         }
         applyTourScroll(Math.max(0, Math.min(scrollY, getMaxTourScroll())), smooth);
     }
@@ -751,10 +826,11 @@
         var step = getCurrentStep();
         if (!(step && (step.fit || step.panels))) return true;
         var rect = getTargetRect(el) || el.getBoundingClientRect();
-        var reserve = getTooltipHeight() + 24;
-        var vh = global.innerHeight;
-        var edge = FIT_PAD;
-        return rect.bottom + edge > vh - reserve || rect.top - edge < TOUR_TOP_PAD;
+        var reserve = getTooltipHeight() + (isNarrow() ? 16 : 24);
+        var vh = getTourViewport().height;
+        var edge = isNarrow() ? 5 : FIT_PAD;
+        var topPad = getTourTopPad();
+        return rect.bottom + edge > vh - reserve || rect.top - edge < topPad;
     }
 
     function layoutStep(el, done) {
@@ -762,11 +838,12 @@
             if (done) done();
             return;
         }
+        ensureMobileTourReady();
         stabilizePageForTour(el);
         var step = getCurrentStep();
         var needsScroll = targetNeedsScroll(el);
         scrollToTarget(el);
-        var scrollDelay = needsScroll ? (step && step.panels ? 280 : 48) : 16;
+        var scrollDelay = isNarrow() ? (needsScroll ? 32 : 0) : (needsScroll ? (step && step.panels ? 280 : 48) : 16);
         global.setTimeout(function () {
             if (!active || highlightedEl !== el) {
                 if (done) done();
@@ -778,6 +855,10 @@
                     return;
                 }
                 updateStepLayout(el);
+                if (isNarrow()) {
+                    if (done) done();
+                    return;
+                }
                 global.setTimeout(function () {
                     if (!active || highlightedEl !== el) {
                         if (done) done();
@@ -984,23 +1065,40 @@
         ensureTourOnTop();
     }
 
-    function bindResize() {
-        unbindResize();
-        resizeHandler = function () {
+    function handleTourResize() {
+        if (!active || !highlightedEl) return;
+        if (resizeDebounceTimer) {
+            global.clearTimeout(resizeDebounceTimer);
+        }
+        resizeDebounceTimer = global.setTimeout(function () {
+            resizeDebounceTimer = null;
             if (!active || !highlightedEl) return;
+            ensureMobileTourReady();
+            if (isNarrow()) {
+                updateStepLayout(highlightedEl);
+                return;
+            }
             stabilizePageForTour(highlightedEl);
             scrollToTarget(highlightedEl);
-            layoutStep(highlightedEl);
-        };
+            updateStepLayout(highlightedEl);
+        }, RESIZE_DEBOUNCE_MS);
+    }
+
+    function bindResize() {
+        unbindResize();
+        resizeHandler = handleTourResize;
         global.addEventListener('resize', resizeHandler);
         if (global.visualViewport) {
-            viewportHandler = resizeHandler;
+            viewportHandler = handleTourResize;
             global.visualViewport.addEventListener('resize', viewportHandler);
-            global.visualViewport.addEventListener('scroll', viewportHandler);
         }
     }
 
     function unbindResize() {
+        if (resizeDebounceTimer) {
+            global.clearTimeout(resizeDebounceTimer);
+            resizeDebounceTimer = null;
+        }
         if (resizeHandler) {
             global.removeEventListener('resize', resizeHandler);
             global.removeEventListener('scroll', resizeHandler, true);
@@ -1008,7 +1106,6 @@
         }
         if (viewportHandler && global.visualViewport) {
             global.visualViewport.removeEventListener('resize', viewportHandler);
-            global.visualViewport.removeEventListener('scroll', viewportHandler);
             viewportHandler = null;
         }
     }
@@ -1017,6 +1114,7 @@
         stopTourPrepGuard();
         forceAllTourContentVisible();
         ensureDom();
+        ensureMobileTourReady();
         active = true;
         scrollToTop();
         lockScroll();
@@ -1045,7 +1143,11 @@
             spotlightEl.classList.remove('is-visible');
             spotlightEl.style.display = 'none';
         }
-        if (rootEl) rootEl.classList.remove('is-ready');
+        if (rootEl) {
+            rootEl.classList.remove('is-ready');
+            rootEl.classList.remove('myub-tour-mobile');
+        }
+        global.document.documentElement.classList.remove('myub-tour-mobile');
     }
 
     function navigateToPage(idx, step) {

@@ -712,3 +712,37 @@ html.myub-enhanced .myub-logo .ml-ub {
     font-weight: 700 !important;
     letter-spacing: 0.03em !important;
 }
+
+/* ── Splash, auth & sidebar — original serif wordmark ── */
+html.myub-enhanced .intro-screen .myub-logo .ml-m,
+html.myub-enhanced .intro-screen .myub-logo .ml-ub,
+html.myub-enhanced .auth-landing .myub-logo .ml-m,
+html.myub-enhanced .auth-landing .myub-logo .ml-ub,
+html.myub-enhanced .portal-card .myub-logo .ml-m,
+html.myub-enhanced .portal-card .myub-logo .ml-ub,
+html.myub-enhanced .sidebar .myub-logo .ml-m,
+html.myub-enhanced .sidebar .myub-logo .ml-ub,
+html.myub-enhanced .sidebar-logo .myub-logo .ml-m,
+html.myub-enhanced .sidebar-logo .myub-logo .ml-ub,
+html.myub-enhanced #sidebar .myub-logo .ml-m,
+html.myub-enhanced #sidebar .myub-logo .ml-ub {
+    font-family: 'Cormorant Garamond', Georgia, serif !important;
+}
+html.myub-enhanced .intro-screen .myub-logo .ml-m,
+html.myub-enhanced .auth-landing .myub-logo .ml-m,
+html.myub-enhanced .portal-card .myub-logo .ml-m,
+html.myub-enhanced .sidebar .myub-logo .ml-m,
+html.myub-enhanced .sidebar-logo .myub-logo .ml-m,
+html.myub-enhanced #sidebar .myub-logo .ml-m {
+    font-weight: 700 !important;
+    letter-spacing: -0.02em !important;
+}
+html.myub-enhanced .intro-screen .myub-logo .ml-ub,
+html.myub-enhanced .auth-landing .myub-logo .ml-ub,
+html.myub-enhanced .portal-card .myub-logo .ml-ub,
+html.myub-enhanced .sidebar .myub-logo .ml-ub,
+html.myub-enhanced .sidebar-logo .myub-logo .ml-ub,
+html.myub-enhanced #sidebar .myub-logo .ml-ub {
+    font-weight: 700 !important;
+    letter-spacing: 0.01em !important;
+}

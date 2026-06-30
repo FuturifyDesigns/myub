@@ -24,8 +24,15 @@
     <script src="myub-utils.js"></script>
     <script src="myub-mobile.js"></script>
     <script src="myub-sidebar.js"></script>
-    <link rel="stylesheet" href="myub-onboarding.css?v=24">
-    <script src="myub-onboarding.js?v=24"></script>
+    <script src="myub-gpa.js"></script>
+    <script src="myub-academic.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+    <link rel="stylesheet" href="myub-onboarding.css?v=35">
+    <link rel="stylesheet" href="myub-theme.css?v=6">
+    <script src="myub-onboarding.js?v=35"></script>
+    <script src="myub-transitions.js?v=5" defer></script>
+    <script src="myub-animations.js?v=4" defer></script>
     <style>
         /* ==========================================================
            MyUB Schedule — dark navy/red theme
@@ -2009,6 +2016,9 @@
                     <span id="viewEventCreated"></span>
                 </div>
                 <div style="display:flex;gap:12px;">
+                    <button id="addToGpaBtn" onclick="event.stopPropagation();addEventToGpa();" class="btn btn-secondary" style="display:none;">
+                        Add to GPA
+                    </button>
                     <button onclick="event.stopPropagation();editFromView();" class="btn btn-primary" style="background:var(--navy);">
                         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:18px;height:18px;">
                             <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
@@ -2411,8 +2421,27 @@
             if (event.created_at) {
                 document.getElementById('viewEventCreated').textContent = 'Created ' + formatTimeAgo(event.created_at);
             }
+
+            const gpaBtn = document.getElementById('addToGpaBtn');
+            const canAddGpa = ['class', 'exam', 'assignment'].includes(event.event_type);
+            gpaBtn.style.display = canAddGpa ? 'inline-flex' : 'none';
             
             document.getElementById('viewEventModal').classList.add('show');
+        }
+
+        async function addEventToGpa() {
+            const event = schedules.find(s => s.id === viewingEventId);
+            if (!event) { showToast('Event not found', 'error'); return; }
+            const semKey = MyUBGPA.inferCurrentSemesterKey();
+            const res = await MyUBAcademic.addCourseFromSchedule(supabaseClient, currentUser.id, event, semKey);
+            if (res.ok) {
+                showToast('Added to GPA tracker!', 'success');
+                closeViewEventModal();
+            } else if (res.existing) {
+                showToast('Course already in GPA tracker', 'error');
+            } else {
+                showToast(res.error || 'Could not add course', 'error');
+            }
         }
         
         function closeViewEventModal() {
@@ -2450,7 +2479,7 @@
                     document.getElementById('eventId').value = event.id;
                     document.getElementById('eventTitle').value = event.title;
                     document.getElementById('eventType').value = event.event_type || 'class';
-                    document.getElementById('courseCode').value = '';
+                    document.getElementById('courseCode').value = event.course_code || '';
                     document.getElementById('startTime').value = formatDateTimeLocal(event.start_time);
                     document.getElementById('endTime').value = event.end_time ? formatDateTimeLocal(event.end_time) : '';
                     document.getElementById('eventLocation').value = event.location || '';
@@ -2497,6 +2526,7 @@
             const eventData = { 
                 title, 
                 event_type: document.getElementById('eventType').value, 
+                course_code: (document.getElementById('courseCode').value || '').trim().toUpperCase() || null,
                 start_time: new Date(startTime).toISOString(), 
                 end_time: endTime ? new Date(endTime).toISOString() : null, 
                 location: location || null, 

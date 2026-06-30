@@ -29,8 +29,13 @@
     <script src="myub-utils.js"></script>
     <script src="myub-mobile.js"></script>
     <script src="myub-sidebar.js"></script>
-    <link rel="stylesheet" href="myub-onboarding.css?v=24">
-    <script src="myub-onboarding.js?v=24"></script>
+    <script src="myub-gpa.js"></script>
+    <script src="myub-academic.js"></script>
+    <link rel="stylesheet" href="myub-onboarding.css?v=35">
+    <link rel="stylesheet" href="myub-theme.css?v=6">
+    <script src="myub-onboarding.js?v=35"></script>
+    <script src="myub-transitions.js?v=5" defer></script>
+    <script src="myub-animations.js?v=4" defer></script>
     
     <!-- OneSignal Push Notifications -->
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
@@ -2889,23 +2894,14 @@
             let totalPoints = 0;
 
             if (courses && courses.length > 0) {
-                const failGrades = ['D', 'D-', 'E']; // Fail grades don't count as earned
-                courses.forEach(course => {
-                    totalCredits += course.credits;
-                    // Only count passed courses (C- and above)
-                    if (course.grade && !failGrades.includes(course.grade)) {
-                        earnedCredits += course.credits;
-                        totalPoints += course.credits * getGradePoints(course.grade);
-                    }
-                });
+                const gpa = MyUBGPA.calculateGPA(courses);
+                const earned = MyUBGPA.earnedCredits(courses);
+                const gpaPercent = MyUBGPA.gpaToPercent(gpa);
 
-                const gpa = earnedCredits > 0 ? (totalPoints / earnedCredits).toFixed(1) : 0;
-                const gpaPercent = (gpa / 5) * 100;
-
-                document.getElementById('creditsCount').textContent = earnedCredits;
-                document.getElementById('gpaValue').textContent = gpa;
+                document.getElementById('creditsCount').textContent = earned;
+                document.getElementById('gpaValue').textContent = MyUBGPA.formatGPA(gpa, 2);
                 document.getElementById('gpaCircle').style.setProperty('--gpa-percent', gpaPercent);
-                document.getElementById('gpaStatus').textContent = getGPAStatus(parseFloat(gpa));
+                document.getElementById('gpaStatus').textContent = MyUBGPA.getGPAStatus(gpa);
             }
 
             // Load study groups count

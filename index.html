@@ -25,6 +25,11 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="myub-security.js"></script>
     <script src="myub-auth.js"></script>
+    <link rel="stylesheet" href="myub-theme.css?v=6">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+    <script src="myub-transitions.js?v=5" defer></script>
+    <script src="myub-animations.js?v=4" defer></script>
     <style>
         /* ==========================================================
            MyUB — Auth Page Redesign
@@ -300,6 +305,13 @@
         }
         .auth-landing.ready { opacity: 1; transform: translateY(0) scale(1); }
         .auth-landing.hidden { display: none; }
+
+        /* Hide landing pieces until intro finishes — prevents flash */
+        .auth-landing:not(.ready) .half-content,
+        .auth-landing:not(.ready) .half-divider,
+        .auth-landing:not(.ready) .landing-header {
+            opacity: 0;
+        }
 
         /* Top half = Create One (Sign Up) */
         .half-signup {
@@ -1266,8 +1278,6 @@
     <!-- Canonical URL -->
     <link rel="canonical" href="https://www.myub.online/">
 
-    <!-- GSAP for page animations (Pass 1: auth redesign) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 </head>
 <body>
     <!-- Page transition overlay -->
@@ -1568,36 +1578,74 @@
     <script>
         // Intro — 2-stage sequence: Futurify Designs -> MyUB reveal -> landing
         let introSkipped = false;
+        let landingRevealed = false;
+
+        function waitGsap(cb) {
+            let n = 0;
+            const t = setInterval(() => {
+                if (window.gsap || ++n > 60) {
+                    clearInterval(t);
+                    cb(window.gsap);
+                }
+            }, 50);
+        }
+
+        function revealLanding() {
+            if (landingRevealed) return;
+            landingRevealed = true;
+            const authLanding = document.getElementById('authLanding');
+            if (!authLanding) return;
+            authLanding.classList.add('ready');
+            waitGsap((g) => {
+                if (!g) return;
+                g.fromTo('.half-signup .half-content',
+                    { opacity: 0, y: -16 },
+                    { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', delay: 0.05, clearProps: 'opacity,transform' }
+                );
+                g.fromTo('.half-login .half-content',
+                    { opacity: 0, y: 16 },
+                    { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', delay: 0.12, clearProps: 'opacity,transform' }
+                );
+                g.fromTo('.half-divider',
+                    { opacity: 0, scaleX: 0.6 },
+                    { opacity: 1, scaleX: 1, duration: 0.7, ease: 'power3.out', delay: 0.2, clearProps: 'opacity,transform' }
+                );
+                g.fromTo('.landing-header',
+                    { opacity: 0, y: -10 },
+                    { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', clearProps: 'opacity,transform' }
+                );
+            });
+        }
+
         function runIntroSequence() {
             const stage1 = document.getElementById('introStage1');
             const stage2 = document.getElementById('introStage2');
             const screen = document.getElementById('introScreen');
 
-            // Stage 1 shows from load (CSS animations already running). Hold 3.2s.
             setTimeout(() => {
                 if (introSkipped) return;
                 stage1.classList.add('hide-stage');
                 setTimeout(() => {
                     if (introSkipped) return;
                     stage2.classList.add('show');
-                    playMyubReveal();
+                    waitGsap((g) => playMyubReveal(g));
                 }, 550);
             }, 3200);
 
-            // Total timing: 3200 (stage1) + 550 (cross) + ~2700 (stage2) = ~6450ms
             setTimeout(() => {
                 if (introSkipped) return;
                 screen.classList.add('hide');
+                revealLanding();
                 setTimeout(() => { screen.style.display = 'none'; }, 750);
             }, 6300);
         }
 
-        function playMyubReveal() {
-            const g = window.gsap;
+        function playMyubReveal(g) {
             if (!g) return;
             const real = document.getElementById('myubRevealReal');
             const line = document.getElementById('myubRevealLine');
             const tag = document.getElementById('myubRevealTagline');
+            if (!real || !line || !tag) return;
             const tl = g.timeline();
             tl.fromTo(real,
                 { opacity: 0, scale: 0.7, rotate: -8 },
@@ -1610,14 +1658,18 @@
             introSkipped = true;
             const s = document.getElementById('introScreen');
             s.classList.add('hide');
-            setTimeout(() => { s.style.display = 'none'; }, 750);
+            revealLanding();
+            setTimeout(() => { s.style.display = 'none'; }, 400);
         }
 
         runIntroSequence();
-        // Force-hide intro after 7.5s no matter what, so it cannot block clicks
         setTimeout(() => {
             const s = document.getElementById('introScreen');
-            if (s) { s.classList.add('hide'); s.style.display = 'none'; }
+            if (s && s.style.display !== 'none') {
+                s.classList.add('hide');
+                s.style.display = 'none';
+                revealLanding();
+            }
         }, 7500);
 
         // Supabase
@@ -1930,7 +1982,10 @@
                 }
                 
                 showAlert('Success! Redirecting...', 'success');
-                setTimeout(() => navigateWithTransition('dashboard.html'), 900);
+                setTimeout(() => {
+                    if (window.myubNavigate) window.myubNavigate('dashboard.html');
+                    else navigateWithTransition('dashboard.html');
+                }, 900);
             } catch (err) {
                 showAlert(err.message);
             } finally {
@@ -2082,7 +2137,8 @@
         async function checkSession() {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (session && session.user.email_confirmed_at) {
-                window.location.href = 'dashboard.html';
+                if (window.myubNavigate) window.myubNavigate('dashboard.html');
+                else window.location.href = 'dashboard.html';
             }
         }
         
@@ -2234,55 +2290,13 @@
         }
         cardBack.addEventListener('click', backToLanding);
 
-        // Entrance animation for the landing after intro finishes
-        function revealLanding() {
-            authLanding.classList.add('ready');
-            const g = window.gsap;
-            if (g) {
-                g.fromTo('.half-signup .half-content',
-                    { opacity: 0, y: -16 },
-                    { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', delay: 0.1 }
-                );
-                g.fromTo('.half-login .half-content',
-                    { opacity: 0, y: 16 },
-                    { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', delay: 0.2 }
-                );
-                g.fromTo('.half-divider',
-                    { opacity: 0, scaleX: 0.6 },
-                    { opacity: 1, scaleX: 1, duration: 0.7, ease: 'power3.out', delay: 0.35 }
-                );
-            }
-        }
-        // Reveal landing after intro auto-hides (4s) or skip
-        const introEl = document.getElementById('introScreen');
-        const revealWhenIntroGone = () => {
-            if (introEl.classList.contains('hide')) {
-                revealLanding();
-            } else {
-                setTimeout(revealWhenIntroGone, 150);
-            }
-        };
-        setTimeout(revealWhenIntroGone, 200);
-
-        // ========== PAGE TRANSITION ==========
+        // ========== PAGE TRANSITION (fallback — myub-transitions.js handles global) ==========
         function navigateWithTransition(url) {
-            const g = window.gsap;
-            const panels = pageTransition.querySelectorAll('.pt-panel');
-            pageTransition.classList.add('active');
-            if (g && panels.length) {
-                g.fromTo(panels,
-                    { yPercent: 100 },
-                    {
-                        yPercent: 0,
-                        duration: 0.7,
-                        ease: 'power4.inOut',
-                        stagger: 0.06,
-                        onComplete: () => { window.location.href = url; }
-                    }
-                );
-            } else {
-                window.location.href = url;
+            if (window.myubNavigate) {
+                window.myubNavigate(url);
+                return;
             }
+            window.location.href = url;
         }
 
         // Init

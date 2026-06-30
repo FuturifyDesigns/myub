@@ -15,6 +15,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="myub-security.js"></script>
@@ -24,8 +25,13 @@
     <script src="myub-utils.js"></script>
     <script src="myub-mobile.js"></script>
     <script src="myub-sidebar.js"></script>
-    <link rel="stylesheet" href="myub-onboarding.css?v=24">
-    <script src="myub-onboarding.js?v=24"></script>
+    <script src="myub-gpa.js"></script>
+    <script src="myub-academic.js"></script>
+    <link rel="stylesheet" href="myub-onboarding.css?v=35">
+    <link rel="stylesheet" href="myub-theme.css?v=6">
+    <script src="myub-onboarding.js?v=35"></script>
+    <script src="myub-transitions.js?v=5" defer></script>
+    <script src="myub-animations.js?v=4" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
     <style>
         /* ==========================================================
@@ -1874,6 +1880,10 @@
                         <span class="info-label">Program Type</span>
                         <span class="info-value" id="infoProgramType">-</span>
                     </div>
+                    <div class="info-item">
+                        <span class="info-label">GPA Goal</span>
+                        <span class="info-value" id="infoGpaGoal">Not set</span>
+                    </div>
                     <div class="info-item full-width">
                         <span class="info-label">Program Name</span>
                         <span class="info-value" id="infoProgramName">-</span>
@@ -1920,6 +1930,11 @@
                             <option value="diploma">Diploma</option>
                             <option value="certificate">Certificate</option>
                         </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editGpaGoal">GPA Goal (0–5)</label>
+                        <input type="number" id="editGpaGoal" min="0" max="5" step="0.01" placeholder="e.g., 3.50">
+                        <span style="font-size:12px;color:var(--text-muted);">Shown on your dashboard and GPA calculator</span>
                     </div>
                     <div class="form-group full-width">
                         <label for="editProgramName">Program Name</label>
@@ -2634,6 +2649,11 @@
             document.getElementById('infoProgramType').textContent = formatProgramType(p.program_type) || '-';
             document.getElementById('infoProgramName').textContent = p.program_name || '-';
 
+            MyUBAcademic.loadGoal(supabaseClient, currentUser.id).then(function (goal) {
+                document.getElementById('infoGpaGoal').textContent = goal && goal.target ? goal.target.toFixed(2) : 'Not set';
+                document.getElementById('editGpaGoal').value = goal && goal.target ? goal.target : '';
+            });
+
             const bioEl = document.getElementById('infoBio');
             if (p.bio) { bioEl.textContent = p.bio; bioEl.classList.remove('empty'); }
             else { bioEl.textContent = 'No bio added yet'; bioEl.classList.add('empty'); }
@@ -2730,6 +2750,14 @@
 
                 const { error } = await supabaseClient.from('profiles').update(updates).eq('id', currentUser.id);
                 if (error) throw error;
+
+                const gpaGoalVal = document.getElementById('editGpaGoal').value;
+                if (gpaGoalVal) {
+                    const goalRes = await MyUBAcademic.saveGoal(supabaseClient, currentUser.id, gpaGoalVal);
+                    if (!goalRes.ok) throw new Error(goalRes.error);
+                } else {
+                    MyUBAcademic.setGoalLocal(currentUser.id, null);
+                }
 
                 await loadProfile();
                 toggleEditMode();

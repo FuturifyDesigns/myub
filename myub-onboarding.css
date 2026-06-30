@@ -17,6 +17,7 @@ html.myub-tour-prep .events-header,
 html.myub-tour-prep .notes-header,
 html.myub-tour-prep .toolbar,
 html.myub-tour-prep .tabs,
+html.myub-tour-prep .myub-reveal,
 html.myub-tour-active .topbar,
 html.myub-tour-active .welcome-banner,
 html.myub-tour-active .stat-card,
@@ -34,7 +35,8 @@ html.myub-tour-active .schedule-header,
 html.myub-tour-active .events-header,
 html.myub-tour-active .notes-header,
 html.myub-tour-active .toolbar,
-html.myub-tour-active .tabs {
+html.myub-tour-active .tabs,
+html.myub-tour-active .myub-reveal {
     opacity: 1 !important;
     visibility: visible !important;
     transform: none !important;
@@ -105,8 +107,19 @@ html.myub-tour-active body {
 
 body.myub-tour-active .myub-tour-highlight {
     /* Do not raise z-index — page content must stay under the tour overlay */
+    box-shadow: none !important;
+}
+
+html.myub-tour-active .myub-tour-outline-target {
+    outline: 3px solid #c41e3a !important;
+    outline-offset: 0 !important;
+}
+
+.myub-tour-spotlight.is-flush {
+    display: none !important;
     outline: none !important;
     box-shadow: none !important;
+    background: transparent;
 }
 
 .myub-tour-tooltip {
@@ -117,8 +130,10 @@ body.myub-tour-active .myub-tour-highlight {
     transform: translateX(-50%);
     z-index: 2;
     width: min(400px, calc(100vw - 32px));
-    max-height: min(50vh, 380px);
+    max-height: min(52vh, 420px);
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
     background: linear-gradient(145deg, #1a365d 0%, #122a4a 100%);
     border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: 14px;
@@ -173,7 +188,11 @@ html.myub-tour-active [data-tour="messages-main"] > .chat-panel {
 [data-tour="profile-header"],
 [data-tour="notes-header"],
 [data-tour="quick-actions"],
-[data-tour="gpa-progression"] {
+[data-tour="gpa-progression"],
+[data-tour="gpa-display"],
+[data-tour="gpa-tabs"],
+[data-tour="gpa-semesters-tour"],
+[data-tour="course-hub-intro"] {
     min-height: 0;
 }
 
@@ -190,8 +209,80 @@ html.myub-tour-active [data-tour="messages-main"] > .chat-panel {
     margin-bottom: 6px;
 }
 
+.myub-tour-mascot-wrap {
+    display: flex;
+    justify-content: center;
+    margin: -4px 0 10px;
+}
+
+/* Soft lit stage — transparent mascot reads on dark navy UI */
+.myub-mascot-stage {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 16px 2px;
+    border-radius: 20px;
+    background: radial-gradient(
+        ellipse 88% 78% at 50% 60%,
+        rgba(255, 255, 255, 0.16) 0%,
+        rgba(147, 197, 253, 0.09) 38%,
+        rgba(26, 54, 93, 0.35) 58%,
+        transparent 76%
+    );
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        0 4px 18px rgba(0, 0, 0, 0.22);
+}
+
+.myub-mascot-stage-popup {
+    margin: 0 auto 12px;
+    padding: 8px 20px 4px;
+}
+
+.myub-tour-mascot-wrap .myub-mascot-stage {
+    width: 100%;
+    max-width: 200px;
+}
+
+.myub-tour-mascot,
+.myub-tour-popup-mascot,
+.welcome-mascot {
+    display: block;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    filter:
+        drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5))
+        drop-shadow(0 8px 20px rgba(0, 0, 0, 0.35))
+        drop-shadow(0 0 18px rgba(255, 255, 255, 0.12));
+}
+
+.myub-tour-mascot {
+    width: 96px;
+    max-height: 108px;
+}
+
+.myub-tour-popup-mascot {
+    width: 128px;
+    max-height: 140px;
+}
+
+.welcome-mascot-stage {
+    flex-shrink: 0;
+    padding: 10px 18px 6px;
+    border-radius: 22px;
+}
+
+.welcome-mascot {
+    width: 140px;
+    max-height: 152px;
+}
+
 .myub-tour-title {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: 'Sora', 'Outfit', system-ui, sans-serif;
     font-size: 22px;
     font-weight: 700;
     color: #fff;
@@ -258,7 +349,7 @@ html.myub-tour-active [data-tour="messages-main"] > .chat-panel {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 24px;
+    padding: max(16px, env(safe-area-inset-top, 16px)) max(16px, env(safe-area-inset-right, 16px)) max(16px, env(safe-area-inset-bottom, 16px)) max(16px, env(safe-area-inset-left, 16px));
     animation: myubTourOverlayIn 0.4s ease;
 }
 
@@ -316,8 +407,9 @@ html.myub-tour-active [data-tour="messages-main"] > .chat-panel {
 }
 
 .myub-tour-popup h3 {
-    font-family: 'Cormorant Garamond', Georgia, serif;
-    font-size: 26px;
+    font-family: 'Sora', 'Outfit', system-ui, sans-serif;
+    font-size: 24px;
+    font-weight: 700;
     color: #fff;
     margin-bottom: 10px;
 }
@@ -371,10 +463,18 @@ html.myub-tour-active [data-tour="messages-main"] > .chat-panel {
     .myub-tour-tooltip {
         width: calc(100vw - 20px);
         max-width: none;
-        padding: 16px 16px;
-        max-height: min(40vh, 260px);
+        padding: 14px 14px 16px;
+        max-height: min(46vh, 300px);
         bottom: max(12px, env(safe-area-inset-bottom, 12px));
         border-radius: 12px;
+    }
+
+    .myub-tour-mascot-wrap {
+        margin: -6px 0 8px;
+    }
+
+    .myub-tour-mascot-wrap .myub-mascot-stage {
+        max-width: 160px;
     }
 
     .myub-tour-tooltip.is-bottom {
@@ -383,6 +483,26 @@ html.myub-tour-active [data-tour="messages-main"] > .chat-panel {
 
     .myub-tour-tooltip.is-entering {
         animation: none;
+    }
+
+    .myub-mascot-stage {
+        padding: 4px 12px 0;
+        border-radius: 16px;
+    }
+
+    .myub-tour-mascot {
+        width: 80px;
+        max-height: 90px;
+    }
+
+    .myub-tour-popup-mascot {
+        width: 108px;
+        max-height: 118px;
+    }
+
+    .welcome-mascot {
+        width: 118px;
+        max-height: 128px;
     }
 
     .myub-tour-title {
@@ -411,6 +531,71 @@ html.myub-tour-active [data-tour="messages-main"] > .chat-panel {
 
     .myub-tour-nav {
         gap: 6px;
+    }
+
+    .myub-tour-popup-overlay {
+        padding: max(12px, env(safe-area-inset-top, 12px)) max(12px, env(safe-area-inset-right, 12px)) max(12px, env(safe-area-inset-bottom, 12px)) max(12px, env(safe-area-inset-left, 12px));
+    }
+
+    .myub-tour-popup {
+        padding: 24px 20px;
+        border-radius: 16px;
+        max-height: calc(100dvh - 24px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .myub-tour-popup h3 {
+        font-size: 21px;
+    }
+
+    .myub-tour-popup .myub-tour-btn-primary {
+        width: 100%;
+    }
+}
+
+@media (max-width: 420px) {
+    .myub-tour-mascot {
+        width: 72px;
+        max-height: 82px;
+    }
+
+    .myub-tour-popup-mascot {
+        width: 96px;
+        max-height: 106px;
+    }
+
+    .welcome-mascot {
+        width: 104px;
+        max-height: 114px;
+    }
+
+    .myub-mascot-stage {
+        padding: 3px 10px 0;
+    }
+
+    .myub-tour-tooltip {
+        max-height: min(50vh, 320px);
+    }
+
+    .myub-tour-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .myub-tour-nav {
+        width: 100%;
+    }
+
+    .myub-tour-nav .myub-tour-btn {
+        flex: 1;
+        text-align: center;
+        justify-content: center;
+    }
+
+    .myub-tour-btn-ghost {
+        align-self: center;
     }
 }
 

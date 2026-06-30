@@ -24,8 +24,13 @@
     <script src="myub-utils.js"></script>
     <script src="myub-mobile.js"></script>
     <script src="myub-sidebar.js"></script>
-    <link rel="stylesheet" href="myub-onboarding.css?v=24">
-    <script src="myub-onboarding.js?v=24"></script>
+    <script src="myub-gpa.js"></script>
+    <script src="myub-academic.js"></script>
+    <link rel="stylesheet" href="myub-onboarding.css?v=35">
+    <link rel="stylesheet" href="myub-theme.css?v=6">
+    <script src="myub-onboarding.js?v=35"></script>
+    <script src="myub-transitions.js?v=5" defer></script>
+    <script src="myub-animations.js?v=4" defer></script>
     
     <!-- OneSignal Push Notifications -->
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
@@ -1249,14 +1254,16 @@
             display: none;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: max(16px, env(safe-area-inset-top, 16px)) max(16px, env(safe-area-inset-right, 16px)) max(16px, env(safe-area-inset-bottom, 16px)) max(16px, env(safe-area-inset-left, 16px));
             animation: fadeIn 0.4s ease;
         }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .welcome-modal {
             width: min(640px, 100%);
-            max-height: 90vh;
+            max-height: min(90vh, calc(100dvh - 32px));
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
             background: rgba(15, 39, 68, 0.8);
             backdrop-filter: blur(24px) saturate(140%);
             -webkit-backdrop-filter: blur(24px) saturate(140%);
@@ -1270,11 +1277,23 @@
         .welcome-modal::-webkit-scrollbar-track { background: transparent; }
         .welcome-modal::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 4px; }
         .welcome-modal-header {
-            padding: 32px 32px 20px;
-            text-align: center;
+            padding: 28px 32px 20px;
             border-bottom: 1px solid var(--border);
             position: relative;
+            overflow: hidden;
         }
+        .welcome-modal-hero {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            text-align: left;
+            position: relative;
+            z-index: 2;
+        }
+        .welcome-mascot-stage {
+            flex-shrink: 0;
+        }
+        .welcome-modal-hero-text { flex: 1; min-width: 0; }
         .welcome-modal-header::before {
             content: '';
             position: absolute;
@@ -1668,11 +1687,29 @@
             .card-title { font-size: 18px; }
             .feature-grid { grid-template-columns: 1fr; }
             .welcome-modal-header { padding: 24px 22px 18px; }
+            .welcome-modal-hero { flex-direction: column; text-align: center; gap: 14px; }
+            .welcome-mascot-stage { align-self: center; padding: 8px 14px 4px; }
+            .welcome-mascot { width: 118px; max-height: 128px; }
+            .welcome-modal-header h1 { font-size: 24px; }
+            .welcome-modal-header p { font-size: 12.5px; line-height: 1.5; }
             .welcome-modal-body { padding: 20px 22px; }
             .welcome-modal-footer { padding: 0 22px 22px; }
+            .welcome-start-btn { width: 100%; justify-content: center; padding: 14px 24px; }
+            .feature-item { padding: 12px; }
+            .contact-links { flex-direction: column; }
+            .contact-link { width: 100%; justify-content: center; }
             .notification-dropdown, .user-dropdown { width: calc(100vw - 32px); max-width: 340px; right: 0; }
         }
         @media (max-width: 420px) {
+            .welcome-modal-overlay { padding: 12px; }
+            .welcome-modal { border-radius: 18px; max-height: calc(100dvh - 24px); }
+            .welcome-modal-header { padding: 20px 16px 16px; }
+            .welcome-modal-body { padding: 16px; }
+            .welcome-modal-footer { padding: 0 16px 16px; }
+            .welcome-mascot { width: 100px; max-height: 110px; }
+            .welcome-modal-header h1 { font-size: 21px; }
+            .welcome-intro h2 { font-size: 19px; }
+            .welcome-intro p { font-size: 12.5px; }
             .topbar { gap: 8px; }
             .search-box { display: none; }
             .topbar-left { gap: 10px; }
@@ -2041,31 +2078,20 @@
     <div class="welcome-modal-overlay" id="welcomeModal" style="display: none;">
         <div class="welcome-modal">
             <div class="welcome-modal-header">
-                <div class="welcome-modal-logo">
-                    <div class="myub-logo">
-                        <div class="ml-m-wrap">
-                            <div class="ml-cap">
-                                <svg viewBox="0 0 100 70">
-                                    <polygon points="50,6 95,24 50,42 5,24" fill="#ffffff"/>
-                                    <circle cx="50" cy="24" r="4.5" fill="#1a365d" stroke="#ffffff" stroke-width="1.5"/>
-                                    <rect x="32" y="38" width="36" height="18" rx="2.5" fill="#ffffff"/>
-                                    <circle cx="78" cy="24" r="4" fill="#c41e3a"/>
-                                    <path d="M78 28 Q82 44 80 54" stroke="#c41e3a" stroke-width="3" fill="none" stroke-linecap="round"/>
-                                    <ellipse cx="80" cy="57" rx="5" ry="8" fill="#c41e3a"/>
-                                </svg>
-                            </div>
-                            <span class="ml-m">M</span>
-                        </div>
-                        <span class="ml-ub">yUB</span>
+                <div class="welcome-modal-hero">
+                    <div class="welcome-mascot-stage myub-mascot-stage">
+                        <img src="myub-mascot-waving.png?v=2" alt="" class="welcome-mascot" loading="eager" decoding="async">
+                    </div>
+                    <div class="welcome-modal-hero-text">
+                        <h1>Welcome to MyUB!</h1>
+                        <p>Your complete University of Botswana student companion. I'll walk you through everything after you tap Get Started.</p>
                     </div>
                 </div>
-                <h1>Welcome to MyUB!</h1>
-                <p>Your Complete University of Botswana Student Companion</p>
             </div>
             <div class="welcome-modal-body">
                 <div class="welcome-intro">
                     <h2>Hello, Future Graduate!</h2>
-                    <p>MyUB is designed to make your university life easier and more organized. Here's everything you can do:</p>
+                    <p>MyUB keeps your grades, schedule, notes, and campus life in one place. Here's what you can do right away:</p>
                 </div>
                 
                 <div class="feature-grid">
@@ -2520,17 +2546,32 @@
                     </div>
                 </div>
 
-                <div class="card">
+                <div class="card" data-tour="gpa-display">
                     <div class="card-header">
                         <h3 class="card-title">Your GPA</h3>
                         <a href="gpa-calculator.html" class="card-action">View Details</a>
                     </div>
                     <div class="gpa-display">
                         <div class="gpa-circle" id="gpaCircle" style="--gpa-percent: 0;">
-                            <span class="gpa-value" id="gpaValue">0.00</span>
+                            <span class="gpa-value" id="gpaValue">0.0</span>
                         </div>
                         <p class="gpa-label">Cumulative GPA</p>
                         <p class="gpa-status" id="gpaStatus">Add courses to calculate</p>
+                        <div id="gpaGoalBar" style="display:none;margin-top:14px;width:100%;max-width:220px;">
+                            <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted,#94a3b8);margin-bottom:4px;">
+                                <span>Goal <strong id="gpaGoalTarget">—</strong></span>
+                                <span id="gpaGoalPct">0%</span>
+                            </div>
+                            <div style="height:6px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden;">
+                                <div id="gpaGoalFill" style="height:100%;width:0;background:var(--red,#c41e3a);border-radius:99px;transition:width .4s;"></div>
+                            </div>
+                        </div>
+                        <div id="semesterGpaRow" style="display:none;margin-top:12px;font-size:13px;color:var(--text-soft,#cbd5e1);">
+                            This semester: <strong id="semesterGpaValue" style="color:var(--white,#fff);">—</strong>
+                        </div>
+                        <div id="examCountdownRow" style="display:none;margin-top:8px;font-size:13px;color:var(--red-light,#e63956);">
+                            Next exam: <strong id="examCountdownText">—</strong>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2843,6 +2884,13 @@
         }
 
         async function loadDashboardData() {
+            const { data: profile } = await supabaseClient
+                .from('profiles')
+                .select('year_of_study, program_type')
+                .eq('id', currentUser.id)
+                .maybeSingle();
+            userProfile = profile || {};
+
             // Load courses count
             const { count: coursesCount } = await supabaseClient
                 .from('courses')
@@ -2851,35 +2899,61 @@
             
             document.getElementById('coursesCount').textContent = coursesCount || 0;
 
-            // Calculate credits
             const { data: courses } = await supabaseClient
                 .from('courses')
-                .select('credits, grade')
+                .select('*')
                 .eq('user_id', currentUser.id);
 
-            let totalCredits = 0;
-            let earnedCredits = 0;
-            let totalPoints = 0;
-
+            let gpa = 0;
             if (courses && courses.length > 0) {
-                const failGrades = ['D', 'D-', 'E']; // Fail grades don't count as earned
-                courses.forEach(course => {
-                    totalCredits += course.credits;
-                    // Only count passed courses (C- and above)
-                    if (course.grade && !failGrades.includes(course.grade)) {
-                        earnedCredits += course.credits;
-                        totalPoints += course.credits * getGradePoints(course.grade);
-                    }
-                });
+                gpa = MyUBGPA.calculateGPA(courses);
+                const earned = MyUBGPA.earnedCredits(courses);
+                const gpaPercent = MyUBGPA.gpaToPercent(gpa);
 
-                const gpa = earnedCredits > 0 ? (totalPoints / earnedCredits).toFixed(1) : 0;
-                const gpaPercent = (gpa / 5) * 100;
-
-                document.getElementById('creditsCount').textContent = earnedCredits;
-                document.getElementById('gpaValue').textContent = gpa;
+                document.getElementById('creditsCount').textContent = earned;
+                document.getElementById('gpaValue').textContent = MyUBGPA.formatGPA(gpa);
                 document.getElementById('gpaCircle').style.setProperty('--gpa-percent', gpaPercent);
-                document.getElementById('gpaStatus').textContent = getGPAStatus(parseFloat(gpa));
+                document.getElementById('gpaStatus').textContent = MyUBGPA.getGPAStatus(gpa);
+
+                const semKey = MyUBGPA.inferCurrentSemesterKey(userProfile.year_of_study);
+                const semCourses = MyUBGPA.coursesInSemester(courses, semKey);
+                if (semCourses.length > 0) {
+                    document.getElementById('semesterGpaRow').style.display = 'block';
+                    document.getElementById('semesterGpaValue').textContent = MyUBGPA.formatGPA(MyUBGPA.calculateGPA(semCourses));
+                }
+
+                const goal = await MyUBAcademic.loadGoal(supabaseClient, currentUser.id);
+                if (goal && goal.target) {
+                    const prog = MyUBAcademic.goalProgress(gpa, goal);
+                    document.getElementById('gpaGoalBar').style.display = 'block';
+                    document.getElementById('gpaGoalTarget').textContent = goal.target.toFixed(2);
+                    document.getElementById('gpaGoalPct').textContent = Math.round(prog.percent) + '%';
+                    document.getElementById('gpaGoalFill').style.width = prog.percent + '%';
+                }
+
+                await MyUBAcademic.runAcademicAlerts(supabaseClient, currentUser.id, gpa);
             }
+
+            try {
+                const { data: nextExam } = await supabaseClient
+                    .from('schedules')
+                    .select('title, course_code, start_time')
+                    .eq('user_id', currentUser.id)
+                    .eq('event_type', 'exam')
+                    .gte('start_time', new Date().toISOString())
+                    .order('start_time', { ascending: true })
+                    .limit(1)
+                    .maybeSingle();
+
+                if (nextExam) {
+                    const cd = MyUBAcademic.formatExamCountdown(nextExam.start_time);
+                    if (cd) {
+                        document.getElementById('examCountdownRow').style.display = 'block';
+                        const label = nextExam.course_code || nextExam.title;
+                        document.getElementById('examCountdownText').textContent = label + ' in ' + cd;
+                    }
+                }
+            } catch (e) { /* schedules may be missing */ }
 
             // Load study groups count
             const { count: groupsCount } = await supabaseClient
@@ -2980,26 +3054,6 @@
                 const container = document.getElementById('scheduleList');
                 if (container) container.innerHTML = '<div style="padding:20px;text-align:center;color:#94a3b8;font-size:14px;">No upcoming events</div>';
             }
-        }
-
-        function getGradePoints(grade) {
-            // UB Grading Scale
-            const points = { 
-                'A': 5.0, 'B+': 4.5, 'B': 4.0, 'B-': 3.5, 
-                'C+': 3.0, 'C': 2.5, 'C-': 2.0, 
-                'D+': 1.5, 'D': 1.0, 'D-': 0.5, 'E': 0 
-            };
-            return points[grade] || 0;
-        }
-
-        function getGPAStatus(gpa) {
-            // UB Degree Classification
-            if (gpa >= 4.4) return 'First Class / Distinction 🎉';
-            if (gpa >= 3.6) return 'Second Class Upper / Merit';
-            if (gpa >= 2.8) return 'Second Class Lower / Credit';
-            if (gpa >= 2.0) return 'Pass';
-            if (gpa > 0) return 'Below Pass';
-            return 'Add courses to calculate';
         }
 
         function getInitials(firstName, lastName) {
@@ -3969,64 +4023,7 @@
 
             // Final safety net: after 8s, force everything visible
             setTimeout(forceVisible, 8000);
-
-            // ============================================================
-            // Lusion-style cursor spotlight on cards
-            // ============================================================
-            function setupCardSpotlight() {
-                const cards = document.querySelectorAll('.stat-card, .card, .quick-action, .feature-item');
-                cards.forEach(card => {
-                    card.addEventListener('mousemove', (e) => {
-                        const rect = card.getBoundingClientRect();
-                        const x = e.clientX - rect.left;
-                        const y = e.clientY - rect.top;
-                        card.style.setProperty('--mx', x + 'px');
-                        card.style.setProperty('--my', y + 'px');
-                    });
-                });
-            }
-            // Re-run after content loads
-            setTimeout(setupCardSpotlight, 500);
-            setTimeout(setupCardSpotlight, 1500);
-
-            // ============================================================
-            // Magnetic hover for quick actions
-            // ============================================================
-            function setupMagneticHover() {
-                const els = document.querySelectorAll('.quick-action, .stat-card');
-                els.forEach(el => {
-                    el.addEventListener('mousemove', (e) => {
-                        const rect = el.getBoundingClientRect();
-                        const x = e.clientX - rect.left - rect.width / 2;
-                        const y = e.clientY - rect.top - rect.height / 2;
-                        el.style.transform = `translate(${x * 0.06}px, ${y * 0.06 - 4}px)`;
-                    });
-                    el.addEventListener('mouseleave', () => {
-                        el.style.transform = '';
-                    });
-                });
-            }
-            setTimeout(setupMagneticHover, 1500);
-
-            // ============================================================
-            // Parallax on welcome banner
-            // ============================================================
-            function setupParallax() {
-                const banner = document.querySelector('.welcome-banner');
-                if (!banner) return;
-                banner.addEventListener('mousemove', (e) => {
-                    const rect = banner.getBoundingClientRect();
-                    const x = (e.clientX - rect.left) / rect.width - 0.5;
-                    const y = (e.clientY - rect.top) / rect.height - 0.5;
-                    banner.style.setProperty('--px', (x * 18) + 'px');
-                    banner.style.setProperty('--py', (y * 10) + 'px');
-                });
-                banner.addEventListener('mouseleave', () => {
-                    banner.style.setProperty('--px', '0px');
-                    banner.style.setProperty('--py', '0px');
-                });
-            }
-            setTimeout(setupParallax, 1500);
+            /* Card spotlight, magnetic hover, parallax → myub-animations.js */
         })();
     </script>
 

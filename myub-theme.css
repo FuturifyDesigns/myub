@@ -693,10 +693,14 @@ html.myub-enhanced .auth-landing.ready {
 }
 
 html.myub-enhanced .auth-landing.ready .half-content,
-html.myub-enhanced .auth-landing.ready .half-divider,
-html.myub-enhanced .auth-landing.ready .landing-header {
+html.myub-enhanced .auth-landing.ready .half-divider {
     opacity: 1 !important;
     transform: none !important;
+}
+
+html.myub-enhanced .auth-landing.ready .landing-header {
+    opacity: 1 !important;
+    transform: translate(-50%, -50%) !important;
 }
 
 /* ── MyUB wordmark — clean sans-serif, matches app UI ── */

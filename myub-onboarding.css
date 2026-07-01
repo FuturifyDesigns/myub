@@ -460,6 +460,15 @@ html.myub-tour-active [data-tour="messages-main"] > .chat-panel {
         will-change: auto;
     }
 
+    html.myub-mobile-perf .myub-tour-spotlight {
+        box-shadow: 0 0 0 9999px rgba(8, 18, 38, 0.82) !important;
+    }
+
+    html.myub-mobile-perf .myub-tour-tooltip {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+
     .myub-tour-tooltip {
         width: calc(100vw - 20px);
         max-width: none;

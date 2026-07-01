@@ -9,10 +9,21 @@
     var html = document.documentElement;
     html.classList.add('myub-enhanced');
 
+    function isMobilePerf() {
+        if (window.MyUBPerf && window.MyUBPerf.isMobile) return window.MyUBPerf.isMobile();
+        return window.matchMedia('(max-width: 900px)').matches ||
+            window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+    }
+
+    var MOBILE_PERF = isMobilePerf();
+    if (MOBILE_PERF) {
+        html.classList.add('myub-mobile-perf');
+    }
+
     var FROM_TRANSITION_KEY = 'myub_from_transition';
 
     function shouldSkipAnimations() {
-        if (REDUCED) return true;
+        if (REDUCED || MOBILE_PERF) return true;
         if (html.classList.contains('myub-tour-active')) return true;
         if (html.classList.contains('myub-tour-prep')) return true;
         if (/[?&]tour=1/.test(location.search)) return true;
@@ -217,6 +228,7 @@
     }
 
     function initCardSpotlight() {
+        if (MOBILE_PERF) return;
         document.querySelectorAll(
             '.stat-card, .card, .quick-action, .feature-item, .event-card, .note-card'
         ).forEach(function (card) {
@@ -311,7 +323,7 @@
     }
 
     function observeDynamicContent() {
-        if (!window.MutationObserver) return;
+        if (MOBILE_PERF || !window.MutationObserver) return;
         var debounce;
         new MutationObserver(function () {
             clearTimeout(debounce);
@@ -335,15 +347,26 @@
     function boot() {
         if (isAuthPage()) return;
 
-        var fastPath = cameFromTransition();
+        var fastPath = cameFromTransition() || MOBILE_PERF;
 
-        initScrollProgress();
+        if (!MOBILE_PERF) {
+            initScrollProgress();
+        }
         tagRevealElements();
-        initCardSpotlight();
-        initMagneticHover();
-        initBannerParallax();
+        if (!MOBILE_PERF) {
+            initCardSpotlight();
+            initMagneticHover();
+            initBannerParallax();
+        }
         initNavRipple();
-        observeDynamicContent();
+        if (!MOBILE_PERF) {
+            observeDynamicContent();
+        }
+
+        if (MOBILE_PERF) {
+            forceVisible('.myub-reveal, .topbar, .sidebar .nav-item, .card, .stat-card, .main-content, #mainContent');
+            return;
+        }
 
         if (fastPath) {
             runAnimations(true);

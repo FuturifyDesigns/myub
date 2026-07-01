@@ -25,11 +25,11 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="myub-security.js"></script>
     <script src="myub-auth.js"></script>
-    <link rel="stylesheet" href="myub-theme.css?v=8">
+    <link rel="stylesheet" href="myub-theme.css?v=9">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
-    <script src="myub-transitions.js?v=5" defer></script>
-    <script src="myub-animations.js?v=4" defer></script>
+    <script src="myub-transitions.js?v=6" defer></script>
+    <script src="myub-animations.js?v=5" defer></script>
     <style>
         /* ==========================================================
            MyUB — Auth Page Redesign
@@ -1581,6 +1581,11 @@
         // Intro — 2-stage sequence: Futurify Designs -> MyUB reveal -> landing
         let introSkipped = false;
         let landingRevealed = false;
+        const MOBILE_PERF = window.matchMedia('(max-width: 900px)').matches ||
+            window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+        if (MOBILE_PERF) {
+            document.documentElement.classList.add('myub-mobile-perf');
+        }
 
         function waitGsap(cb) {
             let n = 0;
@@ -1598,6 +1603,13 @@
             const authLanding = document.getElementById('authLanding');
             if (!authLanding) return;
             authLanding.classList.add('ready');
+            if (MOBILE_PERF) {
+                document.querySelectorAll('.half-content, .half-divider, .landing-header').forEach(function (el) {
+                    el.style.opacity = '1';
+                    el.style.transform = 'none';
+                });
+                return;
+            }
             waitGsap((g) => {
                 if (!g) return;
                 g.fromTo('.half-signup .half-content',
@@ -1661,18 +1673,22 @@
             const s = document.getElementById('introScreen');
             s.classList.add('hide');
             revealLanding();
-            setTimeout(() => { s.style.display = 'none'; }, 400);
+            setTimeout(() => { s.style.display = 'none'; }, MOBILE_PERF ? 0 : 400);
         }
 
-        runIntroSequence();
-        setTimeout(() => {
-            const s = document.getElementById('introScreen');
-            if (s && s.style.display !== 'none') {
-                s.classList.add('hide');
-                s.style.display = 'none';
-                revealLanding();
-            }
-        }, 7500);
+        if (MOBILE_PERF) {
+            skipIntro();
+        } else {
+            runIntroSequence();
+            setTimeout(() => {
+                const s = document.getElementById('introScreen');
+                if (s && s.style.display !== 'none') {
+                    s.classList.add('hide');
+                    s.style.display = 'none';
+                    revealLanding();
+                }
+            }, 7500);
+        }
 
         // Supabase
         const SUPABASE_URL = 'https://weuxtwmaqmbhskjpjdyi.supabase.co';
@@ -2238,6 +2254,13 @@
                 loadRememberedEmail();
             }
             const g = window.gsap;
+            if (MOBILE_PERF || !g) {
+                authLanding.classList.add('hidden');
+                portalCard.classList.add('active');
+                portalCard.style.opacity = '1';
+                portalCard.style.transform = 'none';
+                return;
+            }
             if (g) {
                 g.to(authLanding, {
                     opacity: 0,
@@ -2266,6 +2289,16 @@
 
         function backToLanding() {
             const g = window.gsap;
+            if (MOBILE_PERF || !g) {
+                portalCard.classList.remove('active');
+                portalCard.style.opacity = '';
+                portalCard.style.transform = '';
+                authLanding.classList.remove('hidden');
+                authLanding.style.opacity = '1';
+                authLanding.style.transform = 'none';
+                hideAlert();
+                return;
+            }
             if (g) {
                 g.to(portalCard, {
                     opacity: 0,

@@ -746,3 +746,66 @@ html.myub-enhanced #sidebar .myub-logo .ml-ub {
     font-weight: 700 !important;
     letter-spacing: 0.01em !important;
 }
+
+/* ── Mobile performance — lighter GPU, instant content ── */
+@media (max-width: 900px), (hover: none) and (pointer: coarse) {
+    html.myub-mobile-perf .myub-reveal,
+    html.myub-enhanced.myub-mobile-perf .myub-reveal {
+        opacity: 1 !important;
+        transform: none !important;
+        will-change: auto !important;
+    }
+
+    html.myub-mobile-perf .card,
+    html.myub-mobile-perf .stat-card,
+    html.myub-mobile-perf .quick-action,
+    html.myub-mobile-perf .sidebar,
+    html.myub-mobile-perf .topbar,
+    html.myub-mobile-perf .welcome-banner,
+    html.myub-mobile-perf .welcome-modal,
+    html.myub-mobile-perf .notif-modal,
+    html.myub-mobile-perf .summary-card,
+    html.myub-mobile-perf .loading,
+    html.myub-mobile-perf .portal-card,
+    html.myub-mobile-perf .auth-landing,
+    html.myub-mobile-perf .notification-dropdown,
+    html.myub-mobile-perf .user-dropdown,
+    html.myub-mobile-perf .gpa-page .card,
+    html.myub-mobile-perf .whatif-card,
+    html.myub-mobile-perf .progression-card {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+
+    html.myub-mobile-perf .stat-card,
+    html.myub-mobile-perf .card,
+    html.myub-mobile-perf .quick-action,
+    html.myub-mobile-perf .nav-item,
+    html.myub-mobile-perf .schedule-item,
+    html.myub-mobile-perf .friend-card,
+    html.myub-mobile-perf .event-card,
+    html.myub-mobile-perf .note-card,
+    html.myub-mobile-perf .feature-item {
+        transition-duration: 0.15s !important;
+    }
+
+    html.myub-mobile-perf .stat-card:hover,
+    html.myub-mobile-perf .card:hover,
+    html.myub-mobile-perf .quick-action:hover,
+    html.myub-mobile-perf .feature-item:hover,
+    html.myub-mobile-perf .schedule-item:hover,
+    html.myub-mobile-perf .friend-card:hover,
+    html.myub-mobile-perf .event-card:hover,
+    html.myub-mobile-perf .note-card:hover {
+        transform: none !important;
+    }
+
+    html.myub-mobile-perf .myub-tour-spotlight {
+        transition: opacity 0.2s ease !important;
+        will-change: auto !important;
+    }
+
+    html.myub-mobile-perf .myub-pt-logo-mark {
+        will-change: auto !important;
+    }
+}

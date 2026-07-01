@@ -9,6 +9,11 @@
     var STORAGE_KEY = 'myub_pt';
     var FROM_TRANSITION_KEY = 'myub_from_transition';
     var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var MOBILE_PERF = window.matchMedia('(max-width: 900px)').matches ||
+        window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+    if (MOBILE_PERF) {
+        document.documentElement.classList.add('myub-mobile-perf');
+    }
     var TRANSITION_STYLE = 'curtain';
     var PANEL_DUR = 0.5;
     var PANEL_STAGGER = 0.045;
@@ -62,13 +67,13 @@
     }
 
     function prepEnterOverlay() {
-        if (REDUCED || !sessionStorage.getItem(STORAGE_KEY)) return;
+        if (REDUCED || MOBILE_PERF || !sessionStorage.getItem(STORAGE_KEY)) return;
         var overlay = ensureOverlay();
         overlay.classList.add('active', 'entering', 'myub-pt-prep');
     }
 
     function runExit(url) {
-        if (REDUCED) {
+        if (REDUCED || MOBILE_PERF) {
             location.href = url;
             return;
         }
@@ -108,6 +113,11 @@
     }
 
     function runEnter() {
+        if (MOBILE_PERF) {
+            sessionStorage.removeItem(STORAGE_KEY);
+            sessionStorage.removeItem(FROM_TRANSITION_KEY);
+            return;
+        }
         var raw = sessionStorage.getItem(STORAGE_KEY);
         if (!raw || REDUCED) return;
 
@@ -160,6 +170,7 @@
     window.myubNavigate = navigate;
 
     document.addEventListener('click', function (e) {
+        if (MOBILE_PERF) return;
         var a = e.target.closest('a[href]');
         if (!isInternalHtmlLink(a)) return;
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;

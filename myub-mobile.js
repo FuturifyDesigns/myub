@@ -24,6 +24,19 @@
 
     if (window.MyUBMobile) return; // idempotent
 
+    function isMobilePerf() {
+        return window.matchMedia('(max-width: 900px)').matches ||
+            window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+    }
+
+    if (isMobilePerf()) {
+        document.documentElement.classList.add('myub-mobile-perf');
+    }
+
+    window.MyUBPerf = {
+        isMobile: isMobilePerf
+    };
+
     var THRESHOLD_PX = 70;          // distance the user must drag
     var MAX_PULL_PX  = 140;         // visual cap on the indicator
     var RESIST       = 0.55;        // rubber-band resistance factor
@@ -166,12 +179,26 @@
         style.textContent = [
             '@keyframes myub-ptr-spin{to{transform:rotate(360deg)}}',
             'html,body{-webkit-overflow-scrolling:touch;}',
-            // Modal/sidebar containment — prevents body bounce when a
-            // modal is scrolled to its edges, replacing the overscroll
-            // ban that used to live on html/body.
             '.modal,.sidebar,.dropdown-menu,[role="dialog"]{overscroll-behavior:contain;}',
-            // Tame backdrop-filter cost on phones — biggest single
-            // scroll-jank source on the existing topbar.
+            'html.myub-mobile-perf .card,',
+            'html.myub-mobile-perf .stat-card,',
+            'html.myub-mobile-perf .quick-action,',
+            'html.myub-mobile-perf .sidebar,',
+            'html.myub-mobile-perf .topbar,',
+            'html.myub-mobile-perf .welcome-banner,',
+            'html.myub-mobile-perf .welcome-modal,',
+            'html.myub-mobile-perf .notif-modal,',
+            'html.myub-mobile-perf .summary-card,',
+            'html.myub-mobile-perf .loading,',
+            'html.myub-mobile-perf .portal-card,',
+            'html.myub-mobile-perf .auth-landing,',
+            'html.myub-mobile-perf .notification-dropdown,',
+            'html.myub-mobile-perf .user-dropdown,',
+            'html.myub-mobile-perf .gpa-page .card,',
+            'html.myub-mobile-perf .myub-tour-tooltip{',
+            '  backdrop-filter:none !important;',
+            '  -webkit-backdrop-filter:none !important;',
+            '}',
             '@media (hover:none) and (pointer:coarse){',
             '  .topbar,.app-topbar,header.topbar{backdrop-filter:none !important;-webkit-backdrop-filter:none !important;}',
             '}'
@@ -217,7 +244,8 @@
     }
 
     window.MyUBMobile = {
-        version: '1.0.0',
+        version: '1.1.0',
+        isMobilePerf: isMobilePerf,
         refresh: triggerRefresh,
         // Hook for future use: events.html will call this to register
         // a custom refresh handler instead of full page reload.

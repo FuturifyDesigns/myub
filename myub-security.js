@@ -320,39 +320,277 @@
     MyUBSecurity.session = {
         // Session timeout (30 minutes of inactivity)
         timeoutMs: 30 * 60 * 1000,
+        warningBeforeMs: 2 * 60 * 1000,
+        checkIntervalMs: 30000,
         lastActivity: Date.now(),
-        
-        updateActivity: function() {
-            this.lastActivity = Date.now();
-            sessionStorage.setItem('myub_last_activity', this.lastActivity);
+        warningVisible: false,
+        signingOut: false,
+        checkTimer: null,
+        authListenerBound: false,
+
+        isPublicPage: function() {
+            const path = (window.location.pathname.split('/').pop() || 'index.html').toLowerCase();
+            return path === '' || path === 'index.html' || path === 'verified.html' ||
+                path === 'reset-password.html' || path === 'offline.html';
         },
-        
-        checkTimeout: function() {
-            const lastActivity = parseInt(sessionStorage.getItem('myub_last_activity')) || Date.now();
-            if (Date.now() - lastActivity > this.timeoutMs) {
-                return true; // Session timed out
+
+        isIndexPage: function() {
+            const path = (window.location.pathname.split('/').pop() || 'index.html').toLowerCase();
+            return path === '' || path === 'index.html';
+        },
+
+        getAuthClient: function() {
+            if (window.supabaseClient) return window.supabaseClient;
+            if (window.MyUBAuth && window.MyUBAuth.getClient) {
+                try {
+                    return window.MyUBAuth.getClient();
+                } catch (e) {
+                    return null;
+                }
+            }
+            return null;
+        },
+
+        isAuthenticated: async function() {
+            try {
+                const client = this.getAuthClient();
+                if (window.MyUBAuth && window.MyUBAuth.getSessionSafe && client) {
+                    const { session } = await window.MyUBAuth.getSessionSafe(client);
+                    return !!(session && session.user);
+                }
+                if (client) {
+                    const { data: { session } } = await client.auth.getSession();
+                    return !!(session && session.user);
+                }
+                if (window.MyUBAuth && window.MyUBAuth.hasStoredAuthToken) {
+                    return window.MyUBAuth.hasStoredAuthToken();
+                }
+            } catch (e) {
+                return false;
             }
             return false;
         },
-        
-        init: function() {
-            // Update activity on user interaction
-            ['click', 'keypress', 'scroll', 'touchstart'].forEach(event => {
-                document.addEventListener(event, () => this.updateActivity(), { passive: true });
+
+        getInactiveMs: function() {
+            const lastActivity = parseInt(sessionStorage.getItem('myub_last_activity'), 10);
+            if (!lastActivity) return 0;
+            return Date.now() - lastActivity;
+        },
+
+        updateActivity: function() {
+            this.lastActivity = Date.now();
+            sessionStorage.setItem('myub_last_activity', String(this.lastActivity));
+            if (this.warningVisible) {
+                this.hideWarningModal();
+            }
+        },
+
+        clearActivity: function() {
+            sessionStorage.removeItem('myub_last_activity');
+            this.lastActivity = Date.now();
+            if (this.warningVisible) {
+                this.hideWarningModal();
+            }
+        },
+
+        ensureModal: function() {
+            if (document.getElementById('myub-session-modal')) return;
+
+            const style = document.createElement('style');
+            style.id = 'myub-session-modal-styles';
+            style.textContent = [
+                '#myub-session-modal{position:fixed;inset:0;background:rgba(15,23,42,.72);',
+                'display:none;align-items:center;justify-content:center;z-index:100000;',
+                'font-family:Outfit,system-ui,sans-serif;padding:20px}',
+                '#myub-session-modal.show{display:flex}',
+                '#myub-session-modal .myub-session-card{background:#fff;border-radius:20px;max-width:420px;',
+                'width:100%;padding:32px 28px;box-shadow:0 24px 48px rgba(0,0,0,.22);text-align:center}',
+                '#myub-session-modal h2{font-family:Sora,system-ui,sans-serif;font-size:22px;color:#1a365d;',
+                'margin:0 0 10px}',
+                '#myub-session-modal p{color:#64748b;font-size:15px;line-height:1.6;margin:0 0 24px}',
+                '#myub-session-modal .myub-session-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}',
+                '#myub-session-modal button{border:none;border-radius:12px;padding:12px 20px;font-size:15px;',
+                'font-weight:600;cursor:pointer;min-width:140px}',
+                '#myub-session-modal .myub-session-extend{background:#1a365d;color:#fff}',
+                '#myub-session-modal .myub-session-signout{background:#f1f5f9;color:#334155}'
+            ].join('');
+            document.head.appendChild(style);
+
+            const overlay = document.createElement('div');
+            overlay.id = 'myub-session-modal';
+            overlay.setAttribute('role', 'dialog');
+            overlay.setAttribute('aria-modal', 'true');
+            overlay.setAttribute('aria-labelledby', 'myub-session-modal-title');
+            overlay.innerHTML =
+                '<div class="myub-session-card">' +
+                    '<h2 id="myub-session-modal-title">Are you still with us?</h2>' +
+                    '<p>Your session has been idle for a while. Would you like to extend your session or sign out?</p>' +
+                    '<div class="myub-session-actions">' +
+                        '<button type="button" class="myub-session-extend">Extend session</button>' +
+                        '<button type="button" class="myub-session-signout">Sign out</button>' +
+                    '</div>' +
+                '</div>';
+            document.body.appendChild(overlay);
+
+            const self = this;
+            overlay.querySelector('.myub-session-extend').addEventListener('click', function() {
+                self.extendSession();
             });
-            
-            // Check timeout periodically
-            setInterval(() => {
-                if (this.checkTimeout()) {
-                    console.warn('Security: Session timeout, logging out');
-                    // Trigger logout if supabase client exists
-                    if (window.supabaseClient) {
-                        window.supabaseClient.auth.signOut().then(() => {
-                            window.location.href = 'index.html';
-                        });
-                    }
+            overlay.querySelector('.myub-session-signout').addEventListener('click', function() {
+                self.signOutUser();
+            });
+        },
+
+        showWarningModal: function() {
+            if (this.warningVisible || this.signingOut) return;
+            this.ensureModal();
+            const modal = document.getElementById('myub-session-modal');
+            if (!modal) return;
+            modal.classList.add('show');
+            this.warningVisible = true;
+        },
+
+        hideWarningModal: function() {
+            const modal = document.getElementById('myub-session-modal');
+            if (modal) modal.classList.remove('show');
+            this.warningVisible = false;
+        },
+
+        extendSession: function() {
+            this.updateActivity();
+            this.hideWarningModal();
+        },
+
+        signOutUser: function() {
+            if (this.signingOut) return;
+            this.signingOut = true;
+            this.hideWarningModal();
+            this.clearActivity();
+
+            const redirectIfNeeded = () => {
+                if (!this.isIndexPage()) {
+                    window.location.href = 'index.html';
                 }
-            }, 60000); // Check every minute
+            };
+
+            const client = this.getAuthClient();
+            if (client) {
+                client.auth.signOut()
+                    .then(redirectIfNeeded)
+                    .catch(redirectIfNeeded)
+                    .finally(() => { this.signingOut = false; });
+            } else {
+                redirectIfNeeded();
+                this.signingOut = false;
+            }
+        },
+
+        onUserActivity: function() {
+            if (!this.isMonitoringEnabled) return;
+            this.updateActivity();
+        },
+
+        bindAuthListener: function() {
+            const client = this.getAuthClient();
+            if (this.authListenerBound || !client) return;
+            this.authListenerBound = true;
+            const self = this;
+            client.auth.onAuthStateChange(function(event) {
+                if (event === 'SIGNED_IN') {
+                    self.updateActivity();
+                    self.startMonitoring();
+                } else if (event === 'SIGNED_OUT') {
+                    self.stopMonitoring();
+                    self.clearActivity();
+                }
+            });
+        },
+
+        startMonitoring: function() {
+            this.isMonitoringEnabled = true;
+            if (!sessionStorage.getItem('myub_last_activity')) {
+                this.updateActivity();
+            }
+            if (!this.checkTimer) {
+                const self = this;
+                this.checkTimer = setInterval(function() {
+                    self.evaluateSession();
+                }, this.checkIntervalMs);
+            }
+        },
+
+        stopMonitoring: function() {
+            this.isMonitoringEnabled = false;
+            this.hideWarningModal();
+            if (this.checkTimer) {
+                clearInterval(this.checkTimer);
+                this.checkTimer = null;
+            }
+        },
+
+        evaluateSession: async function() {
+            if (this.signingOut) return;
+
+            const authed = await this.isAuthenticated();
+            if (!authed) {
+                this.stopMonitoring();
+                if (this.isPublicPage()) {
+                    this.clearActivity();
+                }
+                return;
+            }
+
+            this.startMonitoring();
+            const inactiveMs = this.getInactiveMs();
+
+            if (inactiveMs >= this.timeoutMs) {
+                console.warn('Security: Session timeout, logging out');
+                this.signOutUser();
+                return;
+            }
+
+            if (inactiveMs >= (this.timeoutMs - this.warningBeforeMs)) {
+                this.showWarningModal();
+            }
+        },
+
+        init: function() {
+            const self = this;
+            this.isMonitoringEnabled = false;
+
+            ['click', 'keypress', 'scroll', 'touchstart'].forEach(function(event) {
+                document.addEventListener(event, function() {
+                    self.onUserActivity();
+                }, { passive: true });
+            });
+
+            const boot = async function() {
+                self.bindAuthListener();
+                const authed = await self.isAuthenticated();
+                if (authed) {
+                    self.startMonitoring();
+                    await self.evaluateSession();
+                } else if (self.isPublicPage()) {
+                    self.clearActivity();
+                }
+            };
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', boot);
+            } else {
+                boot();
+            }
+
+            let clientWaitAttempts = 0;
+            const clientWait = setInterval(function() {
+                if (self.getAuthClient()) {
+                    clearInterval(clientWait);
+                    self.bindAuthListener();
+                    self.evaluateSession();
+                } else if (++clientWaitAttempts > 40) {
+                    clearInterval(clientWait);
+                }
+            }, 250);
         }
     };
 

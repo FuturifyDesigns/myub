@@ -3856,6 +3856,9 @@
         async function initOneSignal() {
             try {
                 if (!currentUser || !currentUser.id) return;
+                if (window.MyUBConsent && !MyUBConsent.ensureFunctionalConsent(
+                    'Push notifications use OneSignal (a third-party service). Allow functional cookies/storage to continue?'
+                )) return;
                 
                 window.OneSignalDeferred = window.OneSignalDeferred || [];
                 OneSignalDeferred.push(async function(OneSignal) {

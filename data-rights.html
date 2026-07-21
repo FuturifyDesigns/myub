@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Data Rights - MyUB</title>
+    <meta name="description" content="Exercise your rights under Botswana's Data Protection Act, 2024 with MyUB.">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#1a365d">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,500&family=Outfit:wght@400;500;600;700&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="myub-legal.css?v=1">
+</head>
+<body>
+    <div class="page-bg" aria-hidden="true"></div>
+    <header class="legal-top">
+        <a class="brand" href="/">MyUB</a>
+        <nav class="legal-nav">
+            <a href="privacy.html">Privacy</a>
+            <a href="terms.html">Terms</a>
+            <a href="cookies.html">Cookies</a>
+            <a href="data-rights.html" class="active">Your Rights</a>
+        </nav>
+    </header>
+
+    <main class="legal-wrap">
+        <p class="eyebrow">Data Protection Act, 2024 · Part VIII</p>
+        <h1>Your data rights</h1>
+        <p class="meta">Use this page to request access, correction, erasure, restriction, objection, or a copy of your data.</p>
+
+        <div class="callout">
+            Under Botswana’s <strong>Data Protection Act, 2024</strong>, you can exercise rights over your personal data. We will verify your identity before fulfilling requests. You may also complain to the <strong>Information and Data Protection Commission</strong>.
+        </div>
+
+        <h2>Rights you can exercise</h2>
+        <ul>
+            <li><strong>Access</strong> — get a copy of personal data we hold about you</li>
+            <li><strong>Rectification</strong> — correct inaccurate or incomplete data (many profile fields can be edited in Profile)</li>
+            <li><strong>Erasure</strong> — request deletion where the Act allows (also available via Profile → Delete Account)</li>
+            <li><strong>Restriction</strong> — ask us to limit processing in certain cases</li>
+            <li><strong>Objection</strong> — object to certain processing, including optional presence/push features where applicable</li>
+            <li><strong>Portability</strong> — receive data you provided in a commonly used machine-readable format</li>
+            <li><strong>Withdraw consent</strong> — for processing based on consent (cookies, optional notifications)</li>
+        </ul>
+
+        <h2>Self-service options</h2>
+        <ul>
+            <li><a href="profile.html">Profile</a> — update your details or delete your account</li>
+            <li><a href="cookies.html">Cookie Policy</a> — manage cookie preferences</li>
+            <li>Browser / device settings — disable push notifications</li>
+        </ul>
+
+        <h2>Submit a request</h2>
+        <p>Complete the form below. It opens your email client with a pre-filled message to <a href="mailto:privacy@myub.online">privacy@myub.online</a>.</p>
+
+        <form class="form-card" id="rightsForm" onsubmit="return submitRightsRequest(event)">
+            <label for="fullName">Full name</label>
+            <input id="fullName" name="fullName" required autocomplete="name" placeholder="As on your MyUB account">
+
+            <label for="email">UB email</label>
+            <input id="email" name="email" type="email" required autocomplete="email" placeholder="yourid@ub.ac.bw">
+
+            <label for="studentId">Student ID (optional)</label>
+            <input id="studentId" name="studentId" maxlength="9" placeholder="9-digit student ID">
+
+            <label for="requestType">Request type</label>
+            <select id="requestType" name="requestType" required>
+                <option value="">Select</option>
+                <option value="Access">Access my personal data</option>
+                <option value="Rectification">Correct my personal data</option>
+                <option value="Erasure">Erase / delete my personal data</option>
+                <option value="Restriction">Restrict processing</option>
+                <option value="Objection">Object to processing</option>
+                <option value="Portability">Data portability / export</option>
+                <option value="Withdraw consent">Withdraw consent</option>
+                <option value="Other">Other privacy enquiry</option>
+            </select>
+
+            <label for="details">Details</label>
+            <textarea id="details" name="details" required placeholder="Describe your request. For corrections, include what should change."></textarea>
+
+            <button type="submit">Email privacy request</button>
+        </form>
+
+        <h2>Complaints</h2>
+        <p>If you are not satisfied with our response, you may lodge a complaint with the Information and Data Protection Commission (Botswana), the national supervisory authority under the Act.</p>
+
+        <div class="legal-links">
+            <a href="privacy.html">Privacy Policy</a>
+            <a href="terms.html">Terms of Service</a>
+            <a href="cookies.html">Cookie Policy</a>
+            <a href="/">Back to MyUB</a>
+        </div>
+    </main>
+
+    <footer class="legal-footer">
+        © 2026 <a href="https://futurifydesigns.github.io" target="_blank" rel="noopener">Futurify Designs</a>
+        · Data subject rights
+    </footer>
+    <script>
+        function submitRightsRequest(e) {
+            e.preventDefault();
+            var name = document.getElementById('fullName').value.trim();
+            var email = document.getElementById('email').value.trim();
+            var studentId = document.getElementById('studentId').value.trim();
+            var type = document.getElementById('requestType').value;
+            var details = document.getElementById('details').value.trim();
+            var body =
+                'MyUB Data Subject Request (Botswana Data Protection Act, 2024)%0D%0A%0D%0A' +
+                'Name: ' + encodeURIComponent(name) + '%0D%0A' +
+                'Email: ' + encodeURIComponent(email) + '%0D%0A' +
+                'Student ID: ' + encodeURIComponent(studentId || 'N/A') + '%0D%0A' +
+                'Request type: ' + encodeURIComponent(type) + '%0D%0A%0D%0A' +
+                'Details:%0D%0A' + encodeURIComponent(details) + '%0D%0A';
+            window.location.href = 'mailto:privacy@myub.online?subject=' +
+                encodeURIComponent('MyUB Data Request — ' + type) + '&body=' + body;
+            return false;
+        }
+    </script>
+    <script src="myub-consent.js?v=1" defer></script>
+</body>
+</html>

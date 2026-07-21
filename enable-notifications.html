@@ -72,6 +72,7 @@
         <div id="status"></div>
     </div>
 
+    <script src="myub-consent.js?v=1"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
     
@@ -155,6 +156,18 @@
         // Initialize OneSignal
         async function initOneSignal() {
             try {
+                if (window.MyUBConsent && !MyUBConsent.allowFunctional()) {
+                    if (confirm('Push notifications use a third-party service (OneSignal). Allow functional cookies/storage to continue?')) {
+                        MyUBConsent.saveChoice({
+                            preferences: MyUBConsent.getPrefs().preferences,
+                            functional: true
+                        });
+                    } else {
+                        showStatus('Functional consent is required for push notifications.', 'info');
+                        return;
+                    }
+                }
+
                 const { data: { user } } = await notifSupabase.auth.getUser();
                 
                 if (!user) {

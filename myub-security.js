@@ -331,7 +331,9 @@
         isPublicPage: function() {
             const path = (window.location.pathname.split('/').pop() || 'index.html').toLowerCase();
             return path === '' || path === 'index.html' || path === 'verified.html' ||
-                path === 'reset-password.html' || path === 'offline.html';
+                path === 'reset-password.html' || path === 'offline.html' || path === '404.html' ||
+                path === 'privacy.html' || path === 'terms.html' || path === 'cookies.html' ||
+                path === 'data-rights.html';
         },
 
         isIndexPage: function() {
@@ -695,6 +697,16 @@
     
     // Initialize session security
     MyUBSecurity.session.init();
+
+    // Load BDPA consent / cookie banner (once)
+    (function loadConsentScript() {
+        if (document.querySelector('script[data-myub-consent]')) return;
+        var s = document.createElement('script');
+        s.src = 'myub-consent.js?v=1';
+        s.defer = true;
+        s.setAttribute('data-myub-consent', '1');
+        (document.head || document.documentElement).appendChild(s);
+    })();
     
     // Protect console in production
     if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {

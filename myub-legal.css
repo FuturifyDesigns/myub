@@ -1,0 +1,243 @@
+/* Shared styles for MyUB legal pages */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+    --navy: #1a365d;
+    --navy-light: #2c5282;
+    --navy-dark: #0f2744;
+    --navy-darker: #081726;
+    --red: #c41e3a;
+    --white: #ffffff;
+}
+
+html { background: var(--navy-darker); }
+
+body {
+    font-family: 'Outfit', system-ui, sans-serif;
+    color: rgba(255, 255, 255, 0.88);
+    min-height: 100vh;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+}
+
+.page-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+        radial-gradient(circle at 15% 10%, rgba(58, 111, 168, 0.2) 0%, transparent 45%),
+        radial-gradient(circle at 85% 90%, rgba(196, 30, 58, 0.1) 0%, transparent 50%),
+        linear-gradient(160deg, #0f2744 0%, #1a365d 50%, #0f2744 100%);
+}
+
+.legal-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 22px 20px 8px;
+}
+
+.brand {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--white);
+    text-decoration: none;
+    letter-spacing: -0.02em;
+}
+
+.legal-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.legal-nav a {
+    color: rgba(255, 255, 255, 0.65);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: background 0.2s, color 0.2s;
+}
+
+.legal-nav a:hover,
+.legal-nav a.active {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--white);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.legal-wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 24px 20px 48px;
+}
+
+.eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.45);
+    margin-bottom: 8px;
+}
+
+h1 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: clamp(32px, 5vw, 42px);
+    font-weight: 600;
+    font-style: italic;
+    color: var(--white);
+    line-height: 1.15;
+    margin-bottom: 10px;
+}
+
+.meta {
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 13px;
+    margin-bottom: 28px;
+}
+
+.callout {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-left: 3px solid var(--red);
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 28px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.callout a { color: #93c5fd; }
+
+h2 {
+    font-family: 'Sora', 'Outfit', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--white);
+    margin: 28px 0 10px;
+}
+
+h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.92);
+    margin: 18px 0 8px;
+}
+
+p, li { font-size: 14.5px; color: rgba(255, 255, 255, 0.78); }
+
+p { margin-bottom: 12px; }
+
+ul, ol {
+    margin: 0 0 14px 1.2em;
+}
+
+li { margin-bottom: 6px; }
+
+a { color: #93c5fd; }
+
+code {
+    font-family: ui-monospace, Consolas, monospace;
+    font-size: 12.5px;
+    background: rgba(0, 0, 0, 0.25);
+    padding: 2px 6px;
+    border-radius: 6px;
+}
+
+.legal-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 36px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.legal-links a {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--white);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.legal-links a:hover { background: rgba(255, 255, 255, 0.1); }
+
+.legal-footer {
+    text-align: center;
+    padding: 0 20px 36px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.legal-footer a {
+    color: rgba(255, 255, 255, 0.65);
+    text-decoration: none;
+}
+
+.form-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 20px;
+    margin-top: 16px;
+}
+
+.form-card label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.form-card input,
+.form-card select,
+.form-card textarea {
+    width: 100%;
+    margin-bottom: 14px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(0, 0, 0, 0.25);
+    color: var(--white);
+    font-family: inherit;
+    font-size: 14px;
+}
+
+.form-card textarea { min-height: 110px; resize: vertical; }
+
+.form-card button {
+    width: 100%;
+    border: none;
+    border-radius: 12px;
+    padding: 13px 16px;
+    background: linear-gradient(135deg, var(--navy-light), var(--navy));
+    color: var(--white);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.form-card button:hover {
+    background: linear-gradient(135deg, var(--red), #9a1730);
+}
+
+@media (max-width: 600px) {
+    .legal-top { padding-top: 16px; }
+    .legal-nav a { padding: 7px 10px; font-size: 12px; }
+}

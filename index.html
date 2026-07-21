@@ -999,6 +999,35 @@
         }
         .page-footer a:hover { color: var(--white); }
 
+        .consent-block {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 4px 0 14px;
+            padding: 12px 12px 10px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .consent-check {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 12px;
+            line-height: 1.45;
+            color: rgba(255, 255, 255, 0.72);
+            cursor: pointer;
+        }
+        .consent-check input {
+            margin-top: 2px;
+            flex-shrink: 0;
+            accent-color: var(--navy-light, #2c5282);
+        }
+        .consent-check a {
+            color: #93c5fd;
+            text-decoration: underline;
+        }
+
         /* ========== RESPONSIVE ========== */
         @media (max-width: 768px) {
             .portal-container { padding: 14px 14px 22px; }
@@ -1549,6 +1578,16 @@
                                 <button type="button" class="pw-toggle" onclick="togglePw('confirmPassword', this)" aria-label="Show password"><svg class="eye-on" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-off" viewBox="0 0 24 24"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-6.5 0-10-7-10-7a19.8 19.8 0 0 1 4.22-5.58M9.9 4.24A10.94 10.94 0 0 1 12 4c6.5 0 10 7 10 7a19.8 19.8 0 0 1-2.17 3.19M1 1l22 22M14.12 14.12A3 3 0 1 1 9.88 9.88"/></svg></button>
                             </div>
                         </div>
+                        <div class="consent-block">
+                            <label class="consent-check">
+                                <input type="checkbox" id="agreeTerms" required>
+                                <span>I agree to the <a href="terms.html" target="_blank" rel="noopener">Terms of Service</a> and <a href="privacy.html" target="_blank" rel="noopener">Privacy Policy</a> (Botswana Data Protection Act, 2024).</span>
+                            </label>
+                            <label class="consent-check">
+                                <input type="checkbox" id="confirmAge" required>
+                                <span>I confirm I am at least 16 years old and authorised to use a UB student account.</span>
+                            </label>
+                        </div>
                         <button type="submit" class="submit-btn" id="signupBtn">Create Account</button>
                     </form>
                 </div>
@@ -1576,7 +1615,11 @@
         </div>
 
         <div class="page-footer">
-            © 2026 <a href="https://futurifydesigns.github.io" target="_blank">Futurify Designs</a>
+            © 2026 <a href="https://futurifydesigns.github.io" target="_blank" rel="noopener">Futurify Designs</a>
+            · <a href="privacy.html">Privacy</a>
+            · <a href="terms.html">Terms</a>
+            · <a href="cookies.html">Cookies</a>
+            · <a href="data-rights.html">Your Rights</a>
         </div>
     </div>
 
@@ -2037,6 +2080,15 @@
         async function handleSignup(e) {
             e.preventDefault();
             hideAlert();
+
+            if (!document.getElementById('agreeTerms').checked) {
+                showAlert('Please agree to the Terms of Service and Privacy Policy to create an account.');
+                return;
+            }
+            if (!document.getElementById('confirmAge').checked) {
+                showAlert('Please confirm you meet the age and account eligibility requirements.');
+                return;
+            }
             
             const firstName = document.getElementById('firstName').value;
             const lastName = document.getElementById('lastName').value;

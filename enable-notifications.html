@@ -157,12 +157,10 @@
         async function initOneSignal() {
             try {
                 if (window.MyUBConsent && !MyUBConsent.allowFunctional()) {
-                    if (confirm('Push notifications use a third-party service (OneSignal). Allow functional cookies/storage to continue?')) {
-                        MyUBConsent.saveChoice({
-                            preferences: MyUBConsent.getPrefs().preferences,
-                            functional: true
-                        });
-                    } else {
+                    const allowed = await MyUBConsent.requestFunctionalConsent(
+                        'Push notifications use OneSignal, a third-party service, and store functional data on your device. You can turn this off anytime in your privacy choices.'
+                    );
+                    if (!allowed) {
                         showStatus('Functional consent is required for push notifications.', 'info');
                         return;
                     }

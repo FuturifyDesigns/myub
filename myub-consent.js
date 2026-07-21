@@ -240,14 +240,81 @@
         }
     }
 
-    function ensureFunctionalConsent(message) {
-        if (allowFunctional()) return true;
-        var ok = global.confirm(message ||
-            'This feature uses a third-party service that stores functional data (for example push notifications). Allow functional cookies/storage to continue?');
-        if (!ok) return false;
-        var prefs = getPrefs();
-        saveChoice({ preferences: !!prefs.preferences, functional: true });
-        return true;
+    function ensureFuncModal() {
+        if (document.getElementById('myub-func-consent')) return;
+        ensureStyles();
+        var extra = document.createElement('style');
+        extra.id = 'myub-func-consent-styles';
+        extra.textContent = [
+            '#myub-func-consent{position:fixed;inset:0;z-index:100070;background:rgba(8,23,38,.72);',
+            'display:none;align-items:center;justify-content:center;padding:20px;',
+            'font-family:Outfit,system-ui,sans-serif}',
+            '#myub-func-consent.show{display:flex}',
+            '#myub-func-consent .card{background:#fff;color:#0f172a;border-radius:18px;max-width:420px;',
+            'width:100%;padding:24px;box-shadow:0 24px 50px rgba(0,0,0,.3);text-align:center}',
+            '#myub-func-consent .ficon{width:56px;height:56px;border-radius:16px;margin:0 auto 14px;',
+            'display:flex;align-items:center;justify-content:center;font-size:26px;',
+            'background:linear-gradient(135deg,#1a365d,#2c5282);color:#fff}',
+            '#myub-func-consent h2{font-family:Sora,system-ui,sans-serif;font-size:18px;margin:0 0 8px;color:#1a365d}',
+            '#myub-func-consent p{font-size:13.5px;color:#64748b;line-height:1.55;margin:0 0 18px}',
+            '#myub-func-consent .fa{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}',
+            '#myub-func-consent button{border:none;border-radius:11px;padding:11px 16px;font-size:13.5px;',
+            'font-weight:600;cursor:pointer;font-family:inherit;min-width:120px}',
+            '#myub-func-consent .btn-allow{background:#1a365d;color:#fff}',
+            '#myub-func-consent .btn-deny{background:#eef2f6;color:#334155}'
+        ].join('');
+        document.head.appendChild(extra);
+
+        var modal = document.createElement('div');
+        modal.id = 'myub-func-consent';
+        modal.innerHTML =
+            '<div class="card" role="dialog" aria-modal="true" aria-labelledby="myub-func-title">' +
+                '<div class="ficon" aria-hidden="true">\uD83D\uDD14</div>' +
+                '<h2 id="myub-func-title">Enable push notifications?</h2>' +
+                '<p class="myub-func-msg"></p>' +
+                '<div class="fa">' +
+                    '<button type="button" class="btn-allow" data-func="allow">Allow &amp; continue</button>' +
+                    '<button type="button" class="btn-deny" data-func="deny">Not now</button>' +
+                '</div>' +
+            '</div>';
+        document.body.appendChild(modal);
+
+        function resolveWith(value) {
+            modal.classList.remove('show');
+            var cb = modal._resolve;
+            modal._resolve = null;
+            if (cb) cb(value);
+        }
+
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal) { resolveWith(false); return; }
+            var btn = e.target.closest('button[data-func]');
+            if (!btn) return;
+            if (btn.getAttribute('data-func') === 'allow') {
+                var prefs = getPrefs();
+                saveChoice({ preferences: !!prefs.preferences, functional: true });
+                resolveWith(true);
+            } else {
+                resolveWith(false);
+            }
+        });
+    }
+
+    // In-website consent prompt for optional functional features (e.g. push).
+    // Returns a Promise<boolean>. Only call on an explicit user action.
+    function requestFunctionalConsent(message) {
+        return new Promise(function (resolve) {
+            if (allowFunctional()) { resolve(true); return; }
+            ensureFuncModal();
+            var modal = document.getElementById('myub-func-consent');
+            var msgEl = modal.querySelector('.myub-func-msg');
+            if (msgEl) {
+                msgEl.textContent = message ||
+                    'Push notifications use OneSignal, a third-party service. This stores functional data on your device. You can turn it off anytime in your privacy choices.';
+            }
+            modal._resolve = resolve;
+            modal.classList.add('show');
+        });
     }
 
     global.MyUBConsent = {
@@ -256,7 +323,7 @@
         hasDecision: hasDecision,
         allowPreferences: allowPreferences,
         allowFunctional: allowFunctional,
-        ensureFunctionalConsent: ensureFunctionalConsent,
+        requestFunctionalConsent: requestFunctionalConsent,
         acceptAll: acceptAll,
         rejectOptional: rejectOptional,
         openPreferences: openPreferences,

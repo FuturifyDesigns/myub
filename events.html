@@ -3780,6 +3780,8 @@
         // NOTIFICATION PERMISSION
         // =============================================
         async function requestNotificationPermission() {
+            // Only prompt after the user has opted into functional consent (BDPA).
+            if (window.MyUBConsent && !MyUBConsent.allowFunctional()) return;
             if ('Notification' in window && currentUser) {
                 if (Notification.permission === 'default') {
                     try {
@@ -3798,9 +3800,8 @@
         async function initOneSignal() {
             try {
                 if (!currentUser || !currentUser.id) return;
-                if (window.MyUBConsent && !MyUBConsent.ensureFunctionalConsent(
-                    'Push notifications use OneSignal (a third-party service). Allow functional cookies/storage to continue?'
-                )) return;
+                // Silent on load: only initialize if the user already allowed functional consent.
+                if (window.MyUBConsent && !MyUBConsent.allowFunctional()) return;
                 
                 window.OneSignalDeferred = window.OneSignalDeferred || [];
                 OneSignalDeferred.push(async function(OneSignal) {
@@ -3848,7 +3849,18 @@
 
         async function enablePushNotifications() {
             try {
-                if (window.OneSignal) {
+                // BDPA: get in-website functional consent before enabling push.
+                if (window.MyUBConsent && !MyUBConsent.allowFunctional()) {
+                    const allowed = await MyUBConsent.requestFunctionalConsent(
+                        'Push notifications use OneSignal, a third-party service, and store functional data on your device. You can turn this off anytime in your privacy choices.'
+                    );
+                    if (!allowed) return;
+                }
+
+                // Make sure OneSignal is initialized now that consent is granted.
+                await initOneSignal();
+
+                if (window.OneSignal && OneSignal.Slidedown) {
                     await OneSignal.Slidedown.promptPush();
                 } else {
                     // Fallback to native notifications

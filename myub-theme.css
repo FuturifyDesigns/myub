@@ -937,6 +937,132 @@ html.myub-enhanced .badge {
     background-image: none !important;
 }
 
+/* ── High-contrast text safety net (fixes white-on-white leftovers) ── */
+html.myub-enhanced .nav-item,
+html.myub-enhanced .page-title,
+html.myub-enhanced .user-name,
+html.myub-enhanced .user-menu span,
+html.myub-enhanced .user-role,
+html.myub-enhanced .user-program,
+html.myub-enhanced .search-box input,
+html.myub-enhanced .notif-dropdown-header h3,
+html.myub-enhanced .notif-content,
+html.myub-enhanced .notif-content .title,
+html.myub-enhanced .notif-content p,
+html.myub-enhanced .card,
+html.myub-enhanced .card p,
+html.myub-enhanced .card-title,
+html.myub-enhanced .stat-card,
+html.myub-enhanced .stat-label,
+html.myub-enhanced .stat-info p,
+html.myub-enhanced .stat-info h3,
+html.myub-enhanced .quick-action,
+html.myub-enhanced .quick-action span,
+html.myub-enhanced .gpa-value,
+html.myub-enhanced .gpa-label,
+html.myub-enhanced .gpa-status,
+html.myub-enhanced .modal,
+html.myub-enhanced .modal p,
+html.myub-enhanced .modal-title,
+html.myub-enhanced .empty-state,
+html.myub-enhanced .empty-state h3,
+html.myub-enhanced .empty-state p,
+html.myub-enhanced .sidebar-logo span,
+html.myub-enhanced .student-portal-label,
+html.myub-enhanced label,
+html.myub-enhanced .form-group label,
+html.myub-enhanced .hint,
+html.myub-enhanced table,
+html.myub-enhanced td,
+html.myub-enhanced th {
+    color: var(--ink) !important;
+}
+
+html.myub-enhanced .stat-label,
+html.myub-enhanced .gpa-label,
+html.myub-enhanced .card-subtitle,
+html.myub-enhanced .user-role,
+html.myub-enhanced .user-program,
+html.myub-enhanced .hint,
+html.myub-enhanced .text-muted,
+html.myub-enhanced .notif-content .time,
+html.myub-enhanced .empty-state p,
+html.myub-enhanced .nav-section-title {
+    color: var(--text-muted) !important;
+}
+
+html.myub-enhanced .gpa-circle::before {
+    background: #ffffff !important;
+    border: 1px solid var(--border) !important;
+}
+
+html.myub-enhanced .gpa-value {
+    color: #102a43 !important;
+    -webkit-text-fill-color: #102a43 !important;
+}
+
+html.myub-enhanced .myub-logo {
+    --logo-m-color: #1a4b8c !important;
+    --logo-ub-color: #1a4b8c !important;
+}
+
+html.myub-enhanced .welcome-banner,
+html.myub-enhanced .welcome-banner *,
+html.myub-enhanced .welcome-text h2,
+html.myub-enhanced .welcome-text p,
+html.myub-enhanced .welcome-date,
+html.myub-enhanced .welcome-date * {
+    color: #ffffff !important;
+}
+
+html.myub-enhanced .btn-primary,
+html.myub-enhanced .submit-btn,
+html.myub-enhanced .btn-primary *,
+html.myub-enhanced .badge,
+html.myub-enhanced .tab.active,
+html.myub-enhanced .message-bubble.mine,
+html.myub-enhanced .msg-bubble.sent,
+html.myub-enhanced .chat-bubble.own {
+    color: #ffffff !important;
+}
+
+html.myub-enhanced .nav-item {
+    color: #243b53 !important;
+    font-weight: 600 !important;
+}
+
+html.myub-enhanced .nav-item.active {
+    color: #1a4b8c !important;
+}
+
+html.myub-enhanced .nav-item:hover {
+    color: #1a4b8c !important;
+}
+
+html.myub-enhanced input,
+html.myub-enhanced select,
+html.myub-enhanced textarea {
+    color: #102a43 !important;
+    background: #ffffff !important;
+}
+
+html.myub-enhanced input::placeholder,
+html.myub-enhanced textarea::placeholder {
+    color: #829ab1 !important;
+    opacity: 1 !important;
+}
+
+html.myub-enhanced .menu-toggle,
+html.myub-enhanced .notification-btn {
+    color: #1a4b8c !important;
+}
+
+html.myub-enhanced .user-avatar,
+html.myub-enhanced .avatar {
+    color: #1a4b8c !important;
+    background: #e8f1fb !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
     html.myub-enhanced *,
     html.myub-enhanced *::before,

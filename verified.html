@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="myub-enhanced">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,8 +9,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
-    <link rel="stylesheet" href="myub-theme.css?v=21">
-    <script src="myub-transitions.js?v=6" defer></script>
+    <link rel="stylesheet" href="myub-theme.css?v=35">
+    <script src="myub-transitions.js?v=8" defer></script>
     <script src="myub-animations.js?v=6" defer></script>
     <script src="myub-consent.js?v=2" defer></script>
     <style>
@@ -39,15 +39,13 @@
         /* Remove default blue tap highlight on mobile everywhere */
         *, *::before, *::after { -webkit-tap-highlight-color: transparent; }
 
-        html { height: 100%; 
-            background: var(--navy-darker);
-        }
+        html { height: 100%; background: #f4f7fb; }
         body {
             font-family: 'Outfit', sans-serif;
             min-height: 100vh;
             min-height: 100dvh;
-            color: var(--white);
-            background: var(--navy-darker);
+            color: #102a43;
+            background: #f4f7fb;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             overflow-x: hidden;
@@ -55,7 +53,6 @@
             align-items: center;
             justify-content: center;
             padding: 24px 20px;
-        
         }
 
         /* Background */
@@ -63,28 +60,15 @@
             position: fixed;
             inset: 0;
             z-index: -1;
-            background:
-                radial-gradient(circle at 20% 10%, rgba(58, 111, 168, 0.25) 0%, transparent 45%),
-                radial-gradient(circle at 85% 85%, rgba(34, 197, 94, 0.15) 0%, transparent 50%),
-                linear-gradient(160deg, #0f2744 0%, #1a365d 45%, #0f2744 100%);
+            background: #f4f7fb;
         }
-        .page-bg::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image:
-                linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
-            background-size: 48px 48px;
-            mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.8), transparent 75%);
-            -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.8), transparent 75%);
-        }
+        .page-bg::before { display: none; }
 
         /* ========== REAL MyUB LOGO COMPONENT ========== */
         .myub-logo {
             --logo-size: 46px;
             --logo-m-color: #1a365d;
-            --logo-ub-color: #1a365d;
+            --logo-ub-color: #c41e3a;
             position: relative;
             display: inline-flex;
             align-items: flex-end;
@@ -123,24 +107,18 @@
             display: inline-block;
             line-height: 0.85;
         }
-        .myub-logo.on-dark { --logo-m-color: #1a4b8c; --logo-ub-color: #1a4b8c; }
+        .myub-logo.on-dark { --logo-m-color: #1a4b8c; --logo-ub-color: #c41e3a; }
 
         /* Card */
         .card {
             position: relative;
-            width: min(420px, 100%);
-            background: rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(20px) saturate(140%);
-            -webkit-backdrop-filter: blur(20px) saturate(140%);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: min(440px, 100%);
+            background: #ffffff;
+            border: 1px solid #d9e2ec;
             border-radius: 20px;
-            padding: 44px 28px 26px;
+            padding: 48px 28px 24px;
             text-align: center;
-            box-shadow:
-                0 30px 80px -20px rgba(0, 0, 0, 0.5),
-                inset 0 1px 0 rgba(255, 255, 255, 0.08);
-            opacity: 0;
-            transform: translateY(20px) scale(0.98);
+            box-shadow: 0 12px 32px rgba(16, 42, 67, 0.1);
         }
 
         /* Logo floats above card top edge */
@@ -150,10 +128,10 @@
             left: 50%;
             transform: translate(-50%, -50%);
             padding: 12px 22px 12px 14px;
-            background: var(--navy-dark);
-            border: 1px solid rgba(255, 255, 255, 0.16);
+            background: #ffffff;
+            border: 1px solid #d9e2ec;
             border-radius: 999px;
-            box-shadow: 0 14px 34px rgba(0,0,0,0.45), 0 0 0 4px rgba(15, 39, 68, 0.5);
+            box-shadow: 0 8px 24px rgba(16, 42, 67, 0.1);
             display: inline-flex;
             align-items: center;
         }
@@ -206,14 +184,14 @@
             font-size: 30px;
             font-weight: 600;
             font-style: italic;
-            color: var(--white);
+            color: #102a43;
             line-height: 1.15;
             margin-bottom: 10px;
             letter-spacing: 0.3px;
         }
 
         p.lead {
-            color: rgba(255, 255, 255, 0.7);
+            color: #486581;
             font-size: 14px;
             line-height: 1.6;
             margin-bottom: 24px;
@@ -242,44 +220,53 @@
             overflow: hidden;
         }
         .btn-primary {
-            background: linear-gradient(135deg, var(--navy-light) 0%, var(--navy) 100%);
-            color: var(--white);
-            box-shadow: 0 10px 30px -10px rgba(26, 54, 93, 0.8);
+            background: #1a4b8c;
+            color: #ffffff;
+            box-shadow: 0 8px 24px -10px rgba(26, 75, 140, 0.55);
         }
         .btn-primary span, .btn-primary svg { position: relative; z-index: 1; }
         .btn-primary:hover {
-            background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
+            background: #12366a;
             transform: translateY(-2px);
-            box-shadow: 0 16px 40px -10px rgba(196, 30, 58, 0.5);
+            box-shadow: 0 12px 28px -10px rgba(26, 75, 140, 0.5);
         }
         .btn-primary svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.3s ease; }
         .btn-primary:hover svg { transform: translateX(3px); }
 
         .btn-ghost {
             background: transparent;
-            color: rgba(255, 255, 255, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.14);
+            color: #486581;
+            border: 1px solid #d9e2ec;
             margin-top: 10px;
         }
         .btn-ghost:hover {
-            background: rgba(255, 255, 255, 0.06);
-            color: var(--white);
-            border-color: rgba(255, 255, 255, 0.25);
+            background: #ffffff;
+            color: #102a43;
+            border-color: #bcccdc;
         }
 
         .footer {
             margin-top: 22px;
             padding-top: 16px;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            border-top: 1px solid #d9e2ec;
             font-size: 11px;
-            color: rgba(255, 255, 255, 0.4);
+            color: #627d98;
             letter-spacing: 0.3px;
         }
-        .footer a { color: rgba(255, 255, 255, 0.6); text-decoration: none; transition: color 0.3s ease; }
-        .footer a:hover { color: var(--white); }
+        .footer a { color: #1a4b8c; text-decoration: none; transition: color 0.3s ease; }
+        .footer a:hover { color: #12366a; }
 
         @media (max-width: 480px) {
-            .card { padding: 40px 22px 22px; border-radius: 18px; }
+            .card {
+            position: relative;
+            width: min(440px, 100%);
+            background: #ffffff;
+            border: 1px solid #d9e2ec;
+            border-radius: 20px;
+            padding: 48px 28px 24px;
+            text-align: center;
+            box-shadow: 0 12px 32px rgba(16, 42, 67, 0.1);
+        }
             h1 { font-size: 26px; }
             p.lead { font-size: 13px; }
             .success-ring { width: 76px; height: 76px; }
@@ -350,9 +337,9 @@
                 <div class="ml-m-wrap">
                     <div class="ml-cap">
                         <svg viewBox="0 0 100 70">
-                            <polygon points="50,6 95,24 50,42 5,24" fill="#ffffff"/>
-                            <circle cx="50" cy="24" r="4.5" fill="#1a365d" stroke="#ffffff" stroke-width="1.5"/>
-                            <rect x="32" y="38" width="36" height="18" rx="2.5" fill="#ffffff"/>
+                            <polygon points="50,6 95,24 50,42 5,24" fill="#1a4b8c"/>
+                            <circle cx="50" cy="24" r="4.5" fill="#ffffff" stroke="#1a4b8c" stroke-width="1.5"/>
+                            <rect x="32" y="38" width="36" height="18" rx="2.5" fill="#1a4b8c"/>
                             <circle cx="78" cy="24" r="4" fill="#c41e3a"/>
                             <path d="M78 28 Q82 44 80 54" stroke="#c41e3a" stroke-width="3" fill="none" stroke-linecap="round"/>
                             <ellipse cx="80" cy="57" rx="5" ry="8" fill="#c41e3a"/>
@@ -380,11 +367,11 @@
         </button>
 
         <div class="footer">
-            © 2026 <a href="https://futurifydesigns.github.io" target="_blank" rel="noopener">Futurify Designs</a>
-            · <a href="privacy.html">Privacy</a>
-            · <a href="terms.html">Terms</a>
-            · <a href="cookies.html">Cookies</a>
-            · <a href="data-rights.html">Your Rights</a>
+            &copy; 2026 MyUB &middot; Built by <a href="https://futurifydesigns.github.io" target="_blank" rel="noopener">Futurify Designs</a>
+            &middot; <a href="privacy.html">Privacy</a>
+            &middot; <a href="terms.html">Terms</a>
+            &middot; <a href="cookies.html">Cookies</a>
+            &middot; <a href="data-rights.html">Your Rights</a>
         </div>
     </div>
 

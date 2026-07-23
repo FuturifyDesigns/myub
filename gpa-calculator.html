@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="myub-enhanced">
 <head>
     <meta charset="UTF-8">
 <!-- myub-perf-preconnects -->
@@ -20,18 +20,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="myub-security.js"></script>
-    <script src="myub-auth.js"></script>
+    <script src="myub-auth.js?v=2"></script>
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js" defer></script>
     <script src="myub-calls.js" defer></script>
     <script src="myub-utils.js"></script>
     <script src="myub-mobile.js"></script>
-    <script src="myub-sidebar.js"></script>
-    <script src="myub-gpa.js"></script>
-    <script src="myub-academic.js"></script>
-    <link rel="stylesheet" href="myub-onboarding.css?v=36">
-    <link rel="stylesheet" href="myub-theme.css?v=21">
-    <script src="myub-onboarding.js?v=35"></script>
-    <script src="myub-transitions.js?v=6" defer></script>
+    <script src="myub-sidebar.js?v=3"></script>
+    <script src="myub-gpa.js?v=4"></script>
+    <script src="myub-academic.js?v=10"></script>
+    <link rel="stylesheet" href="myub-onboarding.css?v=37">
+    <link rel="stylesheet" href="myub-theme.css?v=35">
+    <script src="myub-onboarding.js?v=37"></script>
+    <script src="myub-transitions.js?v=8" defer></script>
     <script src="myub-animations.js?v=6" defer></script>
     <style>
         /* ==========================================================
@@ -63,8 +63,8 @@
             --cyan: #0e7490;
             --yellow: #a15c07;
             --gray-50: #f8fafc;
-            --gray-100: #f0f4f8;
-            --gray-200: #e6eef6;
+            --gray-100: #ffffff;
+            --gray-200: #e8f1fb;
             --gray-300: #d9e2ec;
             --gray-400: #9fb3c8;
             --gray-500: #627d98;
@@ -72,11 +72,11 @@
             --gray-700: #334e68;
             --text: #102a43;
             --text-soft: #334e68;
-            --text-muted: #627d98;
-            --text-dim: #9fb3c8;
+            --text-muted: #486581;
+            --text-dim: #627d98;
             --surface-1: #ffffff;
-            --surface-2: #f0f4f8;
-            --surface-3: #e6eef6;
+            --surface-2: #ffffff;
+            --surface-3: #e8f1fb;
             --border: #d9e2ec;
             --border-strong: #bcccdc;
             --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
@@ -142,7 +142,7 @@
         .myub-logo {
             --logo-size: 36px;
             --logo-m-color: #1a4b8c;
-            --logo-ub-color: #1a4b8c;
+            --logo-ub-color: #c41e3a;
             position: relative;
             display: inline-flex;
             align-items: flex-end;
@@ -313,14 +313,14 @@
         }
         .nav-item:hover {
             background: var(--surface-2);
-            color: var(--white);
+            color: #102a43;
             transform: translateX(3px);
         }
         .nav-item:hover::after { left: 100%; }
         .nav-item:hover svg { transform: scale(1.08); }
         .nav-item.active {
             background: linear-gradient(135deg, rgba(44, 82, 130, 0.55), rgba(26, 54, 93, 0.45));
-            color: var(--white);
+            color: #102a43;
             border-color: rgba(58, 111, 168, 0.35);
             box-shadow: 0 8px 24px -10px rgba(44, 82, 130, 0.8);
         }
@@ -339,7 +339,7 @@
         .nav-item .badge {
             margin-left: auto;
             background: var(--red);
-            color: var(--white);
+            color: #102a43;
             font-size: 10px;
             font-weight: 700;
             padding: 2px 7px;
@@ -399,7 +399,7 @@
             border-radius: 10px;
             background: var(--surface-2);
             border: 1px solid var(--border);
-            color: var(--white);
+            color: #102a43;
             align-items: center;
             justify-content: center;
             padding: 0;
@@ -412,7 +412,7 @@
             font-family: 'Sora', 'Outfit', sans-serif;
             font-size: 22px;
             font-weight: 700;
-            color: var(--white);
+            color: #102a43;
             letter-spacing: -0.3px;
             white-space: nowrap;
         }
@@ -458,7 +458,7 @@
         .icon-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
         .icon-btn:hover {
             background: var(--surface-2);
-            color: var(--white);
+            color: #102a43;
             transform: translateY(-1px);
         }
         .info-btn .info-icon {
@@ -484,7 +484,7 @@
             padding: 0 5px;
             border-radius: 999px;
             background: var(--red);
-            color: var(--white);
+            color: #102a43;
             font-size: 10px;
             font-weight: 700;
             display: flex;
@@ -523,7 +523,7 @@
             padding: 14px 18px;
             border-bottom: 1px solid var(--border);
         }
-        .notif-dropdown-header h3 { font-size: 14px; font-weight: 700; color: var(--white); }
+        .notif-dropdown-header h3 { font-size: 14px; font-weight: 700; color: #102a43; }
         .notif-dropdown-header button {
             background: transparent;
             border: none;
@@ -568,7 +568,7 @@
         .notif-content h4 {
             font-size: 13px;
             font-weight: 700;
-            color: var(--white);
+            color: #102a43;
             margin-bottom: 2px;
             white-space: nowrap;
             overflow: hidden;
@@ -623,7 +623,7 @@
         }
         .tab:hover:not(.active) {
             background: var(--surface-2);
-            color: var(--white);
+            color: #102a43;
         }
         .tab.active {
             background: #e8f1fb;
@@ -640,15 +640,14 @@
 
         /* ========== PROGRESSION CARD ========== */
         .progression-card {
-            background:
-                radial-gradient(circle at 85% 30%, rgba(196, 30, 58, 0.18) 0%, transparent 55%),
-                linear-gradient(135deg, rgba(26, 54, 93, 0.6) 0%, rgba(15, 39, 68, 0.78) 100%);
+            background: #ffffff;
             border: 1px solid var(--border);
-            border-radius: 20px;
+            border-radius: 16px;
             padding: 26px 28px;
             margin-bottom: 22px;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 1px 2px rgba(16, 42, 67, 0.06);
         }
         .progression-card::before {
             content: '';
@@ -657,9 +656,9 @@
             top: 20%;
             bottom: 20%;
             width: 3px;
-            background: linear-gradient(180deg, transparent, var(--red), transparent);
+            background: var(--navy);
             border-radius: 0 3px 3px 0;
-            box-shadow: 0 0 16px rgba(196, 30, 58, 0.5);
+            box-shadow: none;
         }
         .progression-header {
             display: flex;
@@ -682,7 +681,7 @@
             font-family: 'Sora', sans-serif;
             font-size: 22px;
             font-weight: 800;
-            color: var(--white);
+            color: #102a43;
             line-height: 1.1;
             letter-spacing: -0.4px;
         }
@@ -699,7 +698,7 @@
             font-family: 'Sora', sans-serif;
             font-size: 26px;
             font-weight: 800;
-            color: var(--white);
+            color: #102a43;
             letter-spacing: -1px;
         }
         .progression-credits span { color: var(--red-light); }
@@ -714,25 +713,21 @@
         }
         .progression-bar-container {
             height: 8px;
-            background: rgba(255, 255, 255, 0.08);
+            background: #e6eef6;
             border-radius: 999px;
             overflow: hidden;
             position: relative;
         }
         .progression-bar {
             height: 100%;
-            background: linear-gradient(90deg, var(--navy-lighter) 0%, var(--red) 100%);
+            background: var(--navy);
             border-radius: 999px;
             position: relative;
             transition: width 1s var(--ease-out-expo);
-            box-shadow: 0 0 12px rgba(196, 30, 58, 0.4);
+            box-shadow: none;
         }
         .progression-bar::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
-            animation: shine 2.5s ease-in-out infinite;
+            display: none;
         }
         @keyframes shine {
             0%, 100% { transform: translateX(-100%); }
@@ -744,7 +739,7 @@
             margin-top: 12px;
             font-size: 12px;
         }
-        .progression-percent { color: var(--white); font-weight: 600; }
+        .progression-percent { color: #102a43; font-weight: 600; }
         .progression-percent span { color: var(--red-light); font-weight: 800; font-size: 14px; }
         .progression-remaining { color: var(--text-muted); }
         .progression-remaining span { color: var(--text-soft); font-weight: 700; }
@@ -772,7 +767,7 @@
         }
         .progression-complete-text {
             font-size: 13px;
-            color: var(--white);
+            color: #102a43;
             line-height: 1.5;
         }
 
@@ -798,15 +793,15 @@
             display: flex;
             gap: 16px;
             padding: 20px 24px;
-            background: rgba(196, 30, 58, 0.06);
-            border-bottom: 1px solid rgba(196, 30, 58, 0.15);
+            background: #e8f1fb;
+            border-bottom: 1px solid #c5daf5;
         }
         .whatif-explainer-icon {
             width: 44px;
             height: 44px;
             border-radius: 12px;
-            background: rgba(196, 30, 58, 0.12);
-            color: var(--red-light, #e63956);
+            background: #1a4b8c;
+            color: #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -825,7 +820,7 @@
             font-family: 'Sora', sans-serif;
             font-size: 15px;
             font-weight: 700;
-            color: var(--white, #fff);
+            color: #102a43;
             margin: 0 0 6px;
             letter-spacing: -0.2px;
         }
@@ -833,7 +828,7 @@
         .whatif-explainer p {
             font-size: 13px;
             line-height: 1.55;
-            color: var(--text-soft, #cbd5e1);
+            color: #334e68;
             margin: 0 0 10px;
         }
         .whatif-steps {
@@ -841,12 +836,12 @@
             padding: 0 0 0 18px;
             font-size: 12.5px;
             line-height: 1.6;
-            color: var(--text-muted, #94a3b8);
+            color: #486581;
         }
         .whatif-steps li { margin-bottom: 4px; }
         .whatif-note {
             font-size: 12px !important;
-            color: var(--text-dim, #64748b) !important;
+            color: #627d98 !important;
             margin: 10px 0 0 !important;
             font-style: italic;
         }
@@ -859,8 +854,8 @@
         }
         .whatif-stat {
             padding: 14px 16px;
-            background: var(--surface-2, rgba(15, 39, 68, 0.5));
-            border: 1px solid var(--border, rgba(255,255,255,0.08));
+            background: #ffffff;
+            border: 1px solid #d9e2ec;
             border-radius: 12px;
             text-align: center;
         }
@@ -871,21 +866,21 @@
             font-weight: 600;
             letter-spacing: 0.06em;
             text-transform: uppercase;
-            color: var(--text-muted, #94a3b8);
+            color: #486581;
             margin-bottom: 6px;
         }
         .whatif-stat strong {
             font-family: 'Sora', sans-serif;
             font-size: 26px;
             font-weight: 800;
-            color: var(--white, #fff);
+            color: #102a43;
             letter-spacing: -0.03em;
             line-height: 1;
             font-variant-numeric: tabular-nums;
         }
-        .whatif-stat.projected strong { color: #93c5fd; }
-        .whatif-delta.positive { color: #86efac !important; }
-        .whatif-delta.negative { color: #fca5a5 !important; }
+        .whatif-stat.projected strong { color: #1a4b8c; }
+        .whatif-delta.positive { color: #067647 !important; }
+        .whatif-delta.negative { color: #b42318 !important; }
         .whatif-scenarios-header {
             display: flex;
             align-items: center;
@@ -897,7 +892,7 @@
             font-family: 'Sora', sans-serif;
             font-size: 14px;
             font-weight: 700;
-            color: var(--white, #fff);
+            color: #102a43;
             margin: 0;
         }
         .whatif-scenarios-header span {
@@ -911,8 +906,8 @@
             gap: 10px;
             align-items: end;
             padding: 12px 14px;
-            background: var(--surface-2, rgba(15, 39, 68, 0.4));
-            border: 1px solid var(--border, rgba(255,255,255,0.08));
+            background: #ffffff;
+            border: 1px solid #d9e2ec;
             border-radius: 12px;
         }
         .whatif-field label {
@@ -922,7 +917,7 @@
             font-weight: 600;
             letter-spacing: 0.05em;
             text-transform: uppercase;
-            color: var(--text-dim, #64748b);
+            color: #486581;
             margin-bottom: 5px;
         }
         .whatif-row input,
@@ -932,18 +927,18 @@
             font-family: 'Outfit', sans-serif;
             font-size: 14px;
             font-weight: 500;
-            color: var(--white, #fff);
-            background: var(--surface-3, rgba(8, 18, 38, 0.6));
-            border: 1px solid var(--border, rgba(255,255,255,0.1));
+            color: #102a43;
+            background: #ffffff;
+            border: 1px solid #bcccdc;
             border-radius: 8px;
             font-variant-numeric: tabular-nums;
         }
-        .whatif-row input::placeholder { color: var(--text-dim, #64748b); }
+        .whatif-row input::placeholder { color: #829ab1; }
         .whatif-row input:focus,
         .whatif-row select:focus {
             outline: none;
-            border-color: rgba(196, 30, 58, 0.5);
-            box-shadow: 0 0 0 2px rgba(196, 30, 58, 0.15);
+            border-color: #1a4b8c;
+            box-shadow: 0 0 0 2px rgba(26, 75, 140, 0.15);
         }
         .whatif-row select { cursor: pointer; }
         .whatif-remove {
@@ -1083,10 +1078,10 @@
             box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
         }
         .summary-card:hover::after { opacity: 1; }
-        .summary-card.gpa::before { background: linear-gradient(90deg, var(--red), var(--red-light)); }
-        .summary-card.credits::before { background: linear-gradient(90deg, var(--blue), var(--navy-lighter)); }
-        .summary-card.courses::before { background: linear-gradient(90deg, var(--purple), var(--pink)); }
-        .summary-card.class::before { background: linear-gradient(90deg, var(--orange), var(--yellow)); }
+        .summary-card.gpa::before { background: var(--navy); }
+        .summary-card.credits::before { background: var(--navy); }
+        .summary-card.courses::before { background: var(--navy); }
+        .summary-card.class::before { background: var(--navy); }
         .summary-label {
             font-size: 10.5px;
             font-weight: 700;
@@ -1099,7 +1094,7 @@
             font-family: 'Sora', sans-serif;
             font-size: 34px;
             font-weight: 800;
-            color: var(--white);
+            color: #102a43;
             line-height: 1;
             letter-spacing: -1.5px;
             margin-bottom: 4px;
@@ -1120,33 +1115,34 @@
             letter-spacing: 0.2px;
         }
         .class-badge.none {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-muted);
+            background: #e6eef6;
+            color: #334e68;
+            border: 1px solid #bcccdc;
         }
         .class-badge.first {
-            background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(251, 146, 60, 0.2));
-            border: 1px solid rgba(251, 191, 36, 0.5);
-            color: #fde047;
+            background: #fffaeb;
+            border: 1px solid #fec84b;
+            color: #93370d;
         }
         .class-badge.upper {
-            background: linear-gradient(135deg, rgba(74, 222, 128, 0.2), rgba(34, 197, 94, 0.2));
-            border: 1px solid rgba(74, 222, 128, 0.5);
-            color: #86efac;
+            background: #ecfdf3;
+            border: 1px solid #abefc6;
+            color: #067647;
         }
         .class-badge.lower {
-            background: linear-gradient(135deg, rgba(96, 165, 250, 0.2), rgba(58, 111, 168, 0.2));
-            border: 1px solid rgba(96, 165, 250, 0.5);
-            color: #93c5fd;
+            background: #eff8ff;
+            border: 1px solid #b2ddff;
+            color: #175cd3;
         }
         .class-badge.pass {
-            background: linear-gradient(135deg, rgba(167, 139, 250, 0.2), rgba(139, 92, 246, 0.2));
-            border: 1px solid rgba(167, 139, 250, 0.5);
-            color: #c4b5fd;
+            background: #f4f3ff;
+            border: 1px solid #d9d6fe;
+            color: #5925dc;
         }
         .class-badge.fail {
-            background: linear-gradient(135deg, rgba(196, 30, 58, 0.2), rgba(154, 23, 48, 0.2));
-            border: 1px solid rgba(196, 30, 58, 0.5);
-            color: #fca5a5;
+            background: #fef3f2;
+            border: 1px solid #fecdca;
+            color: #b42318;
         }
 
         /* ========== GENERIC CARD ========== */
@@ -1173,7 +1169,7 @@
             font-family: 'Sora', sans-serif;
             font-size: 20px;
             font-weight: 700;
-            color: var(--white);
+            color: #102a43;
             letter-spacing: -0.3px;
             line-height: 1.2;
             margin-bottom: 4px;
@@ -1210,7 +1206,7 @@
         .btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
         .btn-primary {
             background: linear-gradient(135deg, var(--navy-light) 0%, var(--navy) 100%);
-            color: var(--white);
+            color: #102a43;
             box-shadow: 0 10px 28px -12px rgba(26, 54, 93, 0.8);
         }
         .btn-primary:hover {
@@ -1225,13 +1221,13 @@
         }
         .btn-secondary:hover {
             background: var(--surface-3);
-            color: var(--white);
+            color: #102a43;
             border-color: var(--border-strong);
             transform: translateY(-1px);
         }
         .btn-danger {
             background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
-            color: var(--white);
+            color: #102a43;
             box-shadow: 0 10px 28px -12px rgba(196, 30, 58, 0.6);
         }
         .btn-danger:hover {
@@ -1280,7 +1276,7 @@
             font-family: 'Sora', sans-serif;
             font-size: 15px;
             font-weight: 700;
-            color: var(--white);
+            color: #102a43;
             margin-bottom: 2px;
             letter-spacing: -0.2px;
         }
@@ -1300,7 +1296,7 @@
             font-family: 'Sora', sans-serif;
             font-size: 18px;
             font-weight: 800;
-            color: var(--white);
+            color: #102a43;
             letter-spacing: -0.5px;
             line-height: 1;
         }
@@ -1379,7 +1375,7 @@
         .course-code {
             font-family: 'Sora', sans-serif;
             font-weight: 700;
-            color: var(--white);
+            color: #102a43;
             font-size: 12.5px;
             letter-spacing: -0.2px;
         }
@@ -1474,17 +1470,17 @@
             font-weight: 800;
             letter-spacing: -0.3px;
         }
-        .grade-badge.A       { background: rgba(74, 222, 128, 0.2);  color: #86efac; border: 1px solid rgba(74, 222, 128, 0.5); }
-        .grade-badge.B-plus  { background: rgba(34, 197, 94, 0.18);  color: #6ee7b7; border: 1px solid rgba(34, 197, 94, 0.45); }
-        .grade-badge.B       { background: rgba(96, 165, 250, 0.2);  color: #93c5fd; border: 1px solid rgba(96, 165, 250, 0.5); }
-        .grade-badge.B-minus { background: rgba(59, 130, 246, 0.18); color: #7dd3fc; border: 1px solid rgba(59, 130, 246, 0.45); }
-        .grade-badge.C-plus  { background: rgba(251, 191, 36, 0.18); color: #fde047; border: 1px solid rgba(251, 191, 36, 0.45); }
-        .grade-badge.C       { background: rgba(251, 146, 60, 0.18); color: #fdba74; border: 1px solid rgba(251, 146, 60, 0.45); }
-        .grade-badge.C-minus { background: rgba(234, 88, 12, 0.2);   color: #fdba74; border: 1px solid rgba(234, 88, 12, 0.5); }
-        .grade-badge.D-plus  { background: rgba(220, 38, 38, 0.15);  color: #fca5a5; border: 1px solid rgba(220, 38, 38, 0.4); }
-        .grade-badge.D       { background: rgba(185, 28, 28, 0.2);   color: #fca5a5; border: 1px solid rgba(185, 28, 28, 0.5); }
-        .grade-badge.D-minus { background: rgba(153, 27, 27, 0.22);  color: #fca5a5; border: 1px solid rgba(153, 27, 27, 0.5); }
-        .grade-badge.E       { background: rgba(127, 29, 29, 0.3);   color: #f87171; border: 1px solid rgba(127, 29, 29, 0.5); }
+        .grade-badge.A       { background: #ecfdf3;  color: #067647; border: 1px solid #abefc6; }
+        .grade-badge.B-plus  { background: #edfcf2;  color: #087443; border: 1px solid #a6f4c5; }
+        .grade-badge.B       { background: #eff8ff;  color: #175cd3; border: 1px solid #b2ddff; }
+        .grade-badge.B-minus { background: #f0f9ff;  color: #026aa2; border: 1px solid #b9e6fe; }
+        .grade-badge.C-plus  { background: #fffaeb;  color: #b54708; border: 1px solid #fec84b; }
+        .grade-badge.C       { background: #fff6ed;  color: #c4320a; border: 1px solid #fdb022; }
+        .grade-badge.C-minus { background: #fff4ed;  color: #b93815; border: 1px solid #fd853a; }
+        .grade-badge.D-plus  { background: #fef3f2;  color: #b42318; border: 1px solid #fecdca; }
+        .grade-badge.D       { background: #fef3f2;  color: #912018; border: 1px solid #fecdca; }
+        .grade-badge.D-minus { background: #fef3f2;  color: #7a271a; border: 1px solid #fecdca; }
+        .grade-badge.E       { background: #fef3f2;  color: #7a271a; border: 1px solid #fda29b; }
 
         /* Action buttons in rows */
         .action-btns {
@@ -1508,7 +1504,7 @@
         .action-btn svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
         .action-btn:hover {
             background: var(--surface-3);
-            color: var(--white);
+            color: #102a43;
         }
         .action-btn.danger:hover {
             background: rgba(196, 30, 58, 0.15);
@@ -1548,7 +1544,7 @@
             font-family: 'Sora', sans-serif;
             font-size: 14px;
             font-weight: 700;
-            color: var(--white);
+            color: #102a43;
             margin-bottom: 14px;
             letter-spacing: -0.2px;
         }
@@ -1581,7 +1577,7 @@
             font-size: 22px;
             font-weight: 800;
             margin-bottom: 4px;
-            color: var(--white) !important;
+            color: #102a43 !important;
             letter-spacing: -1px;
         }
         .grade-item .range {
@@ -1621,7 +1617,7 @@
             font-family: 'Sora', sans-serif;
             font-size: 18px;
             font-weight: 700;
-            color: var(--white);
+            color: #102a43;
             letter-spacing: -0.3px;
         }
         .analysis-grid {
@@ -1656,20 +1652,20 @@
             stroke-linejoin: round;
         }
         .analysis-card.best .analysis-card-icon {
-            background: rgba(74, 222, 128, 0.12);
-            color: #86efac;
+            background: #e8f8ef;
+            color: #067647;
         }
         .analysis-card.worst .analysis-card-icon {
-            background: rgba(251, 191, 36, 0.12);
-            color: #fde047;
+            background: #fffaeb;
+            color: #b54708;
         }
         .analysis-card.improved .analysis-card-icon {
-            background: rgba(96, 165, 250, 0.12);
-            color: #93c5fd;
+            background: #e8f1fb;
+            color: #1a4b8c;
         }
         .analysis-card.declined .analysis-card-icon {
-            background: rgba(196, 30, 58, 0.12);
-            color: #fca5a5;
+            background: #fef3f2;
+            color: #b42318;
         }
         .analysis-card:hover {
             background: var(--surface-3);
@@ -1688,7 +1684,7 @@
             font-family: 'Sora', sans-serif;
             font-size: 28px;
             font-weight: 800;
-            color: var(--white);
+            color: #102a43;
             letter-spacing: -1px;
             line-height: 1;
             margin-bottom: 4px;
@@ -1711,16 +1707,16 @@
             font-weight: 700;
         }
         .analysis-card-change.up {
-            background: rgba(74, 222, 128, 0.15);
-            color: #86efac;
+            background: #ecfdf3;
+            color: #067647;
         }
         .analysis-card-change.down {
-            background: rgba(196, 30, 58, 0.15);
-            color: #fca5a5;
+            background: #fef3f2;
+            color: #b42318;
         }
         .analysis-card-change.flat {
-            background: var(--surface-3);
-            color: var(--text-muted);
+            background: #e6eef6;
+            color: #486581;
         }
         .analysis-insights {
             padding: 16px 18px;
@@ -1735,7 +1731,7 @@
             font-family: 'Sora', sans-serif;
             font-size: 13px;
             font-weight: 700;
-            color: var(--white);
+            color: #102a43;
             margin-bottom: 10px;
         }
         .analysis-insights-title svg {
@@ -1830,10 +1826,10 @@
         .form-group select,
         .form-group textarea {
             padding: 11px 14px;
-            background: rgba(0, 0, 0, 0.25);
+            background: #ffffff;
             border: 1px solid var(--border);
             border-radius: 10px;
-            color: var(--white);
+            color: #102a43;
             font-family: 'Outfit', sans-serif;
             font-size: 13px;
             outline: none;
@@ -1845,12 +1841,12 @@
         .form-group select:focus,
         .form-group textarea:focus {
             border-color: var(--navy-lighter);
-            background: rgba(0, 0, 0, 0.35);
+            background: #ffffff;
             box-shadow: 0 0 0 3px rgba(58, 111, 168, 0.18);
         }
         .form-group select option {
-            background: var(--navy-dark);
-            color: var(--white);
+            background: #ffffff;
+            color: #102a43;
         }
         .form-hint {
             margin-top: 4px;
@@ -1862,11 +1858,11 @@
             padding: 10px 14px !important;
             margin-top: 4px !important;
             margin-bottom: 4px !important;
-            background: rgba(251, 191, 36, 0.12) !important;
-            border: 1px solid rgba(251, 191, 36, 0.35) !important;
+            background: #fffaeb !important;
+            border: 1px solid #fec84b !important;
             border-radius: 10px !important;
             font-size: 12.5px !important;
-            color: #fde047 !important;
+            color: #93370d !important;
         }
 
         .predictor-results { margin-top: 20px; }
@@ -1893,16 +1889,16 @@
             font-family: 'Sora', sans-serif !important;
             font-size: 26px !important;
             font-weight: 800 !important;
-            color: var(--white) !important;
+            color: #102a43 !important;
             letter-spacing: -0.8px !important;
         }
-        .predictor-summary #maxPossible { color: #86efac !important; }
+        .predictor-summary #maxPossible { color: #067647 !important; }
 
         .predictor-results h3 {
             font-family: 'Sora', sans-serif !important;
             font-size: 14px !important;
             font-weight: 700 !important;
-            color: var(--white) !important;
+            color: #102a43 !important;
             margin-bottom: 14px !important;
             letter-spacing: -0.2px !important;
         }
@@ -1962,7 +1958,7 @@
             font-family: 'Sora', sans-serif;
             font-size: 13.5px;
             font-weight: 700;
-            color: var(--white);
+            color: #102a43;
             letter-spacing: -0.2px;
             line-height: 1.2;
             margin-bottom: 3px;
@@ -2042,15 +2038,15 @@
             font-family: 'Sora', sans-serif;
             font-size: 28px;
             font-weight: 800;
-            color: var(--white);
+            color: #102a43;
             letter-spacing: -1px;
             line-height: 1.05;
         }
-        .grade-result-score.status-guaranteed { color: #86efac; }
-        .grade-result-score.status-achievable { color: #86efac; }
-        .grade-result-score.status-challenging { color: #fde047; }
-        .grade-result-score.status-hard { color: #fdba74; }
-        .grade-result-score.status-impossible { color: #fca5a5; font-size: 18px; }
+        .grade-result-score.status-guaranteed { color: #067647; }
+        .grade-result-score.status-achievable { color: #067647; }
+        .grade-result-score.status-challenging { color: #b54708; }
+        .grade-result-score.status-hard { color: #c4320a; }
+        .grade-result-score.status-impossible { color: #b42318; font-size: 18px; }
         .grade-result-label {
             font-size: 11px;
             color: var(--text-muted);
@@ -2113,7 +2109,7 @@
             font-family: 'Sora', sans-serif;
             font-size: 18px;
             font-weight: 700;
-            color: var(--white);
+            color: #102a43;
             letter-spacing: -0.3px;
         }
         .modal-close {
@@ -2130,7 +2126,7 @@
             transition: all 0.3s ease;
         }
         .modal-close svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-        .modal-close:hover { background: var(--surface-3); color: var(--white); }
+        .modal-close:hover { background: var(--surface-3); color: #102a43; }
         .modal-body {
             padding: 22px;
             overflow-y: auto;
@@ -2175,7 +2171,7 @@
             border-radius: 12px;
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            color: var(--white);
+            color: #102a43;
             font-size: 13px;
             font-weight: 500;
             box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.6);
@@ -2219,7 +2215,7 @@
             border-radius: 18px;
             border: 1px solid rgba(255, 255, 255, 0.15);
             box-shadow: 0 30px 80px -10px rgba(0, 0, 0, 0.6);
-            color: var(--white);
+            color: #102a43;
             overflow: hidden;
             animation: modalUp 0.55s var(--ease-out-expo);
         }
@@ -2227,7 +2223,7 @@
         .announcement-icon {
             width: 48px; height: 48px; border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0; color: var(--white);
+            flex-shrink: 0; color: #102a43;
         }
         .announcement-icon svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
         .announcement-header-text { flex: 1; min-width: 0; }
@@ -2242,7 +2238,7 @@
             font-family: 'Sora', sans-serif;
             font-size: 20px;
             font-weight: 700;
-            color: var(--white);
+            color: #102a43;
             line-height: 1.2;
             letter-spacing: -0.3px;
         }
@@ -2257,7 +2253,7 @@
             gap: 10px;
             padding: 11px 22px;
             background: rgba(255, 255, 255, 0.15);
-            color: var(--white);
+            color: #102a43;
             border: 1px solid rgba(255, 255, 255, 0.25);
             border-radius: 10px;
             font-family: 'Outfit', sans-serif;
@@ -2349,7 +2345,7 @@
         /* Number flash when value updates */
         @keyframes flashPulse {
             0% { text-shadow: 0 0 0 rgba(196, 30, 58, 0); }
-            30% { text-shadow: 0 0 24px rgba(196, 30, 58, 0.7), 0 0 40px rgba(230, 57, 86, 0.4); color: var(--white); }
+            30% { text-shadow: 0 0 24px rgba(196, 30, 58, 0.7), 0 0 40px rgba(230, 57, 86, 0.4); color: #102a43; }
             100% { text-shadow: 0 0 0 rgba(196, 30, 58, 0); }
         }
         .flash-pulse { animation: flashPulse 0.9s ease-out; }
@@ -2503,24 +2499,14 @@
             box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.8), 0 0 0 1px var(--border-strong) !important;
         }
 
-        /* Summary value gets a subtle scale on card hover */
         .summary-card:hover .summary-value {
-            background: linear-gradient(180deg, #ffffff 0%, #ffb4c0 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            transition: background 0.4s ease;
+            color: #102a43;
+            -webkit-text-fill-color: #102a43;
+            background: none;
         }
 
-        /* Progression bar shine is more dramatic */
-        .progression-bar::after {
-            background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.6) 50%, transparent 100%) !important;
-            animation: shine 2s ease-in-out infinite !important;
-        }
-
-        /* Progression bar gets a pulse ring around it when card animates */
         .pulse-glow .progression-bar {
-            filter: drop-shadow(0 0 20px rgba(196, 30, 58, 0.7));
+            filter: none;
         }
 
         /* Grade badge on hover = slightly bigger + glow */
@@ -2561,10 +2547,9 @@
             box-shadow: 0 20px 40px -18px rgba(0, 0, 0, 0.6);
         }
         .analysis-card:hover .analysis-card-gpa {
-            background: linear-gradient(180deg, #ffffff 0%, #ffb4c0 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #102a43;
+            -webkit-text-fill-color: #102a43;
+            background: none;
         }
 
         /* Grade item hover — lift and color accent */
@@ -2723,9 +2708,9 @@
                     <div class="ml-m-wrap">
                         <div class="ml-cap">
                             <svg viewBox="0 0 100 70">
-                                <polygon points="50,6 95,24 50,42 5,24" fill="#ffffff"/>
-                                <circle cx="50" cy="24" r="4.5" fill="#1a365d" stroke="#ffffff" stroke-width="1.5"/>
-                                <rect x="32" y="38" width="36" height="18" rx="2.5" fill="#ffffff"/>
+                                <polygon points="50,6 95,24 50,42 5,24" fill="#1a4b8c"/>
+                                <circle cx="50" cy="24" r="4.5" fill="#ffffff" stroke="#1a4b8c" stroke-width="1.5"/>
+                                <rect x="32" y="38" width="36" height="18" rx="2.5" fill="#1a4b8c"/>
                                 <circle cx="78" cy="24" r="4" fill="#c41e3a"/>
                                 <path d="M78 28 Q82 44 80 54" stroke="#c41e3a" stroke-width="3" fill="none" stroke-linecap="round"/>
                                 <ellipse cx="80" cy="57" rx="5" ry="8" fill="#c41e3a"/>
@@ -3351,14 +3336,37 @@
         async function loadProfile() {
             const { data, error } = await supabaseClient
                 .from('profiles')
-                .select('program_type, program_name')
+                .select('program_type, program_name, full_name, first_name, last_name, student_id, username, year_of_study')
                 .eq('id', currentUser.id)
                 .single();
             
             if (data) {
-                userProfile = data;
+                userProfile = Object.assign({}, data, {
+                    email: (currentUser && currentUser.email) || '',
+                    username: data.username || (currentUser && currentUser.user_metadata && currentUser.user_metadata.username) || ''
+                });
                 updateProgression();
+            } else if (currentUser) {
+                var meta = currentUser.user_metadata || {};
+                userProfile = {
+                    full_name: meta.full_name || meta.name || '',
+                    first_name: meta.first_name || '',
+                    last_name: meta.last_name || '',
+                    student_id: meta.student_id || '',
+                    username: meta.username || '',
+                    email: currentUser.email || '',
+                    program_type: 'bachelor',
+                    program_name: ''
+                };
+                if (error) console.warn('Profile load for PDF:', error.message || error);
             }
+        }
+
+        async function exportGpaPdf() {
+            try {
+                await loadProfile();
+            } catch (_) {}
+            MyUBAcademic.exportTranscriptPDF(courses, userProfile || {});
         }
 
         function updateProgression() {
@@ -3375,10 +3383,17 @@
             // Update UI
             document.getElementById('programName').textContent = programName;
             document.getElementById('degreeType').textContent = programLabel;
-            document.getElementById('earnedCredits').textContent = earnedCreditsVal;
-            document.getElementById('requiredCredits').textContent = requiredCredits;
-            document.getElementById('progressPercent').textContent = progressPercent;
-            document.getElementById('remainingCredits').textContent = remainingCredits;
+            if (window.MyUBStatAnim) {
+                MyUBStatAnim.set('earnedCredits', earnedCreditsVal, 0);
+                MyUBStatAnim.set('requiredCredits', requiredCredits, 0);
+                MyUBStatAnim.set('progressPercent', progressPercent, 0);
+                MyUBStatAnim.set('remainingCredits', remainingCredits, 0);
+            } else {
+                document.getElementById('earnedCredits').textContent = String(earnedCreditsVal);
+                document.getElementById('requiredCredits').textContent = String(requiredCredits);
+                document.getElementById('progressPercent').textContent = String(progressPercent);
+                document.getElementById('remainingCredits').textContent = String(remainingCredits);
+            }
             
             const progressBar = document.getElementById('progressionBar');
             progressBar.style.width = progressPercent + '%';
@@ -3411,9 +3426,14 @@
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); 
             if (ev && ev.target) ev.target.classList.add('active'); 
             document.getElementById(tab + 'Tab').classList.add('active');
-            if (tab === 'whatif' && !whatIfInitialized) {
-                MyUBAcademic.renderWhatIfPanel(document.getElementById('whatifPanel'), courses);
-                whatIfInitialized = true;
+            if (tab === 'whatif') {
+                var panel = document.getElementById('whatifPanel');
+                if (!whatIfInitialized || !panel || !panel.querySelector('.whatif-layout')) {
+                    MyUBAcademic.renderWhatIfPanel(panel, courses);
+                    whatIfInitialized = true;
+                } else if (panel._whatIfSetCourses) {
+                    panel._whatIfSetCourses(courses);
+                }
             }
         }
 
@@ -3430,10 +3450,6 @@
             document.getElementById('gpaGoalCurrent').textContent = MyUBGPA.formatGPA(gpa);
             document.getElementById('gpaGoalTargetDisplay').textContent = goal.target.toFixed(2);
             document.getElementById('gpaGoalProgressBar').style.width = prog.percent + '%';
-        }
-
-        function exportGpaPdf() {
-            MyUBAcademic.exportTranscriptPDF(courses, userProfile);
         }
 
         // =============================================
@@ -3516,6 +3532,10 @@
             updateSummary();
             updateProgression();
             updateGpaGoalDisplay();
+            var whatifPanel = document.getElementById('whatifPanel');
+            if (whatifPanel && whatifPanel._whatIfSetCourses) {
+                whatifPanel._whatIfSetCourses(courses);
+            }
         }
 
         function groupBySemester() { 
@@ -3634,14 +3654,23 @@
         function updateSummary() { 
             const gpa = calculateGPA(courses); 
             const totalCredits = MyUBGPA.earnedCredits(courses);
-            const classification = getClassification(gpa); 
-            document.getElementById('cumulativeGPA').textContent = gpa.toFixed(1); 
-            document.getElementById('totalCredits').textContent = totalCredits; 
-            document.getElementById('totalCourses').textContent = courses.length; 
+            const courseCount = MyUBGPA.gradedCourseCount
+                ? MyUBGPA.gradedCourseCount(courses)
+                : courses.filter(function (c) { return !!c.grade; }).length;
+            const classification = getClassification(gpa);
+            if (window.MyUBStatAnim) {
+                MyUBStatAnim.set('cumulativeGPA', gpa, 1);
+                MyUBStatAnim.set('totalCredits', totalCredits, 0);
+                MyUBStatAnim.set('totalCourses', courseCount, 0);
+            } else {
+                document.getElementById('cumulativeGPA').textContent = gpa.toFixed(1); 
+                document.getElementById('totalCredits').textContent = String(totalCredits); 
+                document.getElementById('totalCourses').textContent = String(courseCount);
+            }
             const classEl = document.getElementById('classification'); 
             classEl.textContent = classification.name; 
             classEl.className = `class-badge ${classification.badge}`; 
-            document.getElementById('classificationSub').textContent = courses.length === 0 ? 'Add courses to see' : gpa < 2.0 && gpa > 0 ? 'Below pass threshold' : `GPA ${gpa.toFixed(1)}`;
+            document.getElementById('classificationSub').textContent = courseCount === 0 ? 'Add courses to see' : gpa < 2.0 && gpa > 0 ? 'Below pass threshold' : `GPA ${gpa.toFixed(1)}`;
             updateSemesterAnalysis();
         }
         
@@ -4508,58 +4537,95 @@
         // ==========================================================
         (function() {
             // ============================================================
-            // 1. NUMBER COUNT-UP for summary cards
+            // 1. NUMBER COUNT-UP for summary cards (no MutationObserver —
+            //    observing textContent while animating caused endless re-tweens)
             // ============================================================
-            function animateNumber(el, from, to, duration = 1200, decimals = 0) {
+            var _statTweens = {};
+            var _statValues = {};
+
+            function readStatNumber(el) {
+                if (!el) return 0;
+                var raw = String(el.textContent || '').replace(/,/g, '').trim();
+                var n = parseFloat(raw);
+                return isFinite(n) ? n : 0;
+            }
+
+            function formatStatNumber(value, decimals) {
+                var n = Number(value);
+                if (!isFinite(n)) n = 0;
+                return decimals > 0 ? n.toFixed(decimals) : String(Math.round(n));
+            }
+
+            function animateNumber(el, from, to, duration, decimals, key) {
                 if (!el) return;
-                const g = window.gsap;
-                const obj = { v: from };
-                const update = () => {
-                    el.textContent = decimals ? obj.v.toFixed(decimals) : Math.round(obj.v).toLocaleString();
+                duration = duration == null ? 700 : duration;
+                decimals = decimals || 0;
+                if (_statTweens[key] && window.gsap) {
+                    try { window.gsap.killTweensOf(_statTweens[key]); } catch (_) {}
+                }
+                if (Math.abs(from - to) < 0.0001) {
+                    el.textContent = formatStatNumber(to, decimals);
+                    _statValues[key] = to;
+                    return;
+                }
+                var g = window.gsap;
+                var obj = { v: from };
+                _statTweens[key] = obj;
+                var update = function () {
+                    el.textContent = formatStatNumber(obj.v, decimals);
+                };
+                var done = function () {
+                    el.textContent = formatStatNumber(to, decimals);
+                    _statValues[key] = to;
+                    delete _statTweens[key];
                 };
                 if (g) {
-                    g.to(obj, { v: to, duration: duration / 1000, ease: 'power2.out', onUpdate: update });
+                    g.to(obj, {
+                        v: to,
+                        duration: duration / 1000,
+                        ease: 'power2.out',
+                        onUpdate: update,
+                        onComplete: done
+                    });
                 } else {
-                    const start = performance.now();
+                    var start = performance.now();
                     function tick(now) {
-                        const t = Math.min(1, (now - start) / duration);
-                        const eased = 1 - Math.pow(1 - t, 3);
+                        if (_statTweens[key] !== obj) return;
+                        var t = Math.min(1, (now - start) / duration);
+                        var eased = 1 - Math.pow(1 - t, 3);
                         obj.v = from + (to - from) * eased;
                         update();
                         if (t < 1) requestAnimationFrame(tick);
+                        else done();
                     }
                     requestAnimationFrame(tick);
                 }
             }
 
-            // Watch summary card values and animate them whenever they change
-            function wireCountUp() {
-                const targets = [
-                    { id: 'cumulativeGPA', decimals: 2 },
-                    { id: 'totalCredits',  decimals: 0 },
-                    { id: 'totalCourses',  decimals: 0 },
-                    { id: 'earnedCredits', decimals: 0 },
-                    { id: 'requiredCredits', decimals: 0 },
-                    { id: 'remainingCredits', decimals: 0 },
-                    { id: 'progressPercent', decimals: 0 }
-                ];
-                targets.forEach(t => {
-                    const el = document.getElementById(t.id);
+            window.MyUBStatAnim = {
+                set: function (id, value, decimals) {
+                    var el = document.getElementById(id);
                     if (!el) return;
-                    let last = parseFloat(el.textContent) || 0;
-                    const obs = new MutationObserver(() => {
-                        const cur = parseFloat(el.textContent) || 0;
-                        if (cur === last) return;
-                        // Flash effect
-                        el.classList.remove('flash-pulse');
-                        void el.offsetWidth;
-                        el.classList.add('flash-pulse');
-                        // Animate from last to cur
-                        animateNumber(el, last, cur, 900, t.decimals);
-                        last = cur;
-                    });
-                    obs.observe(el, { childList: true, characterData: true, subtree: true });
-                });
+                    decimals = decimals == null ? 0 : decimals;
+                    var to = Number(value);
+                    if (!isFinite(to)) to = 0;
+                    var from = _statValues.hasOwnProperty(id)
+                        ? _statValues[id]
+                        : readStatNumber(el);
+                    // Snap if first paint / huge jump (avoids wild count from stale DOM)
+                    if (!_statValues.hasOwnProperty(id) && from === 0 && to !== 0) {
+                        from = 0;
+                    }
+                    el.classList.remove('flash-pulse');
+                    void el.offsetWidth;
+                    el.classList.add('flash-pulse');
+                    _statValues[id] = to;
+                    animateNumber(el, from, to, 700, decimals, id);
+                }
+            };
+
+            function wireCountUp() {
+                // Values are driven explicitly via MyUBStatAnim.set from updateSummary/updateProgression
             }
 
             // ============================================================

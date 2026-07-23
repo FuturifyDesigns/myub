@@ -1,5 +1,5 @@
 /**
- * MyUB Academic — GPA goals, CA metadata, what-if, export, alerts
+ * MyUB Academic helpers — goals, CA marks, what-if, alerts, transcript PDF
  */
 (function (global) {
     'use strict';
@@ -10,127 +10,102 @@
 
     function lsGet(key, fallback) {
         try {
-            var v = localStorage.getItem(key);
-            return v ? JSON.parse(v) : fallback;
-        } catch (e) {
+            var raw = global.localStorage.getItem(key);
+            if (!raw) return fallback;
+            return JSON.parse(raw);
+        } catch (_) {
             return fallback;
         }
     }
 
-    function lsSet(key, val) {
-        try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) { /* ignore */ }
+    function lsSet(key, value) {
+        try {
+            global.localStorage.setItem(key, JSON.stringify(value));
+        } catch (_) {}
     }
 
-    function goalStorageKey(userId) {
-        return GOAL_KEY + '_' + (userId || 'anon');
+    function getGoal() {
+        return lsGet(GOAL_KEY, null);
     }
 
-    function caStorageKey(userId) {
-        return CA_KEY + '_' + (userId || 'anon');
-    }
-
-    function getGoal(userId) {
-        var g = lsGet(goalStorageKey(userId), null);
-        return g && typeof g.target === 'number' ? g : null;
-    }
-
-    function setGoalLocal(userId, target) {
-        if (target === null || target === '' || target === undefined) {
-            try { localStorage.removeItem(goalStorageKey(userId)); } catch (e) { /* ignore */ }
-            return true;
-        }
-        var t = parseFloat(target);
-        if (isNaN(t) || t < 0 || t > 5) return false;
-        lsSet(goalStorageKey(userId), { target: t, updated: new Date().toISOString() });
-        return true;
+    function setGoalLocal(goal) {
+        lsSet(GOAL_KEY, goal);
+        return goal;
     }
 
     async function loadGoal(supabase, userId) {
-        var local = getGoal(userId);
+        var local = getGoal();
         if (!supabase || !userId) return local;
         try {
             var res = await supabase.from('profiles').select('gpa_goal').eq('id', userId).maybeSingle();
-            if (!res.error && res.data && res.data.gpa_goal != null) {
-                var t = parseFloat(res.data.gpa_goal);
-                if (!isNaN(t)) {
-                    setGoalLocal(userId, t);
-                    return { target: t };
-                }
+            if (res.data && res.data.gpa_goal != null) {
+                var goal = { target: parseFloat(res.data.gpa_goal), updatedAt: Date.now() };
+                setGoalLocal(goal);
+                return goal;
             }
-        } catch (e) { /* column may not exist */ }
+        } catch (_) {}
         return local;
     }
 
     async function saveGoal(supabase, userId, target) {
-        if (!setGoalLocal(userId, target)) return { ok: false, error: 'Goal must be between 0 and 5' };
+        var goal = { target: parseFloat(target), updatedAt: Date.now() };
+        setGoalLocal(goal);
         if (supabase && userId) {
             try {
-                var res = await supabase.from('profiles').update({ gpa_goal: parseFloat(target) }).eq('id', userId);
-                if (res.error && /gpa_goal|column/i.test(res.error.message || '')) {
-                    return { ok: true, localOnly: true };
-                }
-                if (res.error) return { ok: false, error: res.error.message };
-            } catch (e) {
-                return { ok: true, localOnly: true };
-            }
+                await supabase.from('profiles').update({ gpa_goal: goal.target }).eq('id', userId);
+            } catch (_) {}
         }
-        return { ok: true };
+        return goal;
     }
 
-    function getAllCA(userId) {
-        return lsGet(caStorageKey(userId), {});
+    function getAllCA() {
+        return lsGet(CA_KEY, {}) || {};
     }
 
-    function getCourseCA(userId, courseId) {
-        var all = getAllCA(userId);
-        return all[courseId] || { ca_weight: 40, exam_weight: 60, ca_mark: null, exam_mark: null };
+    function getCourseCA(courseId) {
+        var all = getAllCA();
+        return all[courseId] || null;
     }
 
-    function setCourseCA(userId, courseId, data) {
-        var all = getAllCA(userId);
-        all[courseId] = Object.assign(getCourseCA(userId, courseId), data || {});
-        lsSet(caStorageKey(userId), all);
+    function setCourseCA(courseId, data) {
+        var all = getAllCA();
+        all[courseId] = data;
+        lsSet(CA_KEY, all);
+        return data;
     }
 
-    function mergeCourseCA(courses, userId) {
-        var all = getAllCA(userId);
+    function mergeCourseCA(courses) {
+        var all = getAllCA();
         return (courses || []).map(function (c) {
-            var ca = all[c.id] || {};
-            var merged = Object.assign({}, c, {
-                ca_weight: ca.ca_weight != null ? ca.ca_weight : 40,
-                exam_weight: ca.exam_weight != null ? ca.exam_weight : 60,
-                ca_mark: ca.ca_mark,
-                exam_mark: ca.exam_mark
-            });
-            if (merged.ca_mark != null && merged.exam_mark != null && !merged.final_score) {
-                merged.projected_score = MyUBGPA.projectedFinalScore(
-                    merged.ca_mark, merged.exam_mark, merged.ca_weight, merged.exam_weight
-                );
-            }
-            return merged;
+            var ca = all[c.id];
+            if (!ca) return c;
+            return Object.assign({}, c, { ca: ca });
         });
     }
 
     function goalProgress(gpa, goal) {
-        if (!goal || !goal.target) return null;
-        var target = goal.target;
-        var pct = Math.min(100, Math.max(0, (gpa / target) * 100));
-        var met = gpa >= target;
-        return { target: target, current: gpa, percent: pct, met: met, gap: target - gpa };
+        if (!goal || !goal.target) return { met: false, gap: null, pct: 0 };
+        var target = parseFloat(goal.target) || 0;
+        var current = parseFloat(gpa) || 0;
+        var met = current >= target;
+        var gap = Math.max(0, target - current);
+        var pct = target > 0 ? Math.min(100, (current / target) * 100) : 0;
+        return { met: met, gap: gap, pct: pct, target: target, current: current };
     }
 
-    function whatIfGPA(existingCourses, hypotheticalCourses) {
-        var combined = (existingCourses || []).concat(hypotheticalCourses || []);
+    function whatIfGPA(existingCourses, scenarioCourses) {
+        var combined = (existingCourses || []).concat(scenarioCourses || []);
         return MyUBGPA.calculateGPA(combined);
     }
 
     function renderWhatIfPanel(container, existingCourses, onUpdate) {
         if (!container) return;
+        var courseRef = existingCourses || [];
         var rows = [];
         var id = 0;
-        var removeIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z"/></svg>';
-        var addIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>';
-        var calcIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>';
+        var removeIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>';
+        var addIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>';
+        var calcIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v6"/><path d="m8 7 4-4 4 4"/><path d="M6 14h4"/><path d="M14 14h4"/><path d="M6 18h4"/><path d="M14 18h4"/><rect x="3" y="10" width="18" height="11" rx="2"/></svg>';
 
         function toggleEmpty() {
             var empty = container.querySelector('.whatif-empty');
@@ -143,11 +118,13 @@
             var hypo = rows.map(function (r) {
                 return { credits: r.credits, grade: r.grade };
             }).filter(function (r) { return r.grade && r.credits; });
-            var current = MyUBGPA.calculateGPA(existingCourses || []);
-            var projected = whatIfGPA(existingCourses, hypo);
+            var current = MyUBGPA.calculateGPA(courseRef);
+            var projected = whatIfGPA(courseRef, hypo);
             var delta = projected - current;
-            container.querySelector('.whatif-current').textContent = MyUBGPA.formatGPA(current);
-            container.querySelector('.whatif-projected').textContent = MyUBGPA.formatGPA(projected);
+            var currentEl = container.querySelector('.whatif-current');
+            var projectedEl = container.querySelector('.whatif-projected');
+            if (currentEl) currentEl.textContent = MyUBGPA.formatGPA(current);
+            if (projectedEl) projectedEl.textContent = MyUBGPA.formatGPA(projected);
             var deltaEl = container.querySelector('.whatif-delta');
             if (deltaEl) {
                 var sign = delta >= 0 ? '+' : '';
@@ -161,13 +138,19 @@
             if (onUpdate) onUpdate({ current: current, projected: projected, hypothetical: hypo });
         }
 
+        function gradeOptions(selected) {
+            return Object.keys(MyUBGPA.GRADING_SCALE).map(function (g) {
+                return '<option value="' + g + '"' + (g === selected ? ' selected' : '') + '>' + g + '</option>';
+            }).join('');
+        }
+
         function addRow() {
             var rowId = ++id;
             rows.push({ id: rowId, credits: 3, grade: 'B' });
             var list = container.querySelector('.whatif-rows');
             var div = document.createElement('div');
             div.className = 'whatif-row';
-            div.dataset.rowId = rowId;
+            div.dataset.rowId = String(rowId);
             div.innerHTML =
                 '<div class="whatif-field whatif-field-code"><label>Course</label>' +
                 '<input type="text" placeholder="e.g. CSI 413" class="whatif-code" autocomplete="off"></div>' +
@@ -195,12 +178,6 @@
             });
             toggleEmpty();
             sync();
-        }
-
-        function gradeOptions(selected) {
-            return Object.keys(MyUBGPA.GRADING_SCALE).map(function (g) {
-                return '<option value="' + g + '"' + (g === selected ? ' selected' : '') + '>' + g + '</option>';
-            }).join('');
         }
 
         container.innerHTML =
@@ -231,49 +208,249 @@
             '</div></div></div>';
 
         container.querySelector('.whatif-add').addEventListener('click', addRow);
+        container._whatIfSetCourses = function (next) {
+            courseRef = next || [];
+            sync();
+        };
         sync();
     }
 
+    function escapeHtml(s) {
+        return String(s || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function sortSemesterKeys(keys) {
+        return keys.slice().sort(function (a, b) {
+            var pa = String(a).match(/(\d{4})|Year\s*(\d+)|Semester\s*(\d+)/gi) || [];
+            var pb = String(b).match(/(\d{4})|Year\s*(\d+)|Semester\s*(\d+)/gi) || [];
+            return String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' });
+        });
+    }
+
+    function countGradedCourses(courses) {
+        return (courses || []).filter(function (c) { return !!c.grade; }).length;
+    }
+
+    function sumAttemptedCredits(courses) {
+        return (courses || []).reduce(function (sum, c) {
+            var n = Number(c.credits);
+            return sum + (c.grade && isFinite(n) ? n : 0);
+        }, 0);
+    }
+
+    function resolveProfileName(profile) {
+        if (!profile) return '';
+        var full = (profile.full_name || '').trim();
+        if (full) return full;
+        var parts = ((profile.first_name || '') + ' ' + (profile.last_name || '')).trim();
+        if (parts) return parts;
+        if (profile.username) return String(profile.username);
+        if (profile.email) return String(profile.email).split('@')[0];
+        return '';
+    }
+
+    function logoMarkup() {
+        return (
+            '<div class="brand-logo" aria-label="MyUB">' +
+                '<div class="brand-m-wrap">' +
+                    '<div class="brand-cap">' +
+                        '<svg viewBox="0 0 100 70" width="42" height="29" aria-hidden="true">' +
+                            '<polygon points="50,6 95,24 50,42 5,24" fill="#1a4b8c"/>' +
+                            '<circle cx="50" cy="24" r="4.5" fill="#ffffff" stroke="#1a4b8c" stroke-width="1.5"/>' +
+                            '<rect x="32" y="38" width="36" height="18" rx="2.5" fill="#1a4b8c"/>' +
+                            '<circle cx="78" cy="24" r="4" fill="#c41e3a"/>' +
+                            '<path d="M78 28 Q82 44 80 54" stroke="#c41e3a" stroke-width="3" fill="none" stroke-linecap="round"/>' +
+                            '<ellipse cx="80" cy="57" rx="5" ry="8" fill="#c41e3a"/>' +
+                        '</svg>' +
+                    '</div>' +
+                    '<span class="brand-m">M</span>' +
+                '</div>' +
+                '<span class="brand-ub">yUB</span>' +
+            '</div>'
+        );
+    }
+
     function exportTranscriptPDF(courses, profile) {
-        var name = (profile && (profile.full_name || profile.username)) || 'Student';
+        var name = resolveProfileName(profile) || 'Student';
         var program = (profile && profile.program_name) || '';
-        var gpa = MyUBGPA.calculateGPA(courses);
+        var studentId = (profile && (profile.student_id || profile.username)) || '';
+        var yearOfStudy = profile && profile.year_of_study ? ('Year ' + profile.year_of_study) : '';
+        var programType = profile && profile.program_type ? MyUBGPA.PROGRAM_LABELS[profile.program_type] || profile.program_type : '';
+        var email = (profile && profile.email) || '';
+
+        var list = courses || [];
+        var gpa = MyUBGPA.calculateGPA(list);
         var cls = MyUBGPA.getClassification(gpa);
-
-        var html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>MyUB GPA Transcript</title>' +
-            '<style>body{font-family:Segoe UI,Arial,sans-serif;padding:40px;color:#1a365d}' +
-            'h1{color:#c41e3a;margin:0 0 8px}table{width:100%;border-collapse:collapse;margin-top:24px}' +
-            'th,td{border:1px solid #ddd;padding:10px;text-align:left;font-size:13px}' +
-            'th{background:#1a365d;color:#fff}.summary{margin-top:24px;padding:16px;background:#f8fafc;border-radius:8px}' +
-            '</style></head><body>' +
-            '<h1>MyUB GPA Summary</h1>' +
-            '<p><strong>' + escapeHtml(name) + '</strong>' + (program ? ' — ' + escapeHtml(program) : '') + '</p>' +
-            '<p>Generated ' + new Date().toLocaleString() + '</p>' +
-            '<div class="summary"><strong>Cumulative GPA:</strong> ' + MyUBGPA.formatGPA(gpa) +
-            ' &nbsp;|&nbsp; <strong>Classification:</strong> ' + escapeHtml(cls.name) + '</div>' +
-            '<table><thead><tr><th>Code</th><th>Course</th><th>Year</th><th>Sem</th><th>Credits</th><th>Grade</th></tr></thead><tbody>';
-
-        (courses || []).forEach(function (c) {
-            html += '<tr><td>' + escapeHtml(c.course_code || '') + '</td><td>' + escapeHtml(c.course_name || '') +
-                '</td><td>' + escapeHtml(c.academic_year || '') + '</td><td>' + escapeHtml(c.semester || '') +
-                '</td><td>' + (c.credits || '') + '</td><td>' + escapeHtml(c.grade || '—') + '</td></tr>';
+        var earned = MyUBGPA.earnedCredits(list);
+        var attempted = sumAttemptedCredits(list);
+        var totalCourses = countGradedCourses(list);
+        var required = MyUBGPA.requiredCreditsForProgram(profile && profile.program_type);
+        var grouped = MyUBGPA.groupBySemester(list);
+        var semKeys = sortSemesterKeys(Object.keys(grouped));
+        var generated = new Date().toLocaleString(undefined, {
+            year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
         });
 
-        html += '</tbody></table><p style="margin-top:32px;font-size:11px;color:#666">Unofficial summary from MyUB. Verify with the University of Botswana registrar.</p></body></html>';
+        var semesterBlocks = '';
+        semKeys.forEach(function (key) {
+            var rows = grouped[key] || [];
+            var semGpa = MyUBGPA.calculateGPA(rows);
+            var semCredits = sumAttemptedCredits(rows);
+            var semEarned = MyUBGPA.earnedCredits(rows);
+            var semCourses = countGradedCourses(rows);
+            var body = '';
+            rows.forEach(function (c) {
+                body += '<tr>' +
+                    '<td class="code">' + escapeHtml(c.course_code || '') + '</td>' +
+                    '<td class="course">' + escapeHtml(c.course_name || '') + '</td>' +
+                    '<td class="num">' + (c.credits != null ? escapeHtml(c.credits) : '—') + '</td>' +
+                    '<td class="grade">' + escapeHtml(c.grade || '—') + '</td>' +
+                    '<td class="num">' + (c.grade ? MyUBGPA.getGradePoints(c.grade).toFixed(1) : '—') + '</td>' +
+                    '</tr>';
+            });
+            semesterBlocks +=
+                '<section class="semester">' +
+                    '<div class="semester-head">' +
+                        '<h2>' + escapeHtml(key) + '</h2>' +
+                        '<div class="semester-meta">' +
+                            '<span><strong>' + MyUBGPA.formatGPA(semGpa) + '</strong> GPA</span>' +
+                            '<span>' + semCourses + ' course' + (semCourses === 1 ? '' : 's') + '</span>' +
+                            '<span>' + semCredits + ' credits attempted</span>' +
+                            '<span>' + semEarned + ' earned</span>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="table-wrap">' +
+                    '<table>' +
+                        '<thead><tr><th>Code</th><th>Course</th><th>Credits</th><th>Grade</th><th>Points</th></tr></thead>' +
+                        '<tbody>' + (body || '<tr><td colspan="5" class="empty">No courses in this semester</td></tr>') + '</tbody>' +
+                    '</table>' +
+                    '</div>' +
+                '</section>';
+        });
+
+        if (!semesterBlocks) {
+            semesterBlocks = '<section class="semester"><p class="empty-note">No graded courses yet.</p></section>';
+        }
+
+        var html = '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">' +
+            '<meta name="viewport" content="width=device-width, initial-scale=1">' +
+            '<title>MyUB Academic Summary — ' + escapeHtml(name) + '</title>' +
+            '<style>' +
+            '@page{size:A4;margin:14mm}' +
+            '*{box-sizing:border-box}' +
+            'body{margin:0;font-family:"Segoe UI",Calibri,Arial,sans-serif;color:#102a43;background:#f4f7fb;line-height:1.45;-webkit-text-size-adjust:100%}' +
+            '.sheet{max-width:820px;margin:0 auto;padding:18px 16px 28px;background:#fff}' +
+            '.brand{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;border-bottom:3px solid #1a4b8c;padding-bottom:14px;margin-bottom:18px}' +
+            '.brand-logo{display:inline-flex;align-items:flex-end;gap:4px;line-height:1;font-family:Sora,Outfit,"Segoe UI",sans-serif;user-select:none}' +
+            '.brand-m-wrap{position:relative;display:inline-block;line-height:0.82}' +
+            '.brand-m{font-size:42px;font-weight:800;color:#1a4b8c;letter-spacing:-0.04em;display:inline-block}' +
+            '.brand-ub{font-size:16px;font-weight:700;color:#c41e3a;letter-spacing:0.03em;display:inline-block;line-height:0.85;padding-bottom:4px}' +
+            '.brand-cap{position:absolute;top:-14px;left:50%;transform:translateX(-50%) rotate(-6deg);width:42px;height:29px;pointer-events:none}' +
+            '.brand-cap svg{width:42px;height:29px;display:block;overflow:visible}' +
+            '.brand-sub{font-size:12px;color:#486581;margin-top:8px}' +
+            '.doc-title{text-align:right}' +
+            '.doc-title h1{margin:0;font-size:18px;color:#1a4b8c}' +
+            '.doc-title p{margin:4px 0 0;font-size:11px;color:#627d98}' +
+            '.student{display:grid;grid-template-columns:1.4fr 1fr;gap:10px 18px;padding:14px 16px;background:#f7fafc;border:1px solid #d9e2ec;border-radius:12px;margin-bottom:18px}' +
+            '.student .label{display:block;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#627d98;margin-bottom:2px}' +
+            '.student .value{font-size:14px;font-weight:600;color:#102a43;word-break:break-word}' +
+            '.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:22px}' +
+            '.stat{border:1px solid #d9e2ec;border-radius:12px;padding:12px 10px;text-align:center;background:#fff}' +
+            '.stat .k{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#627d98}' +
+            '.stat .v{font-size:22px;font-weight:800;color:#1a4b8c;margin-top:4px;line-height:1.1}' +
+            '.stat .s{font-size:11px;color:#486581;margin-top:4px}' +
+            '.stat.accent{border-color:#c5daf5;background:#eef5fb}' +
+            '.stat.accent .v{color:#c41e3a}' +
+            '.semester{margin-bottom:18px;break-inside:avoid}' +
+            '.semester-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:8px}' +
+            '.semester-head h2{margin:0;font-size:15px;color:#1a4b8c}' +
+            '.semester-meta{display:flex;flex-wrap:wrap;gap:8px 12px;font-size:11px;color:#486581}' +
+            '.semester-meta strong{color:#102a43;font-size:13px}' +
+            '.table-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}' +
+            'table{width:100%;border-collapse:collapse;font-size:12px;min-width:480px}' +
+            'th,td{padding:8px 10px;border-bottom:1px solid #e6eef6;text-align:left}' +
+            'th{background:#1a4b8c;color:#fff;font-weight:600;font-size:11px;letter-spacing:.03em;text-transform:uppercase}' +
+            'tr:nth-child(even) td{background:#f8fafc}' +
+            'td.num,th:nth-child(3),th:nth-child(5){text-align:center}' +
+            'td.grade{text-align:center;font-weight:700;color:#1a4b8c}' +
+            'td.empty,.empty-note{text-align:center;color:#627d98;padding:16px}' +
+            '.footnote{margin-top:22px;padding-top:12px;border-top:1px solid #d9e2ec;font-size:10px;color:#627d98}' +
+            '.footnote strong{color:#334e68}' +
+            '.toolbar{display:flex;justify-content:flex-end;gap:8px;margin:0 0 14px;position:sticky;top:0;z-index:5;background:rgba(244,247,251,.92);backdrop-filter:blur(6px);padding:8px 0}' +
+            '.toolbar button{appearance:none;border:1px solid #1a4b8c;background:#1a4b8c;color:#fff;border-radius:10px;padding:10px 14px;font-size:13px;font-weight:700;cursor:pointer}' +
+            '.toolbar button.secondary{background:#fff;color:#1a4b8c}' +
+            '@media (max-width:720px){' +
+              'body{background:#fff}' +
+              '.sheet{padding:12px 12px 24px}' +
+              '.brand{flex-direction:column;align-items:flex-start;gap:10px}' +
+              '.doc-title{text-align:left}' +
+              '.doc-title h1{font-size:16px}' +
+              '.brand-m{font-size:36px}' +
+              '.brand-ub{font-size:14px}' +
+              '.brand-cap{top:-12px;width:36px;height:25px}' +
+              '.brand-cap svg{width:36px;height:25px}' +
+              '.student{grid-template-columns:1fr;gap:12px}' +
+              '.stats{grid-template-columns:repeat(2,minmax(0,1fr))}' +
+              '.stat .v{font-size:20px}' +
+              '.semester-head{align-items:flex-start}' +
+              'table{font-size:11px;min-width:420px}' +
+              'th,td{padding:7px 8px}' +
+            '}' +
+            '@media (max-width:420px){' +
+              '.stats{grid-template-columns:1fr 1fr}' +
+              '.stat{padding:10px 8px}' +
+              '.stat .k{font-size:9px}' +
+              '.stat .v{font-size:18px}' +
+            '}' +
+            '@media print{' +
+              'body{background:#fff}' +
+              '.toolbar{display:none!important}' +
+              '.sheet{padding:0;max-width:none}' +
+              'body{-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
+              '.stat,.student,th{print-color-adjust:exact}' +
+              'table{min-width:0}' +
+            '}' +
+            '</style></head><body><div class="sheet">' +
+            '<div class="toolbar"><button type="button" class="secondary" onclick="window.close()">Close</button><button type="button" onclick="window.print()">Save / Print PDF</button></div>' +
+            '<header class="brand">' +
+                '<div>' + logoMarkup() +
+                '<div class="brand-sub">University of Botswana · Student Academic Summary</div></div>' +
+                '<div class="doc-title"><h1>GPA Transcript Summary</h1><p>Generated ' + escapeHtml(generated) + '</p></div>' +
+            '</header>' +
+            '<section class="student">' +
+                '<div><span class="label">Student</span><span class="value">' + escapeHtml(name) + '</span></div>' +
+                '<div><span class="label">Student ID</span><span class="value">' + escapeHtml(studentId || '—') + '</span></div>' +
+                '<div><span class="label">Program</span><span class="value">' + escapeHtml(program || programType || '—') + (yearOfStudy ? ' · ' + escapeHtml(yearOfStudy) : '') + '</span></div>' +
+                '<div><span class="label">Classification</span><span class="value">' + escapeHtml(cls.name || 'N/A') + '</span></div>' +
+                (email ? '<div><span class="label">Email</span><span class="value">' + escapeHtml(email) + '</span></div>' : '') +
+            '</section>' +
+            '<section class="stats">' +
+                '<div class="stat accent"><div class="k">Cumulative GPA</div><div class="v">' + MyUBGPA.formatGPA(gpa) + '</div><div class="s">out of 5.00</div></div>' +
+                '<div class="stat"><div class="k">Courses taken</div><div class="v">' + totalCourses + '</div><div class="s">with recorded grades</div></div>' +
+                '<div class="stat"><div class="k">Credits earned</div><div class="v">' + earned + '</div><div class="s">toward degree' + (required ? ' / ' + required : '') + '</div></div>' +
+                '<div class="stat"><div class="k">Credits attempted</div><div class="v">' + attempted + '</div><div class="s">graded credit load</div></div>' +
+            '</section>' +
+            semesterBlocks +
+            '<footer class="footnote">' +
+                '<strong>Unofficial MyUB summary.</strong> This document is generated from your MyUB course records for personal tracking. ' +
+                'It is not an official University of Botswana transcript — verify all results with the Registrar.' +
+                '<br>© MyUB · Built by Futurify Designs' +
+            '</footer>' +
+            '</div></body></html>';
 
         var w = window.open('', '_blank');
         if (!w) {
             alert('Please allow pop-ups to export PDF.');
             return;
         }
+        w.document.open();
         w.document.write(html);
         w.document.close();
         w.focus();
-        setTimeout(function () { w.print(); }, 400);
-    }
-
-    function escapeHtml(s) {
-        return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
     function alertSent(key) {
@@ -346,7 +523,7 @@
 
         var prog = goalProgress(gpa, goal);
         if (prog.met) {
-            await createNotification(supabase, userId, 'GPA goal reached! 🎉',
+            await createNotification(supabase, userId, 'GPA goal reached!',
                 'Your GPA (' + MyUBGPA.formatGPA(gpa) + ') meets your goal of ' + goal.target.toFixed(2) + '.',
                 'gpa-calculator.html');
             markAlertSent(key);

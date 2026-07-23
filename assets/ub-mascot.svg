@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 360" fill="none" role="img" aria-label="University of Botswana student mascot">
+  <!-- soft ground shadow -->
+  <ellipse cx="140" cy="338" rx="72" ry="12" fill="#1a4b8c" opacity="0.12"/>
+  <!-- body / gown -->
+  <path d="M78 168c8-28 36-48 62-48s54 20 62 48l18 150H60L78 168z" fill="#1a4b8c"/>
+  <path d="M90 190c12 46 28 70 50 86 22-16 38-40 50-86" fill="#12366a" opacity="0.35"/>
+  <!-- sash -->
+  <path d="M118 175l22 145h10L140 175z" fill="#c41e3a"/>
+  <!-- arms -->
+  <path d="M78 175c-28 18-42 48-40 78l18 6c0-24 10-46 30-60z" fill="#1a4b8c"/>
+  <path d="M202 175c28 18 42 48 40 78l-18 6c0-24-10-46-30-60z" fill="#1a4b8c"/>
+  <!-- waving hand -->
+  <circle cx="228" cy="248" r="18" fill="#e8b896"/>
+  <path d="M220 236c6-14 20-16 26-8" stroke="#d49a72" stroke-width="3" stroke-linecap="round"/>
+  <!-- head -->
+  <circle cx="140" cy="118" r="46" fill="#e8b896"/>
+  <!-- hair -->
+  <path d="M96 112c4-36 30-54 44-54s40 18 44 54c-12-14-28-20-44-20s-32 6-44 20z" fill="#2a1a12"/>
+  <!-- face -->
+  <circle cx="124" cy="118" r="4" fill="#2a1a12"/>
+  <circle cx="156" cy="118" r="4" fill="#2a1a12"/>
+  <path d="M128 138c8 10 24 10 32 0" stroke="#b42318" stroke-width="3" stroke-linecap="round"/>
+  <!-- cheeks -->
+  <circle cx="112" cy="128" r="6" fill="#c41e3a" opacity="0.18"/>
+  <circle cx="168" cy="128" r="6" fill="#c41e3a" opacity="0.18"/>
+  <!-- mortarboard -->
+  <polygon points="140,42 210,68 140,94 70,68" fill="#0c274d"/>
+  <rect x="118" y="88" width="44" height="14" rx="3" fill="#0c274d"/>
+  <circle cx="140" cy="68" r="5" fill="#ffffff"/>
+  <!-- tassel -->
+  <circle cx="198" cy="70" r="5" fill="#c41e3a"/>
+  <path d="M198 75c4 18 2 34 0 44" stroke="#c41e3a" stroke-width="3.5" stroke-linecap="round"/>
+  <ellipse cx="198" cy="124" rx="7" ry="10" fill="#c41e3a"/>
+  <!-- book -->
+  <g transform="translate(52 250)">
+    <rect x="0" y="0" width="46" height="34" rx="4" fill="#ffffff" stroke="#1a4b8c" stroke-width="2"/>
+    <path d="M23 0v34" stroke="#c41e3a" stroke-width="2"/>
+    <path d="M8 10h10M8 17h10M8 24h8" stroke="#9fb3c8" stroke-width="2" stroke-linecap="round"/>
+  </g>
+</svg>

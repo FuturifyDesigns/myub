@@ -995,11 +995,54 @@
     }
 
     function destroyTourCompletely() {
-        teardown();
-        closeMobileSidebar();
-        if (rootEl && rootEl.parentNode) {
-            rootEl.parentNode.removeChild(rootEl);
-        }
+        active = false;
+        try { stopTourPrepGuard(); } catch (_) {}
+        try { teardown(); } catch (_) {}
+        try { closeMobileSidebar(); } catch (_) {}
+        try { unlockScroll(); } catch (_) {}
+        try { clearTourPrep(); } catch (_) {}
+        try { setTourActive(false); } catch (_) {}
+
+        // Nuke any leftover tour layers that can trap clicks after skip/finish
+        try {
+            global.document.querySelectorAll(
+                '.myub-tour-root, .myub-tour-popup-overlay, .myub-tour-spotlight, .myub-tour-tooltip'
+            ).forEach(function (el) {
+                if (el && el.parentNode) el.parentNode.removeChild(el);
+            });
+        } catch (_) {}
+
+        try {
+            global.document.documentElement.classList.remove(
+                'myub-tour-active',
+                'myub-tour-prep',
+                'myub-tour-mobile'
+            );
+            global.document.body.classList.remove('myub-tour-active');
+            global.document.documentElement.style.overflow = '';
+            global.document.body.style.overflow = '';
+            global.document.documentElement.style.pointerEvents = '';
+            global.document.body.style.pointerEvents = '';
+        } catch (_) {}
+
+        // Close any stuck mobile sidebar dimmer on desktop too
+        try {
+            var sidebar = global.document.getElementById('sidebar');
+            var overlay = global.document.getElementById('sidebarOverlay');
+            if (sidebar) sidebar.classList.remove('open');
+            if (overlay) overlay.classList.remove('show');
+        } catch (_) {}
+
+        try {
+            var qs = new URLSearchParams(global.location.search);
+            if (qs.has('tour') || qs.has('replayTour')) {
+                qs.delete('tour');
+                qs.delete('replayTour');
+                var next = global.location.pathname + (qs.toString() ? '?' + qs.toString() : '') + global.location.hash;
+                global.history.replaceState(null, '', next);
+            }
+        } catch (_) {}
+
         rootEl = null;
         backdropEl = null;
         sidebarBandEl = null;
@@ -1362,7 +1405,11 @@
 
     function finish(completed) {
         if (completed) markCompleted();
-        else setTourActive(false);
+        else {
+            stopTourPrepGuard();
+            clearTourPrep();
+            setTourActive(false);
+        }
         destroyTourCompletely();
         if (completed) {
             showPopup('success', "You're all set!", "You've toured every main area of MyUB. Explore, connect, and make the most of your semester.", 'Start exploring');
@@ -1386,8 +1433,10 @@
         btn.className = 'myub-tour-btn myub-tour-btn-primary';
         btn.textContent = btnLabel;
         function close() {
-            overlay.remove();
-            unlockScroll();
+            try {
+                if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+            } catch (_) {}
+            destroyTourCompletely();
         }
         btn.addEventListener('click', close);
         overlay.addEventListener('click', function (e) { if (e.target === overlay) close(); });
@@ -1612,6 +1661,7 @@
         isTourActive: isTourActive,
         resumeIfActive: resumeIfActive,
         resetTourProgress: resetTourProgress,
+        destroyTourCompletely: destroyTourCompletely,
         mascots: MASCOTS,
         getMascotSrc: getMascotSrc
     };
@@ -1628,6 +1678,19 @@
         }
         resumeIfActive();
     }
+
+    // If a leftover tour layer is somehow still present after finish/skip,
+    // first click on navigation clears it so the site stays usable.
+    try {
+        global.document.addEventListener('click', function (e) {
+            if (active) return;
+            var t = e.target;
+            if (!t || !t.closest) return;
+            if (!t.closest('.nav-item, a[href$=".html"], .sidebar a')) return;
+            var stray = global.document.querySelector('.myub-tour-root, .myub-tour-popup-overlay');
+            if (stray) destroyTourCompletely();
+        }, true);
+    } catch (_) {}
 
     if (!abandonIfFinished() && isTourSession()) {
         markTourPrep();

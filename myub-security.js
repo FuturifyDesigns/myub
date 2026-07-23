@@ -702,7 +702,7 @@
     (function loadConsentScript() {
         if (document.querySelector('script[data-myub-consent]')) return;
         var s = document.createElement('script');
-        s.src = 'myub-consent.js?v=1';
+        s.src = 'myub-consent.js?v=7';
         s.defer = true;
         s.setAttribute('data-myub-consent', '1');
         (document.head || document.documentElement).appendChild(s);

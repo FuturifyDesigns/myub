@@ -10,14 +10,29 @@
 
     function shouldPersistLogin() {
         try {
-            var flag = global.localStorage.getItem(REMEMBER_FLAG_KEY);
-            if (flag === 'true') return true;
-            if (flag === 'false') return false;
-            // Legacy users (before Remember Me flag): keep localStorage sessions working
-            return true;
+            return global.localStorage.getItem(REMEMBER_FLAG_KEY) === 'true';
         } catch (_) {
+            return false;
+        }
+    }
+
+    function preferencesAllowed() {
+        if (!global.MyUBConsent) return true;
+        // If user has not decided yet, allow temporary remember-me until they choose.
+        if (typeof global.MyUBConsent.hasDecision === 'function' && !global.MyUBConsent.hasDecision()) {
             return true;
         }
+        return !!(global.MyUBConsent.allowPreferences && global.MyUBConsent.allowPreferences());
+    }
+
+    function ensurePreferencesForRememberMe() {
+        if (!global.MyUBConsent || typeof global.MyUBConsent.saveChoice !== 'function') return;
+        if (preferencesAllowed() && global.MyUBConsent.hasDecision && global.MyUBConsent.hasDecision()) return;
+        var prefs = global.MyUBConsent.getPrefs ? global.MyUBConsent.getPrefs() : {};
+        global.MyUBConsent.saveChoice({
+            preferences: true,
+            functional: !!(prefs && prefs.functional)
+        });
     }
 
     function getAuthStorage() {
@@ -60,6 +75,9 @@
     function saveRememberedCredentials(email, password) {
         try {
             if (!email || !password) return;
+            if (!preferencesAllowed()) {
+                ensurePreferencesForRememberMe();
+            }
             global.localStorage.setItem(REMEMBER_EMAIL_KEY, email);
             global.localStorage.setItem(REMEMBER_PASSWORD_KEY, encodePassword(password));
             global.localStorage.setItem(REMEMBER_FLAG_KEY, 'true');
@@ -74,16 +92,30 @@
         } catch (_) {}
     }
 
+    function syncRememberCheckbox() {
+        var rememberCheckbox = global.document.getElementById('rememberMe');
+        if (!rememberCheckbox) return;
+        rememberCheckbox.checked = shouldPersistLogin();
+        rememberCheckbox.setAttribute('aria-checked', rememberCheckbox.checked ? 'true' : 'false');
+    }
+
     function loadRememberedCredentials() {
         var loginEmail = global.document.getElementById('loginEmail');
         var loginPassword = global.document.getElementById('loginPassword');
         var rememberCheckbox = global.document.getElementById('rememberMe');
         if (!loginEmail || !rememberCheckbox) return;
 
-        var rememberMe = shouldPersistLogin();
+        var rememberMe = shouldPersistLogin() && preferencesAllowed();
         rememberCheckbox.checked = rememberMe;
+        rememberCheckbox.setAttribute('aria-checked', rememberMe ? 'true' : 'false');
 
-        if (!rememberMe) return;
+        if (!rememberMe) {
+            // Keep flag honest if preferences were revoked
+            if (shouldPersistLogin() && !preferencesAllowed()) {
+                clearRememberedCredentials();
+            }
+            return;
+        }
 
         var email = global.localStorage.getItem(REMEMBER_EMAIL_KEY);
         if (email) {
@@ -104,7 +136,10 @@
         var loginPassword = global.document.getElementById('loginPassword');
         if (!rememberCheckbox) return;
 
+        rememberCheckbox.setAttribute('aria-checked', rememberCheckbox.checked ? 'true' : 'false');
+
         if (rememberCheckbox.checked) {
+            ensurePreferencesForRememberMe();
             var email = loginEmail ? loginEmail.value.trim().toLowerCase() : '';
             var password = loginPassword ? loginPassword.value : '';
             if (email && password) {
@@ -121,11 +156,21 @@
             }
         } else {
             clearRememberedCredentials();
-            if (loginPassword) {
-                loginPassword.value = '';
-            }
         }
     }
+
+    // If user turns off Preferences in the cookie modal, drop remember-me data.
+    try {
+        global.addEventListener('myub-consent-changed', function (e) {
+            var detail = e && e.detail;
+            if (detail && detail.preferences === false) {
+                clearRememberedCredentials();
+                syncRememberCheckbox();
+                var loginPassword = global.document.getElementById('loginPassword');
+                if (loginPassword) loginPassword.value = '';
+            }
+        });
+    } catch (_) {}
 
     global.MyUBAuth = {
         shouldPersistLogin: shouldPersistLogin,
@@ -134,6 +179,7 @@
         saveRememberedCredentials: saveRememberedCredentials,
         clearRememberedCredentials: clearRememberedCredentials,
         loadRememberedCredentials: loadRememberedCredentials,
-        handleRememberMeChange: handleRememberMeChange
+        handleRememberMeChange: handleRememberMeChange,
+        syncRememberCheckbox: syncRememberCheckbox
     };
 })(typeof window !== 'undefined' ? window : this);

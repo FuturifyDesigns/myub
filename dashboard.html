@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="myub-enhanced">
 <head>
     <meta charset="UTF-8">
 <!-- myub-perf-preconnects -->
@@ -18,18 +18,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="myub-security.js"></script>
-    <script src="myub-auth.js"></script>
+    <script src="myub-auth.js?v=2"></script>
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js" defer></script>
     <script src="myub-calls.js" defer></script>
     <script src="myub-utils.js"></script>
     <script src="myub-mobile.js"></script>
-    <script src="myub-sidebar.js"></script>
+    <script src="myub-sidebar.js?v=3"></script>
     <script src="myub-gpa.js"></script>
     <script src="myub-academic.js"></script>
-    <link rel="stylesheet" href="myub-onboarding.css?v=36">
-    <link rel="stylesheet" href="myub-theme.css?v=21">
-    <script src="myub-onboarding.js?v=35"></script>
-    <script src="myub-transitions.js?v=6" defer></script>
+    <link rel="stylesheet" href="myub-onboarding.css?v=37">
+    <link rel="stylesheet" href="myub-theme.css?v=35">
+    <script src="myub-onboarding.js?v=37"></script>
+    <script src="myub-transitions.js?v=8" defer></script>
     <script src="myub-animations.js?v=6" defer></script>
     
     <!-- OneSignal Push Notifications -->
@@ -75,11 +75,11 @@
             --yellow: #a15c07;
             --text: #102a43;
             --text-soft: #334e68;
-            --text-muted: #627d98;
-            --text-dim: #9fb3c8;
+            --text-muted: #486581;
+            --text-dim: #627d98;
             --surface-1: #ffffff;
-            --surface-2: #f0f4f8;
-            --surface-3: #e6eef6;
+            --surface-2: #ffffff;
+            --surface-3: #e8f1fb;
             --border: #d9e2ec;
             --border-strong: #bcccdc;
             --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
@@ -146,7 +146,7 @@
         .myub-logo {
             --logo-size: 36px;
             --logo-m-color: #1a4b8c;
-            --logo-ub-color: #1a4b8c;
+            --logo-ub-color: #c41e3a;
             position: relative;
             display: inline-flex;
             align-items: flex-end;
@@ -313,14 +313,14 @@
         }
         .nav-item:hover {
             background: var(--surface-2);
-            color: var(--white);
+            color: #102a43;
             transform: translateX(3px);
         }
         .nav-item:hover::after { left: 100%; }
         .nav-item:hover svg { transform: scale(1.08); }
         .nav-item.active {
             background: linear-gradient(135deg, rgba(44, 82, 130, 0.55), rgba(26, 54, 93, 0.45));
-            color: var(--white);
+            color: #102a43;
             border-color: rgba(58, 111, 168, 0.35);
             box-shadow: 0 8px 24px -10px rgba(44, 82, 130, 0.8);
         }
@@ -339,7 +339,7 @@
         .nav-item .badge {
             margin-left: auto;
             background: var(--red);
-            color: var(--white);
+            color: #102a43;
             font-size: 10px;
             font-weight: 700;
             padding: 2px 7px;
@@ -388,7 +388,7 @@
             border-radius: 10px;
             background: var(--surface-2);
             border: 1px solid var(--border);
-            color: var(--white);
+            color: #102a43;
             align-items: center;
             justify-content: center;
             padding: 0;
@@ -401,7 +401,7 @@
             font-family: 'Sora', 'Outfit', sans-serif;
             font-size: 22px;
             font-weight: 700;
-            color: var(--white);
+            color: #102a43;
             letter-spacing: -0.3px;
             white-space: nowrap;
         }
@@ -446,7 +446,7 @@
             background: transparent;
             border: none;
             outline: none;
-            color: var(--white);
+            color: #102a43;
             font-size: 13.5px;
             width: 100%;
         }
@@ -504,7 +504,7 @@
         .search-result-content h4 {
             font-size: 13px;
             font-weight: 600;
-            color: var(--white);
+            color: #102a43;
             margin-bottom: 2px;
             white-space: nowrap;
             overflow: hidden;
@@ -537,7 +537,7 @@
         .icon-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
         .icon-btn:hover {
             background: var(--surface-2);
-            color: var(--white);
+            color: #102a43;
             transform: translateY(-1px);
         }
         .notification-badge {
@@ -549,7 +549,7 @@
             padding: 0 5px;
             border-radius: 999px;
             background: var(--red);
-            color: var(--white);
+            color: #102a43;
             font-size: 10px;
             font-weight: 700;
             display: flex;
@@ -588,7 +588,7 @@
             padding: 14px 18px;
             border-bottom: 1px solid var(--border);
         }
-        .notif-dropdown-header h3 { font-size: 14px; font-weight: 600; color: var(--white); }
+        .notif-dropdown-header h3 { font-size: 14px; font-weight: 600; color: #102a43; }
         .notif-dropdown-header button {
             background: transparent;
             border: none;
@@ -646,7 +646,7 @@
         .notif-content h4 {
             font-size: 13px;
             font-weight: 600;
-            color: var(--white);
+            color: #102a43;
             margin-bottom: 2px;
             white-space: nowrap;
             overflow: hidden;
@@ -780,7 +780,7 @@
         .dropdown-user-name {
             font-size: 14px;
             font-weight: 700;
-            color: var(--white);
+            color: #102a43;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -836,7 +836,7 @@
             transition: all 0.25s ease;
         }
         .dropdown-item svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
-        .dropdown-item:hover { background: var(--surface-2); color: var(--white); }
+        .dropdown-item:hover { background: var(--surface-2); color: #102a43; }
         .dropdown-item.danger { color: #ffb4c0; }
         .dropdown-item.danger:hover { background: rgba(196, 30, 58, 0.12); color: var(--red-light); }
         .dropdown-divider { height: 1px; background: var(--border); margin: 4px 0; }
@@ -904,7 +904,7 @@
             font-family: 'Sora', 'Outfit', sans-serif;
             font-size: clamp(24px, 3.2vw, 34px);
             font-weight: 800;
-            color: var(--white);
+            color: #102a43;
             line-height: 1.1;
             margin-bottom: 6px;
             letter-spacing: -0.5px;
@@ -926,7 +926,7 @@
             font-family: 'Sora', 'Outfit', sans-serif;
             font-size: 36px;
             font-weight: 800;
-            color: var(--white);
+            color: #102a43;
             line-height: 1;
             letter-spacing: -1.5px;
         }
@@ -987,19 +987,19 @@
             border: 1px solid rgba(96, 165, 250, 0.3);
         }
         .stat-icon svg { width: 22px; height: 22px; stroke: var(--blue); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-        .stat-icon.blue { background: rgba(96, 165, 250, 0.15); border-color: rgba(96, 165, 250, 0.3); }
-        .stat-icon.blue svg { stroke: var(--blue); }
-        .stat-icon.green { background: rgba(74, 222, 128, 0.15); border-color: rgba(74, 222, 128, 0.3); }
-        .stat-icon.green svg { stroke: var(--green); }
-        .stat-icon.purple { background: rgba(167, 139, 250, 0.15); border-color: rgba(167, 139, 250, 0.3); }
-        .stat-icon.purple svg { stroke: var(--purple); }
-        .stat-icon.orange { background: rgba(251, 146, 60, 0.15); border-color: rgba(251, 146, 60, 0.3); }
-        .stat-icon.orange svg { stroke: var(--orange); }
+        .stat-icon.blue { background: #e8f1fb; border-color: #c5daf5; }
+        .stat-icon.blue svg { stroke: #1a4b8c; }
+        .stat-icon.green { background: #ecfdf3; border-color: #abefc6; }
+        .stat-icon.green svg { stroke: #067647; }
+        .stat-icon.purple { background: #f4f3ff; border-color: #d9d6fe; }
+        .stat-icon.purple svg { stroke: #5925dc; }
+        .stat-icon.orange { background: #fff6ed; border-color: #fdb022; }
+        .stat-icon.orange svg { stroke: #b54708; }
         .stat-info h3 {
             font-family: 'Sora', 'Outfit', sans-serif;
             font-size: 32px;
             font-weight: 800;
-            color: var(--white);
+            color: #102a43;
             line-height: 1;
             margin-bottom: 2px;
             letter-spacing: -1px;
@@ -1034,7 +1034,7 @@
             font-family: 'Sora', 'Outfit', sans-serif;
             font-size: 19px;
             font-weight: 700;
-            color: var(--white);
+            color: #102a43;
             letter-spacing: -0.2px;
         }
         .card-action {
@@ -1096,12 +1096,12 @@
         }
         .quick-action:hover .quick-action-icon { transform: scale(1.08) rotate(-3deg); }
         .quick-action-icon svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-        .quick-action:nth-child(1) .quick-action-icon { background: rgba(96, 165, 250, 0.18) !important; color: var(--blue) !important; border-color: rgba(96, 165, 250, 0.3); }
-        .quick-action:nth-child(2) .quick-action-icon { background: rgba(251, 191, 36, 0.18) !important; color: var(--yellow) !important; border-color: rgba(251, 191, 36, 0.3); }
-        .quick-action:nth-child(3) .quick-action-icon { background: rgba(74, 222, 128, 0.18) !important; color: var(--green) !important; border-color: rgba(74, 222, 128, 0.3); }
-        .quick-action:nth-child(4) .quick-action-icon { background: rgba(167, 139, 250, 0.18) !important; color: var(--purple) !important; border-color: rgba(167, 139, 250, 0.3); }
-        .quick-action:nth-child(5) .quick-action-icon { background: rgba(244, 114, 182, 0.18) !important; color: var(--pink) !important; border-color: rgba(244, 114, 182, 0.3); }
-        .quick-action:nth-child(6) .quick-action-icon { background: rgba(251, 146, 60, 0.18) !important; color: var(--orange) !important; border-color: rgba(251, 146, 60, 0.3); }
+        .quick-action:nth-child(1) .quick-action-icon { background: #e8f1fb !important; color: #1a4b8c !important; border-color: #c5daf5; }
+        .quick-action:nth-child(2) .quick-action-icon { background: #fffaeb !important; color: #b54708 !important; border-color: #fec84b; }
+        .quick-action:nth-child(3) .quick-action-icon { background: #ecfdf3 !important; color: #067647 !important; border-color: #abefc6; }
+        .quick-action:nth-child(4) .quick-action-icon { background: #f4f3ff !important; color: #5925dc !important; border-color: #d9d6fe; }
+        .quick-action:nth-child(5) .quick-action-icon { background: #fdf2fa !important; color: #c11574 !important; border-color: #fcceee; }
+        .quick-action:nth-child(6) .quick-action-icon { background: #fff6ed !important; color: #b54708 !important; border-color: #fd853a; }
         .quick-action span {
             font-size: 12px;
             font-weight: 500;
@@ -1205,7 +1205,7 @@
             font-family: 'Sora', 'Outfit', sans-serif;
             font-size: 18px;
             font-weight: 700;
-            color: var(--white);
+            color: #102a43;
             line-height: 1;
         }
         .schedule-time .period {
@@ -1220,7 +1220,7 @@
         .schedule-details h4 {
             font-size: 13.5px;
             font-weight: 600;
-            color: var(--white);
+            color: #102a43;
             margin-bottom: 2px;
         }
         .schedule-details p {
@@ -1320,7 +1320,7 @@
             font-family: 'Sora', 'Outfit', sans-serif;
             font-size: 28px;
             font-weight: 600;
-            color: var(--white);
+            color: #102a43;
             margin-bottom: 6px;
             position: relative;
             z-index: 2;
@@ -1337,7 +1337,7 @@
             font-family: 'Sora', 'Outfit', sans-serif;
             font-size: 22px;
             font-weight: 600;
-            color: var(--white);
+            color: #102a43;
             margin-bottom: 6px;
         }
         .welcome-intro p {
@@ -1387,7 +1387,7 @@
         .feature-text h4 {
             font-size: 13px;
             font-weight: 600;
-            color: var(--white);
+            color: #102a43;
             margin-bottom: 3px;
         }
         .feature-text p {
@@ -1405,7 +1405,7 @@
         .welcome-contact h4 {
             font-size: 13px;
             font-weight: 600;
-            color: var(--white);
+            color: #102a43;
             margin-bottom: 6px;
             display: flex;
             align-items: center;
@@ -1440,7 +1440,7 @@
         .contact-link:hover {
             background: var(--surface-3);
             border-color: var(--border-strong);
-            color: var(--white);
+            color: #102a43;
             transform: translateY(-1px);
         }
         .contact-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
@@ -1455,7 +1455,7 @@
             gap: 10px;
             padding: 13px 32px;
             background: linear-gradient(135deg, var(--navy-light) 0%, var(--navy) 100%);
-            color: var(--white);
+            color: #102a43;
             border: none;
             border-radius: 12px;
             font-family: 'Outfit', sans-serif;
@@ -1504,7 +1504,7 @@
             border-radius: 18px;
             border: 1px solid rgba(255, 255, 255, 0.15);
             box-shadow: 0 30px 80px -10px rgba(0, 0, 0, 0.6);
-            color: var(--white);
+            color: #102a43;
             overflow: hidden;
             animation: welcomeUp 0.55s var(--ease-out-expo);
         }
@@ -1522,7 +1522,7 @@
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            color: var(--white);
+            color: #102a43;
         }
         .announcement-icon svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
         .announcement-header-text { flex: 1; min-width: 0; }
@@ -1537,7 +1537,7 @@
             font-family: 'Sora', 'Outfit', sans-serif;
             font-size: 22px;
             font-weight: 600;
-            color: var(--white);
+            color: #102a43;
             line-height: 1.2;
         }
         .announcement-body {
@@ -1566,7 +1566,7 @@
             gap: 10px;
             padding: 11px 22px;
             background: rgba(255, 255, 255, 0.15);
-            color: var(--white);
+            color: #102a43;
             border: 1px solid rgba(255, 255, 255, 0.25);
             border-radius: 10px;
             font-family: 'Outfit', sans-serif;
@@ -1763,7 +1763,7 @@
             font-family: 'Sora', 'Outfit', sans-serif;
             font-size: 22px;
             font-weight: 600;
-            color: var(--white);
+            color: #102a43;
             letter-spacing: 0.3px;
         }
         .notif-modal-close {
@@ -1779,7 +1779,7 @@
             transition: all 0.3s ease;
         }
         .notif-modal-close svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-        .notif-modal-close:hover { background: var(--surface-3); color: var(--white); }
+        .notif-modal-close:hover { background: var(--surface-3); color: #102a43; }
         .notif-modal-toolbar {
             display: flex;
             gap: 10px;
@@ -1799,7 +1799,7 @@
         }
         .notif-tool-btn:hover {
             background: var(--surface-3);
-            color: var(--white);
+            color: #102a43;
             border-color: var(--border-strong);
         }
         .notif-tool-btn.danger {
@@ -1891,10 +1891,9 @@
 
         /* Stat cards — add a number count-up feel with larger display */
         .stat-info h3 {
-            background: linear-gradient(180deg, #ffffff 0%, rgba(255, 255, 255, 0.7) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #102a43;
+            -webkit-text-fill-color: #102a43;
+            background: none;
             transition: transform 0.4s var(--ease-out-back);
         }
         .stat-card:hover .stat-info h3 { transform: scale(1.05); }
@@ -1908,7 +1907,7 @@
             transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.4s ease;
         }
         .quick-action span { transition: color 0.3s ease; }
-        .quick-action:hover span { color: var(--white); }
+        .quick-action:hover span { color: #102a43; }
 
         /* GPA circle — glow on hover */
         .gpa-circle {
@@ -2178,9 +2177,9 @@
                     <div class="ml-m-wrap">
                         <div class="ml-cap">
                             <svg viewBox="0 0 100 70">
-                                <polygon points="50,6 95,24 50,42 5,24" fill="#ffffff"/>
-                                <circle cx="50" cy="24" r="4.5" fill="#1a365d" stroke="#ffffff" stroke-width="1.5"/>
-                                <rect x="32" y="38" width="36" height="18" rx="2.5" fill="#ffffff"/>
+                                <polygon points="50,6 95,24 50,42 5,24" fill="#1a4b8c"/>
+                                <circle cx="50" cy="24" r="4.5" fill="#ffffff" stroke="#1a4b8c" stroke-width="1.5"/>
+                                <rect x="32" y="38" width="36" height="18" rx="2.5" fill="#1a4b8c"/>
                                 <circle cx="78" cy="24" r="4" fill="#c41e3a"/>
                                 <path d="M78 28 Q82 44 80 54" stroke="#c41e3a" stroke-width="3" fill="none" stroke-linecap="round"/>
                                 <ellipse cx="80" cy="57" rx="5" ry="8" fill="#c41e3a"/>

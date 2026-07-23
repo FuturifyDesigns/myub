@@ -76,14 +76,20 @@
         return c.name;
     }
 
+    function creditValue(credits) {
+        var n = Number(credits);
+        return isFinite(n) && n > 0 ? n : 0;
+    }
+
     function calculateGPA(coursesList) {
         if (!coursesList || !coursesList.length) return 0;
         var totalPoints = 0;
         var totalCredits = 0;
         coursesList.forEach(function (course) {
-            if (course.grade && course.credits) {
-                totalPoints += getGradePoints(course.grade) * course.credits;
-                totalCredits += course.credits;
+            var credits = creditValue(course.credits);
+            if (course.grade && credits) {
+                totalPoints += getGradePoints(course.grade) * credits;
+                totalCredits += credits;
             }
         });
         return totalCredits > 0 ? totalPoints / totalCredits : 0;
@@ -93,15 +99,22 @@
         if (!coursesList) return 0;
         return coursesList.reduce(function (sum, c) {
             if (c.grade && FAIL_GRADES_EARNED.indexOf(c.grade) === -1) {
-                return sum + (c.credits || 0);
+                return sum + creditValue(c.credits);
             }
             return sum;
         }, 0);
     }
 
+    function gradedCourseCount(coursesList) {
+        if (!coursesList) return 0;
+        return coursesList.reduce(function (sum, c) {
+            return sum + (c.grade ? 1 : 0);
+        }, 0);
+    }
+
     function totalCourseCredits(coursesList) {
         if (!coursesList) return 0;
-        return coursesList.reduce(function (sum, c) { return sum + (c.credits || 0); }, 0);
+        return coursesList.reduce(function (sum, c) { return sum + creditValue(c.credits); }, 0);
     }
 
     function semesterKey(course) {
@@ -172,6 +185,7 @@
         getGPAStatus: getGPAStatus,
         calculateGPA: calculateGPA,
         earnedCredits: earnedCredits,
+        gradedCourseCount: gradedCourseCount,
         totalCourseCredits: totalCourseCredits,
         semesterKey: semesterKey,
         inferCurrentSemesterKey: inferCurrentSemesterKey,

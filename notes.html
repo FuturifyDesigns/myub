@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="myub-enhanced">
 <head>
     <meta charset="UTF-8">
 <!-- myub-perf-preconnects -->
@@ -20,16 +20,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="myub-security.js"></script>
-    <script src="myub-auth.js"></script>
+    <script src="myub-auth.js?v=2"></script>
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js" defer></script>
     <script src="myub-calls.js" defer></script>
     <script src="myub-utils.js"></script>
     <script src="myub-mobile.js"></script>
-    <script src="myub-sidebar.js"></script>
-    <link rel="stylesheet" href="myub-onboarding.css?v=36">
-    <link rel="stylesheet" href="myub-theme.css?v=21">
-    <script src="myub-onboarding.js?v=35"></script>
-    <script src="myub-transitions.js?v=6" defer></script>
+    <script src="myub-sidebar.js?v=3"></script>
+    <link rel="stylesheet" href="myub-onboarding.css?v=37">
+    <link rel="stylesheet" href="myub-theme.css?v=35">
+    <script src="myub-onboarding.js?v=37"></script>
+    <script src="myub-transitions.js?v=8" defer></script>
     <script src="myub-animations.js?v=6" defer></script>
     <script src="myub-upload.js"></script>
     <style>
@@ -63,8 +63,8 @@
 
             /* Light-theme fallback overrides for inline-styled modals */
             --gray-50: #f8fafc;
-            --gray-100: #f0f4f8;
-            --gray-200: #e6eef6;
+            --gray-100: #ffffff;
+            --gray-200: #e8f1fb;
             --gray-300: #d9e2ec;
             --gray-400: #9fb3c8;
             --gray-500: #627d98;
@@ -74,11 +74,11 @@
 
             --text: #102a43;
             --text-soft: #334e68;
-            --text-muted: #627d98;
-            --text-dim: #9fb3c8;
+            --text-muted: #486581;
+            --text-dim: #627d98;
             --surface-1: #ffffff;
-            --surface-2: #f0f4f8;
-            --surface-3: #e6eef6;
+            --surface-2: #ffffff;
+            --surface-3: #e8f1fb;
             --border: #d9e2ec;
             --border-strong: #bcccdc;
             --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
@@ -160,7 +160,7 @@
         .myub-logo {
             --logo-size: 36px;
             --logo-m-color: #1a4b8c;
-            --logo-ub-color: #1a4b8c;
+            --logo-ub-color: #c41e3a;
             position: relative;
             display: inline-flex;
             align-items: flex-end;
@@ -330,14 +330,14 @@
         }
         .nav-item:hover {
             background: var(--surface-2);
-            color: var(--white);
+            color: #102a43;
             transform: translateX(3px);
         }
         .nav-item:hover::after { left: 100%; }
         .nav-item:hover svg { transform: scale(1.08); }
         .nav-item.active {
             background: linear-gradient(135deg, rgba(44, 82, 130, 0.55), rgba(26, 54, 93, 0.45));
-            color: var(--white);
+            color: #102a43;
             border-color: rgba(58, 111, 168, 0.35);
             box-shadow: 0 8px 24px -10px rgba(44, 82, 130, 0.8);
         }
@@ -356,7 +356,7 @@
         .nav-item .badge {
             margin-left: auto;
             background: var(--red);
-            color: var(--white);
+            color: #102a43;
             font-size: 10px;
             font-weight: 700;
             padding: 2px 7px;
@@ -411,7 +411,7 @@
             border-radius: 10px;
             background: var(--surface-2);
             border: 1px solid var(--border);
-            color: var(--white);
+            color: #102a43;
             align-items: center;
             justify-content: center;
             padding: 0;
@@ -422,7 +422,7 @@
             font-family: 'Sora', 'Outfit', sans-serif;
             font-size: 22px;
             font-weight: 700;
-            color: var(--white);
+            color: #102a43;
             letter-spacing: -0.3px;
             white-space: nowrap;
         }
@@ -462,7 +462,7 @@
             transition: all 0.3s ease;
         }
         .notif-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-        .notif-btn:hover { background: var(--surface-2); color: var(--white); transform: translateY(-1px); }
+        .notif-btn:hover { background: var(--surface-2); color: #102a43; transform: translateY(-1px); }
         .notif-btn .badge {
             position: absolute;
             top: -4px;
@@ -472,7 +472,7 @@
             padding: 0 5px;
             border-radius: 999px;
             background: var(--red);
-            color: var(--white);
+            color: #102a43;
             font-size: 10px;
             font-weight: 700;
             display: none;
@@ -512,7 +512,7 @@
             padding: 14px 18px;
             border-bottom: 1px solid var(--border);
         }
-        .notif-header h3 { font-size: 14px; font-weight: 700; color: var(--white); }
+        .notif-header h3 { font-size: 14px; font-weight: 700; color: #102a43; }
         .notif-header button {
             background: transparent;
             border: none;
@@ -575,7 +575,7 @@
         .notif-content h5 {
             font-size: 13px;
             font-weight: 700;
-            color: var(--white);
+            color: #102a43;
             margin-bottom: 2px;
             white-space: nowrap;
             overflow: hidden;
@@ -601,7 +601,7 @@
             gap: 8px;
             padding: 10px 18px;
             background: linear-gradient(135deg, var(--navy-light) 0%, var(--navy) 100%);
-            color: var(--white);
+            color: #102a43;
             border: none;
             border-radius: 10px;
             font-family: 'Outfit', sans-serif;
@@ -681,10 +681,10 @@
         .search-box input {
             width: 100%;
             padding: 11px 14px 11px 40px;
-            background: rgba(0, 0, 0, 0.25);
+            background: #ffffff;
             border: 1px solid var(--border);
             border-radius: 10px;
-            color: var(--white);
+            color: #102a43;
             font-family: 'Outfit', sans-serif;
             font-size: 13px;
             outline: none;
@@ -716,7 +716,7 @@
         .filter-btn svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
         .filter-btn:hover {
             background: var(--surface-3);
-            color: var(--white);
+            color: #102a43;
             border-color: var(--border-strong);
         }
         .filter-btn.active {
@@ -749,7 +749,7 @@
             transition: all 0.3s var(--ease-out-expo);
         }
         .view-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-        .view-btn:hover:not(.active) { background: var(--surface-2); color: var(--white); }
+        .view-btn:hover:not(.active) { background: var(--surface-2); color: #102a43; }
         .view-btn.active {
             background: #e8f1fb;
             color: #1a4b8c;
@@ -847,7 +847,7 @@
             font-family: 'Sora', sans-serif;
             font-size: 15.5px;
             font-weight: 700;
-            color: var(--white);
+            color: #102a43;
             letter-spacing: -0.2px;
             line-height: 1.3;
             flex: 1;
@@ -916,7 +916,7 @@
         .note-action svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
         .note-action:hover {
             background: var(--surface-3);
-            color: var(--white);
+            color: #102a43;
             border-color: var(--border-strong);
         }
         .note-action.danger:hover {
@@ -981,7 +981,7 @@
         }
         .note-action-btn:hover {
             background: var(--surface-3);
-            color: var(--white);
+            color: #102a43;
             border-color: var(--border-strong);
         }
         .note-action-btn.pinned {
@@ -1062,7 +1062,7 @@
             font-family: 'Sora', sans-serif;
             font-size: 14px;
             font-weight: 700;
-            color: var(--white);
+            color: #102a43;
             letter-spacing: -0.2px;
             margin-bottom: 4px;
             white-space: nowrap;
@@ -1143,7 +1143,7 @@
         }
         .btn-primary {
             background: linear-gradient(135deg, var(--navy-light) 0%, var(--navy) 100%);
-            color: var(--white);
+            color: #102a43;
             box-shadow: 0 10px 28px -12px rgba(26, 54, 93, 0.8);
         }
         .btn-primary:hover {
@@ -1158,13 +1158,13 @@
         }
         .btn-secondary:hover {
             background: var(--surface-3);
-            color: var(--white);
+            color: #102a43;
             border-color: var(--border-strong);
             transform: translateY(-1px);
         }
         .btn-danger {
             background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
-            color: var(--white);
+            color: #102a43;
             box-shadow: 0 10px 28px -12px rgba(196, 30, 58, 0.6);
         }
         .btn-danger:hover {
@@ -1173,7 +1173,7 @@
         }
         .btn-save {
             background: linear-gradient(135deg, var(--navy-light) 0%, var(--navy) 100%);
-            color: var(--white);
+            color: #102a43;
             box-shadow: 0 10px 28px -12px rgba(26, 54, 93, 0.8);
         }
         .btn-save:hover {
@@ -1227,7 +1227,7 @@
             font-family: 'Sora', sans-serif;
             font-size: 18px;
             font-weight: 700;
-            color: var(--white) !important;
+            color: #102a43 !important;
             letter-spacing: -0.3px;
         }
         .modal-header svg { color: var(--text-soft) !important; stroke: currentColor; }
@@ -1247,7 +1247,7 @@
             line-height: 1;
         }
         .modal-close svg, .close-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-        .modal-close:hover, .close-btn:hover { background: var(--surface-3); color: var(--white); }
+        .modal-close:hover, .close-btn:hover { background: var(--surface-3); color: #102a43; }
         .modal-body {
             padding: 22px;
             overflow-y: auto;
@@ -1280,10 +1280,10 @@
         .form-input {
             width: 100%;
             padding: 12px 14px;
-            background: rgba(0, 0, 0, 0.25);
+            background: #ffffff;
             border: 1px solid var(--border);
             border-radius: 10px;
-            color: var(--white);
+            color: #102a43;
             font-family: 'Outfit', sans-serif;
             font-size: 14px;
             outline: none;
@@ -1316,7 +1316,7 @@
             border-color: var(--border-strong);
         }
         .color-option.active {
-            border-color: var(--white);
+            border-color: #102a43;
             box-shadow: 0 0 0 2px var(--navy-deepest), 0 0 0 4px var(--red);
         }
         .color-option.default { background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05)); }
@@ -1335,7 +1335,7 @@
             gap: 8px;
             flex-wrap: wrap;
             padding: 10px 12px;
-            background: rgba(0, 0, 0, 0.25);
+            background: #ffffff;
             border: 1px solid var(--border);
             border-top-left-radius: 10px;
             border-top-right-radius: 10px;
@@ -1354,7 +1354,7 @@
             background: var(--surface-2);
             border: 1px solid var(--border);
             border-radius: 8px;
-            color: var(--white);
+            color: #102a43;
             font-family: 'Outfit', sans-serif;
             font-size: 12px;
             cursor: pointer;
@@ -1367,7 +1367,7 @@
         }
         .toolbar-select option {
             background: var(--navy-dark);
-            color: var(--white);
+            color: #102a43;
         }
         .toolbar-btn {
             width: 32px;
@@ -1395,7 +1395,7 @@
         }
         .toolbar-btn:hover {
             background: var(--surface-2);
-            color: var(--white);
+            color: #102a43;
             border-color: var(--border);
         }
         .toolbar-btn.active {
@@ -1441,12 +1441,12 @@
         .editor-content {
             min-height: 240px;
             padding: 16px;
-            background: rgba(0, 0, 0, 0.25);
+            background: #ffffff;
             border: 1px solid var(--border);
             border-top: none;
             border-bottom-left-radius: 10px;
             border-bottom-right-radius: 10px;
-            color: var(--white);
+            color: #102a43;
             font-family: 'Outfit', sans-serif;
             font-size: 14px;
             line-height: 1.65;
@@ -1504,7 +1504,7 @@
             font-family: 'Sora', sans-serif;
             font-size: 20px;
             font-weight: 700;
-            color: var(--white);
+            color: #102a43;
             margin-bottom: 8px;
             letter-spacing: -0.3px;
         }
@@ -1523,7 +1523,7 @@
         #viewNoteModal .modal-body,
         #editNoteModal .modal-body { color: var(--text-soft) !important; }
         #viewNoteContent {
-            background: rgba(0, 0, 0, 0.25) !important;
+            background: #ffffff !important;
             border: 1px solid var(--border);
             color: var(--text) !important;
         }
@@ -1546,9 +1546,9 @@
             letter-spacing: 0.8px;
         }
         #editNoteTitle[style] {
-            background: rgba(0, 0, 0, 0.25) !important;
+            background: #ffffff !important;
             border: 1px solid var(--border) !important;
-            color: var(--white) !important;
+            color: #102a43 !important;
             font-size: 14px !important;
         }
         #editNoteTitle:focus {
@@ -1556,9 +1556,9 @@
             box-shadow: 0 0 0 3px rgba(58, 111, 168, 0.18) !important;
         }
         #editNoteContent[style] {
-            background: rgba(0, 0, 0, 0.25) !important;
+            background: #ffffff !important;
             border: 1px solid var(--border) !important;
-            color: var(--white) !important;
+            color: #102a43 !important;
             font-size: 14px !important;
             line-height: 1.65 !important;
         }
@@ -1571,7 +1571,7 @@
         #editNoteModal .modal-footer[style] { border-top: 1px solid var(--border) !important; }
         #editNoteModal .btn-secondary[style*="background:var(--red)"] {
             background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%) !important;
-            color: var(--white) !important;
+            color: #102a43 !important;
             border: none !important;
             box-shadow: 0 10px 28px -12px rgba(196, 30, 58, 0.6) !important;
         }
@@ -1602,7 +1602,7 @@
         }
         #notificationsModal .btn-secondary:hover {
             background: var(--surface-3);
-            color: var(--white);
+            color: #102a43;
         }
         #notificationsModal .btn-danger {
             color: #ffb4c0;
@@ -1628,7 +1628,7 @@
             border-radius: 12px;
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            color: var(--white);
+            color: #102a43;
             font-size: 13px;
             font-weight: 500;
             box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.6);
@@ -1669,7 +1669,7 @@
             border-radius: 18px;
             border: 1px solid rgba(255, 255, 255, 0.15);
             box-shadow: 0 30px 80px -10px rgba(0, 0, 0, 0.6);
-            color: var(--white);
+            color: #102a43;
             overflow: hidden;
             animation: modalUp 0.55s var(--ease-out-expo);
         }
@@ -1677,7 +1677,7 @@
         .announcement-icon {
             width: 48px; height: 48px; border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0; color: var(--white);
+            flex-shrink: 0; color: #102a43;
         }
         .announcement-icon svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
         .announcement-header-text { flex: 1; min-width: 0; }
@@ -1686,7 +1686,7 @@
             font-family: 'Sora', sans-serif;
             font-size: 20px;
             font-weight: 700;
-            color: var(--white);
+            color: #102a43;
             line-height: 1.2;
             letter-spacing: -0.3px;
         }
@@ -1701,7 +1701,7 @@
             gap: 10px;
             padding: 11px 22px;
             background: rgba(255, 255, 255, 0.15);
-            color: var(--white);
+            color: #102a43;
             border: 1px solid rgba(255, 255, 255, 0.25);
             border-radius: 10px;
             font-family: 'Outfit', sans-serif;
@@ -1930,9 +1930,9 @@
                     <div class="ml-m-wrap">
                         <div class="ml-cap">
                             <svg viewBox="0 0 100 70">
-                                <polygon points="50,6 95,24 50,42 5,24" fill="#ffffff"/>
-                                <circle cx="50" cy="24" r="4.5" fill="#1a365d" stroke="#ffffff" stroke-width="1.5"/>
-                                <rect x="32" y="38" width="36" height="18" rx="2.5" fill="#ffffff"/>
+                                <polygon points="50,6 95,24 50,42 5,24" fill="#1a4b8c"/>
+                                <circle cx="50" cy="24" r="4.5" fill="#ffffff" stroke="#1a4b8c" stroke-width="1.5"/>
+                                <rect x="32" y="38" width="36" height="18" rx="2.5" fill="#1a4b8c"/>
                                 <circle cx="78" cy="24" r="4" fill="#c41e3a"/>
                                 <path d="M78 28 Q82 44 80 54" stroke="#c41e3a" stroke-width="3" fill="none" stroke-linecap="round"/>
                                 <ellipse cx="80" cy="57" rx="5" ry="8" fill="#c41e3a"/>
@@ -2388,7 +2388,7 @@
                 const date = new Date(f.created_at).toLocaleDateString();
                 const ext = (f.file_name && f.file_name.split('.').pop() || '').toUpperCase().slice(0,4);
                 return `
-                <div class="myub-file-card" data-id="${f.id}" style="background:linear-gradient(180deg,rgba(26,54,93,.45),rgba(15,39,68,.55));border:1px solid var(--border,rgba(255,255,255,.09));border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;transition:transform .2s var(--ease-out-expo,cubic-bezier(.19,1,.22,1)),border-color .2s,box-shadow .2s;cursor:pointer;" onmouseover="this.style.transform='translateY(-2px)';this.style.borderColor='var(--border-strong,rgba(255,255,255,.18))';this.style.boxShadow='0 10px 30px rgba(0,0,0,.3)';" onmouseout="this.style.transform='';this.style.borderColor='var(--border,rgba(255,255,255,.09))';this.style.boxShadow='';" onclick="viewFile('${f.id}')">
+                <div class="myub-file-card" data-id="${f.id}" style="background:#ffffff;border:1px solid #d9e2ec;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;transition:transform .2s var(--ease-out-expo,cubic-bezier(.19,1,.22,1)),border-color .2s,box-shadow .2s;cursor:pointer;color:#102a43;" onmouseover="this.style.transform='translateY(-2px)';this.style.borderColor='#9fb8d9';this.style.boxShadow='0 10px 30px rgba(16,42,67,.1)';" onmouseout="this.style.transform='';this.style.borderColor='#d9e2ec';this.style.boxShadow='';" onclick="viewFile('${f.id}')">
                     <div style="display:flex;align-items:flex-start;gap:12px;">
                         <div style="width:48px;height:56px;border-radius:8px;background:linear-gradient(180deg,${color}33,${color}1a);border:1px solid ${color}44;color:${color};display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;font-weight:700;font-size:10px;letter-spacing:.5px;">
                             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-bottom:2px;"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>

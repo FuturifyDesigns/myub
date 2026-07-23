@@ -129,18 +129,18 @@ html.myub-tour-active .myub-tour-outline-target {
     top: auto !important;
     transform: translateX(-50%);
     z-index: 2;
-    width: min(400px, calc(100vw - 32px));
-    max-height: min(52vh, 420px);
+    width: min(420px, calc(100vw - 32px));
+    max-height: min(58vh, 460px);
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
-    background: linear-gradient(145deg, #1a365d 0%, #122a4a 100%);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: 14px;
-    padding: 20px 22px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
-    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-    color: #e8edf5;
+    background: #ffffff;
+    border: 1px solid #d9e2ec;
+    border-radius: 18px;
+    padding: 18px 20px 16px;
+    box-shadow: 0 18px 48px rgba(16, 42, 67, 0.18);
+    font-family: 'Source Sans 3', 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: #102a43;
     pointer-events: auto;
 }
 
@@ -202,8 +202,8 @@ html.myub-tour-active [data-tour="messages-main"] > .chat-panel {
 
 .myub-tour-step-label {
     font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
+    font-weight: 700;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     color: #c41e3a;
     margin-bottom: 6px;
@@ -212,36 +212,32 @@ html.myub-tour-active [data-tour="messages-main"] > .chat-panel {
 .myub-tour-mascot-wrap {
     display: flex;
     justify-content: center;
-    margin: -4px 0 10px;
+    margin: 0 0 12px;
 }
 
-/* Soft lit stage — transparent mascot reads on dark navy UI */
+/* Soft campus stage for transparent mascot PNGs */
 .myub-mascot-stage {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 6px 16px 2px;
-    border-radius: 20px;
-    background: radial-gradient(
-        ellipse 88% 78% at 50% 60%,
-        rgba(255, 255, 255, 0.16) 0%,
-        rgba(147, 197, 253, 0.09) 38%,
-        rgba(26, 54, 93, 0.35) 58%,
-        transparent 76%
-    );
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.1),
-        0 4px 18px rgba(0, 0, 0, 0.22);
+    padding: 14px 28px 8px;
+    border-radius: 16px;
+    border: 1px solid #d9e2ec;
+    background:
+        radial-gradient(circle at 22% 30%, rgba(196, 30, 58, 0.14) 0%, transparent 48%),
+        radial-gradient(circle at 78% 70%, rgba(26, 75, 140, 0.16) 0%, transparent 52%),
+        #eef5fb;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .myub-mascot-stage-popup {
-    margin: 0 auto 12px;
-    padding: 8px 20px 4px;
+    margin: 0 auto 14px;
+    padding: 16px 32px 10px;
 }
 
 .myub-tour-mascot-wrap .myub-mascot-stage {
     width: 100%;
-    max-width: 200px;
+    max-width: none;
 }
 
 .myub-tour-mascot,
@@ -254,26 +250,23 @@ html.myub-tour-active [data-tour="messages-main"] > .chat-panel {
     pointer-events: none;
     user-select: none;
     -webkit-user-drag: none;
-    filter:
-        drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5))
-        drop-shadow(0 8px 20px rgba(0, 0, 0, 0.35))
-        drop-shadow(0 0 18px rgba(255, 255, 255, 0.12));
+    filter: drop-shadow(0 8px 16px rgba(16, 42, 67, 0.16));
 }
 
 .myub-tour-mascot {
-    width: 96px;
-    max-height: 108px;
+    width: 112px;
+    max-height: 124px;
 }
 
 .myub-tour-popup-mascot {
-    width: 128px;
-    max-height: 140px;
+    width: 136px;
+    max-height: 148px;
 }
 
 .welcome-mascot-stage {
     flex-shrink: 0;
-    padding: 10px 18px 6px;
-    border-radius: 22px;
+    padding: 12px 22px 8px;
+    border-radius: 18px;
 }
 
 .welcome-mascot {
@@ -282,18 +275,20 @@ html.myub-tour-active [data-tour="messages-main"] > .chat-panel {
 }
 
 .myub-tour-title {
-    font-family: 'Sora', 'Outfit', system-ui, sans-serif;
+    font-family: 'Libre Baskerville', Georgia, serif;
     font-size: 22px;
     font-weight: 700;
-    color: #fff;
+    color: #102a43 !important;
+    -webkit-text-fill-color: #102a43 !important;
     margin-bottom: 8px;
-    line-height: 1.2;
+    line-height: 1.25;
 }
 
 .myub-tour-body {
-    font-size: 14px;
+    font-size: 14.5px;
     line-height: 1.55;
-    color: rgba(232, 237, 245, 0.88);
+    color: #486581 !important;
+    -webkit-text-fill-color: #486581 !important;
     margin-bottom: 18px;
 }
 
@@ -315,15 +310,16 @@ html.myub-tour-active [data-tour="messages-main"] > .chat-panel {
     font-size: 13px;
     font-weight: 600;
     border: none;
-    border-radius: 8px;
-    padding: 9px 16px;
+    border-radius: 10px;
+    padding: 10px 16px;
     cursor: pointer;
     transition: background 0.25s ease, color 0.25s ease, transform 0.2s ease;
 }
 
 .myub-tour-btn-primary {
     background: #c41e3a;
-    color: #fff;
+    color: #fff !important;
+    -webkit-text-fill-color: #fff !important;
 }
 
 .myub-tour-btn-primary:hover {
@@ -331,13 +327,16 @@ html.myub-tour-active [data-tour="messages-main"] > .chat-panel {
 }
 
 .myub-tour-btn-secondary {
-    background: rgba(255, 255, 255, 0.12);
-    color: #e8edf5;
+    background: #e8f1fb;
+    color: #1a4b8c !important;
+    -webkit-text-fill-color: #1a4b8c !important;
+    border: 1px solid #c5daf5;
 }
 
 .myub-tour-btn-ghost {
     background: transparent;
-    color: rgba(232, 237, 245, 0.7);
+    color: #627d98 !important;
+    -webkit-text-fill-color: #627d98 !important;
     padding: 9px 10px;
 }
 
@@ -345,7 +344,7 @@ html.myub-tour-active [data-tour="messages-main"] > .chat-panel {
     position: fixed;
     inset: 0;
     z-index: 2147483647;
-    background: rgba(8, 18, 38, 0.78);
+    background: rgba(16, 42, 67, 0.45);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -360,13 +359,14 @@ html.myub-tour-active [data-tour="messages-main"] > .chat-panel {
 
 .myub-tour-popup {
     width: min(420px, 100%);
-    background: linear-gradient(160deg, #1a365d 0%, #0f2440 100%);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: #ffffff;
+    border: 1px solid #d9e2ec;
     border-radius: 18px;
-    padding: 32px 28px;
+    padding: 28px 26px;
     text-align: center;
-    font-family: 'Outfit', sans-serif;
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+    font-family: 'Source Sans 3', 'Outfit', sans-serif;
+    color: #102a43;
+    box-shadow: 0 20px 48px rgba(16, 42, 67, 0.16);
     animation: myubTourPopupIn 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -407,17 +407,19 @@ html.myub-tour-active [data-tour="messages-main"] > .chat-panel {
 }
 
 .myub-tour-popup h3 {
-    font-family: 'Sora', 'Outfit', system-ui, sans-serif;
+    font-family: 'Libre Baskerville', Georgia, serif;
     font-size: 24px;
     font-weight: 700;
-    color: #fff;
+    color: #102a43 !important;
+    -webkit-text-fill-color: #102a43 !important;
     margin-bottom: 10px;
 }
 
 .myub-tour-popup p {
     font-size: 14px;
     line-height: 1.6;
-    color: rgba(232, 237, 245, 0.85);
+    color: #486581 !important;
+    -webkit-text-fill-color: #486581 !important;
     margin-bottom: 22px;
 }
 
@@ -479,11 +481,11 @@ html.myub-tour-active [data-tour="messages-main"] > .chat-panel {
     }
 
     .myub-tour-mascot-wrap {
-        margin: -6px 0 8px;
+        margin: 0 0 10px;
     }
 
     .myub-tour-mascot-wrap .myub-mascot-stage {
-        max-width: 160px;
+        max-width: none;
     }
 
     .myub-tour-tooltip.is-bottom {
@@ -495,13 +497,13 @@ html.myub-tour-active [data-tour="messages-main"] > .chat-panel {
     }
 
     .myub-mascot-stage {
-        padding: 4px 12px 0;
-        border-radius: 16px;
+        padding: 10px 16px 6px;
+        border-radius: 14px;
     }
 
     .myub-tour-mascot {
-        width: 80px;
-        max-height: 90px;
+        width: 92px;
+        max-height: 102px;
     }
 
     .myub-tour-popup-mascot {

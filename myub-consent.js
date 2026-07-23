@@ -64,8 +64,15 @@
             decidedAt: new Date().toISOString()
         };
         writePrefs(prefs);
+        if (!prefs.preferences && global.MyUBAuth && typeof global.MyUBAuth.clearRememberedCredentials === 'function') {
+            global.MyUBAuth.clearRememberedCredentials();
+            if (typeof global.MyUBAuth.syncRememberCheckbox === 'function') {
+                global.MyUBAuth.syncRememberCheckbox();
+            }
+        }
         hideBanner();
         hideModal();
+        ensureFab();
         return prefs;
     }
 
@@ -105,7 +112,10 @@
             '#myub-consent-modal h2{font-family:"Libre Baskerville",Georgia,serif;font-size:18px;margin:0 0 8px;color:#102a43}',
             '#myub-consent-modal p{font-size:13px;color:#627d98;line-height:1.55;margin:0 0 16px}',
             '#myub-consent-modal .opt{display:flex;gap:12px;align-items:flex-start;padding:12px 0;',
-            'border-top:1px solid #e6eef6}',
+            'border-top:1px solid #e6eef6;cursor:pointer;margin:0;user-select:none}',
+            '#myub-consent-modal .opt input[type=checkbox]{width:18px;height:18px;margin-top:2px;flex-shrink:0;',
+            'accent-color:#1a4b8c;cursor:pointer}',
+            '#myub-consent-modal .opt input[type=checkbox]:disabled{cursor:not-allowed;opacity:.9}',
             '#myub-consent-modal .opt strong{display:block;font-size:14px;color:#102a43}',
             '#myub-consent-modal .opt span{display:block;font-size:12px;color:#627d98;margin-top:2px}',
             '#myub-consent-modal .modal-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}',
@@ -113,10 +123,12 @@
             'font-weight:600;cursor:pointer;font-family:inherit}',
             '#myub-consent-modal .btn-save{background:#1a4b8c;color:#fff}',
             '#myub-consent-modal .btn-all{background:#f0f4f8;color:#102a43;border:1px solid #d9e2ec}',
-            '#myub-consent-fab{position:fixed;left:14px;bottom:14px;z-index:100040;border:1px solid #d9e2ec;',
-            'border-radius:999px;padding:10px 14px;background:#fff;color:#1a4b8c;font-size:12px;',
-            'font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(16,42,67,.1);',
-            'font-family:"Source Sans 3",Outfit,system-ui,sans-serif}',
+            '#myub-consent-fab{border:none;background:transparent!important;color:#1a4b8c;font-size:11px;',
+            'font-weight:600;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px;',
+            'font-family:"Source Sans 3",Outfit,system-ui,sans-serif;box-shadow:none!important;border-radius:0;border:none!important}',
+            '#myub-consent-fab.myub-consent-fab--fixed{position:fixed;right:14px;bottom:14px;left:auto;',
+            'z-index:100040;border:1px solid #c5daf5!important;border-radius:999px;padding:8px 12px;',
+            'background:rgba(232,241,251,.92)!important;text-decoration:none;box-shadow:none}',
             '@media(max-width:520px){#myub-consent-banner{left:10px;right:10px;bottom:10px}}'
         ].join('');
         document.head.appendChild(style);
@@ -158,18 +170,18 @@
             '<div class="card" role="dialog" aria-modal="true" aria-labelledby="myub-consent-title">' +
                 '<h2 id="myub-consent-title">Cookie &amp; storage preferences</h2>' +
                 '<p>Choose optional categories. Necessary items stay on so MyUB can function securely.</p>' +
-                '<div class="opt">' +
-                    '<input type="checkbox" checked disabled id="myub-c-necessary">' +
+                '<label class="opt">' +
+                    '<input type="checkbox" checked disabled id="myub-c-necessary" name="myub-c-necessary">' +
                     '<div><strong>Necessary</strong><span>Auth, security, session timeout, consent record.</span></div>' +
-                '</div>' +
-                '<div class="opt">' +
-                    '<input type="checkbox" id="myub-c-preferences">' +
+                '</label>' +
+                '<label class="opt">' +
+                    '<input type="checkbox" id="myub-c-preferences" name="myub-c-preferences">' +
                     '<div><strong>Preferences</strong><span>Theme, UI state, remember-me flags stored locally.</span></div>' +
-                '</div>' +
-                '<div class="opt">' +
-                    '<input type="checkbox" id="myub-c-functional">' +
+                '</label>' +
+                '<label class="opt">' +
+                    '<input type="checkbox" id="myub-c-functional" name="myub-c-functional">' +
                     '<div><strong>Functional</strong><span>Push notification helpers (OneSignal) when you enable alerts.</span></div>' +
-                '</div>' +
+                '</label>' +
                 '<div class="modal-actions">' +
                     '<button type="button" class="btn-save" data-action="save">Save choices</button>' +
                     '<button type="button" class="btn-all" data-action="all">Accept all</button>' +
@@ -180,14 +192,17 @@
             if (e.target === modal) hideModal();
             var btn = e.target.closest('button[data-action]');
             if (!btn) return;
+            e.preventDefault();
             if (btn.getAttribute('data-action') === 'all') {
                 acceptAll();
                 return;
             }
             if (btn.getAttribute('data-action') === 'save') {
+                var prefEl = document.getElementById('myub-c-preferences');
+                var funcEl = document.getElementById('myub-c-functional');
                 saveChoice({
-                    preferences: !!document.getElementById('myub-c-preferences').checked,
-                    functional: !!document.getElementById('myub-c-functional').checked
+                    preferences: !!(prefEl && prefEl.checked),
+                    functional: !!(funcEl && funcEl.checked)
                 });
             }
         });
@@ -202,7 +217,22 @@
         fab.type = 'button';
         fab.textContent = 'Privacy choices';
         fab.addEventListener('click', openPreferences);
-        document.body.appendChild(fab);
+        var footerLinks = document.querySelector('.page-footer-links');
+        var footer = footerLinks || document.querySelector('.page-footer, .legal-footer, .footer');
+        if (footer) {
+            if (footerLinks) {
+                footer.appendChild(fab);
+            } else {
+                var sep = document.createElement('span');
+                sep.className = 'myub-consent-sep';
+                sep.innerHTML = ' &middot; ';
+                footer.appendChild(sep);
+                footer.appendChild(fab);
+            }
+        } else {
+            fab.classList.add('myub-consent-fab--fixed');
+            document.body.appendChild(fab);
+        }
     }
 
     function showBanner() {

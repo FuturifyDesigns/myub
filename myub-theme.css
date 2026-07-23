@@ -1,6 +1,6 @@
 /* ==========================================================
-   MyUB Theme v2 — Clean Educational Campus UI
-   Blue + white · no gradient chrome · loads AFTER page CSS
+   MyUB Theme v2 ? Clean Educational Campus UI
+   Blue + white ? no gradient chrome ? loads AFTER page CSS
    ========================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@400;500;600;700&display=swap');
@@ -14,7 +14,7 @@ html.myub-enhanced {
     --navy-darker: #0c274d;
     --navy-deepest: #f4f7fb;
 
-    /* Accents — restrained (errors stay red) */
+    /* Accents ? restrained (errors stay red) */
     --red: #b42318;
     --red-light: #d92d20;
     --red-dark: #912018;
@@ -30,11 +30,12 @@ html.myub-enhanced {
     /* Light educational surfaces */
     --text: #102a43;
     --text-soft: #334e68;
-    --text-muted: #627d98;
-    --text-dim: #9fb3c8;
+    --text-muted: #486581;
+    --text-dim: #627d98;
     --surface-1: #ffffff;
-    --surface-2: #f0f4f8;
-    --surface-3: #e6eef6;
+    --surface-2: #ffffff;
+    --field-bg: #ffffff;
+    --surface-3: #e8f1fb;
     --border: #d9e2ec;
     --border-strong: #bcccdc;
 
@@ -52,9 +53,74 @@ html.myub-enhanced {
 
     color-scheme: light;
     scroll-behavior: smooth;
+
+    /* Custom right-edge scrollbar (Firefox) */
+    scrollbar-width: thin !important;
+    scrollbar-color: #1a4b8c #e4ebf5 !important;
 }
 
-/* ── Kill decorative overlays / mesh / grain ── */
+/* Custom right-edge scrollbar (Chrome / Edge / Safari) */
+html.myub-enhanced::-webkit-scrollbar,
+html.myub-enhanced body::-webkit-scrollbar {
+    width: 12px !important;
+    height: 12px !important;
+}
+
+html.myub-enhanced::-webkit-scrollbar-track,
+html.myub-enhanced body::-webkit-scrollbar-track {
+    background: #e4ebf5 !important;
+    border-left: 1px solid #d0dae8 !important;
+}
+
+html.myub-enhanced::-webkit-scrollbar-thumb,
+html.myub-enhanced body::-webkit-scrollbar-thumb {
+    background: #1a4b8c !important;
+    border-radius: 10px !important;
+    border: 3px solid #e4ebf5 !important;
+    min-height: 40px;
+}
+
+html.myub-enhanced::-webkit-scrollbar-thumb:hover,
+html.myub-enhanced body::-webkit-scrollbar-thumb:hover {
+    background: #12366a !important;
+}
+
+html.myub-enhanced::-webkit-scrollbar-corner,
+html.myub-enhanced body::-webkit-scrollbar-corner {
+    background: #e4ebf5 !important;
+}
+
+/* Nested scroll panes use the same look */
+html.myub-enhanced *::-webkit-scrollbar {
+    width: 10px !important;
+    height: 10px !important;
+}
+
+html.myub-enhanced *::-webkit-scrollbar-track {
+    background: #eef3f9 !important;
+}
+
+html.myub-enhanced *::-webkit-scrollbar-thumb {
+    background: #3b7dd8 !important;
+    border-radius: 8px !important;
+    border: 2px solid #eef3f9 !important;
+}
+
+html.myub-enhanced *::-webkit-scrollbar-thumb:hover {
+    background: #1a4b8c !important;
+}
+
+html.myub-enhanced,
+html.myub-enhanced body,
+html.myub-enhanced .sidebar,
+html.myub-enhanced .main-content,
+html.myub-enhanced .chat-messages,
+html.myub-enhanced .conversations-list {
+    scrollbar-width: thin !important;
+    scrollbar-color: #1a4b8c #e4ebf5 !important;
+}
+
+/* ?? Kill decorative overlays / mesh / grain ?? */
 html.myub-enhanced body::before,
 html.myub-enhanced body::after,
 html.myub-enhanced .page-bg,
@@ -77,7 +143,7 @@ html.myub-enhanced body {
     -webkit-font-smoothing: antialiased;
 }
 
-/* Scroll progress — solid blue bar, no glow */
+/* Scroll progress ? solid blue bar, no glow */
 .myub-scroll-progress {
     position: fixed;
     top: 0;
@@ -90,7 +156,7 @@ html.myub-enhanced body {
     box-shadow: none !important;
 }
 
-/* ── Typography ── */
+/* ?? Typography ?? */
 html.myub-enhanced .page-title,
 html.myub-enhanced h1,
 html.myub-enhanced h2.card-title,
@@ -138,7 +204,7 @@ html.myub-enhanced .nav-section-title::before {
     opacity: 1;
 }
 
-/* ── Sidebar — white campus nav ── */
+/* ?? Sidebar ? white campus nav ?? */
 html.myub-enhanced .sidebar {
     background: var(--sidebar-bg) !important;
     border-right: 1px solid var(--border) !important;
@@ -150,12 +216,25 @@ html.myub-enhanced .sidebar {
 html.myub-enhanced .sidebar-header {
     border-bottom: 1px solid var(--border) !important;
     background: #fff !important;
+    overflow: visible !important;
+    padding-top: 30px !important;
+    padding-bottom: 18px !important;
+}
+
+html.myub-enhanced .sidebar-logo {
+    overflow: visible !important;
+    padding-top: 6px !important;
+    padding-left: 6px !important;
+    padding-right: 10px !important;
+    max-width: 100%;
 }
 
 html.myub-enhanced .sidebar .myub-logo,
 html.myub-enhanced .sidebar-logo .myub-logo {
-    --logo-m-color: var(--navy) !important;
-    --logo-ub-color: var(--navy) !important;
+    --logo-m-color: #1a4b8c !important;
+    --logo-ub-color: #c41e3a !important;
+    overflow: visible !important;
+    padding-top: calc(var(--logo-size, 36px) * 0.42) !important;
 }
 
 html.myub-enhanced .nav-item {
@@ -194,7 +273,7 @@ html.myub-enhanced .badge {
     color: #fff !important;
 }
 
-/* ── Topbar ── */
+/* ?? Topbar ?? */
 html.myub-enhanced .topbar {
     background: #ffffff !important;
     border: 1px solid var(--border) !important;
@@ -254,7 +333,7 @@ html.myub-enhanced .notif-dropdown-item.unread {
     background: #eef4fb !important;
 }
 
-/* ── Main content / loading ── */
+/* ?? Main content / loading ?? */
 html.myub-enhanced .main-content,
 html.myub-enhanced .dashboard,
 html.myub-enhanced .page-content,
@@ -277,7 +356,7 @@ html.myub-enhanced .spinner {
     border-top-color: var(--navy) !important;
 }
 
-/* ── Cards — white panels, solid borders ── */
+/* ?? Cards ? white panels, solid borders ?? */
 html.myub-enhanced .card,
 html.myub-enhanced .stat-card,
 html.myub-enhanced .quick-action,
@@ -363,7 +442,7 @@ html.myub-enhanced .quick-action:hover .quick-action-icon {
     background: #d7e8f8 !important;
 }
 
-/* ── Welcome banner — solid campus blue, no mesh ── */
+/* ?? Welcome banner ? solid campus blue, no mesh ?? */
 html.myub-enhanced .welcome-banner {
     background: var(--navy) !important;
     border: 1px solid var(--navy-dark) !important;
@@ -389,7 +468,7 @@ html.myub-enhanced .welcome-date .day {
     color: #fff !important;
 }
 
-/* ── Buttons ── */
+/* ?? Buttons ?? */
 html.myub-enhanced .btn-primary,
 html.myub-enhanced .submit-btn,
 html.myub-enhanced button.btn-primary,
@@ -437,7 +516,7 @@ html.myub-enhanced .btn-danger:hover {
     background: #fef3f2 !important;
 }
 
-/* ── Forms / inputs ── */
+/* ?? Forms / inputs ?? */
 html.myub-enhanced input,
 html.myub-enhanced select,
 html.myub-enhanced textarea,
@@ -466,7 +545,7 @@ html.myub-enhanced .error-msg {
     color: var(--text-muted) !important;
 }
 
-/* ── Modals / overlays ── */
+/* ?? Modals / overlays ?? */
 html.myub-enhanced .modal-overlay,
 html.myub-enhanced .welcome-modal-overlay,
 html.myub-enhanced .notif-modal-overlay,
@@ -495,7 +574,7 @@ html.myub-enhanced .modal-close {
     background: var(--surface-2) !important;
 }
 
-/* ── Tables / lists / chats ── */
+/* ?? Tables / lists / chats ?? */
 html.myub-enhanced table,
 html.myub-enhanced .data-table {
     background: #fff !important;
@@ -514,12 +593,20 @@ html.myub-enhanced td {
 }
 
 html.myub-enhanced .conversation-item.active,
-html.myub-enhanced .group-item.active,
-html.myub-enhanced .tab.active,
-html.myub-enhanced .tabs .active {
+html.myub-enhanced .group-item.active {
     background: #e8f1fb !important;
     color: var(--navy) !important;
     border-color: #c5daf5 !important;
+}
+
+html.myub-enhanced .tab.active,
+html.myub-enhanced .tabs .tab.active,
+html.myub-enhanced .tabs .active {
+    background: #1a4b8c !important;
+    background-image: none !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    border-color: #1a4b8c !important;
 }
 
 html.myub-enhanced .message-bubble,
@@ -546,7 +633,7 @@ html.myub-enhanced .empty-state h3 {
     color: var(--ink) !important;
 }
 
-/* ── Tabs / chips / pills — square-ish educational, not neon pills ── */
+/* ?? Tabs / chips / pills ? square-ish educational, not neon pills ?? */
 html.myub-enhanced .tab,
 html.myub-enhanced .chip,
 html.myub-enhanced .tag {
@@ -570,7 +657,7 @@ html.myub-enhanced .progress > div {
     border-radius: 4px !important;
 }
 
-/* ── Toast ── */
+/* ?? Toast ?? */
 html.myub-enhanced .toast {
     background: #fff !important;
     color: var(--text) !important;
@@ -578,7 +665,7 @@ html.myub-enhanced .toast {
     box-shadow: var(--edu-shadow-md) !important;
 }
 
-/* ── Avatar fallbacks ── */
+/* ?? Avatar fallbacks ?? */
 html.myub-enhanced .avatar,
 html.myub-enhanced .user-avatar,
 html.myub-enhanced .profile-avatar {
@@ -588,7 +675,7 @@ html.myub-enhanced .profile-avatar {
     box-shadow: none !important;
 }
 
-/* ── Danger zone ── */
+/* ?? Danger zone ?? */
 html.myub-enhanced .danger-zone {
     border-color: #fecdca !important;
     background: #fffaf9 !important;
@@ -598,10 +685,10 @@ html.myub-enhanced .danger-description {
     color: var(--text-soft) !important;
 }
 
-/* ── Flatten common gradient utilities on themed pages ── */
+/* ?? Flatten common gradient utilities on themed pages ?? */
 html.myub-enhanced [style*="linear-gradient"],
 html.myub-enhanced [style*="radial-gradient"] {
-    /* can't override inline style attr easily — handled by class rules above */
+    /* can't override inline style attr easily ? handled by class rules above */
 }
 
 /* Force solid backgrounds on known gradient classes */
@@ -615,17 +702,37 @@ html.myub-enhanced .quick-action-icon {
     background-image: none !important;
 }
 
-/* ── Auth / landing (index) light educational redesign ── */
-html.myub-enhanced .portal-container,
-html.myub-enhanced .intro-screen {
-    background: var(--page-bg) !important;
+/* ?? Auth / landing (index) light educational redesign ?? */
+html.myub-enhanced .portal-wrapper {
+    background-color: #f2eef3 !important;
+    background-image:
+        radial-gradient(circle at 8% 12%, rgba(196, 30, 58, 0.22) 0%, transparent 36%),
+        radial-gradient(circle at 92% 18%, rgba(26, 75, 140, 0.24) 0%, transparent 38%),
+        radial-gradient(circle at 82% 88%, rgba(196, 30, 58, 0.18) 0%, transparent 40%),
+        radial-gradient(circle at 14% 86%, rgba(26, 75, 140, 0.2) 0%, transparent 38%),
+        radial-gradient(circle at 48% 42%, rgba(196, 30, 58, 0.08) 0%, transparent 28%),
+        radial-gradient(circle at 58% 58%, rgba(26, 75, 140, 0.1) 0%, transparent 30%) !important;
+}
+
+html.myub-enhanced .portal-container {
+    background: transparent !important;
     color: var(--text) !important;
 }
 
 html.myub-enhanced .intro-screen,
+html.myub-enhanced .intro-bg {
+    background-color: #f2eef3 !important;
+    background-image:
+        radial-gradient(circle at 12% 18%, rgba(196, 30, 58, 0.26) 0%, transparent 38%),
+        radial-gradient(circle at 88% 22%, rgba(26, 75, 140, 0.28) 0%, transparent 40%),
+        radial-gradient(circle at 78% 82%, rgba(196, 30, 58, 0.2) 0%, transparent 42%),
+        radial-gradient(circle at 18% 78%, rgba(26, 75, 140, 0.22) 0%, transparent 40%) !important;
+    color: var(--text) !important;
+}
+
 html.myub-enhanced .intro-brand,
 html.myub-enhanced .intro-myub {
-    background: var(--page-bg) !important;
+    background: transparent !important;
     color: var(--ink) !important;
 }
 
@@ -636,14 +743,22 @@ html.myub-enhanced .auth-landing {
     border-radius: var(--edu-radius-xl) !important;
 }
 
-html.myub-enhanced .half-signup,
-html.myub-enhanced .half-login {
-    background: #fff !important;
-}
-
 html.myub-enhanced .half-signup {
-    background: #eef4fb !important;
-    border-right: 1px solid var(--border) !important;
+    background: #fce8ec !important;
+    border-right: none !important;
+}
+html.myub-enhanced .half-login {
+    background: #e6f0fb !important;
+}
+html.myub-enhanced .half-signup:hover,
+html.myub-enhanced .auth-landing.hover-signup .half-signup,
+html.myub-enhanced .auth-landing.selected-signup .half-signup {
+    background: #f5b8c2 !important;
+}
+html.myub-enhanced .half-login:hover,
+html.myub-enhanced .auth-landing.hover-login .half-login,
+html.myub-enhanced .auth-landing.selected-login .half-login {
+    background: #b7d3f2 !important;
 }
 
 html.myub-enhanced .half-title,
@@ -654,21 +769,36 @@ html.myub-enhanced .landing-header-text {
 }
 
 html.myub-enhanced .half-bgword {
-    color: rgba(26, 75, 140, 0.06) !important;
-    -webkit-text-stroke: 0 !important;
+    color: transparent !important;
 }
 
 html.myub-enhanced .half-divider {
-    background: var(--border) !important;
+    background: transparent !important;
 }
 
-html.myub-enhanced .portal-card,
-html.myub-enhanced .portal-card-inner {
+html.myub-enhanced .portal-card {
     background: #fff !important;
     border: 1px solid var(--border) !important;
     box-shadow: var(--edu-shadow-md) !important;
     color: var(--text) !important;
     backdrop-filter: none !important;
+}
+html.myub-enhanced .portal-card-inner {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+html.myub-enhanced .auth-promo {
+    background: #e6f0fb !important;
+}
+html.myub-enhanced .portal-card.mode-signup .auth-promo {
+    background: #fce8ec !important;
+}
+html.myub-enhanced .portal-card.mode-login .auth-promo {
+    background: #e6f0fb !important;
+}
+html.myub-enhanced .auth-forms-col {
+    background: #ffffff !important;
 }
 
 html.myub-enhanced .portal-card h1,
@@ -696,18 +826,31 @@ html.myub-enhanced .auth-tab.active,
 html.myub-enhanced .tab-btn.active,
 html.myub-enhanced #loginTab.active,
 html.myub-enhanced #signupTab.active {
-    color: var(--navy) !important;
-    border-bottom-color: var(--navy) !important;
+    background: #1a4b8c !important;
+    background-image: none !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    border-bottom-color: #1a4b8c !important;
+}
+
+html.myub-enhanced .page-footer {
+    color: #486581 !important;
+}
+html.myub-enhanced .page-footer-brand {
+    background: rgba(255, 255, 255, 0.78) !important;
+    border-color: #d9e2ec !important;
+    color: #334e68 !important;
+}
+html.myub-enhanced .page-footer-brand .footer-copy {
+    color: #102a43 !important;
+}
+html.myub-enhanced .page-footer-links a,
+html.myub-enhanced .page-footer-links #myub-consent-fab {
+    color: #1a4b8c !important;
     background: transparent !important;
-}
-
-html.myub-enhanced .page-footer,
-html.myub-enhanced .page-footer a {
-    color: var(--text-muted) !important;
-}
-
-html.myub-enhanced .page-footer a:hover {
-    color: var(--navy) !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
 }
 
 html.myub-enhanced .verification-screen {
@@ -721,6 +864,16 @@ html.myub-enhanced .consent-block {
 
 html.myub-enhanced .consent-check {
     color: var(--text-soft) !important;
+}
+
+html.myub-enhanced .consent-check input[type="checkbox"],
+html.myub-enhanced .remember input[type="checkbox"] {
+    width: 18px !important;
+    height: 18px !important;
+    accent-color: var(--navy) !important;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    flex-shrink: 0;
 }
 
 html.myub-enhanced .consent-check a {
@@ -747,7 +900,7 @@ html.myub-enhanced .myub-logo .ml-ub {
     font-weight: 700 !important;
 }
 
-/* ── Interactive educational affordances ── */
+/* ?? Interactive educational affordances ?? */
 html.myub-enhanced .quick-action,
 html.myub-enhanced .stat-card,
 html.myub-enhanced .nav-item,
@@ -783,7 +936,7 @@ html.myub-enhanced a:not(.nav-item):not(.btn):hover {
     }
 }
 
-/* ── Admin / misc panels ── */
+/* ?? Admin / misc panels ?? */
 html.myub-enhanced .groups-panel,
 html.myub-enhanced .chat-panel,
 html.myub-enhanced .conversations-panel,
@@ -799,7 +952,7 @@ html.myub-enhanced .ban-overlay {
     background: rgba(16, 42, 67, 0.5) !important;
 }
 
-/* ── Mobile perf: keep light theme, skip motion ── */
+/* ?? Mobile perf: keep light theme, skip motion ?? */
 @media (max-width: 900px), (hover: none) and (pointer: coarse) {
     html.myub-mobile-perf .card,
     html.myub-mobile-perf .stat-card,
@@ -840,8 +993,9 @@ html.myub-enhanced .tab {
 }
 
 html.myub-enhanced .tab.active {
-    background: var(--navy) !important;
-    color: #fff !important;
+    background: #1a4b8c !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
     box-shadow: none !important;
     background-image: none !important;
 }
@@ -907,12 +1061,20 @@ html.myub-enhanced .forgot {
 
 html.myub-enhanced .intro-screen,
 html.myub-enhanced .intro-bg {
-    background: #f4f7fb !important;
-    background-image: none !important;
+    background-color: #f2eef3 !important;
+    background-image:
+        radial-gradient(circle at 12% 18%, rgba(196, 30, 58, 0.26) 0%, transparent 38%),
+        radial-gradient(circle at 88% 22%, rgba(26, 75, 140, 0.28) 0%, transparent 40%),
+        radial-gradient(circle at 78% 82%, rgba(196, 30, 58, 0.2) 0%, transparent 42%),
+        radial-gradient(circle at 18% 78%, rgba(26, 75, 140, 0.22) 0%, transparent 40%) !important;
 }
 
 html.myub-enhanced .intro-rays {
-    display: none !important;
+    display: block !important;
+    opacity: 0.7 !important;
+    background:
+        radial-gradient(circle at 30% 20%, rgba(196, 30, 58, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 70% 80%, rgba(26, 75, 140, 0.14) 0%, transparent 48%) !important;
 }
 
 html.myub-enhanced .intro-brand,
@@ -937,7 +1099,7 @@ html.myub-enhanced .badge {
     background-image: none !important;
 }
 
-/* ── High-contrast text safety net (fixes white-on-white leftovers) ── */
+/* ?? High-contrast text safety net (fixes white-on-white leftovers) ?? */
 html.myub-enhanced .nav-item,
 html.myub-enhanced .page-title,
 html.myub-enhanced .user-name,
@@ -996,14 +1158,212 @@ html.myub-enhanced .gpa-circle::before {
     border: 1px solid var(--border) !important;
 }
 
-html.myub-enhanced .gpa-value {
+html.myub-enhanced .gpa-value,
+html.myub-enhanced .stat-info h3,
+html.myub-enhanced .stat-value,
+html.myub-enhanced .summary-value,
+html.myub-enhanced .analysis-card-gpa,
+html.myub-enhanced .progression-program,
+html.myub-enhanced .progression-credits,
+html.myub-enhanced .progression-percent,
+html.myub-enhanced .card-title,
+html.myub-enhanced h1,
+html.myub-enhanced h2,
+html.myub-enhanced h3 {
     color: #102a43 !important;
     -webkit-text-fill-color: #102a43 !important;
+    background: none !important;
+    background-image: none !important;
+    -webkit-background-clip: border-box !important;
+    background-clip: border-box !important;
 }
 
+/* Kill white/transparent gradient text fills left from dark theme */
+html.myub-enhanced .summary-card:hover .summary-value,
+html.myub-enhanced .analysis-card:hover .analysis-card-gpa,
+html.myub-enhanced .stat-card:hover .stat-info h3,
+html.myub-enhanced .stat-card.highlight .stat-value {
+    color: #102a43 !important;
+    -webkit-text-fill-color: #102a43 !important;
+    background: none !important;
+    background-image: none !important;
+    -webkit-background-clip: border-box !important;
+    background-clip: border-box !important;
+}
+
+html.myub-enhanced .summary-label,
+html.myub-enhanced .summary-sub,
+html.myub-enhanced .progression-title,
+html.myub-enhanced .progression-goal,
+html.myub-enhanced .progression-remaining,
+html.myub-enhanced .progression-degree,
+html.myub-enhanced .analysis-card-label,
+html.myub-enhanced .analysis-card-semester,
+html.myub-enhanced .analysis-card-change,
+html.myub-enhanced .nav-section-title,
+html.myub-enhanced .stat-label,
+html.myub-enhanced .stat-info p {
+    color: #486581 !important;
+    -webkit-text-fill-color: #486581 !important;
+}
+
+html.myub-enhanced .analysis-card {
+    background: #ffffff !important;
+    border: 1px solid #d9e2ec !important;
+    color: #102a43 !important;
+}
+
+html.myub-enhanced .analysis-card.best .analysis-card-icon {
+    background: #e8f8ef !important;
+    color: #067647 !important;
+}
+html.myub-enhanced .analysis-card.worst .analysis-card-icon {
+    background: #fffaeb !important;
+    color: #b54708 !important;
+}
+html.myub-enhanced .analysis-card.improved .analysis-card-icon {
+    background: #e8f1fb !important;
+    color: #1a4b8c !important;
+}
+html.myub-enhanced .analysis-card.declined .analysis-card-icon {
+    background: #fef3f2 !important;
+    color: #b42318 !important;
+}
+
+html.myub-enhanced .class-badge.none {
+    background: #e6eef6 !important;
+    color: #334e68 !important;
+    -webkit-text-fill-color: #334e68 !important;
+    border: 1px solid #bcccdc !important;
+}
+html.myub-enhanced .class-badge.first {
+    background: #fffaeb !important;
+    color: #93370d !important;
+    -webkit-text-fill-color: #93370d !important;
+    border: 1px solid #fec84b !important;
+}
+html.myub-enhanced .class-badge.upper {
+    background: #ecfdf3 !important;
+    color: #067647 !important;
+    -webkit-text-fill-color: #067647 !important;
+    border: 1px solid #abefc6 !important;
+}
+html.myub-enhanced .class-badge.lower {
+    background: #eff8ff !important;
+    color: #175cd3 !important;
+    -webkit-text-fill-color: #175cd3 !important;
+    border: 1px solid #b2ddff !important;
+}
+html.myub-enhanced .class-badge.pass {
+    background: #f4f3ff !important;
+    color: #5925dc !important;
+    -webkit-text-fill-color: #5925dc !important;
+    border: 1px solid #d9d6fe !important;
+}
+html.myub-enhanced .class-badge.fail {
+    background: #fef3f2 !important;
+    color: #b42318 !important;
+    -webkit-text-fill-color: #b42318 !important;
+    border: 1px solid #fecdca !important;
+}
+
+/* Solid progress bars ? no blue?red gradients */
+html.myub-enhanced .progression-card {
+    background: #ffffff !important;
+    background-image: none !important;
+    box-shadow: var(--edu-shadow-sm) !important;
+}
+html.myub-enhanced .progression-card::before {
+    background: #1a4b8c !important;
+    box-shadow: none !important;
+}
+html.myub-enhanced .progression-bar-container {
+    background: #e6eef6 !important;
+}
+html.myub-enhanced .progression-bar,
+html.myub-enhanced .progress-fill,
+html.myub-enhanced .progress-bar > * {
+    background: #1a4b8c !important;
+    background-image: none !important;
+    box-shadow: none !important;
+}
+html.myub-enhanced .progression-bar::after {
+    display: none !important;
+}
+
+html.myub-enhanced .summary-card::before,
+html.myub-enhanced .summary-card.gpa::before,
+html.myub-enhanced .summary-card.credits::before,
+html.myub-enhanced .summary-card.courses::before,
+html.myub-enhanced .summary-card.class::before {
+    background: #1a4b8c !important;
+    background-image: none !important;
+}
+
+html.myub-enhanced .semester-section.open .semester-header {
+    background: #ffffff !important;
+    background-image: none !important;
+}
+
+html.myub-enhanced .summary-card::after,
+html.myub-enhanced .card::after,
+html.myub-enhanced .analysis-card::after,
+html.myub-enhanced .grade-result-card::after,
+html.myub-enhanced .progression-card::after,
+html.myub-enhanced .semester-section::after,
+html.myub-enhanced .predictor-card::after,
+html.myub-enhanced .grade-item::after {
+    display: none !important;
+}
+
+/* Logo ? navy M, red yUB, sharp mortarboard (no blur) */
 html.myub-enhanced .myub-logo {
     --logo-m-color: #1a4b8c !important;
-    --logo-ub-color: #1a4b8c !important;
+    --logo-ub-color: #c41e3a !important;
+    filter: none !important;
+    overflow: visible !important;
+    padding-top: calc(var(--logo-size, 80px) * 0.38);
+}
+
+html.myub-enhanced .auth-landing {
+    overflow: visible !important;
+}
+
+html.myub-enhanced .landing-header {
+    overflow: visible !important;
+}
+
+html.myub-enhanced .myub-logo .ml-m {
+    color: #1a4b8c !important;
+    -webkit-text-fill-color: #1a4b8c !important;
+}
+
+html.myub-enhanced .myub-logo .ml-ub {
+    color: #c41e3a !important;
+    -webkit-text-fill-color: #c41e3a !important;
+}
+
+html.myub-enhanced .myub-logo .ml-cap,
+html.myub-enhanced .myub-logo .ml-cap svg {
+    filter: none !important;
+    opacity: 1 !important;
+    mix-blend-mode: normal !important;
+}
+
+html.myub-enhanced .myub-logo .ml-cap svg polygon,
+html.myub-enhanced .myub-logo .ml-cap svg rect {
+    fill: #1a4b8c !important;
+}
+
+html.myub-enhanced .myub-logo .ml-cap svg circle[stroke] {
+    fill: #ffffff !important;
+    stroke: #1a4b8c !important;
+}
+
+html.myub-enhanced .sidebar-header::before {
+    color: #486581 !important;
+    letter-spacing: 0.14em !important;
+    font-weight: 700 !important;
 }
 
 html.myub-enhanced .welcome-banner,
@@ -1013,6 +1373,7 @@ html.myub-enhanced .welcome-text p,
 html.myub-enhanced .welcome-date,
 html.myub-enhanced .welcome-date * {
     color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
 }
 
 html.myub-enhanced .btn-primary,
@@ -1024,6 +1385,7 @@ html.myub-enhanced .message-bubble.mine,
 html.myub-enhanced .msg-bubble.sent,
 html.myub-enhanced .chat-bubble.own {
     color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
 }
 
 html.myub-enhanced .nav-item {
@@ -1063,6 +1425,93 @@ html.myub-enhanced .avatar {
     background: #e8f1fb !important;
 }
 
+html.myub-enhanced .analysis-card-change.up {
+    background: #ecfdf3 !important;
+    color: #067647 !important;
+    -webkit-text-fill-color: #067647 !important;
+}
+html.myub-enhanced .analysis-card-change.down {
+    background: #fef3f2 !important;
+    color: #b42318 !important;
+    -webkit-text-fill-color: #b42318 !important;
+}
+html.myub-enhanced .analysis-card-change.flat {
+    background: #e6eef6 !important;
+    color: #486581 !important;
+    -webkit-text-fill-color: #486581 !important;
+}
+
+/* Leftover dark-theme white/translucent text on light surfaces */
+html.myub-enhanced .announcement-message,
+html.myub-enhanced .announcement-time,
+html.myub-enhanced .empty-state h3,
+html.myub-enhanced .empty-state p,
+html.myub-enhanced .modal-body,
+html.myub-enhanced .modal-body p,
+html.myub-enhanced .form-hint,
+html.myub-enhanced .helper-text,
+html.myub-enhanced .meta,
+html.myub-enhanced .subtitle,
+html.myub-enhanced .card-body,
+html.myub-enhanced .card-body p,
+html.myub-enhanced .list-item,
+html.myub-enhanced .friend-name,
+html.myub-enhanced .friend-meta,
+html.myub-enhanced .group-name,
+html.myub-enhanced .group-meta,
+html.myub-enhanced .note-title,
+html.myub-enhanced .note-meta,
+html.myub-enhanced .paper-title,
+html.myub-enhanced .paper-meta,
+html.myub-enhanced .event-title,
+html.myub-enhanced .event-meta,
+html.myub-enhanced .course-name,
+html.myub-enhanced .course-code,
+html.myub-enhanced .semester-title,
+html.myub-enhanced .grade-course,
+html.myub-enhanced .grade-meta {
+    color: #334e68 !important;
+    -webkit-text-fill-color: #334e68 !important;
+}
+
+html.myub-enhanced .privacy-choices-btn,
+html.myub-enhanced .myub-privacy-btn,
+html.myub-enhanced [data-consent-open],
+html.myub-enhanced button.privacy-choices,
+html.myub-enhanced #myub-consent-fab {
+    color: #1a4b8c !important;
+    -webkit-text-fill-color: #1a4b8c !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    text-decoration: underline !important;
+    text-underline-offset: 2px;
+    font-weight: 600 !important;
+}
+
+/* Fixed privacy control ? no white pill; soft chip matching page bg */
+html.myub-enhanced #myub-consent-fab.myub-consent-fab--fixed {
+    background: rgba(232, 241, 251, 0.92) !important;
+    border: 1px solid #c5daf5 !important;
+    border-radius: 999px !important;
+    padding: 8px 12px !important;
+    box-shadow: none !important;
+    text-decoration: none !important;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+html.myub-enhanced .page-footer-links #myub-consent-fab,
+html.myub-enhanced .page-footer-links a {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    text-decoration: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
     html.myub-enhanced *,
     html.myub-enhanced *::before,
@@ -1070,4 +1519,761 @@ html.myub-enhanced .avatar {
         transition-duration: 0.01ms !important;
         animation-duration: 0.01ms !important;
     }
+}
+
+/* ==========================================================
+   Campus light coverage ? auth, What-If, predictor, hub, shell
+   ========================================================== */
+
+html.myub-enhanced .whatif-explainer h3,
+html.myub-enhanced .whatif-scenarios-header h4,
+html.myub-enhanced .whatif-stat strong,
+html.myub-enhanced .predictor-summary #caContribution,
+html.myub-enhanced .predictor-summary #maxPossible,
+html.myub-enhanced .predictor-results h3,
+html.myub-enhanced .grade-result-score {
+    color: #102a43 !important;
+    -webkit-text-fill-color: #102a43 !important;
+}
+
+html.myub-enhanced .whatif-stat.projected strong,
+html.myub-enhanced .predictor-summary #maxPossible {
+    color: #1a4b8c !important;
+    -webkit-text-fill-color: #1a4b8c !important;
+}
+
+html.myub-enhanced .whatif-delta.positive,
+html.myub-enhanced .grade-result-score.status-guaranteed,
+html.myub-enhanced .grade-result-score.status-achievable {
+    color: #067647 !important;
+    -webkit-text-fill-color: #067647 !important;
+}
+html.myub-enhanced .whatif-delta.negative,
+html.myub-enhanced .grade-result-score.status-impossible {
+    color: #b42318 !important;
+    -webkit-text-fill-color: #b42318 !important;
+}
+html.myub-enhanced .grade-result-score.status-challenging { color: #b54708 !important; -webkit-text-fill-color: #b54708 !important; }
+html.myub-enhanced .grade-result-score.status-hard { color: #c4320a !important; -webkit-text-fill-color: #c4320a !important; }
+
+html.myub-enhanced .whatif-explainer p,
+html.myub-enhanced .whatif-steps,
+html.myub-enhanced .whatif-stat .label,
+html.myub-enhanced .whatif-field label,
+html.myub-enhanced .whatif-scenarios-header span,
+html.myub-enhanced .whatif-empty,
+html.myub-enhanced .predictor-empty p,
+html.myub-enhanced .form-hint,
+html.myub-enhanced .weight-warning {
+    color: #486581 !important;
+    -webkit-text-fill-color: #486581 !important;
+}
+
+html.myub-enhanced .whatif-stat,
+html.myub-enhanced .whatif-row,
+html.myub-enhanced .predictor-summary {
+    background: #ffffff !important;
+    border-color: #d9e2ec !important;
+}
+
+html.myub-enhanced .whatif-row input,
+html.myub-enhanced .whatif-row select,
+html.myub-enhanced .predictor-form input,
+html.myub-enhanced .predictor-form select,
+html.myub-enhanced .form-group input,
+html.myub-enhanced .form-group select,
+html.myub-enhanced .form-group textarea {
+    background: #ffffff !important;
+    color: #102a43 !important;
+    -webkit-text-fill-color: #102a43 !important;
+    border-color: #bcccdc !important;
+}
+
+html.myub-enhanced .reset-card,
+html.myub-enhanced .card-logo {
+    background: #ffffff !important;
+    border: 1px solid #d9e2ec !important;
+    box-shadow: 0 12px 32px rgba(16, 42, 67, 0.1) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+html.myub-enhanced p.lead,
+html.myub-enhanced .loading-screen p,
+html.myub-enhanced .error-screen p,
+html.myub-enhanced .success-screen p,
+html.myub-enhanced .reset-header p,
+html.myub-enhanced .footer {
+    color: #486581 !important;
+    -webkit-text-fill-color: #486581 !important;
+}
+
+html.myub-enhanced .footer a {
+    color: #1a4b8c !important;
+}
+
+html.myub-enhanced .btn-ghost {
+    color: #486581 !important;
+    -webkit-text-fill-color: #486581 !important;
+    border-color: #d9e2ec !important;
+    background: transparent !important;
+}
+
+html.myub-enhanced .btn-primary {
+    background: #1a4b8c !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    background-image: none !important;
+}
+
+html.myub-enhanced .alert-error,
+html.myub-enhanced .alert.error {
+    background: #fef3f2 !important;
+    border-color: #fecdca !important;
+    color: #b42318 !important;
+    -webkit-text-fill-color: #b42318 !important;
+}
+html.myub-enhanced .alert-success,
+html.myub-enhanced .alert.success {
+    background: #ecfdf3 !important;
+    border-color: #abefc6 !important;
+    color: #067647 !important;
+    -webkit-text-fill-color: #067647 !important;
+}
+html.myub-enhanced .alert-warning,
+html.myub-enhanced .alert.warning {
+    background: #fffaeb !important;
+    border-color: #fec84b !important;
+    color: #93370d !important;
+    -webkit-text-fill-color: #93370d !important;
+}
+
+html.myub-enhanced .consent-block {
+    background: #ffffff !important;
+    border-color: #d9e2ec !important;
+}
+html.myub-enhanced .consent-check a { color: #1a4b8c !important; }
+
+html.myub-enhanced .detail-hero,
+html.myub-enhanced .resource-tile,
+html.myub-enhanced .admin-card,
+html.myub-enhanced .modal-content,
+html.myub-enhanced .modal-body,
+html.myub-enhanced .chat-panel,
+html.myub-enhanced .conversation-list,
+html.myub-enhanced .messages-sidebar,
+html.myub-enhanced .group-sidebar,
+html.myub-enhanced .myub-file-card {
+    background: #ffffff !important;
+    background-image: none !important;
+    border-color: #d9e2ec !important;
+    color: #102a43 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+html.myub-enhanced .stat-icon.blue { background: #e8f1fb !important; border-color: #c5daf5 !important; }
+html.myub-enhanced .stat-icon.blue svg { stroke: #1a4b8c !important; }
+html.myub-enhanced .stat-icon.green { background: #ecfdf3 !important; border-color: #abefc6 !important; }
+html.myub-enhanced .stat-icon.green svg { stroke: #067647 !important; }
+html.myub-enhanced .stat-icon.purple { background: #f4f3ff !important; border-color: #d9d6fe !important; }
+html.myub-enhanced .stat-icon.purple svg { stroke: #5925dc !important; }
+html.myub-enhanced .stat-icon.orange { background: #fff6ed !important; border-color: #fdb022 !important; }
+html.myub-enhanced .stat-icon.orange svg { stroke: #b54708 !important; }
+
+html.myub-enhanced .quick-action:nth-child(1) .quick-action-icon { background: #e8f1fb !important; color: #1a4b8c !important; border-color: #c5daf5 !important; }
+html.myub-enhanced .quick-action:nth-child(2) .quick-action-icon { background: #fffaeb !important; color: #b54708 !important; border-color: #fec84b !important; }
+html.myub-enhanced .quick-action:nth-child(3) .quick-action-icon { background: #ecfdf3 !important; color: #067647 !important; border-color: #abefc6 !important; }
+html.myub-enhanced .quick-action:nth-child(4) .quick-action-icon { background: #f4f3ff !important; color: #5925dc !important; border-color: #d9d6fe !important; }
+html.myub-enhanced .quick-action:nth-child(5) .quick-action-icon { background: #fdf2fa !important; color: #c11574 !important; border-color: #fcceee !important; }
+html.myub-enhanced .quick-action:nth-child(6) .quick-action-icon { background: #fff6ed !important; color: #b54708 !important; border-color: #fd853a !important; }
+
+html.myub-enhanced .half-icon {
+    background: rgba(255, 255, 255, 0.72) !important;
+    border-color: rgba(16, 42, 67, 0.1) !important;
+}
+html.myub-enhanced .half-signup .half-icon svg { stroke: #c41e3a !important; }
+html.myub-enhanced .half-login .half-icon svg { stroke: #1a4b8c !important; }
+html.myub-enhanced .half-signup:hover .half-icon,
+html.myub-enhanced .auth-landing.hover-signup .half-signup .half-icon,
+html.myub-enhanced .auth-landing.selected-signup .half-signup .half-icon {
+    background: #c41e3a !important;
+    border-color: #c41e3a !important;
+}
+html.myub-enhanced .half-login:hover .half-icon,
+html.myub-enhanced .auth-landing.hover-login .half-login .half-icon,
+html.myub-enhanced .auth-landing.selected-login .half-login .half-icon {
+    background: #1a4b8c !important;
+    border-color: #1a4b8c !important;
+}
+html.myub-enhanced .half-signup:hover .half-icon svg,
+html.myub-enhanced .auth-landing.hover-signup .half-signup .half-icon svg,
+html.myub-enhanced .auth-landing.selected-signup .half-signup .half-icon svg,
+html.myub-enhanced .half-login:hover .half-icon svg,
+html.myub-enhanced .auth-landing.hover-login .half-login .half-icon svg,
+html.myub-enhanced .auth-landing.selected-login .half-login .half-icon svg {
+    stroke: #ffffff !important;
+}
+
+html.myub-enhanced .user-avatar,
+html.myub-enhanced .avatar,
+html.myub-enhanced .friend-avatar,
+html.myub-enhanced .msg-avatar {
+    border-color: #ffffff !important;
+}
+
+html.myub-enhanced .empty-state svg,
+html.myub-enhanced .predictor-empty svg,
+html.myub-enhanced .whatif-empty svg {
+    stroke: #627d98 !important;
+    opacity: 0.85 !important;
+}
+
+html.myub-enhanced .choice-icon svg,
+html.myub-enhanced .reset-icon svg {
+    stroke: #1a4b8c !important;
+}
+
+html.myub-enhanced .error-icon-inner svg,
+html.myub-enhanced .success-icon-inner svg,
+html.myub-enhanced .success-circle svg {
+    stroke: #ffffff !important;
+}
+
+/* ==========================================================
+   App pages polish ? course, schedule, events, notes, papers,
+   groups, messages, friends, profile
+   ========================================================== */
+
+html.myub-enhanced .main-content,
+html.myub-enhanced .content,
+html.myub-enhanced .page-content {
+    color: #102a43 !important;
+}
+
+html.myub-enhanced .page-title,
+html.myub-enhanced .section-title,
+html.myub-enhanced .panel-title,
+html.myub-enhanced .card-title {
+    color: #102a43 !important;
+    -webkit-text-fill-color: #102a43 !important;
+}
+
+html.myub-enhanced .card,
+html.myub-enhanced .panel,
+html.myub-enhanced .stat-card,
+html.myub-enhanced .friend-card,
+html.myub-enhanced .request-card,
+html.myub-enhanced .course-card,
+html.myub-enhanced .hub-card,
+html.myub-enhanced .file-card,
+html.myub-enhanced .myub-file-card,
+html.myub-enhanced .group-card,
+html.myub-enhanced .event-card,
+html.myub-enhanced .note-card,
+html.myub-enhanced .calendar-panel,
+html.myub-enhanced .upcoming-panel,
+html.myub-enhanced .conversations-panel,
+html.myub-enhanced .chat-panel,
+html.myub-enhanced .profile-card,
+html.myub-enhanced .info-box {
+    background: #ffffff !important;
+    border-color: #d9e2ec !important;
+    color: #102a43 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+html.myub-enhanced .discover-card {
+    background: #ffffff !important;
+    border: 1px solid #d9e2ec !important;
+    box-shadow: 0 4px 16px rgba(16, 42, 67, 0.08) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+html.myub-enhanced .discover-card:hover {
+    box-shadow: 0 12px 28px rgba(16, 42, 67, 0.12) !important;
+    border-color: #bcccdc !important;
+}
+
+html.myub-enhanced .discover-name,
+html.myub-enhanced .friend-name,
+html.myub-enhanced .course-name,
+html.myub-enhanced .file-title,
+html.myub-enhanced .group-name,
+html.myub-enhanced .event-title,
+html.myub-enhanced .note-title,
+html.myub-enhanced .conversation-name,
+html.myub-enhanced .chat-header-name {
+    color: #102a43 !important;
+    -webkit-text-fill-color: #102a43 !important;
+}
+
+html.myub-enhanced .discover-program,
+html.myub-enhanced .friend-program,
+html.myub-enhanced .course-meta,
+html.myub-enhanced .file-meta,
+html.myub-enhanced .conversation-preview,
+html.myub-enhanced .chat-status {
+    color: #486581 !important;
+    -webkit-text-fill-color: #486581 !important;
+}
+
+html.myub-enhanced .discover-status.offline {
+    color: #627d98 !important;
+    background: #ffffff !important;
+    border-color: #d9e2ec !important;
+}
+
+html.myub-enhanced .discover-avatar .online-dot {
+    border-color: #ffffff !important;
+    box-shadow: 0 0 0 2px #fff !important;
+}
+
+html.myub-enhanced .course-code,
+html.myub-enhanced .hub-course-code {
+    color: #c41e3a !important;
+    -webkit-text-fill-color: #c41e3a !important;
+}
+
+html.myub-enhanced .hub-intro,
+html.myub-enhanced .course-hub-intro,
+html.myub-enhanced .intro-card {
+    background: linear-gradient(90deg, #e8f1fb 0%, #fce8ec 100%) !important;
+    border: 1px solid #d9e2ec !important;
+    color: #102a43 !important;
+}
+
+html.myub-enhanced .hub-intro p,
+html.myub-enhanced .course-hub-intro p,
+html.myub-enhanced .intro-card p,
+html.myub-enhanced .hub-intro h3,
+html.myub-enhanced .intro-card h3 {
+    color: #102a43 !important;
+    -webkit-text-fill-color: #102a43 !important;
+}
+
+html.myub-enhanced .search-box,
+html.myub-enhanced .search-bar,
+html.myub-enhanced .filters-bar {
+    background: #ffffff !important;
+    border-color: #d9e2ec !important;
+    color: #102a43 !important;
+}
+
+html.myub-enhanced .calendar-toolbar {
+    background: #1a4b8c !important;
+    color: #ffffff !important;
+    border-color: #12366a !important;
+}
+
+html.myub-enhanced .calendar-toolbar button,
+html.myub-enhanced .calendar-toolbar .view-btn,
+html.myub-enhanced .calendar-toolbar .nav-btn {
+    color: #ffffff !important;
+}
+
+html.myub-enhanced .calendar-toolbar .view-btn.active,
+html.myub-enhanced .calendar-toolbar .active {
+    background: rgba(255, 255, 255, 0.18) !important;
+    color: #ffffff !important;
+}
+
+html.myub-enhanced .tab-btn.active,
+html.myub-enhanced .tabs .tab.active,
+html.myub-enhanced .filter-tab.active,
+html.myub-enhanced .groups-tab.active {
+    background: #1a4b8c !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+html.myub-enhanced .btn-primary,
+html.myub-enhanced .btn.primary,
+html.myub-enhanced .add-btn,
+html.myub-enhanced .create-btn {
+    background: #1a4b8c !important;
+    background-image: none !important;
+    border-color: #12366a !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Keep intentional red accent CTAs */
+html.myub-enhanced .btn-top.primary,
+html.myub-enhanced .btn-danger,
+html.myub-enhanced .btn-red,
+html.myub-enhanced button.primary-red {
+    background: #c41e3a !important;
+    border-color: #9f1232 !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+html.myub-enhanced .btn-secondary,
+html.myub-enhanced .btn-ghost,
+html.myub-enhanced .btn-outline {
+    background: #ffffff !important;
+    border-color: #d9e2ec !important;
+    color: #1a4b8c !important;
+}
+
+html.myub-enhanced .msg-bubble.received,
+html.myub-enhanced .message.received .bubble {
+    background: #e8f1fb !important;
+    color: #102a43 !important;
+}
+
+html.myub-enhanced .msg-bubble.sent,
+html.myub-enhanced .message.sent .bubble {
+    background: #ffffff !important;
+    color: #102a43 !important;
+    border: 1px solid #d9e2ec !important;
+}
+
+html.myub-enhanced .conversation-item.active {
+    background: #e8f1fb !important;
+    border-color: #c5daf5 !important;
+}
+
+html.myub-enhanced .profile-field,
+html.myub-enhanced .info-row,
+html.myub-enhanced .about-field {
+    background: #ffffff !important;
+    border-color: #d9e2ec !important;
+    color: #102a43 !important;
+}
+
+html.myub-enhanced .profile-field label,
+html.myub-enhanced .about-field .label,
+html.myub-enhanced .info-row .label {
+    color: #486581 !important;
+}
+
+html.myub-enhanced .modal,
+html.myub-enhanced .modal-content,
+html.myub-enhanced .modal-card,
+html.myub-enhanced .profile-modal {
+    background: #ffffff !important;
+    color: #102a43 !important;
+    border-color: #d9e2ec !important;
+}
+
+html.myub-enhanced .modal h2,
+html.myub-enhanced .modal h3,
+html.myub-enhanced .modal-title,
+html.myub-enhanced .profile-modal-name {
+    color: #1a4b8c !important;
+    -webkit-text-fill-color: #1a4b8c !important;
+}
+
+html.myub-enhanced .sidebar {
+    background: #ffffff !important;
+    border-right: 1px solid #d9e2ec !important;
+}
+
+html.myub-enhanced .nav-section-title {
+    color: #627d98 !important;
+}
+
+html.myub-enhanced body {
+    background: #f4f7fb !important;
+    color: #102a43 !important;
+}
+
+html.myub-enhanced .app-shell,
+html.myub-enhanced .layout,
+html.myub-enhanced .dashboard-layout {
+    background: #f4f7fb !important;
+}
+
+html.myub-enhanced .grade-badge,
+html.myub-enhanced .course-grade {
+    color: #067647 !important;
+}
+
+html.myub-enhanced .view-btn-file,
+html.myub-enhanced .file-actions .btn-view {
+    background: #c41e3a !important;
+    color: #ffffff !important;
+}
+
+/* ==========================================================
+   Soft campus fields (replace dull grey boxes) + tour contrast
+   ========================================================== */
+
+html.myub-enhanced .myub-tour-tooltip,
+html.myub-enhanced .myub-tour-popup {
+    background: #ffffff !important;
+    border-color: #d9e2ec !important;
+    color: #102a43 !important;
+}
+
+html.myub-enhanced .myub-tour-tooltip h2,
+html.myub-enhanced .myub-tour-title,
+html.myub-enhanced .myub-tour-popup h3 {
+    color: #102a43 !important;
+    -webkit-text-fill-color: #102a43 !important;
+    background: none !important;
+}
+
+html.myub-enhanced .myub-tour-body,
+html.myub-enhanced .myub-tour-popup p {
+    color: #486581 !important;
+    -webkit-text-fill-color: #486581 !important;
+}
+
+html.myub-enhanced .myub-tour-step-label {
+    color: #c41e3a !important;
+    -webkit-text-fill-color: #c41e3a !important;
+}
+
+html.myub-enhanced .myub-tour-btn-ghost {
+    color: #627d98 !important;
+    -webkit-text-fill-color: #627d98 !important;
+}
+
+html.myub-enhanced .myub-tour-btn-secondary {
+    background: #e8f1fb !important;
+    color: #1a4b8c !important;
+    -webkit-text-fill-color: #1a4b8c !important;
+}
+
+html.myub-enhanced .myub-tour-btn-primary {
+    background: #c41e3a !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+html.myub-enhanced .myub-mascot-stage {
+    background:
+        radial-gradient(circle at 22% 30%, rgba(196, 30, 58, 0.14) 0%, transparent 48%),
+        radial-gradient(circle at 78% 70%, rgba(26, 75, 140, 0.16) 0%, transparent 52%),
+        #eef5fb !important;
+    border: 1px solid #d9e2ec !important;
+    box-shadow: none !important;
+}
+
+/* Replace leftover grey / dark glass fields */
+html.myub-enhanced .info-item,
+html.myub-enhanced .profile-field,
+html.myub-enhanced .about-field,
+html.myub-enhanced .info-row,
+html.myub-enhanced .profile-modal-meta,
+html.myub-enhanced #profileModal .profile-modal-meta,
+html.myub-enhanced .member-since,
+html.myub-enhanced .meta-box,
+html.myub-enhanced .detail-box,
+html.myub-enhanced .info-grid .info-item,
+html.myub-enhanced input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+html.myub-enhanced select,
+html.myub-enhanced textarea {
+    background: #ffffff !important;
+    border-color: #d9e2ec !important;
+    color: #102a43 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+html.myub-enhanced .info-item,
+html.myub-enhanced .profile-field,
+html.myub-enhanced .about-field,
+html.myub-enhanced .info-row,
+html.myub-enhanced .profile-modal-meta,
+html.myub-enhanced #profileModal .profile-modal-meta,
+html.myub-enhanced .member-since,
+html.myub-enhanced .meta-box,
+html.myub-enhanced .detail-box {
+    border: 1px solid #d9e2ec !important;
+}
+
+html.myub-enhanced .info-item:hover {
+    background: #ffffff !important;
+    border-color: #c5daf5 !important;
+    box-shadow: 0 4px 14px rgba(16, 42, 67, 0.06) !important;
+}
+
+html.myub-enhanced .info-label,
+html.myub-enhanced .profile-field label,
+html.myub-enhanced .about-field .label,
+html.myub-enhanced .profile-modal-meta .label {
+    color: #486581 !important;
+}
+
+html.myub-enhanced .info-value,
+html.myub-enhanced .profile-modal-meta .value {
+    color: #102a43 !important;
+}
+
+html.myub-enhanced .stat-card,
+html.myub-enhanced .quick-action,
+html.myub-enhanced .search-box,
+html.myub-enhanced .search-bar,
+html.myub-enhanced input[type="search"],
+html.myub-enhanced .search-input,
+html.myub-enhanced .filters-bar,
+html.myub-enhanced .toolbar:not(.calendar-toolbar) {
+    background: #ffffff !important;
+    border-color: #d9e2ec !important;
+    color: #102a43 !important;
+}
+
+html.myub-enhanced .tabs,
+html.myub-enhanced .tab-bar,
+html.myub-enhanced .filter-tabs {
+    background: #ffffff !important;
+    border: 1px solid #d9e2ec !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+html.myub-enhanced .tab,
+html.myub-enhanced .tab-btn,
+html.myub-enhanced .filter-tab {
+    background: transparent !important;
+    color: #486581 !important;
+    -webkit-text-fill-color: #486581 !important;
+}
+
+html.myub-enhanced .tab.active,
+html.myub-enhanced .tabs .tab.active,
+html.myub-enhanced .tab-btn.active,
+html.myub-enhanced .filter-tab.active {
+    background: #1a4b8c !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+html.myub-enhanced .empty-state,
+html.myub-enhanced .events-list,
+html.myub-enhanced .notes-list,
+html.myub-enhanced .papers-list {
+    background: #ffffff !important;
+}
+
+html.myub-enhanced [style*="rgba(0, 0, 0"],
+html.myub-enhanced [style*="rgba(0,0,0"] {
+    /* cannot override inline reliably ? class rules above cover known cases */
+}
+
+html.myub-enhanced .welcome-banner {
+    background: #1a4b8c !important;
+    color: #ffffff !important;
+    border-color: #12366a !important;
+}
+
+html.myub-enhanced .welcome-banner h1,
+html.myub-enhanced .welcome-banner h2,
+html.myub-enhanced .welcome-banner p,
+html.myub-enhanced .welcome-banner .welcome-text,
+html.myub-enhanced .welcome-banner .welcome-text * {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Messages / Schedule / Course Hub � kill leftover grey panels */
+html.myub-enhanced .hub-explainer,
+html.myub-enhanced .course-hub-tour-intro .hub-explainer {
+    background:
+        radial-gradient(circle at 8% 20%, rgba(196, 30, 58, 0.08) 0%, transparent 42%),
+        radial-gradient(circle at 92% 80%, rgba(26, 75, 140, 0.1) 0%, transparent 45%),
+        #ffffff !important;
+    border: 1px solid #d9e2ec !important;
+    color: #102a43 !important;
+}
+
+html.myub-enhanced .hub-explainer h2 {
+    color: #102a43 !important;
+    -webkit-text-fill-color: #102a43 !important;
+}
+
+html.myub-enhanced .hub-explainer p,
+html.myub-enhanced .hub-step {
+    color: #486581 !important;
+}
+
+html.myub-enhanced .hub-search input,
+html.myub-enhanced .conversations-search .search-input,
+html.myub-enhanced .search-input,
+html.myub-enhanced .message-input,
+html.myub-enhanced .chat-input,
+html.myub-enhanced .composer input,
+html.myub-enhanced #messageInput {
+    background: #ffffff !important;
+    border-color: #d9e2ec !important;
+    color: #102a43 !important;
+}
+
+html.myub-enhanced .chat-input-wrapper,
+html.myub-enhanced .search-input-wrapper,
+html.myub-enhanced .composer,
+html.myub-enhanced .message-composer,
+html.myub-enhanced .conversations-search,
+html.myub-enhanced .conversations-search .search-box,
+html.myub-enhanced .search-box {
+    background: #ffffff !important;
+    border-color: #d9e2ec !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+html.myub-enhanced .chat-input-wrapper .chat-input,
+html.myub-enhanced .search-input-wrapper .search-input {
+    background: transparent !important;
+}
+
+html.myub-enhanced .emoji-btn {
+    background: #ffffff !important;
+    border-color: #d9e2ec !important;
+}
+
+html.myub-enhanced .conversations-panel,
+html.myub-enhanced .chat-panel,
+html.myub-enhanced .chat-header,
+html.myub-enhanced .schedule-header,
+html.myub-enhanced .calendar-container,
+html.myub-enhanced .upcoming-sidebar {
+    background: #ffffff !important;
+    border-color: #d9e2ec !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+html.myub-enhanced .chat-date-divider span {
+    background: #ffffff !important;
+    border-color: #d9e2ec !important;
+    color: #486581 !important;
+}
+
+html.myub-enhanced #myub-consent-fab,
+html.myub-enhanced #myub-consent-fab.myub-consent-fab--fixed {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    text-decoration: underline !important;
+    color: #1a4b8c !important;
+}
+
+/* Safety: never leave tour layers trapping clicks when tour is off */
+html:not(.myub-tour-active):not(.myub-tour-prep) .myub-tour-root,
+html:not(.myub-tour-active) .myub-tour-spotlight {
+    display: none !important;
+    pointer-events: none !important;
+}
+
+/* Safety: kill stuck page-transition logo (was painting a giant mortarboard) */
+html:not(.myub-pt-running) #myubPageTransition,
+html:not(.myub-pt-running) .myub-pt {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+html.myub-pt-running #myubPageTransition .myub-pt-cap,
+html.myub-pt-running #myubPageTransition .myub-pt-cap svg {
+    width: 50px !important;
+    height: 35px !important;
+    max-width: 50px !important;
+    max-height: 35px !important;
 }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="myub-enhanced">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content, maximum-scale=1.0, user-scalable=no">
@@ -8,18 +8,18 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="myub-onboarding.css?v=36">
-    <link rel="stylesheet" href="myub-theme.css?v=21">
+    <link rel="stylesheet" href="myub-onboarding.css?v=37">
+    <link rel="stylesheet" href="myub-theme.css?v=35">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="myub-security.js"></script>
-    <script src="myub-auth.js"></script>
+    <script src="myub-auth.js?v=2"></script>
     <script src="myub-utils.js"></script>
     <script src="myub-mobile.js"></script>
-    <script src="myub-sidebar.js"></script>
+    <script src="myub-sidebar.js?v=3"></script>
     <script src="myub-gpa.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
-    <script src="myub-onboarding.js?v=35"></script>
-    <script src="myub-transitions.js?v=6" defer></script>
+    <script src="myub-onboarding.js?v=37"></script>
+    <script src="myub-transitions.js?v=8" defer></script>
     <script src="myub-animations.js?v=6" defer></script>
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -39,11 +39,11 @@
             --pink: #c11574;
             --text: #102a43;
             --text-soft: #334e68;
-            --text-muted: #627d98;
-            --text-dim: #9fb3c8;
+            --text-muted: #486581;
+            --text-dim: #627d98;
             --surface-1: #ffffff;
-            --surface-2: #f0f4f8;
-            --surface-3: #e6eef6;
+            --surface-2: #ffffff;
+            --surface-3: #e8f1fb;
             --border: #d9e2ec;
             --border-strong: #bcccdc;
             --sidebar-w: 260px;
@@ -116,7 +116,7 @@
         .myub-logo {
             --logo-size: 36px;
             --logo-m-color: #1a4b8c;
-            --logo-ub-color: #1a4b8c;
+            --logo-ub-color: #c41e3a;
             position: relative;
             display: inline-flex;
             align-items: flex-end;
@@ -213,10 +213,10 @@
             width: 18px; height: 18px; stroke: currentColor;
             flex-shrink: 0; fill: none; stroke-width: 2;
         }
-        .nav-item:hover { background: var(--surface-2); color: var(--white); transform: translateX(3px); }
+        .nav-item:hover { background: var(--surface-2); color: #102a43; transform: translateX(3px); }
         .nav-item.active {
             background: linear-gradient(135deg, rgba(44, 82, 130, 0.55), rgba(26, 54, 93, 0.45));
-            color: var(--white);
+            color: #102a43;
             border-color: rgba(58, 111, 168, 0.35);
             box-shadow: 0 8px 24px -10px rgba(44, 82, 130, 0.8);
         }
@@ -231,7 +231,7 @@
         }
         .nav-item .badge {
             margin-left: auto;
-            background: var(--red); color: var(--white);
+            background: var(--red); color: #102a43;
             font-size: 10px; font-weight: 700;
             padding: 2px 7px; border-radius: 999px;
         }
@@ -265,7 +265,7 @@
         .menu-toggle {
             display: none; width: 40px; height: 40px;
             border-radius: 10px; background: var(--surface-2);
-            border: 1px solid var(--border); color: var(--white);
+            border: 1px solid var(--border); color: #102a43;
             align-items: center; justify-content: center;
             padding: 0; cursor: pointer;
         }
@@ -273,7 +273,7 @@
         .page-title {
             font-family: 'Sora', sans-serif;
             font-size: 22px; font-weight: 700;
-            color: var(--white); letter-spacing: -0.3px;
+            color: #102a43; letter-spacing: -0.3px;
         }
         .page-title::after {
             content: '';
@@ -299,7 +299,7 @@
             transition: all 0.25s ease;
             cursor: pointer;
         }
-        .btn-top:hover { border-color: var(--red); color: var(--white); background: rgba(196,30,58,0.12); }
+        .btn-top:hover { border-color: var(--red); color: #102a43; background: rgba(196,30,58,0.12); }
         .btn-top.primary { background: var(--red); border-color: var(--red); color: #fff; }
         .btn-top.primary:hover { background: var(--red-light); }
 
@@ -314,8 +314,11 @@
             padding: 22px 24px;
             margin-bottom: 22px;
             border-radius: 16px;
-            border: 1px solid rgba(58, 111, 168, 0.25);
-            background: linear-gradient(135deg, rgba(26, 54, 93, 0.55), rgba(15, 39, 68, 0.35));
+            border: 1px solid #d9e2ec;
+            background:
+                radial-gradient(circle at 8% 20%, rgba(196, 30, 58, 0.08) 0%, transparent 42%),
+                radial-gradient(circle at 92% 80%, rgba(26, 75, 140, 0.1) 0%, transparent 45%),
+                #ffffff;
             position: relative;
             overflow: hidden;
         }
@@ -324,26 +327,27 @@
             position: absolute;
             top: -40%; right: -10%;
             width: 200px; height: 200px;
-            background: radial-gradient(circle, rgba(196,30,58,0.15), transparent 70%);
+            background: radial-gradient(circle, rgba(196,30,58,0.08), transparent 70%);
             pointer-events: none;
         }
         .hub-explainer-icon {
             width: 52px; height: 52px;
             border-radius: 14px;
-            background: rgba(196, 30, 58, 0.15);
-            border: 1px solid rgba(196, 30, 58, 0.3);
+            background: #fce8ec;
+            border: 1px solid #f3c4ce;
             display: flex; align-items: center; justify-content: center;
             flex-shrink: 0;
         }
-        .hub-explainer-icon svg { width: 26px; height: 26px; stroke: var(--red-light); fill: none; stroke-width: 2; }
+        .hub-explainer-icon svg { width: 26px; height: 26px; stroke: var(--red); fill: none; stroke-width: 2; }
         .hub-explainer h2 {
             font-family: 'Sora', sans-serif;
             font-size: 18px; font-weight: 700;
             margin-bottom: 8px;
+            color: #102a43;
         }
         .hub-explainer p {
             font-size: 14px; line-height: 1.6;
-            color: var(--text-soft);
+            color: #486581;
             margin-bottom: 12px;
         }
         .hub-steps {
@@ -388,7 +392,7 @@
             border-radius: 10px;
             border: 1px solid var(--border);
             background: var(--surface-1);
-            color: var(--white);
+            color: #102a43;
             font-size: 14px;
             outline: none;
             transition: border-color 0.2s, box-shadow 0.2s;
@@ -496,25 +500,26 @@
 
         .detail-hero {
             padding: 28px 30px;
-            border-radius: 18px;
+            border-radius: 16px;
             margin-bottom: 22px;
-            border: 1px solid var(--border);
-            background: linear-gradient(135deg, rgba(26,54,93,0.8), rgba(44,82,130,0.4));
+            border: 1px solid #d9e2ec;
+            background: #ffffff;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 1px 2px rgba(16, 42, 67, 0.06);
         }
         .detail-hero::before {
             content: '';
             position: absolute;
-            right: -20px; top: -20px;
-            width: 160px; height: 160px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(196,30,58,0.2), transparent 70%);
+            left: 0; top: 0; bottom: 0;
+            width: 4px;
+            background: #1a4b8c;
+            border-radius: 4px 0 0 4px;
         }
         .detail-code {
             font-family: 'Sora', sans-serif;
             font-size: 32px; font-weight: 800;
-            color: var(--white);
+            color: #102a43;
             letter-spacing: -0.5px;
             margin-bottom: 6px;
             position: relative;
@@ -555,27 +560,28 @@
             display: flex; align-items: flex-start; gap: 14px;
             padding: 20px;
             border-radius: 14px;
-            border: 1px solid var(--border);
-            background: rgba(15, 39, 68, 0.5);
+            border: 1px solid #d9e2ec;
+            background: #ffffff;
             transition: all 0.3s var(--ease-out-expo);
             position: relative;
             overflow: hidden;
+            box-shadow: 0 1px 2px rgba(16, 42, 67, 0.06);
         }
         .resource-tile::after {
-            content: '→';
+            content: '';
             position: absolute;
             right: 18px; top: 50%;
+            width: 18px; height: 18px;
             transform: translateY(-50%);
-            font-size: 18px;
-            color: var(--text-dim);
-            transition: transform 0.25s, color 0.25s;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23627d98' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' viewBox='0 0 24 24'%3E%3Cpath d='M5 12h14'/%3E%3Cpath d='m12 5 7 7-7 7'/%3E%3C/svg%3E") center/contain no-repeat;
+            transition: transform 0.25s, filter 0.25s;
         }
         .resource-tile:hover {
-            border-color: rgba(196,30,58,0.4);
+            border-color: #9fb8d9;
             transform: translateX(4px);
-            box-shadow: 0 12px 32px -8px rgba(0,0,0,0.4);
+            box-shadow: 0 8px 24px rgba(16, 42, 67, 0.1);
         }
-        .resource-tile:hover::after { transform: translate(4px, -50%); color: var(--red-light); }
+        .resource-tile:hover::after { transform: translate(4px, -50%); filter: brightness(0.6); }
         .resource-icon {
             width: 44px; height: 44px;
             border-radius: 12px;
@@ -583,10 +589,10 @@
             flex-shrink: 0;
         }
         .resource-icon svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2; }
-        .resource-icon.notes { background: rgba(251, 191, 36, 0.12); color: #fbbf24; }
-        .resource-icon.papers { background: rgba(96, 165, 250, 0.12); color: var(--blue); }
-        .resource-icon.groups { background: rgba(167, 139, 250, 0.12); color: var(--purple); }
-        .resource-icon.schedule { background: rgba(74, 222, 128, 0.12); color: var(--green); }
+        .resource-icon.notes { background: #fffaeb; color: #b54708; }
+        .resource-icon.papers { background: #e8f1fb; color: #1a4b8c; }
+        .resource-icon.groups { background: #f4f3ff; color: #5925dc; }
+        .resource-icon.schedule { background: #ecfdf3; color: #067647; }
         .resource-text h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
         .resource-text p { font-size: 12px; color: var(--text-muted); line-height: 1.45; padding-right: 24px; }
 
@@ -616,9 +622,9 @@
                     <div class="ml-m-wrap">
                         <div class="ml-cap">
                             <svg viewBox="0 0 100 70">
-                                <polygon points="50,6 95,24 50,42 5,24" fill="#ffffff"/>
-                                <circle cx="50" cy="24" r="4.5" fill="#1a365d" stroke="#ffffff" stroke-width="1.5"/>
-                                <rect x="32" y="38" width="36" height="18" rx="2.5" fill="#ffffff"/>
+                                <polygon points="50,6 95,24 50,42 5,24" fill="#1a4b8c"/>
+                                <circle cx="50" cy="24" r="4.5" fill="#ffffff" stroke="#1a4b8c" stroke-width="1.5"/>
+                                <rect x="32" y="38" width="36" height="18" rx="2.5" fill="#1a4b8c"/>
                                 <circle cx="78" cy="24" r="4" fill="#c41e3a"/>
                                 <path d="M78 28 Q82 44 80 54" stroke="#c41e3a" stroke-width="3" fill="none" stroke-linecap="round"/>
                                 <ellipse cx="80" cy="57" rx="5" ry="8" fill="#c41e3a"/>
@@ -706,7 +712,7 @@
             </div>
 
             <p class="myub-reveal" style="font-size:14px;color:var(--text-soft);margin-bottom:16px;line-height:1.55;">
-                Everything below is filtered to <strong id="filterCodeLabel" style="color:var(--white);">this course</strong> — tap a tile to jump straight in.
+                Everything below is filtered to <strong id="filterCodeLabel" style="color:#1a4b8c;">this course</strong> — tap a tile to jump straight in.
             </p>
 
             <div class="resource-grid myub-reveal">

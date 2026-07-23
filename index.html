@@ -1842,7 +1842,8 @@
                         </div>
                         <div class="form-group">
                             <label>Program Name <span class="required">*</span></label>
-                            <input type="text" id="programName" placeholder="e.g. Computer Science" required>
+                            <input type="text" id="programName" placeholder="e.g. Computer Science" required maxlength="80" autocomplete="organization-title" oninput="validateProgramNameInput(this)">
+                            <p class="error-msg" id="programNameError"></p>
                         </div>
                         <div class="form-group">
                             <label>Password <span class="required">*</span></label>
@@ -2373,6 +2374,58 @@
             if (!/^[a-zA-Z\s\-']+$/.test(name.trim())) return { valid: false, error: fieldName + ' can only contain letters' };
             return { valid: true };
         }
+
+        function validateProgramName(value) {
+            var raw = (value || '').trim().replace(/\s+/g, ' ');
+            if (!raw) {
+                return { valid: false, error: 'Program name is required.' };
+            }
+            if (raw.length < 3) {
+                return { valid: false, error: 'Program name must be at least 3 characters.' };
+            }
+            if (raw.length > 80) {
+                return { valid: false, error: 'Program name must be 80 characters or less.' };
+            }
+            if (/\d/.test(raw)) {
+                return { valid: false, error: 'Program name cannot include numbers.' };
+            }
+            if (/[./;'"\[\]{}\\|<>,:!@#$%^*()_+=`~?]/.test(raw)) {
+                return { valid: false, error: 'Program name cannot include symbols like . / ; \' [ ]. Use letters only (spaces, & and hyphens are OK).' };
+            }
+            if (!/^[A-Za-z][A-Za-z\s&\-]*[A-Za-z]$|^[A-Za-z]{3,}$/.test(raw)) {
+                return { valid: false, error: 'Enter a real program name (e.g. Computer Science).' };
+            }
+            var letters = (raw.match(/[A-Za-z]/g) || []).join('');
+            if (letters.length < 3) {
+                return { valid: false, error: 'Program name must include at least 3 letters.' };
+            }
+            if (containsBadWords(raw)) {
+                return { valid: false, error: 'Program name contains inappropriate language.' };
+            }
+            return { valid: true, value: raw };
+        }
+
+        function validateProgramNameInput(input) {
+            var errorEl = document.getElementById('programNameError');
+            var value = (input && input.value) || '';
+            if (!value.trim()) {
+                if (input) input.classList.remove('error');
+                if (errorEl) { errorEl.textContent = ''; errorEl.classList.remove('show'); }
+                return false;
+            }
+            var result = validateProgramName(value);
+            if (!result.valid) {
+                if (input) input.classList.add('error');
+                if (errorEl) { errorEl.textContent = result.error; errorEl.classList.add('show'); }
+                return false;
+            }
+            if (input) {
+                input.value = result.value;
+                input.classList.remove('error');
+            }
+            if (errorEl) { errorEl.textContent = ''; errorEl.classList.remove('show'); }
+            return true;
+        }
         
         async function handleSignup(e) {
             e.preventDefault();
@@ -2396,6 +2449,18 @@
             
             const lastNameVal = validateNameField(lastName, 'Last name');
             if (!lastNameVal.valid) { showAlert(lastNameVal.error); return; }
+
+            const programNameInput = document.getElementById('programName');
+            const programVal = validateProgramName(programNameInput.value);
+            if (!programVal.valid) {
+                programNameInput.classList.add('error');
+                const programErr = document.getElementById('programNameError');
+                if (programErr) { programErr.textContent = programVal.error; programErr.classList.add('show'); }
+                showAlert(programVal.error);
+                return;
+            }
+            programNameInput.value = programVal.value;
+            programNameInput.classList.remove('error');
             
             const studentIdInput = document.getElementById('studentId');
             if (!validateStudentId(studentIdInput)) {
@@ -2445,7 +2510,7 @@
                             student_id: document.getElementById('studentId').value,
                             year_of_study: document.getElementById('yearOfStudy').value,
                             program_type: document.getElementById('programType').value,
-                            program_name: document.getElementById('programName').value,
+                            program_name: programVal.value,
                             full_name: `${firstName} ${lastName}`
                         },
                         emailRedirectTo: window.location.origin + '/verified.html'

@@ -2736,6 +2736,24 @@
             if (!/^[a-zA-Z\s\-']+$/.test(name.trim())) return { valid: false, error: fieldName + ' can only contain letters, spaces, hyphens, and apostrophes' };
             return { valid: true };
         }
+
+        function validateProgramName(value) {
+            var raw = (value || '').trim().replace(/\s+/g, ' ');
+            if (!raw) return { valid: false, error: 'Program name is required.' };
+            if (raw.length < 3) return { valid: false, error: 'Program name must be at least 3 characters.' };
+            if (raw.length > 80) return { valid: false, error: 'Program name must be 80 characters or less.' };
+            if (/\d/.test(raw)) return { valid: false, error: 'Program name cannot include numbers.' };
+            if (/[./;'"\[\]{}\\|<>,:!@#$%^*()_+=`~?]/.test(raw)) {
+                return { valid: false, error: 'Program name cannot include symbols like . / ; \' [ ]. Use letters only (spaces, & and hyphens are OK).' };
+            }
+            if (!/^[A-Za-z][A-Za-z\s&\-]*[A-Za-z]$|^[A-Za-z]{3,}$/.test(raw)) {
+                return { valid: false, error: 'Enter a real program name (e.g. Computer Science).' };
+            }
+            var letters = (raw.match(/[A-Za-z]/g) || []).join('');
+            if (letters.length < 3) return { valid: false, error: 'Program name must include at least 3 letters.' };
+            if (containsBadWords(raw)) return { valid: false, error: 'Program name contains inappropriate language.' };
+            return { valid: true, value: raw };
+        }
         
         async function saveProfile(e) {
             e.preventDefault();
@@ -2751,6 +2769,11 @@
             
             const lastNameVal = validateName(lastName, 'Last name');
             if (!lastNameVal.valid) { showToast(lastNameVal.error, 'error'); return; }
+
+            const programNameInput = document.getElementById('editProgramName');
+            const programVal = validateProgramName(programNameInput.value);
+            if (!programVal.valid) { showToast(programVal.error, 'error'); return; }
+            programNameInput.value = programVal.value;
             
             if (bio && bio.length > 500) { showToast('Bio must be less than 500 characters', 'error'); return; }
             if (containsBadWords(bio)) { showToast('Bio contains inappropriate language', 'error'); return; }
@@ -2765,7 +2788,7 @@
                     full_name: `${firstName} ${lastName}`,
                     year_of_study: parseInt(document.getElementById('editYear').value),
                     program_type: document.getElementById('editProgramType').value,
-                    program_name: document.getElementById('editProgramName').value,
+                    program_name: programVal.value,
                     bio: bio,
                     updated_at: new Date().toISOString()
                 };

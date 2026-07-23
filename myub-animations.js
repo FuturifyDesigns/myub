@@ -228,47 +228,30 @@
     }
 
     function initCardSpotlight() {
-        if (MOBILE_PERF) return;
-        document.querySelectorAll(
-            '.stat-card, .card, .quick-action, .feature-item, .event-card, .note-card'
-        ).forEach(function (card) {
-            card.addEventListener('mousemove', function (e) {
-                var rect = card.getBoundingClientRect();
-                card.style.setProperty('--mx', (e.clientX - rect.left) + 'px');
-                card.style.setProperty('--my', (e.clientY - rect.top) + 'px');
-            });
-        });
+        /* Disabled — glow tracking reads as generic AI UI */
+        return;
     }
 
     function initMagneticHover() {
-        if (REDUCED || window.innerWidth < 768) return;
-        document.querySelectorAll('.quick-action, .stat-card, .btn-primary').forEach(function (el) {
-            el.addEventListener('mousemove', function (e) {
-                var rect = el.getBoundingClientRect();
-                var x = (e.clientX - rect.left - rect.width / 2) * 0.05;
-                var y = (e.clientY - rect.top - rect.height / 2) * 0.05;
-                el.style.transform = 'translate(' + x + 'px, ' + (y - 2) + 'px)';
-            });
-            el.addEventListener('mouseleave', function () {
-                el.style.transform = '';
-            });
-        });
+        /* Disabled — magnetic drift feels gimmicky for an education portal */
+        return;
     }
 
     function initBannerParallax() {
-        if (REDUCED) return;
-        var banner = document.querySelector('.welcome-banner');
-        if (!banner) return;
-        banner.addEventListener('mousemove', function (e) {
-            var rect = banner.getBoundingClientRect();
-            var x = (e.clientX - rect.left) / rect.width - 0.5;
-            var y = (e.clientY - rect.top) / rect.height - 0.5;
-            banner.style.setProperty('--px', (x * 14) + 'px');
-            banner.style.setProperty('--py', (y * 8) + 'px');
-        });
-        banner.addEventListener('mouseleave', function () {
-            banner.style.setProperty('--px', '0px');
-            banner.style.setProperty('--py', '0px');
+        /* Disabled — keep welcome banner solid and stable */
+        return;
+    }
+
+    function initEduInteractions() {
+        if (REDUCED || MOBILE_PERF) return;
+        document.querySelectorAll('.quick-action, .stat-card, .nav-item').forEach(function (el) {
+            el.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    if (el.tagName === 'A' || el.tagName === 'BUTTON') return;
+                    var link = el.querySelector('a');
+                    if (link) link.click();
+                }
+            });
         });
     }
 
@@ -357,6 +340,7 @@
             initCardSpotlight();
             initMagneticHover();
             initBannerParallax();
+            initEduInteractions();
         }
         initNavRipple();
         if (!MOBILE_PERF) {

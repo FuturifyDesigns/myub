@@ -1,815 +1,947 @@
 /* ==========================================================
-   MyUB Theme — Professional Education Platform
-   Enhancement layer: navy + red brand, refined & structured
-   Load AFTER page inline styles. Does not replace functionality.
+   MyUB Theme v2 — Clean Educational Campus UI
+   Blue + white · no gradient chrome · loads AFTER page CSS
    ========================================================== */
 
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@400;500;600;700&display=swap');
+
 html.myub-enhanced {
-    --edu-radius-sm: 10px;
-    --edu-radius-md: 14px;
-    --edu-radius-lg: 20px;
-    --edu-radius-xl: 24px;
-    --edu-shadow-sm: 0 2px 8px -2px rgba(0, 0, 0, 0.35);
-    --edu-shadow-md: 0 12px 32px -12px rgba(0, 0, 0, 0.5);
-    --edu-shadow-lg: 0 24px 48px -16px rgba(0, 0, 0, 0.55);
-    --edu-accent-line: linear-gradient(180deg, var(--red, #c41e3a), var(--navy-lighter, #3a6fa8));
+    /* Brand blues (solid) */
+    --navy: #1a4b8c;
+    --navy-light: #2563a8;
+    --navy-lighter: #3b7dd8;
+    --navy-dark: #12366a;
+    --navy-darker: #0c274d;
+    --navy-deepest: #f4f7fb;
+
+    /* Accents — restrained (errors stay red) */
+    --red: #b42318;
+    --red-light: #d92d20;
+    --red-dark: #912018;
+    --white: #ffffff;
+    --blue: #2b6cb0;
+    --green: #067647;
+    --purple: #6941c6;
+    --orange: #b54708;
+    --pink: #c11574;
+    --cyan: #0e7490;
+    --yellow: #a15c07;
+
+    /* Light educational surfaces */
+    --text: #102a43;
+    --text-soft: #334e68;
+    --text-muted: #627d98;
+    --text-dim: #9fb3c8;
+    --surface-1: #ffffff;
+    --surface-2: #f0f4f8;
+    --surface-3: #e6eef6;
+    --border: #d9e2ec;
+    --border-strong: #bcccdc;
+
+    --edu-radius-sm: 8px;
+    --edu-radius-md: 12px;
+    --edu-radius-lg: 14px;
+    --edu-radius-xl: 16px;
+    --edu-shadow-sm: 0 1px 2px rgba(16, 42, 67, 0.06);
+    --edu-shadow-md: 0 4px 16px rgba(16, 42, 67, 0.08);
+    --edu-shadow-lg: 0 12px 32px rgba(16, 42, 67, 0.1);
+    --edu-accent-line: var(--navy);
+    --page-bg: #f4f7fb;
+    --sidebar-bg: #ffffff;
+    --ink: #102a43;
+
+    color-scheme: light;
     scroll-behavior: smooth;
 }
 
-/* ── Scroll progress bar ── */
+/* ── Kill decorative overlays / mesh / grain ── */
+html.myub-enhanced body::before,
+html.myub-enhanced body::after,
+html.myub-enhanced .page-bg,
+html.myub-enhanced .page-bg::before {
+    display: none !important;
+    content: none !important;
+    background: none !important;
+    opacity: 0 !important;
+}
+
+html.myub-enhanced,
+html.myub-enhanced body,
+html.myub-enhanced html {
+    background: var(--page-bg) !important;
+    color: var(--text) !important;
+}
+
+html.myub-enhanced body {
+    font-family: 'Source Sans 3', 'Outfit', system-ui, sans-serif !important;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Scroll progress — solid blue bar, no glow */
 .myub-scroll-progress {
     position: fixed;
     top: 0;
     left: 0;
     height: 3px;
     width: 0%;
-    background: linear-gradient(90deg, var(--red, #c41e3a), var(--navy-lighter, #3a6fa8));
+    background: var(--navy, #1a4b8c) !important;
     z-index: 99999;
     pointer-events: none;
-    transform-origin: left center;
-    box-shadow: 0 0 12px rgba(196, 30, 58, 0.5);
+    box-shadow: none !important;
 }
 
-/* ── Film grain texture (subtle, less "AI slop") ── */
-html.myub-enhanced body::after {
-    background-image:
-        url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"),
-        linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
-    background-size: 180px 180px, 64px 64px, 64px 64px;
-    opacity: 0.55;
-}
-
-/* ── Typography refinements ── */
-html.myub-enhanced .page-title {
-    font-family: 'Sora', 'Outfit', sans-serif;
-    font-weight: 700;
-    letter-spacing: -0.4px;
-    position: relative;
+/* ── Typography ── */
+html.myub-enhanced .page-title,
+html.myub-enhanced h1,
+html.myub-enhanced h2.card-title,
+html.myub-enhanced .welcome-text h2,
+html.myub-enhanced .stat-info h3,
+html.myub-enhanced .card-header h3,
+html.myub-enhanced .section-title,
+html.myub-enhanced .panel-title {
+    font-family: 'Libre Baskerville', Georgia, serif !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.02em;
+    color: var(--ink) !important;
 }
 
 html.myub-enhanced .page-title::after {
     content: '';
     display: block;
-    width: 28px;
+    width: 32px;
     height: 3px;
-    background: var(--red, #c41e3a);
+    background: var(--navy) !important;
     border-radius: 2px;
-    margin-top: 4px;
-    opacity: 0.85;
-}
-
-html.myub-enhanced .card-header h3,
-html.myub-enhanced .section-title,
-html.myub-enhanced .panel-title {
-    font-family: 'Sora', 'Outfit', sans-serif;
-    font-weight: 700;
-    letter-spacing: -0.2px;
+    margin-top: 6px;
 }
 
 html.myub-enhanced .nav-section-title {
-    font-size: 9.5px;
-    letter-spacing: 1.6px;
-    color: rgba(255, 255, 255, 0.32);
+    font-family: 'Source Sans 3', sans-serif !important;
+    font-size: 11px !important;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted) !important;
+    padding-left: 12px !important;
     position: relative;
-    padding-left: 18px;
 }
 
 html.myub-enhanced .nav-section-title::before {
     content: '';
     position: absolute;
-    left: 14px;
+    left: 0;
     top: 50%;
     transform: translateY(-50%);
-    width: 2px;
-    height: 10px;
-    background: var(--red, #c41e3a);
-    border-radius: 1px;
-    opacity: 0.7;
+    width: 3px;
+    height: 12px;
+    background: var(--navy) !important;
+    border-radius: 2px;
+    opacity: 1;
 }
 
-/* ── Sidebar — structured academic nav ── */
+/* ── Sidebar — white campus nav ── */
 html.myub-enhanced .sidebar {
-    background: rgba(6, 16, 28, 0.92);
-    border-right: 1px solid rgba(255, 255, 255, 0.07);
-    box-shadow: 4px 0 24px -8px rgba(0, 0, 0, 0.4);
+    background: var(--sidebar-bg) !important;
+    border-right: 1px solid var(--border) !important;
+    box-shadow: 1px 0 0 var(--border) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
 }
 
 html.myub-enhanced .sidebar-header {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    background: linear-gradient(180deg, rgba(26, 54, 93, 0.25) 0%, transparent 100%);
+    border-bottom: 1px solid var(--border) !important;
+    background: #fff !important;
+}
+
+html.myub-enhanced .sidebar .myub-logo,
+html.myub-enhanced .sidebar-logo .myub-logo {
+    --logo-m-color: var(--navy) !important;
+    --logo-ub-color: var(--navy) !important;
 }
 
 html.myub-enhanced .nav-item {
-    border-radius: var(--edu-radius-sm);
-    font-weight: 500;
-    transition: all 0.35s cubic-bezier(0.19, 1, 0.22, 1);
+    color: var(--text-soft) !important;
+    border-radius: var(--edu-radius-sm) !important;
+    border: 1px solid transparent !important;
+    font-weight: 600 !important;
+    font-family: 'Source Sans 3', sans-serif !important;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.15s ease !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+html.myub-enhanced .nav-item:hover {
+    background: var(--surface-2) !important;
+    color: var(--navy) !important;
+    transform: translateX(2px);
 }
 
 html.myub-enhanced .nav-item.active {
-    background: linear-gradient(135deg, rgba(26, 54, 93, 0.7) 0%, rgba(15, 39, 68, 0.5) 100%);
-    border-color: rgba(196, 30, 58, 0.2);
-    box-shadow: inset 3px 0 0 var(--red, #c41e3a), 0 8px 20px -10px rgba(0, 0, 0, 0.4);
+    background: #e8f1fb !important;
+    color: var(--navy) !important;
+    border-color: #c5daf5 !important;
+    box-shadow: inset 3px 0 0 var(--navy) !important;
 }
 
-html.myub-enhanced .nav-item.active::before {
-    display: none;
+html.myub-enhanced .nav-item.active::before { display: none !important; }
+
+html.myub-enhanced .nav-item svg {
+    stroke: currentColor !important;
+    color: inherit !important;
 }
 
-/* ── Topbar — clean academic header ── */
+html.myub-enhanced .badge {
+    background: var(--navy) !important;
+    color: #fff !important;
+}
+
+/* ── Topbar ── */
 html.myub-enhanced .topbar {
-    background: rgba(8, 20, 35, 0.75);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: var(--edu-radius-lg);
-    box-shadow: var(--edu-shadow-sm);
-    backdrop-filter: blur(24px) saturate(160%);
-    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    background: #ffffff !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--edu-radius-lg) !important;
+    box-shadow: var(--edu-shadow-sm) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
 }
 
-/* ── Cards — education platform panels ── */
+html.myub-enhanced .menu-toggle,
+html.myub-enhanced .notification-btn,
+html.myub-enhanced .user-menu {
+    background: var(--surface-2) !important;
+    border: 1px solid var(--border) !important;
+    color: var(--text) !important;
+}
+
+html.myub-enhanced .menu-toggle:hover,
+html.myub-enhanced .notification-btn:hover,
+html.myub-enhanced .user-menu:hover {
+    background: var(--surface-3) !important;
+    border-color: var(--border-strong) !important;
+}
+
+html.myub-enhanced .search-box input,
+html.myub-enhanced .search-input,
+html.myub-enhanced input[type="search"],
+html.myub-enhanced .search-box {
+    background: var(--surface-2) !important;
+    border-color: var(--border) !important;
+    color: var(--text) !important;
+}
+
+html.myub-enhanced .search-box input:focus,
+html.myub-enhanced .search-input:focus {
+    border-color: var(--navy-lighter) !important;
+    background: #fff !important;
+    outline: 2px solid rgba(26, 75, 140, 0.15);
+}
+
+html.myub-enhanced .notification-dropdown,
+html.myub-enhanced .user-dropdown,
+html.myub-enhanced .search-results {
+    background: #fff !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: var(--edu-shadow-md) !important;
+    color: var(--text) !important;
+    backdrop-filter: none !important;
+}
+
+html.myub-enhanced .notif-dropdown-item:hover,
+html.myub-enhanced .search-result-item:hover {
+    background: var(--surface-2) !important;
+}
+
+html.myub-enhanced .notif-dropdown-item.unread {
+    background: #eef4fb !important;
+}
+
+/* ── Main content / loading ── */
+html.myub-enhanced .main-content,
+html.myub-enhanced .dashboard,
+html.myub-enhanced .page-content,
+html.myub-enhanced .gpa-page,
+html.myub-enhanced .hub-page {
+    background: transparent !important;
+    color: var(--text) !important;
+}
+
+html.myub-enhanced .loading,
+html.myub-enhanced #loadingScreen,
+html.myub-enhanced .loading-screen {
+    background: var(--page-bg) !important;
+    color: var(--text) !important;
+}
+
+html.myub-enhanced .loading-spinner,
+html.myub-enhanced .spinner {
+    border-color: var(--border) !important;
+    border-top-color: var(--navy) !important;
+}
+
+/* ── Cards — white panels, solid borders ── */
 html.myub-enhanced .card,
 html.myub-enhanced .stat-card,
-html.myub-enhanced .quick-action {
-    border-radius: var(--edu-radius-lg);
-    border: 1px solid rgba(255, 255, 255, 0.09);
-    background: rgba(255, 255, 255, 0.025);
-    transition:
-        transform 0.45s cubic-bezier(0.19, 1, 0.22, 1),
-        border-color 0.35s ease,
-        box-shadow 0.45s ease,
-        background 0.35s ease;
-}
-
-html.myub-enhanced .card {
-    box-shadow: var(--edu-shadow-sm);
+html.myub-enhanced .quick-action,
+html.myub-enhanced .feature-item,
+html.myub-enhanced .summary-card,
+html.myub-enhanced .progression-card,
+html.myub-enhanced .whatif-card,
+html.myub-enhanced .semester-card,
+html.myub-enhanced .friend-card,
+html.myub-enhanced .request-card,
+html.myub-enhanced .conversation-item,
+html.myub-enhanced .note-card,
+html.myub-enhanced .paper-card,
+html.myub-enhanced .event-card,
+html.myub-enhanced .group-card,
+html.myub-enhanced .profile-header-card {
+    background: #ffffff !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--edu-radius-lg) !important;
+    box-shadow: var(--edu-shadow-sm) !important;
+    color: var(--text) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease !important;
 }
 
 html.myub-enhanced .card:hover,
-html.myub-enhanced .stat-card:hover {
-    border-color: rgba(58, 111, 168, 0.35);
-    box-shadow: var(--edu-shadow-md);
-    background: rgba(255, 255, 255, 0.04);
+html.myub-enhanced .stat-card:hover,
+html.myub-enhanced .quick-action:hover,
+html.myub-enhanced .friend-card:hover,
+html.myub-enhanced .event-card:hover,
+html.myub-enhanced .note-card:hover {
+    border-color: #9fb8d9 !important;
+    box-shadow: var(--edu-shadow-md) !important;
+    transform: translateY(-2px);
+    background: #ffffff !important;
 }
 
-html.myub-enhanced .card-header {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    padding-bottom: 14px;
-    margin-bottom: 16px;
-}
-
-/* Card spotlight cursor glow */
+/* Remove glow / cursor spotlight overlays */
 html.myub-enhanced .stat-card::after,
 html.myub-enhanced .card::after,
 html.myub-enhanced .quick-action::after,
 html.myub-enhanced .feature-item::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: radial-gradient(
-        320px circle at var(--mx, 50%) var(--my, 50%),
-        rgba(196, 30, 58, 0.08) 0%,
-        rgba(58, 111, 168, 0.05) 35%,
-        transparent 65%
-    );
-    opacity: 0;
-    transition: opacity 0.4s ease;
-    pointer-events: none;
-    z-index: 1;
+    display: none !important;
 }
 
-html.myub-enhanced .stat-card:hover::after,
-html.myub-enhanced .card:hover::after,
-html.myub-enhanced .quick-action:hover::after,
-html.myub-enhanced .feature-item:hover::after {
-    opacity: 1;
+html.myub-enhanced .card-header {
+    border-bottom: 1px solid var(--border) !important;
+    color: var(--text) !important;
 }
 
-/* ── Welcome banner — hero section ── */
-html.myub-enhanced .welcome-banner {
-    border-radius: var(--edu-radius-xl);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background:
-        radial-gradient(ellipse at 90% 20%, rgba(196, 30, 58, 0.18) 0%, transparent 50%),
-        radial-gradient(ellipse at 10% 80%, rgba(58, 111, 168, 0.15) 0%, transparent 45%),
-        linear-gradient(135deg, rgba(26, 54, 93, 0.55) 0%, rgba(8, 20, 35, 0.8) 100%);
-    box-shadow: var(--edu-shadow-md);
-    transform: translate(var(--px, 0), var(--py, 0));
-    transition: transform 0.15s ease-out;
+html.myub-enhanced .card-subtitle,
+html.myub-enhanced .card-header p,
+html.myub-enhanced .text-muted,
+html.myub-enhanced .empty-state p {
+    color: var(--text-muted) !important;
 }
 
-html.myub-enhanced .welcome-text h2 {
-    font-family: 'Sora', 'Outfit', sans-serif;
-    font-weight: 700;
-    letter-spacing: -0.6px;
+html.myub-enhanced .card-title,
+html.myub-enhanced .stat-label,
+html.myub-enhanced .stat-info p {
+    color: var(--text-soft) !important;
 }
 
-html.myub-enhanced .welcome-date {
-    border-radius: var(--edu-radius-md);
-    border: 1px solid rgba(196, 30, 58, 0.25);
-    background: rgba(196, 30, 58, 0.08);
-}
-
-html.myub-enhanced .welcome-date .day {
-    color: var(--red-light, #e63956);
-}
-
-/* ── Stat cards ── */
-html.myub-enhanced .stat-icon {
-    border-radius: var(--edu-radius-md);
-    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
+html.myub-enhanced .stat-value,
+html.myub-enhanced .gpa-value,
 html.myub-enhanced .stat-info h3 {
-    font-family: 'Sora', 'Outfit', sans-serif;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-    transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+    color: var(--ink) !important;
 }
 
-/* ── Quick actions ── */
-html.myub-enhanced .quick-action {
-    cursor: pointer;
-    text-align: center;
-}
-
-html.myub-enhanced .quick-action:hover {
-    border-color: rgba(196, 30, 58, 0.3);
-    transform: translateY(-3px);
-}
-
-html.myub-enhanced .quick-action-icon {
-    transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+html.myub-enhanced .stat-icon,
+html.myub-enhanced .quick-action-icon,
+html.myub-enhanced .feature-icon {
+    background: #e8f1fb !important;
+    color: var(--navy) !important;
+    border: 1px solid #c5daf5 !important;
+    border-radius: var(--edu-radius-md) !important;
+    box-shadow: none !important;
 }
 
 html.myub-enhanced .quick-action:hover .quick-action-icon {
-    transform: scale(1.1) rotate(-4deg);
+    transform: scale(1.05);
+    background: #d7e8f8 !important;
 }
 
-/* ── Buttons — clear hierarchy ── */
-html.myub-enhanced .btn,
-html.myub-enhanced button.primary,
-html.myub-enhanced .btn-primary {
-    border-radius: var(--edu-radius-sm);
-    font-weight: 600;
-    letter-spacing: 0.2px;
-    transition: all 0.35s cubic-bezier(0.19, 1, 0.22, 1);
+/* ── Welcome banner — solid campus blue, no mesh ── */
+html.myub-enhanced .welcome-banner {
+    background: var(--navy) !important;
+    border: 1px solid var(--navy-dark) !important;
+    border-radius: var(--edu-radius-xl) !important;
+    box-shadow: var(--edu-shadow-sm) !important;
+    color: #fff !important;
+    transform: none !important;
 }
 
+html.myub-enhanced .welcome-banner *,
+html.myub-enhanced .welcome-text h2,
+html.myub-enhanced .welcome-text p {
+    color: #fff !important;
+}
+
+html.myub-enhanced .welcome-date {
+    background: rgba(255, 255, 255, 0.12) !important;
+    border: 1px solid rgba(255, 255, 255, 0.22) !important;
+    border-radius: var(--edu-radius-md) !important;
+}
+
+html.myub-enhanced .welcome-date .day {
+    color: #fff !important;
+}
+
+/* ── Buttons ── */
 html.myub-enhanced .btn-primary,
-html.myub-enhanced button.primary {
-    background: linear-gradient(135deg, var(--red, #c41e3a) 0%, var(--red-dark, #9a1730) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 4px 16px -4px rgba(196, 30, 58, 0.5);
+html.myub-enhanced .submit-btn,
+html.myub-enhanced button.btn-primary,
+html.myub-enhanced .btn.btn-primary {
+    background: var(--navy) !important;
+    color: #fff !important;
+    border: 1px solid var(--navy-dark) !important;
+    border-radius: var(--edu-radius-sm) !important;
+    box-shadow: none !important;
+    font-weight: 600 !important;
+    transition: background 0.15s ease, transform 0.12s ease !important;
 }
 
 html.myub-enhanced .btn-primary:hover,
-html.myub-enhanced button.primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px -6px rgba(196, 30, 58, 0.6);
+html.myub-enhanced .submit-btn:hover {
+    background: var(--navy-light) !important;
+    transform: translateY(-1px);
+}
+
+html.myub-enhanced .btn-primary:active,
+html.myub-enhanced .submit-btn:active {
+    transform: translateY(0);
 }
 
 html.myub-enhanced .btn-secondary,
-html.myub-enhanced button.secondary {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+html.myub-enhanced .btn.btn-secondary {
+    background: #fff !important;
+    color: var(--navy) !important;
+    border: 1px solid var(--border-strong) !important;
+    box-shadow: none !important;
 }
 
-html.myub-enhanced .btn-secondary:hover,
-html.myub-enhanced button.secondary:hover {
-    background: rgba(255, 255, 255, 0.09);
-    border-color: rgba(58, 111, 168, 0.4);
+html.myub-enhanced .btn-secondary:hover {
+    background: var(--surface-2) !important;
+    border-color: var(--navy-lighter) !important;
 }
 
-/* ── Form inputs — clean edu style ── */
-html.myub-enhanced input[type="text"],
-html.myub-enhanced input[type="email"],
-html.myub-enhanced input[type="password"],
-html.myub-enhanced input[type="search"],
-html.myub-enhanced input[type="number"],
+html.myub-enhanced .btn-danger {
+    background: #fff !important;
+    color: var(--red) !important;
+    border: 1px solid #fecdca !important;
+}
+
+html.myub-enhanced .btn-danger:hover {
+    background: #fef3f2 !important;
+}
+
+/* ── Forms / inputs ── */
+html.myub-enhanced input,
+html.myub-enhanced select,
 html.myub-enhanced textarea,
-html.myub-enhanced select {
-    border-radius: var(--edu-radius-sm);
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+html.myub-enhanced .form-group input,
+html.myub-enhanced .form-group select {
+    background: #fff !important;
+    border: 1px solid var(--border-strong) !important;
+    color: var(--text) !important;
+    border-radius: var(--edu-radius-sm) !important;
 }
 
 html.myub-enhanced input:focus,
-html.myub-enhanced textarea:focus,
-html.myub-enhanced select:focus {
-    outline: none;
-    border-color: rgba(58, 111, 168, 0.6) !important;
-    box-shadow: 0 0 0 3px rgba(58, 111, 168, 0.15) !important;
+html.myub-enhanced select:focus,
+html.myub-enhanced textarea:focus {
+    border-color: var(--navy) !important;
+    box-shadow: 0 0 0 3px rgba(26, 75, 140, 0.12) !important;
+    outline: none !important;
 }
 
-html.myub-enhanced .search-box {
-    border-radius: var(--edu-radius-sm);
+html.myub-enhanced label {
+    color: var(--text-soft) !important;
 }
 
-html.myub-enhanced .search-box:focus-within {
-    border-color: rgba(196, 30, 58, 0.35);
-    box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.1);
+html.myub-enhanced .hint,
+html.myub-enhanced .error-msg {
+    color: var(--text-muted) !important;
 }
 
-/* ── Dropdowns & modals ── */
-html.myub-enhanced .notification-dropdown,
-html.myub-enhanced .user-dropdown,
-html.myub-enhanced .search-results-dropdown,
-html.myub-enhanced .modal-content,
-html.myub-enhanced .modal {
-    border-radius: var(--edu-radius-lg);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: var(--edu-shadow-lg);
+/* ── Modals / overlays ── */
+html.myub-enhanced .modal-overlay,
+html.myub-enhanced .welcome-modal-overlay,
+html.myub-enhanced .notif-modal-overlay,
+html.myub-enhanced .sidebar-overlay {
+    background: rgba(16, 42, 67, 0.45) !important;
+    backdrop-filter: none !important;
 }
 
-/* ── Tabs ── */
-html.myub-enhanced .tab,
-html.myub-enhanced .tabs button,
-html.myub-enhanced .tab-btn {
-    border-radius: var(--edu-radius-sm);
-    transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+html.myub-enhanced .modal,
+html.myub-enhanced .welcome-modal,
+html.myub-enhanced .notif-modal {
+    background: #fff !important;
+    border: 1px solid var(--border) !important;
+    color: var(--text) !important;
+    box-shadow: var(--edu-shadow-lg) !important;
+    border-radius: var(--edu-radius-xl) !important;
 }
 
+html.myub-enhanced .modal-title,
+html.myub-enhanced .modal-header h3 {
+    color: var(--ink) !important;
+}
+
+html.myub-enhanced .modal-close {
+    color: var(--text-muted) !important;
+    background: var(--surface-2) !important;
+}
+
+/* ── Tables / lists / chats ── */
+html.myub-enhanced table,
+html.myub-enhanced .data-table {
+    background: #fff !important;
+    color: var(--text) !important;
+}
+
+html.myub-enhanced th {
+    background: var(--surface-2) !important;
+    color: var(--text-soft) !important;
+    border-bottom: 1px solid var(--border) !important;
+}
+
+html.myub-enhanced td {
+    border-bottom: 1px solid var(--border) !important;
+    color: var(--text) !important;
+}
+
+html.myub-enhanced .conversation-item.active,
+html.myub-enhanced .group-item.active,
 html.myub-enhanced .tab.active,
-html.myub-enhanced .tabs button.active,
-html.myub-enhanced .tab-btn.active {
-    background: rgba(26, 54, 93, 0.6);
-    border-color: rgba(196, 30, 58, 0.3);
-    box-shadow: inset 0 -2px 0 var(--red, #c41e3a);
+html.myub-enhanced .tabs .active {
+    background: #e8f1fb !important;
+    color: var(--navy) !important;
+    border-color: #c5daf5 !important;
 }
 
-/* ── Schedule / events / notes page headers ── */
-html.myub-enhanced .schedule-header,
-html.myub-enhanced .events-header,
-html.myub-enhanced .notes-header,
-html.myub-enhanced .toolbar {
-    border-radius: var(--edu-radius-lg);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    background: rgba(255, 255, 255, 0.025);
-    box-shadow: var(--edu-shadow-sm);
+html.myub-enhanced .message-bubble,
+html.myub-enhanced .msg-bubble,
+html.myub-enhanced .chat-bubble {
+    background: var(--surface-2) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border) !important;
 }
 
-/* ── Messages / chat panels ── */
-html.myub-enhanced .conversations-panel,
-html.myub-enhanced .chat-panel,
-html.myub-enhanced .groups-panel,
-html.myub-enhanced .messages-container {
-    border-radius: var(--edu-radius-lg);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: var(--edu-shadow-sm);
-    overflow: hidden;
+html.myub-enhanced .message-bubble.mine,
+html.myub-enhanced .msg-bubble.sent,
+html.myub-enhanced .chat-bubble.own {
+    background: var(--navy) !important;
+    color: #fff !important;
+    border-color: var(--navy-dark) !important;
 }
 
-/* ── Profile ── */
-html.myub-enhanced .profile-header-card,
-html.myub-enhanced .progression-card {
-    border-radius: var(--edu-radius-xl);
-    border: 1px solid rgba(255, 255, 255, 0.09);
-    box-shadow: var(--edu-shadow-md);
+html.myub-enhanced .empty-state svg {
+    stroke: var(--text-dim) !important;
 }
 
-/* ── Empty states ── */
-html.myub-enhanced .empty-state,
-html.myub-enhanced .notif-empty {
-    border-radius: var(--edu-radius-md);
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px dashed rgba(255, 255, 255, 0.1);
+html.myub-enhanced .empty-state h3 {
+    color: var(--ink) !important;
 }
 
-/* ── Badges & pills ── */
-html.myub-enhanced .badge,
-html.myub-enhanced .nav-item .badge,
-html.myub-enhanced .notification-badge {
-    font-variant-numeric: tabular-nums;
-    letter-spacing: 0.3px;
+/* ── Tabs / chips / pills — square-ish educational, not neon pills ── */
+html.myub-enhanced .tab,
+html.myub-enhanced .chip,
+html.myub-enhanced .tag {
+    border-radius: 6px !important;
+    background: var(--surface-2) !important;
+    color: var(--text-soft) !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: none !important;
 }
 
-/* Scroll reveal — GSAP handles visibility; no CSS pre-hide */
-html.myub-enhanced .myub-reveal {
-    will-change: transform, opacity;
+html.myub-enhanced .progress-bar,
+html.myub-enhanced .progress {
+    background: var(--surface-3) !important;
+    border-radius: 4px !important;
 }
 
-/* ── Auth page (index.html) ── */
-html.myub-enhanced .auth-landing {
-    border-radius: var(--edu-radius-xl);
-    box-shadow:
-        0 40px 80px -24px rgba(0, 0, 0, 0.65),
-        0 0 0 1px rgba(255, 255, 255, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+html.myub-enhanced .progress-bar > *,
+html.myub-enhanced .progress-fill,
+html.myub-enhanced .progress > div {
+    background: var(--navy) !important;
+    border-radius: 4px !important;
 }
 
-html.myub-enhanced .auth-panel {
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-}
-
-html.myub-enhanced .auth-hero {
-    position: relative;
-    overflow: hidden;
-}
-
-html.myub-enhanced .auth-hero::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(
-        ellipse at 30% 40%,
-        rgba(196, 30, 58, 0.12) 0%,
-        transparent 55%
-    );
-    pointer-events: none;
-}
-
-html.myub-enhanced .feature-item {
-    border-radius: var(--edu-radius-md);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    background: rgba(255, 255, 255, 0.03);
-    transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
-    position: relative;
-    overflow: hidden;
-}
-
-html.myub-enhanced .feature-item:hover {
-    border-color: rgba(58, 111, 168, 0.35);
-    background: rgba(255, 255, 255, 0.06);
-    transform: translateY(-2px);
-}
-
-html.myub-enhanced .intro-title {
-    font-family: 'Cormorant Garamond', Georgia, serif;
-    font-weight: 700;
-    letter-spacing: 1px;
-}
-
-/* ── Loading spinner ── */
-html.myub-enhanced .loading-spinner {
-    border-top-color: var(--red, #c41e3a);
-    border-right-color: rgba(58, 111, 168, 0.4);
-}
-
-/* ── Stagger line decoration for section headers ── */
-html.myub-enhanced .card-header::before,
-html.myub-enhanced .section-header::before {
-    content: '';
-    display: inline-block;
-    width: 3px;
-    height: 16px;
-    background: var(--edu-accent-line);
-    border-radius: 2px;
-    margin-right: 10px;
-    vertical-align: middle;
-}
-
-/* ── Schedule items, list rows ── */
-html.myub-enhanced .schedule-item,
-html.myub-enhanced .hs-item,
-html.myub-enhanced .event-card,
-html.myub-enhanced .note-card,
-html.myub-enhanced .paper-card,
-html.myub-enhanced .friend-card {
-    border-radius: var(--edu-radius-md);
-    transition: all 0.35s cubic-bezier(0.19, 1, 0.22, 1);
-}
-
-html.myub-enhanced .schedule-item:hover,
-html.myub-enhanced .hs-item:hover,
-html.myub-enhanced .event-card:hover,
-html.myub-enhanced .note-card:hover,
-html.myub-enhanced .paper-card:hover,
-html.myub-enhanced .friend-card:hover {
-    transform: translateX(4px);
-    border-color: rgba(58, 111, 168, 0.3);
-}
-
-/* ── GPA calculator ── */
-html.myub-enhanced .gpa-display,
-html.myub-enhanced .gpa-value {
-    font-family: 'Sora', 'Outfit', sans-serif;
-    font-weight: 800;
-    letter-spacing: -1px;
-}
-
-/* ── Toast notifications ── */
+/* ── Toast ── */
 html.myub-enhanced .toast {
-    border-radius: var(--edu-radius-md);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: var(--edu-shadow-md);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    background: #fff !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: var(--edu-shadow-md) !important;
 }
 
-/* ── Reduced motion ── */
+/* ── Avatar fallbacks ── */
+html.myub-enhanced .avatar,
+html.myub-enhanced .user-avatar,
+html.myub-enhanced .profile-avatar {
+    background: #e8f1fb !important;
+    color: var(--navy) !important;
+    border: 1px solid #c5daf5 !important;
+    box-shadow: none !important;
+}
+
+/* ── Danger zone ── */
+html.myub-enhanced .danger-zone {
+    border-color: #fecdca !important;
+    background: #fffaf9 !important;
+}
+
+html.myub-enhanced .danger-description {
+    color: var(--text-soft) !important;
+}
+
+/* ── Flatten common gradient utilities on themed pages ── */
+html.myub-enhanced [style*="linear-gradient"],
+html.myub-enhanced [style*="radial-gradient"] {
+    /* can't override inline style attr easily — handled by class rules above */
+}
+
+/* Force solid backgrounds on known gradient classes */
+html.myub-enhanced .btn-primary,
+html.myub-enhanced .submit-btn,
+html.myub-enhanced .nav-item.active,
+html.myub-enhanced .welcome-banner,
+html.myub-enhanced .sidebar-header,
+html.myub-enhanced .stat-icon,
+html.myub-enhanced .quick-action-icon {
+    background-image: none !important;
+}
+
+/* ── Auth / landing (index) light educational redesign ── */
+html.myub-enhanced .portal-container,
+html.myub-enhanced .intro-screen {
+    background: var(--page-bg) !important;
+    color: var(--text) !important;
+}
+
+html.myub-enhanced .intro-screen,
+html.myub-enhanced .intro-brand,
+html.myub-enhanced .intro-myub {
+    background: var(--page-bg) !important;
+    color: var(--ink) !important;
+}
+
+html.myub-enhanced .auth-landing {
+    background: #fff !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: var(--edu-shadow-md) !important;
+    border-radius: var(--edu-radius-xl) !important;
+}
+
+html.myub-enhanced .half-signup,
+html.myub-enhanced .half-login {
+    background: #fff !important;
+}
+
+html.myub-enhanced .half-signup {
+    background: #eef4fb !important;
+    border-right: 1px solid var(--border) !important;
+}
+
+html.myub-enhanced .half-title,
+html.myub-enhanced .half-desc,
+html.myub-enhanced .landing-header,
+html.myub-enhanced .landing-header-text {
+    color: var(--ink) !important;
+}
+
+html.myub-enhanced .half-bgword {
+    color: rgba(26, 75, 140, 0.06) !important;
+    -webkit-text-stroke: 0 !important;
+}
+
+html.myub-enhanced .half-divider {
+    background: var(--border) !important;
+}
+
+html.myub-enhanced .portal-card,
+html.myub-enhanced .portal-card-inner {
+    background: #fff !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: var(--edu-shadow-md) !important;
+    color: var(--text) !important;
+    backdrop-filter: none !important;
+}
+
+html.myub-enhanced .portal-card h1,
+html.myub-enhanced #headerTitle,
+html.myub-enhanced .header-title {
+    color: var(--ink) !important;
+    font-family: 'Libre Baskerville', Georgia, serif !important;
+}
+
+html.myub-enhanced #headerSubtitle,
+html.myub-enhanced .header-subtitle {
+    color: var(--text-muted) !important;
+}
+
+html.myub-enhanced .auth-tab,
+html.myub-enhanced .tab-btn,
+html.myub-enhanced #loginTab,
+html.myub-enhanced #signupTab {
+    color: var(--text-muted) !important;
+    background: transparent !important;
+    border-bottom: 2px solid transparent !important;
+}
+
+html.myub-enhanced .auth-tab.active,
+html.myub-enhanced .tab-btn.active,
+html.myub-enhanced #loginTab.active,
+html.myub-enhanced #signupTab.active {
+    color: var(--navy) !important;
+    border-bottom-color: var(--navy) !important;
+    background: transparent !important;
+}
+
+html.myub-enhanced .page-footer,
+html.myub-enhanced .page-footer a {
+    color: var(--text-muted) !important;
+}
+
+html.myub-enhanced .page-footer a:hover {
+    color: var(--navy) !important;
+}
+
+html.myub-enhanced .verification-screen {
+    color: var(--text) !important;
+}
+
+html.myub-enhanced .consent-block {
+    background: var(--surface-2) !important;
+    border-color: var(--border) !important;
+}
+
+html.myub-enhanced .consent-check {
+    color: var(--text-soft) !important;
+}
+
+html.myub-enhanced .consent-check a {
+    color: var(--navy) !important;
+}
+
+/* Logo on light surfaces */
+html.myub-enhanced .portal-card .myub-logo,
+html.myub-enhanced .auth-landing .myub-logo,
+html.myub-enhanced .landing-header .myub-logo {
+    --logo-m-color: var(--navy) !important;
+    --logo-ub-color: var(--navy) !important;
+}
+
+html.myub-enhanced .myub-logo.on-dark {
+    --logo-m-color: var(--navy) !important;
+    --logo-ub-color: var(--navy) !important;
+}
+
+/* Wordmark fonts */
+html.myub-enhanced .myub-logo .ml-m,
+html.myub-enhanced .myub-logo .ml-ub {
+    font-family: 'Libre Baskerville', Georgia, serif !important;
+    font-weight: 700 !important;
+}
+
+/* ── Interactive educational affordances ── */
+html.myub-enhanced .quick-action,
+html.myub-enhanced .stat-card,
+html.myub-enhanced .nav-item,
+html.myub-enhanced .btn,
+html.myub-enhanced .conversation-item,
+html.myub-enhanced .friend-card {
+    cursor: pointer;
+}
+
+html.myub-enhanced .quick-action:focus-visible,
+html.myub-enhanced .nav-item:focus-visible,
+html.myub-enhanced .btn:focus-visible,
+html.myub-enhanced a:focus-visible {
+    outline: 2px solid var(--navy);
+    outline-offset: 2px;
+}
+
+html.myub-enhanced a:not(.nav-item):not(.btn):not(.btn-primary):not(.btn-secondary) {
+    color: var(--navy);
+    text-underline-offset: 2px;
+}
+
+html.myub-enhanced a:not(.nav-item):not(.btn):hover {
+    text-decoration: underline;
+}
+
+/* Soft press feedback */
+@media (hover: hover) {
+    html.myub-enhanced .btn-primary:active,
+    html.myub-enhanced .quick-action:active,
+    html.myub-enhanced .stat-card:active {
+        transform: translateY(0) scale(0.985);
+    }
+}
+
+/* ── Admin / misc panels ── */
+html.myub-enhanced .groups-panel,
+html.myub-enhanced .chat-panel,
+html.myub-enhanced .conversations-panel,
+html.myub-enhanced .messages-container,
+html.myub-enhanced .friends-main {
+    background: #fff !important;
+    border-color: var(--border) !important;
+    color: var(--text) !important;
+}
+
+html.myub-enhanced .announcement-overlay,
+html.myub-enhanced .ban-overlay {
+    background: rgba(16, 42, 67, 0.5) !important;
+}
+
+/* ── Mobile perf: keep light theme, skip motion ── */
+@media (max-width: 900px), (hover: none) and (pointer: coarse) {
+    html.myub-mobile-perf .card,
+    html.myub-mobile-perf .stat-card,
+    html.myub-mobile-perf .quick-action {
+        transform: none !important;
+    }
+}
+
+html.myub-enhanced .half-content,
+html.myub-enhanced .half-title,
+html.myub-enhanced .half-desc,
+html.myub-enhanced .half-labels,
+html.myub-enhanced .divider-or {
+    color: var(--ink) !important;
+}
+
+html.myub-enhanced .half-bgword {
+    -webkit-text-stroke: 1.5px rgba(26, 75, 140, 0.08) !important;
+    color: transparent !important;
+}
+
+html.myub-enhanced .half-signup:hover .half-bgword,
+html.myub-enhanced .half-login:hover .half-bgword {
+    -webkit-text-stroke-color: rgba(26, 75, 140, 0.16) !important;
+}
+
+html.myub-enhanced .landing-header {
+    background: #fff !important;
+    border: 1px solid var(--border) !important;
+    color: var(--ink) !important;
+    box-shadow: var(--edu-shadow-sm) !important;
+}
+
+html.myub-enhanced .tab {
+    color: var(--text-muted) !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+html.myub-enhanced .tab.active {
+    background: var(--navy) !important;
+    color: #fff !important;
+    box-shadow: none !important;
+    background-image: none !important;
+}
+
+html.myub-enhanced .form-group label {
+    color: var(--text-soft) !important;
+}
+
+html.myub-enhanced .form-group input,
+html.myub-enhanced .form-group select {
+    background: #fff !important;
+    border: 1px solid var(--border-strong) !important;
+    color: var(--text) !important;
+}
+
+html.myub-enhanced .pw-toggle {
+    color: var(--text-muted) !important;
+}
+
+html.myub-enhanced .pw-toggle:hover {
+    color: var(--navy) !important;
+}
+
+html.myub-enhanced .submit-btn {
+    background: var(--navy) !important;
+    background-image: none !important;
+    color: #fff !important;
+    box-shadow: none !important;
+}
+
+html.myub-enhanced .submit-btn:hover:not(:disabled) {
+    background: var(--navy-light) !important;
+    background-image: none !important;
+}
+
+html.myub-enhanced .alert-error {
+    background: #fef3f2 !important;
+    border-color: #fecdca !important;
+    color: #912018 !important;
+}
+
+html.myub-enhanced .alert-success {
+    background: #ecfdf3 !important;
+    border-color: #abefc6 !important;
+    color: #067647 !important;
+}
+
+html.myub-enhanced .alert-warning {
+    background: #fffaeb !important;
+    border-color: #fedf89 !important;
+    color: #93370d !important;
+}
+
+html.myub-enhanced .remember,
+html.myub-enhanced .forgot,
+html.myub-enhanced .form-footer {
+    color: var(--text-muted) !important;
+}
+
+html.myub-enhanced .forgot {
+    color: var(--navy) !important;
+}
+
+html.myub-enhanced .intro-screen,
+html.myub-enhanced .intro-bg {
+    background: #f4f7fb !important;
+    background-image: none !important;
+}
+
+html.myub-enhanced .intro-rays {
+    display: none !important;
+}
+
+html.myub-enhanced .intro-brand,
+html.myub-enhanced .intro-myub,
+html.myub-enhanced .intro-screen h1,
+html.myub-enhanced .intro-screen p {
+    color: var(--ink) !important;
+}
+
+/* Kill leftover gradients on common app chrome */
+html.myub-enhanced .welcome-banner,
+html.myub-enhanced .btn-primary,
+html.myub-enhanced .submit-btn,
+html.myub-enhanced .nav-item.active,
+html.myub-enhanced .tab.active,
+html.myub-enhanced .avatar,
+html.myub-enhanced .user-avatar,
+html.myub-enhanced .stat-icon,
+html.myub-enhanced .quick-action-icon,
+html.myub-enhanced .progress-fill,
+html.myub-enhanced .badge {
+    background-image: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
     html.myub-enhanced *,
     html.myub-enhanced *::before,
     html.myub-enhanced *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
-    }
-
-    html.myub-enhanced .myub-scroll-progress {
-        display: none;
-    }
-}
-
-/* ── Mobile refinements ── */
-@media (max-width: 900px) {
-    html.myub-enhanced .main-content {
-        padding: 14px 16px 32px;
-    }
-
-    html.myub-enhanced .topbar {
-        border-radius: var(--edu-radius-md);
-        margin-bottom: 16px;
-    }
-
-    html.myub-enhanced .page-title::after {
-        width: 20px;
-        height: 2px;
-    }
-}
-
-/* ==========================================================
-   Page transitions — unique per destination
-   ========================================================== */
-.myub-pt {
-    position: fixed;
-    inset: 0;
-    z-index: 2147483645;
-    pointer-events: none;
-    overflow: hidden;
-}
-
-.myub-pt.active {
-    pointer-events: auto;
-}
-
-.myub-pt-curtain,
-.myub-pt-blinds {
-    display: flex;
-    width: 100%;
-    height: 100%;
-}
-
-.myub-pt-curtain {
-    gap: 0;
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-}
-
-/* Centered MyUB logo during curtain transition */
-.myub-pt-logo {
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-}
-
-.myub-pt-logo-mark {
-    --pt-logo-size: clamp(64px, 14vw, 96px);
-    display: inline-flex;
-    align-items: flex-end;
-    gap: calc(var(--pt-logo-size) * 0.06);
-    font-family: 'Sora', 'Outfit', sans-serif;
-    line-height: 1;
-    filter:
-        drop-shadow(0 16px 32px rgba(196, 30, 58, 0.35))
-        drop-shadow(0 6px 16px rgba(0, 0, 0, 0.45));
-    will-change: transform, opacity;
-}
-
-.myub-pt-m-wrap {
-    position: relative;
-    display: inline-block;
-    line-height: 0.82;
-}
-
-.myub-pt-m {
-    font-size: var(--pt-logo-size);
-    font-weight: 800;
-    color: #ffffff;
-    letter-spacing: -0.03em;
-    display: inline-block;
-    font-family: 'Cormorant Garamond', Georgia, serif;
-}
-
-.myub-pt-cap {
-    position: absolute;
-    top: calc(var(--pt-logo-size) * -0.34);
-    left: 50%;
-    transform: translateX(-50%) rotate(-6deg);
-    width: calc(var(--pt-logo-size) * 0.78);
-    height: calc(var(--pt-logo-size) * 0.55);
-    pointer-events: none;
-}
-
-.myub-pt-cap svg {
-    width: 100%;
-    height: 100%;
-    overflow: visible;
-}
-
-.myub-pt-ub {
-    font-size: calc(var(--pt-logo-size) * 0.38);
-    font-weight: 800;
-    color: #ffffff;
-    letter-spacing: 0.01em;
-    display: inline-block;
-    line-height: 0.85;
-    font-family: 'Cormorant Garamond', Georgia, serif;
-}
-
-.myub-pt.entering .myub-pt-logo-mark {
-    filter:
-        drop-shadow(0 20px 40px rgba(196, 30, 58, 0.45))
-        drop-shadow(0 8px 20px rgba(0, 0, 0, 0.5));
-}
-
-.myub-pt-curtain i {
-    flex: 1;
-    height: 100%;
-    background: linear-gradient(180deg, var(--navy, #1a365d) 0%, var(--navy-dark, #0f2744) 100%);
-    border-right: 1px solid rgba(255, 255, 255, 0.04);
-}
-
-.myub-pt-curtain i:nth-child(3) {
-    background: linear-gradient(180deg, var(--red, #c41e3a) 0%, var(--navy, #1a365d) 100%);
-}
-
-/* Instant cover + logo on page enter — before GSAP loads */
-.myub-pt.entering.myub-pt-prep .myub-pt-curtain i,
-.myub-pt.entering:not(.myub-pt-anim) .myub-pt-curtain i {
-    transform: translateY(0);
-}
-
-.myub-pt.entering.myub-pt-prep .myub-pt-logo-mark,
-.myub-pt.entering:not(.myub-pt-anim) .myub-pt-logo-mark {
-    opacity: 1;
-    transform: none;
-}
-
-/* Exit: logo hidden until GSAP animates the mark */
-.myub-pt.active:not(.entering) .myub-pt-logo-mark {
-    opacity: 0;
-}
-
-.myub-pt-blinds {
-    flex-direction: column;
-}
-
-.myub-pt-blinds i {
-    flex: 1;
-    width: 100%;
-    background: linear-gradient(90deg, var(--navy-dark, #0f2744), var(--navy, #1a365d));
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.myub-pt-blinds i:nth-child(odd) {
-    background: linear-gradient(90deg, var(--navy, #1a365d), var(--red-dark, #9a1730));
-}
-
-.myub-pt-panel {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, var(--navy, #1a365d) 0%, var(--red, #c41e3a) 50%, var(--navy-dark, #0f2744) 100%);
-}
-
-.myub-pt-circle {
-    position: absolute;
-    border-radius: 50%;
-    background: radial-gradient(circle, var(--red, #c41e3a) 0%, var(--navy, #1a365d) 70%);
-    pointer-events: none;
-}
-
-/* Auth landing — never hide behind reveal system */
-html.myub-enhanced .auth-landing.ready {
-    opacity: 1 !important;
-    transform: translateY(0) scale(1) !important;
-    visibility: visible !important;
-}
-
-html.myub-enhanced .auth-landing.ready .half-content,
-html.myub-enhanced .auth-landing.ready .half-divider {
-    opacity: 1 !important;
-    transform: none !important;
-}
-
-html.myub-enhanced .auth-landing.ready .landing-header {
-    opacity: 1 !important;
-    transform: translate(-50%, -50%) !important;
-}
-
-/* ── MyUB wordmark — clean sans-serif, matches app UI ── */
-html.myub-enhanced .myub-logo .ml-m,
-html.myub-enhanced .myub-logo .ml-ub {
-    font-family: 'Sora', 'Outfit', system-ui, -apple-system, sans-serif !important;
-}
-html.myub-enhanced .myub-logo .ml-m {
-    font-weight: 800 !important;
-    letter-spacing: -0.04em !important;
-}
-html.myub-enhanced .myub-logo .ml-ub {
-    font-weight: 700 !important;
-    letter-spacing: 0.03em !important;
-}
-
-/* ── Splash, auth & sidebar — original serif wordmark ── */
-html.myub-enhanced .intro-screen .myub-logo .ml-m,
-html.myub-enhanced .intro-screen .myub-logo .ml-ub,
-html.myub-enhanced .auth-landing .myub-logo .ml-m,
-html.myub-enhanced .auth-landing .myub-logo .ml-ub,
-html.myub-enhanced .portal-card .myub-logo .ml-m,
-html.myub-enhanced .portal-card .myub-logo .ml-ub,
-html.myub-enhanced .sidebar .myub-logo .ml-m,
-html.myub-enhanced .sidebar .myub-logo .ml-ub,
-html.myub-enhanced .sidebar-logo .myub-logo .ml-m,
-html.myub-enhanced .sidebar-logo .myub-logo .ml-ub,
-html.myub-enhanced #sidebar .myub-logo .ml-m,
-html.myub-enhanced #sidebar .myub-logo .ml-ub {
-    font-family: 'Cormorant Garamond', Georgia, serif !important;
-}
-html.myub-enhanced .intro-screen .myub-logo .ml-m,
-html.myub-enhanced .auth-landing .myub-logo .ml-m,
-html.myub-enhanced .portal-card .myub-logo .ml-m,
-html.myub-enhanced .sidebar .myub-logo .ml-m,
-html.myub-enhanced .sidebar-logo .myub-logo .ml-m,
-html.myub-enhanced #sidebar .myub-logo .ml-m {
-    font-weight: 700 !important;
-    letter-spacing: -0.02em !important;
-}
-html.myub-enhanced .intro-screen .myub-logo .ml-ub,
-html.myub-enhanced .auth-landing .myub-logo .ml-ub,
-html.myub-enhanced .portal-card .myub-logo .ml-ub,
-html.myub-enhanced .sidebar .myub-logo .ml-ub,
-html.myub-enhanced .sidebar-logo .myub-logo .ml-ub,
-html.myub-enhanced #sidebar .myub-logo .ml-ub {
-    font-weight: 700 !important;
-    letter-spacing: 0.01em !important;
-}
-
-/* ── Mobile performance — lighter GPU, instant content ── */
-@media (max-width: 900px), (hover: none) and (pointer: coarse) {
-    html.myub-mobile-perf .myub-reveal,
-    html.myub-enhanced.myub-mobile-perf .myub-reveal {
-        opacity: 1 !important;
-        transform: none !important;
-        will-change: auto !important;
-    }
-
-    html.myub-mobile-perf .card,
-    html.myub-mobile-perf .stat-card,
-    html.myub-mobile-perf .quick-action,
-    html.myub-mobile-perf .sidebar,
-    html.myub-mobile-perf .topbar,
-    html.myub-mobile-perf .welcome-banner,
-    html.myub-mobile-perf .welcome-modal,
-    html.myub-mobile-perf .notif-modal,
-    html.myub-mobile-perf .summary-card,
-    html.myub-mobile-perf .loading,
-    html.myub-mobile-perf .portal-card,
-    html.myub-mobile-perf .auth-landing,
-    html.myub-mobile-perf .notification-dropdown,
-    html.myub-mobile-perf .user-dropdown,
-    html.myub-mobile-perf .gpa-page .card,
-    html.myub-mobile-perf .whatif-card,
-    html.myub-mobile-perf .progression-card {
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
-    }
-
-    html.myub-mobile-perf .stat-card,
-    html.myub-mobile-perf .card,
-    html.myub-mobile-perf .quick-action,
-    html.myub-mobile-perf .nav-item,
-    html.myub-mobile-perf .schedule-item,
-    html.myub-mobile-perf .friend-card,
-    html.myub-mobile-perf .event-card,
-    html.myub-mobile-perf .note-card,
-    html.myub-mobile-perf .feature-item {
-        transition-duration: 0.15s !important;
-    }
-
-    html.myub-mobile-perf .stat-card:hover,
-    html.myub-mobile-perf .card:hover,
-    html.myub-mobile-perf .quick-action:hover,
-    html.myub-mobile-perf .feature-item:hover,
-    html.myub-mobile-perf .schedule-item:hover,
-    html.myub-mobile-perf .friend-card:hover,
-    html.myub-mobile-perf .event-card:hover,
-    html.myub-mobile-perf .note-card:hover {
-        transform: none !important;
-    }
-
-    html.myub-mobile-perf .myub-tour-spotlight {
-        transition: opacity 0.2s ease !important;
-        will-change: auto !important;
-    }
-
-    html.myub-mobile-perf .myub-pt-logo-mark {
-        will-change: auto !important;
+        animation-duration: 0.01ms !important;
     }
 }

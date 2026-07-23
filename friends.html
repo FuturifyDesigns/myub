@@ -15,7 +15,7 @@
     <link rel="shortcut icon" href="favicon-48x48.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -27,10 +27,10 @@
     <script src="myub-mobile.js"></script>
     <script src="myub-sidebar.js"></script>
     <link rel="stylesheet" href="myub-onboarding.css?v=36">
-    <link rel="stylesheet" href="myub-theme.css?v=10">
+    <link rel="stylesheet" href="myub-theme.css?v=20">
     <script src="myub-onboarding.js?v=35"></script>
     <script src="myub-transitions.js?v=6" defer></script>
-    <script src="myub-animations.js?v=5" defer></script>
+    <script src="myub-animations.js?v=6" defer></script>
     <style>
         /* ==========================================================
            MyUB Friends — dark navy/red theme
@@ -43,45 +43,45 @@
         }
 
         :root {
-            --navy: #1a365d;
-            --navy-light: #2c5282;
-            --navy-lighter: #3a6fa8;
-            --navy-dark: #0f2744;
-            --navy-darker: #081726;
-            --navy-deepest: #050f1c;
-            --red: #c41e3a;
-            --red-light: #e63956;
-            --red-dark: #9a1730;
+            --navy: #1a4b8c;
+            --navy-light: #2563a8;
+            --navy-lighter: #3b7dd8;
+            --navy-dark: #12366a;
+            --navy-darker: #0c274d;
+            --navy-deepest: #f4f7fb;
+            --red: #b42318;
+            --red-light: #d92d20;
+            --red-dark: #912018;
             --white: #ffffff;
-            --blue: #60a5fa;
-            --green: #4ade80;
-            --purple: #a78bfa;
-            --orange: #fb923c;
-            --pink: #f472b6;
-            --yellow: #fbbf24;
+            --blue: #2b6cb0;
+            --green: #067647;
+            --purple: #6941c6;
+            --orange: #b54708;
+            --pink: #c11574;
+            --yellow: #a15c07;
 
-            --text: #ffffff;
-            --text-soft: rgba(255, 255, 255, 0.72);
-            --text-muted: rgba(255, 255, 255, 0.5);
-            --text-dim: rgba(255, 255, 255, 0.35);
-            --surface-1: rgba(255, 255, 255, 0.03);
-            --surface-2: rgba(255, 255, 255, 0.05);
-            --surface-3: rgba(255, 255, 255, 0.08);
-            --surface-4: rgba(255, 255, 255, 0.12);
-            --border: rgba(255, 255, 255, 0.09);
-            --border-strong: rgba(255, 255, 255, 0.14);
+            --text: #102a43;
+            --text-soft: #334e68;
+            --text-muted: #627d98;
+            --text-dim: #9fb3c8;
+            --surface-1: #ffffff;
+            --surface-2: #f0f4f8;
+            --surface-3: #e6eef6;
+            --surface-4: #d9e2ec;
+            --border: #d9e2ec;
+            --border-strong: #bcccdc;
 
             /* Legacy light-theme var overrides */
-            --gray-50: rgba(255, 255, 255, 0.04);
-            --gray-100: rgba(255, 255, 255, 0.06);
-            --gray-200: rgba(255, 255, 255, 0.1);
-            --gray-300: rgba(255, 255, 255, 0.14);
-            --gray-400: rgba(255, 255, 255, 0.4);
-            --gray-500: rgba(255, 255, 255, 0.55);
-            --gray-600: rgba(255, 255, 255, 0.7);
-            --gray-700: rgba(255, 255, 255, 0.85);
-            --gray-800: rgba(255, 255, 255, 0.92);
-            --gray-900: #ffffff;
+            --gray-50: #f8fafc;
+            --gray-100: #f0f4f8;
+            --gray-200: #e6eef6;
+            --gray-300: #d9e2ec;
+            --gray-400: #9fb3c8;
+            --gray-500: #627d98;
+            --gray-600: #486581;
+            --gray-700: #334e68;
+            --gray-800: #243b53;
+            --gray-900: #102a43;
 
             --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
             --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -2304,12 +2304,12 @@
     <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
     <link rel="mask-icon" href="icons/favicon-32x32.png" color="#1a365d">
-    <meta name="msapplication-TileColor" content="#1a365d">
+    <meta name="msapplication-TileColor" content="#1a4b8c">
     <meta name="msapplication-TileImage" content="icons/icon-144x144.png">
     
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#1a365d">
+    <meta name="theme-color" content="#1a4b8c">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
